@@ -36,14 +36,17 @@ namespace boost
   namespace system
   {
     // Implement the .failure() observer.
-    inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec) { return boost::copy_exception(boost::system::system_error(ec)); }
+    inline boost::exception_ptr basic_outcome_failure_exception_from_error(const boost::system::error_code &ec)
+    {
+      return boost::copy_exception(boost::system::system_error(ec));
+    }
   }  // namespace system
 }  // namespace boost
 #endif
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class R, class S = boost::system::error_code, class P = boost::exception_ptr, class NoValuePolicy = policy::default_policy<R, S, P>>  //

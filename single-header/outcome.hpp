@@ -4871,7 +4871,7 @@ OUTCOME_V2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-template <class R, class S, class NoValuePolicy>                                                                                                                                  //
+template <class R, class S, class NoValuePolicy>  //
 class basic_result;
 
 namespace detail
@@ -4880,12 +4880,14 @@ namespace detail
   template <class value_type, class error_type> struct result_predicates
   {
     // Predicate for the implicit constructors to be available. Weakened to allow result<int, C enum>.
-    static constexpr bool implicit_constructors_enabled =                                                                               //
-    !(trait::is_error_type<std::decay_t<value_type>>::value && trait::is_error_type<std::decay_t<error_type>>::value)                   // both value and error types are not whitelisted error types
-    && ((!detail::is_implicitly_constructible<value_type, error_type> && !detail::is_implicitly_constructible<error_type, value_type>)  // if value and error types cannot be constructed into one another
-        || (trait::is_error_type<std::decay_t<error_type>>::value                                                                       // if error type is a whitelisted error type
-            && !detail::is_implicitly_constructible<error_type, value_type>                                                             // AND which cannot be constructed from the value type
-            && std::is_integral<value_type>::value));                                                                                   // AND the value type is some integral type
+    static constexpr bool implicit_constructors_enabled =  //
+    !(trait::is_error_type<std::decay_t<value_type>>::value &&
+      trait::is_error_type<std::decay_t<error_type>>::value)  // both value and error types are not whitelisted error types
+    && ((!detail::is_implicitly_constructible<value_type, error_type> &&
+         !detail::is_implicitly_constructible<error_type, value_type>)       // if value and error types cannot be constructed into one another
+        || (trait::is_error_type<std::decay_t<error_type>>::value            // if error type is a whitelisted error type
+            && !detail::is_implicitly_constructible<error_type, value_type>  // AND which cannot be constructed from the value type
+            && std::is_integral<value_type>::value));                        // AND the value type is some integral type
 
     // Predicate for the value converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
@@ -4895,7 +4897,7 @@ namespace detail
     && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value                                                // not an enum valid for my error type
     && ((detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>)  // is unambiguously for value type
         || (std::is_same<value_type, std::decay_t<T>>::value                                                         // OR is my value type exactly
-            && detail::is_implicitly_constructible<value_type, T>) );                                                // and my value type is constructible from this ref form of T
+            && detail::is_implicitly_constructible<value_type, T>) );  // and my value type is constructible from this ref form of T
 
 
     // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
@@ -4906,37 +4908,46 @@ namespace detail
     && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value                                                // not an enum valid for my error type
     && ((!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>)  // is unambiguously for error type
         || (std::is_same<error_type, std::decay_t<T>>::value                                                         // OR is my error type exactly
-            && detail::is_implicitly_constructible<error_type, T>) );                                                // and my error type is constructible from this ref form of T
+            && detail::is_implicitly_constructible<error_type, T>) );  // and my error type is constructible from this ref form of T
 
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
-    static constexpr bool enable_error_condition_converting_constructor =                                                                       //
-    !is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value                                                                                     // not in place construction
-    && trait::is_error_type_enum<error_type, std::decay_t<ErrorCondEnum>>::value                                                                // is an error condition enum
-    /*&& !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>*/;  // not constructible via any other means
+    static constexpr bool enable_error_condition_converting_constructor =         //
+    !is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value                       // not in place construction
+    && trait::is_error_type_enum<error_type, std::decay_t<ErrorCondEnum>>::value  // is an error condition enum
+    /*&& !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>*/;  // not
+                                                                                                                                                // constructible
+                                                                                                                                                // via any other
+                                                                                                                                                // means
 
     // Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_compatible_conversion =                                                                       //
-    (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)    // if our value types are constructible
-    &&(std::is_void<U>::value || detail::is_explicitly_constructible<error_type, typename basic_result<T, U, V>::error_type>)  // if our error types are constructible
+    static constexpr bool enable_compatible_conversion =  //
+    (std::is_void<T>::value ||
+     detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // if our value types are constructible
+    &&(std::is_void<U>::value ||
+       detail::is_explicitly_constructible<error_type, typename basic_result<T, U, V>::error_type>)  // if our error types are constructible
     ;
 
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_make_error_code_compatible_conversion =                                                        //
-    trait::is_error_code_available<std::decay_t<error_type>>::value                                                             // if error type has an error code
-    && !enable_compatible_conversion<T, U, V>                                                                                   // and the normal compatible conversion is not available
-    && (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // and if our value types are constructible
-    &&detail::is_explicitly_constructible<error_type, typename trait::is_error_code_available<U>::type>;                        // and our error type is constructible from a make_error_code()
+    static constexpr bool enable_make_error_code_compatible_conversion =  //
+    trait::is_error_code_available<std::decay_t<error_type>>::value       // if error type has an error code
+    && !enable_compatible_conversion<T, U, V>                             // and the normal compatible conversion is not available
+    && (std::is_void<T>::value ||
+        detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // and if our value types are constructible
+    &&detail::is_explicitly_constructible<error_type,
+                                          typename trait::is_error_code_available<U>::type>;  // and our error type is constructible from a make_error_code()
 
     // Predicate for the converting constructor from a make_exception_ptr() of the input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_make_exception_ptr_compatible_conversion =                                                     //
-    trait::is_exception_ptr_available<std::decay_t<error_type>>::value                                                          // if error type has an exception ptr
-    && !enable_compatible_conversion<T, U, V>                                                                                   // and the normal compatible conversion is not available
-    && (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // and if our value types are constructible
-    &&detail::is_explicitly_constructible<error_type, typename trait::is_exception_ptr_available<U>::type>;                     // and our error type is constructible from a make_exception_ptr()
+    static constexpr bool enable_make_exception_ptr_compatible_conversion =  //
+    trait::is_exception_ptr_available<std::decay_t<error_type>>::value       // if error type has an exception ptr
+    && !enable_compatible_conversion<T, U, V>                                // and the normal compatible conversion is not available
+    && (std::is_void<T>::value ||
+        detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)         // and if our value types are constructible
+    &&detail::is_explicitly_constructible<error_type, typename trait::is_exception_ptr_available<U>::type>;  // and our error type is constructible from a
+                                                                                                             // make_exception_ptr()
 
     // Predicate for the implicit converting inplace constructor from a compatible input to be available.
     struct disable_inplace_value_error_constructor;
@@ -4952,8 +4963,9 @@ namespace detail
     error_type,                                                                                              //
     disable_inplace_value_error_constructor>>>;
     template <class... Args>
-    static constexpr bool enable_inplace_value_error_constructor = implicit_constructors_enabled  //
-                                                                   && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
+    static constexpr bool enable_inplace_value_error_constructor =
+    implicit_constructors_enabled  //
+    && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
 
   template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value(); }
@@ -4961,7 +4973,10 @@ namespace detail
   template <class T> constexpr inline T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
 
   template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error(); }
-  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v) { return static_cast<failure_type<U, V> &&>(v).error(); }
+  template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v)
+  {
+    return static_cast<failure_type<U, V> &&>(v).error();
+  }
   template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
 
   template <class T> struct is_basic_result
@@ -5011,26 +5026,36 @@ SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class T, class U, class... Args> constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept {}
+  template <class T, class U, class... Args>
+  constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
+  {
+  }
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept { return r->_state._status.spare_storage_value; }
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept
+  {
+    return r->_state._status.spare_storage_value;
+  }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class R, class S, class NoValuePolicy> constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept { r->_state._status.spare_storage_value = v; }
+  template <class R, class S, class NoValuePolicy>
+  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept
+  {
+    r->_state._status.spare_storage_value = v;
+  }
 }  // namespace hooks
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class R, class S, class NoValuePolicy> basic_result. Potential doc page: `basic_result<T, E, NoValuePolicy>`
 */
-template <class R, class S, class NoValuePolicy>                                                                                                                                  //
+template <class R, class S, class NoValuePolicy>  //
 class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, NoValuePolicy>
 {
   static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
@@ -5211,7 +5236,8 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T>) )))
-  basic_result(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) = delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
+  basic_result(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) =
+  delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -5220,7 +5246,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
-  constexpr basic_result(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  constexpr basic_result(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(
+  std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
       : base{in_place_type<typename base::value_type>, static_cast<T &&>(t)}
   {
     using namespace hooks;
@@ -5233,7 +5260,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
-  constexpr basic_result(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  constexpr basic_result(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
       : base{in_place_type<typename base::error_type>, static_cast<T &&>(t)}
   {
     using namespace hooks;
@@ -5247,7 +5275,8 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
-  constexpr basic_result(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
+  constexpr basic_result(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(
+  noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
       : base{in_place_type<typename base::error_type>, make_error_code(t)}
   {
     using namespace hooks;
@@ -5262,7 +5291,8 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),  //
                     OUTCOME_TEXPR(convert::value_or_error<basic_result, std::decay_t<T>>{}(std::declval<T>())))
-  constexpr explicit basic_result(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+  constexpr explicit basic_result(T &&o,
+                                  explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
       : basic_result{convert::value_or_error<basic_result, std::decay_t<T>>{}(static_cast<T &&>(o))}
   {
   }
@@ -5273,7 +5303,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit basic_result(const basic_result<T, U, V> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+  constexpr explicit basic_result(
+  const basic_result<T, U, V> &o,
+  explicit_compatible_copy_conversion_tag /*unused*/ =
+  explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
       : base{typename base::compatible_conversion_tag(), o}
   {
     using namespace hooks;
@@ -5286,7 +5319,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit basic_result(basic_result<T, U, V> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+  constexpr explicit basic_result(
+  basic_result<T, U, V> &&o,
+  explicit_compatible_move_conversion_tag /*unused*/ =
+  explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
       : base{typename base::compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
   {
     using namespace hooks;
@@ -5299,7 +5335,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<T, U, V>))
-  constexpr explicit basic_result(const basic_result<T, U, V> &o, explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ = explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+  constexpr explicit basic_result(const basic_result<T, U, V> &o,
+                                  explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
+                                  explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                                                                                      &&noexcept(make_error_code(std::declval<U>())))
       : base{typename base::make_error_code_compatible_conversion_tag(), o}
   {
     using namespace hooks;
@@ -5312,7 +5351,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<T, U, V>))
-  constexpr explicit basic_result(basic_result<T, U, V> &&o, explicit_make_error_code_compatible_move_conversion_tag /*unused*/ = explicit_make_error_code_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+  constexpr explicit basic_result(basic_result<T, U, V> &&o,
+                                  explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
+                                  explicit_make_error_code_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                                                                                      &&noexcept(make_error_code(std::declval<U>())))
       : base{typename base::make_error_code_compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
   {
     using namespace hooks;
@@ -5325,7 +5367,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<T, U, V>))
-  constexpr explicit basic_result(const basic_result<T, U, V> &o, explicit_make_exception_ptr_compatible_copy_conversion_tag /*unused*/ = explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+  constexpr explicit basic_result(const basic_result<T, U, V> &o,
+                                  explicit_make_exception_ptr_compatible_copy_conversion_tag /*unused*/ =
+                                  explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                                                                                         &&noexcept(make_exception_ptr(std::declval<U>())))
       : base{typename base::make_exception_ptr_compatible_conversion_tag(), o}
   {
     using namespace hooks;
@@ -5338,7 +5383,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<T, U, V>))
-  constexpr explicit basic_result(basic_result<T, U, V> &&o, explicit_make_exception_ptr_compatible_move_conversion_tag /*unused*/ = explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value  &&noexcept(make_exception_ptr(std::declval<U>())))
+  constexpr explicit basic_result(basic_result<T, U, V> &&o,
+                                  explicit_make_exception_ptr_compatible_move_conversion_tag /*unused*/ =
+                                  explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                                                                                         &&noexcept(make_exception_ptr(std::declval<U>())))
       : base{typename base::make_exception_ptr_compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
   {
     using namespace hooks;
@@ -5365,7 +5413,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit basic_result(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+  constexpr explicit basic_result(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il,
+                                  Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
       : base{_, il, static_cast<Args &&>(args)...}
   {
     using namespace hooks;
@@ -5391,7 +5440,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit basic_result(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+  constexpr explicit basic_result(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il,
+                                  Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
       : base{_, il, static_cast<Args &&>(args)...}
   {
     using namespace hooks;
@@ -5404,8 +5454,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class A1, class A2, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_constructor<A1, A2, Args...>))
-  constexpr basic_result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
-      : basic_result(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, static_cast<A1 &&>(a1), static_cast<A2 &&>(a2), static_cast<Args &&>(args)...)
+  constexpr basic_result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(
+  typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
+      : basic_result(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, static_cast<A1 &&>(a1),
+                     static_cast<A2 &&>(a2), static_cast<Args &&>(args)...)
   {
     /* I was a little surprised that the below is needed given that we forward to another constructor.
     But it turns out that ADL only fires on the first constructor for some reason.
@@ -5460,7 +5512,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
-  constexpr basic_result(const failure_type<T> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  constexpr basic_result(const failure_type<T> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o)}
   {
     using namespace hooks;
@@ -5473,7 +5526,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
-  constexpr basic_result(failure_type<T> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  constexpr basic_result(failure_type<T> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
   {
     using namespace hooks;
@@ -5486,7 +5540,9 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<void, T, void>))
-  constexpr basic_result(const failure_type<T> &o, explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ = explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+  constexpr basic_result(const failure_type<T> &o,
+                         explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
+                         explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_error_code(detail::extract_error_from_failure<error_type>(o))}
   {
     using namespace hooks;
@@ -5499,7 +5555,9 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<void, T, void>))
-  constexpr basic_result(failure_type<T> &&o, explicit_make_error_code_compatible_move_conversion_tag /*unused*/ = explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+  constexpr basic_result(failure_type<T> &&o,
+                         explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
+                         explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_error_code(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
   {
     using namespace hooks;
@@ -5512,7 +5570,9 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<void, T, void>))
-  constexpr basic_result(const failure_type<T> &o, explicit_make_exception_ptr_compatible_copy_conversion_tag /*unused*/ = explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>())))  // NOLINT
+  constexpr basic_result(const failure_type<T> &o,
+                         explicit_make_exception_ptr_compatible_copy_conversion_tag /*unused*/ =
+                         explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>())))  // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_exception_ptr(detail::extract_error_from_failure<error_type>(o))}
   {
     using namespace hooks;
@@ -5525,7 +5585,9 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<void, T, void>))
-  constexpr basic_result(failure_type<T> &&o, explicit_make_exception_ptr_compatible_move_conversion_tag /*unused*/ = explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>())))  // NOLINT
+  constexpr basic_result(failure_type<T> &&o,
+                         explicit_make_exception_ptr_compatible_move_conversion_tag /*unused*/ =
+                         explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>())))  // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_exception_ptr(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
   {
     using namespace hooks;
@@ -5550,15 +5612,13 @@ SIGNATURE NOT RECOGNISED
 */
 
 
-  auto as_failure() const & {
-    return failure(this->assume_error()); }
+  auto as_failure() const & { return failure(this->assume_error()); }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 
 
-  auto as_failure() && {
-    return failure(static_cast<basic_result &&>(*this).assume_error()); }
+  auto as_failure() && { return failure(static_cast<basic_result &&>(*this).assume_error()); }
 };
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5572,9 +5632,11 @@ template <class R, class S, class P> inline void swap(basic_result<R, S, P> &a, 
 #if !defined(NDEBUG)
 // Check is trivial in all ways except default constructibility
 // static_assert(std::is_trivial<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivial!");
-// static_assert(std::is_trivially_default_constructible<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially default constructible!");
+// static_assert(std::is_trivially_default_constructible<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially default
+// constructible!");
 static_assert(std::is_trivially_copyable<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially copyable!");
-static_assert(std::is_trivially_assignable<basic_result<int, long, policy::all_narrow>, basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially assignable!");
+static_assert(std::is_trivially_assignable<basic_result<int, long, policy::all_narrow>, basic_result<int, long, policy::all_narrow>>::value,
+              "result<int> is not trivially assignable!");
 static_assert(std::is_trivially_destructible<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially destructible!");
 static_assert(std::is_trivially_copy_constructible<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially copy constructible!");
 static_assert(std::is_trivially_move_constructible<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivially move constructible!");
@@ -6469,7 +6531,7 @@ OUTCOME_V2_NAMESPACE_END
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-template <class R, class S, class P, class NoValuePolicy>                                                                            //
+template <class R, class S, class P, class NoValuePolicy>  //
 class basic_outcome;
 
 namespace detail
@@ -6511,7 +6573,8 @@ namespace detail
     static constexpr bool enable_exception_converting_constructor =  //
     implicit_constructors_enabled                                    //
     && !is_in_place_type_t<std::decay_t<T>>::value                   // not in place construction
-    && !detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T> && detail::is_implicitly_constructible<exception_type, T>;
+    && !detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T> &&
+    detail::is_implicitly_constructible<exception_type, T>;
 
     // Predicate for the error + exception converting constructor to be available.
     template <class T, class U>
@@ -6523,51 +6586,66 @@ namespace detail
 
     // Predicate for the converting copy constructor from a compatible outcome to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_compatible_conversion =                                                                                   //
-    (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)            // if our value types are constructible
-    &&(std::is_void<U>::value || detail::is_explicitly_constructible<error_type, typename basic_outcome<T, U, V, W>::error_type>)          // if our error types are constructible
-    &&(std::is_void<V>::value || detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+    static constexpr bool enable_compatible_conversion =  //
+    (std::is_void<T>::value ||
+     detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)  // if our value types are constructible
+    &&(std::is_void<U>::value ||
+       detail::is_explicitly_constructible<error_type, typename basic_outcome<T, U, V, W>::error_type>)  // if our error types are constructible
+    &&(std::is_void<V>::value ||
+       detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
     ;
 
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_make_error_code_compatible_conversion =                                                                     //
-    trait::is_error_code_available<std::decay_t<error_type>>::value                                                                          // if error type has an error code
-    && !enable_compatible_conversion<T, U, V, W>                                                                                             // and the normal compatible conversion is not available
-    && (std::is_void<T>::value || detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)           // and if our value types are constructible
-    &&detail::is_explicitly_constructible<error_type, typename trait::is_error_code_available<U>::type>                                      // and our error type is constructible from a make_error_code()
-    && (std::is_void<V>::value || detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>);  // and our exception types are constructible
+    static constexpr bool enable_make_error_code_compatible_conversion =  //
+    trait::is_error_code_available<std::decay_t<error_type>>::value       // if error type has an error code
+    && !enable_compatible_conversion<T, U, V, W>                          // and the normal compatible conversion is not available
+    && (std::is_void<T>::value ||
+        detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)  // and if our value types are constructible
+    &&detail::is_explicitly_constructible<error_type,
+                                          typename trait::is_error_code_available<U>::type>  // and our error type is constructible from a make_error_code()
+    && (std::is_void<V>::value ||
+        detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>);  // and our exception types are constructible
 
     // Predicate for the implicit converting inplace constructor from a compatible input to be available.
     struct disable_inplace_value_error_exception_constructor;
     template <class... Args>
-    using choose_inplace_value_error_exception_constructor = std::conditional_t<                                                                                                                                                  //
-    ((static_cast<int>(std::is_constructible<value_type, Args...>::value) + static_cast<int>(std::is_constructible<error_type, Args...>::value) + static_cast<int>(std::is_constructible<exception_type, Args...>::value)) > 1),  //
-    disable_inplace_value_error_exception_constructor,                                                                                                                                                                            //
-    std::conditional_t<                                                                                                                                                                                                           //
-    std::is_constructible<value_type, Args...>::value,                                                                                                                                                                            //
-    value_type,                                                                                                                                                                                                                   //
-    std::conditional_t<                                                                                                                                                                                                           //
-    std::is_constructible<error_type, Args...>::value,                                                                                                                                                                            //
-    error_type,                                                                                                                                                                                                                   //
-    std::conditional_t<                                                                                                                                                                                                           //
-    std::is_constructible<exception_type, Args...>::value,                                                                                                                                                                        //
-    exception_type,                                                                                                                                                                                                               //
+    using choose_inplace_value_error_exception_constructor = std::conditional_t<  //
+    ((static_cast<int>(std::is_constructible<value_type, Args...>::value) + static_cast<int>(std::is_constructible<error_type, Args...>::value) +
+      static_cast<int>(std::is_constructible<exception_type, Args...>::value)) > 1),  //
+    disable_inplace_value_error_exception_constructor,                                //
+    std::conditional_t<                                                               //
+    std::is_constructible<value_type, Args...>::value,                                //
+    value_type,                                                                       //
+    std::conditional_t<                                                               //
+    std::is_constructible<error_type, Args...>::value,                                //
+    error_type,                                                                       //
+    std::conditional_t<                                                               //
+    std::is_constructible<exception_type, Args...>::value,                            //
+    exception_type,                                                                   //
     disable_inplace_value_error_exception_constructor>>>>;
     template <class... Args>
     static constexpr bool enable_inplace_value_error_exception_constructor =  //
-    implicit_constructors_enabled && !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
+    implicit_constructors_enabled &&
+    !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
 
   // Select whether to use basic_outcome_failure_observers or not
   template <class Base, class R, class S, class P, class NoValuePolicy>
   using select_basic_outcome_failure_observers =  //
-  std::conditional_t<trait::is_error_code_available<S>::value && trait::is_exception_ptr_available<P>::value, basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
+  std::conditional_t<trait::is_error_code_available<S>::value && trait::is_exception_ptr_available<P>::value,
+                     basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
 
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
-  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v) { return static_cast<failure_type<U, V> &&>(v).exception(); }
+  template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v)
+  {
+    return static_cast<failure_type<U, V> &&>(v).exception();
+  }
   template <class T, class U> constexpr inline const U &extract_exception_from_failure(const failure_type<U, void> &v) { return v.error(); }
-  template <class T, class U> constexpr inline U &&extract_exception_from_failure(failure_type<U, void> &&v) { return static_cast<failure_type<U, void> &&>(v).error(); }
+  template <class T, class U> constexpr inline U &&extract_exception_from_failure(failure_type<U, void> &&v)
+  {
+    return static_cast<failure_type<U, void> &&>(v).error();
+  }
 
   template <class T> struct is_basic_outcome
   {
@@ -6613,36 +6691,43 @@ SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class T, class U, class... Args> constexpr inline void hook_outcome_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept {}
+  template <class T, class U, class... Args>
+  constexpr inline void hook_outcome_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
+  {
+  }
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
+  template <class R, class S, class P, class NoValuePolicy, class U>
+  constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }  // namespace hooks
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class R, class S, class P, class NoValuePolicy> basic_outcome. Potential doc page: `basic_outcome<T, EC, EP, NoValuePolicy>`
 */
-template <class R, class S, class P, class NoValuePolicy>                                                                            //
+template <class R, class S, class P, class NoValuePolicy>  //
 class OUTCOME_NODISCARD basic_outcome
 
 
 
 
 
-    : public detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>
+    : public detail::select_basic_outcome_failure_observers<
+      detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>
 
 {
   static_assert(trait::type_can_be_used_in_basic_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
-  using base = detail::select_basic_outcome_failure_observers<detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
+  using base = detail::select_basic_outcome_failure_observers<
+  detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
   friend struct policy::base;
-  template <class T, class U, class V, class W>                                                                                        //
+  template <class T, class U, class V, class W>  //
   friend class basic_outcome;
-  template <class T, class U, class V, class W, class X> friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
+  template <class T, class U, class V, class W, class X>
+  friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
 
   struct implicit_constructors_disabled_tag
   {
@@ -6708,9 +6793,12 @@ protected:
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
 
     // Predicate for any constructors to be available at all
-    static constexpr bool constructors_enabled = (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value))             //
-                                                 && (!std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value || (std::is_void<value_type>::value && std::is_void<exception_type>::value))  //
-                                                 && (!std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value || (std::is_void<error_type>::value && std::is_void<exception_type>::value))  //
+    static constexpr bool constructors_enabled =
+    (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value))  //
+    && (!std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value ||
+        (std::is_void<value_type>::value && std::is_void<exception_type>::value))  //
+    && (!std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value ||
+        (std::is_void<error_type>::value && std::is_void<exception_type>::value))  //
     ;
 
     // Predicate for implicit constructors to be available at all
@@ -6791,13 +6879,17 @@ protected:
     static constexpr bool enable_inplace_value_error_exception_constructor =  //
     constructors_enabled                                                      //
     &&base::template enable_inplace_value_error_exception_constructor<Args...>;
-    template <class... Args> using choose_inplace_value_error_exception_constructor = typename base::template choose_inplace_value_error_exception_constructor<Args...>;
+    template <class... Args>
+    using choose_inplace_value_error_exception_constructor = typename base::template choose_inplace_value_error_exception_constructor<Args...>;
   };
 
 public:
-  using value_type_if_enabled = std::conditional_t<std::is_same<value_type, error_type>::value || std::is_same<value_type, exception_type>::value, disable_in_place_value_type, value_type>;
-  using error_type_if_enabled = std::conditional_t<std::is_same<error_type, value_type>::value || std::is_same<error_type, exception_type>::value, disable_in_place_error_type, error_type>;
-  using exception_type_if_enabled = std::conditional_t<std::is_same<exception_type, value_type>::value || std::is_same<exception_type, error_type>::value, disable_in_place_exception_type, exception_type>;
+  using value_type_if_enabled =
+  std::conditional_t<std::is_same<value_type, error_type>::value || std::is_same<value_type, exception_type>::value, disable_in_place_value_type, value_type>;
+  using error_type_if_enabled =
+  std::conditional_t<std::is_same<error_type, value_type>::value || std::is_same<error_type, exception_type>::value, disable_in_place_error_type, error_type>;
+  using exception_type_if_enabled = std::conditional_t<std::is_same<exception_type, value_type>::value || std::is_same<exception_type, error_type>::value,
+                                                       disable_in_place_exception_type, exception_type>;
 
 protected:
   detail::devoid<exception_type> _ptr;
@@ -6819,8 +6911,10 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
-                                   && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T> || detail::is_implicitly_constructible<exception_type, T>) )))
-  basic_outcome(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) = delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
+                                   && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T> ||
+                                       detail::is_implicitly_constructible<exception_type, T>) )))
+  basic_outcome(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) =
+  delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -6829,7 +6923,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
-  constexpr basic_outcome(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  constexpr basic_outcome(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(
+  std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
       : base{in_place_type<typename base::_value_type>, static_cast<T &&>(t)}
       , _ptr()
   {
@@ -6843,7 +6938,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
-  constexpr basic_outcome(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  constexpr basic_outcome(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
       : base{in_place_type<typename base::_error_type>, static_cast<T &&>(t)}
       , _ptr()
   {
@@ -6858,7 +6954,8 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
-  constexpr basic_outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
+  constexpr basic_outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(
+  noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
       : base{in_place_type<typename base::_error_type>, make_error_code(t)}
   {
     using namespace hooks;
@@ -6871,7 +6968,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_exception_converting_constructor<T>))
-  constexpr basic_outcome(T &&t, exception_converting_constructor_tag /*unused*/ = exception_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
+  constexpr basic_outcome(T &&t, exception_converting_constructor_tag /*unused*/ = exception_converting_constructor_tag()) noexcept(
+  std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
       : base()
       , _ptr(static_cast<T &&>(t))
   {
@@ -6886,7 +6984,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_exception_converting_constructor<T, U>))
-  constexpr basic_outcome(T &&a, U &&b, error_exception_converting_constructor_tag /*unused*/ = error_exception_converting_constructor_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
+  constexpr basic_outcome(T &&a, U &&b, error_exception_converting_constructor_tag /*unused*/ = error_exception_converting_constructor_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
       : base{in_place_type<typename base::_error_type>, static_cast<T &&>(a)}
       , _ptr(static_cast<U &&>(b))
   {
@@ -6904,7 +7003,8 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),    //
                     OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !is_basic_outcome_v<T>),  //
                     OUTCOME_TEXPR(convert::value_or_error<basic_outcome, std::decay_t<T>>{}(std::declval<T>())))
-  constexpr explicit basic_outcome(T &&o, explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+  constexpr explicit basic_outcome(T &&o,
+                                   explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
       : basic_outcome{convert::value_or_error<basic_outcome, std::decay_t<T>>{}(static_cast<T &&>(o))}
   {
   }
@@ -6915,8 +7015,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
-  constexpr explicit basic_outcome(const basic_outcome<T, U, V, W> &o,
-                                   explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<exception_type, V>::value)
+  constexpr explicit basic_outcome(
+  const basic_outcome<T, U, V, W> &o,
+  explicit_compatible_copy_conversion_tag /*unused*/ =
+  explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
+                                                      &&std::is_nothrow_constructible<exception_type, V>::value)
       : base{typename base::compatible_conversion_tag(), o}
       , _ptr(o._ptr)
   {
@@ -6930,8 +7033,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
-  constexpr explicit basic_outcome(basic_outcome<T, U, V, W> &&o,
-                                   explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<exception_type, V>::value)
+  constexpr explicit basic_outcome(
+  basic_outcome<T, U, V, W> &&o,
+  explicit_compatible_move_conversion_tag /*unused*/ =
+  explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
+                                                      &&std::is_nothrow_constructible<exception_type, V>::value)
       : base{typename base::compatible_conversion_tag(), static_cast<basic_outcome<T, U, V, W> &&>(o)}
       , _ptr(static_cast<typename basic_outcome<T, U, V, W>::exception_type &&>(o._ptr))
   {
@@ -6945,8 +7051,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit basic_outcome(const basic_result<T, U, V> &o,
-                                   explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<exception_type>::value)
+  constexpr explicit basic_outcome(
+  const basic_result<T, U, V> &o,
+  explicit_compatible_copy_conversion_tag /*unused*/ =
+  explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
+                                                      &&std::is_nothrow_constructible<exception_type>::value)
       : base{typename base::compatible_conversion_tag(), o}
       , _ptr()
   {
@@ -6960,8 +7069,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_compatible_conversion<T, U, V>))
-  constexpr explicit basic_outcome(basic_result<T, U, V> &&o,
-                                   explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value &&std::is_nothrow_constructible<exception_type>::value)
+  constexpr explicit basic_outcome(
+  basic_result<T, U, V> &&o,
+  explicit_compatible_move_conversion_tag /*unused*/ =
+  explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
+                                                      &&std::is_nothrow_constructible<exception_type>::value)
       : base{typename base::compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
       , _ptr()
   {
@@ -6975,8 +7087,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_make_error_code_compatible_conversion<T, U, V>))
-  constexpr explicit basic_outcome(const basic_result<T, U, V> &o, explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ = explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&noexcept(make_error_code(std::declval<U>())) &&
-                                                                                                                                                                                                            std::is_nothrow_constructible<exception_type>::value)
+  constexpr explicit basic_outcome(const basic_result<T, U, V> &o,
+                                   explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
+                                   explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                                                                                       &&noexcept(make_error_code(std::declval<U>())) &&
+                                                                                                       std::is_nothrow_constructible<exception_type>::value)
       : base{typename base::make_error_code_compatible_conversion_tag(), o}
       , _ptr()
   {
@@ -6990,8 +7105,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_make_error_code_compatible_conversion<T, U, V>))
-  constexpr explicit basic_outcome(basic_result<T, U, V> &&o, explicit_make_error_code_compatible_move_conversion_tag /*unused*/ = explicit_make_error_code_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&noexcept(make_error_code(std::declval<U>())) &&
-                                                                                                                                                                                                       std::is_nothrow_constructible<exception_type>::value)
+  constexpr explicit basic_outcome(basic_result<T, U, V> &&o,
+                                   explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
+                                   explicit_make_error_code_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                                                                                       &&noexcept(make_error_code(std::declval<U>())) &&
+                                                                                                       std::is_nothrow_constructible<exception_type>::value)
       : base{typename base::make_error_code_compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
       , _ptr()
   {
@@ -7007,7 +7125,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7021,7 +7140,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
       : base{_, il, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7035,7 +7155,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7049,7 +7170,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
       : base{_, il, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7063,7 +7185,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_exception_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<exception_type_if_enabled> /*unused*/, Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, Args...>::value)
+  constexpr explicit basic_outcome(in_place_type_t<exception_type_if_enabled> /*unused*/,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, Args...>::value)
       : base()
       , _ptr(static_cast<Args &&>(args)...)
   {
@@ -7078,7 +7201,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_exception_constructor<std::initializer_list<U>, Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<exception_type_if_enabled> /*unused*/, std::initializer_list<U> il, Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, std::initializer_list<U>, Args...>::value)
+  constexpr explicit basic_outcome(in_place_type_t<exception_type_if_enabled> /*unused*/, std::initializer_list<U> il,
+                                   Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, std::initializer_list<U>, Args...>::value)
       : base()
       , _ptr(il, static_cast<Args &&>(args)...)
   {
@@ -7093,8 +7217,11 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class A1, class A2, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_exception_constructor<A1, A2, Args...>))
-  constexpr basic_outcome(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(), std::declval<Args>()...)))
-      : basic_outcome(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, static_cast<A1 &&>(a1), static_cast<A2 &&>(a2), static_cast<Args &&>(args)...)
+  constexpr basic_outcome(A1 &&a1, A2 &&a2, Args &&... args) noexcept(
+  noexcept(typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>(std::declval<A1>(), std::declval<A2>(),
+                                                                                                          std::declval<Args>()...)))
+      : basic_outcome(in_place_type<typename predicate::template choose_inplace_value_error_exception_constructor<A1, A2, Args...>>, static_cast<A1 &&>(a1),
+                      static_cast<A2 &&>(a2), static_cast<Args &&>(args)...)
   {
   }
 
@@ -7143,7 +7270,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, T, void, void>))
-  constexpr basic_outcome(const failure_type<T> &o, error_failure_tag /*unused*/ = error_failure_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  constexpr basic_outcome(const failure_type<T> &o,
+                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr()
   {
@@ -7157,7 +7285,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
-  constexpr basic_outcome(const failure_type<T> &o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
+  constexpr basic_outcome(const failure_type<T> &o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
+  std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -7172,7 +7301,9 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_make_error_code_compatible_conversion<void, T, void, void>))
-  constexpr basic_outcome(const failure_type<T> &o, explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ = explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+  constexpr basic_outcome(const failure_type<T> &o,
+                          explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
+                          explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
       : base{in_place_type<typename base::_error_type>, make_error_code(detail::extract_error_from_failure<error_type>(o))}
       , _ptr()
   {
@@ -7186,17 +7317,18 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<U>::value && predicate::template enable_compatible_conversion<void, T, U, void>))
-  constexpr basic_outcome(const failure_type<T, U> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
+  constexpr basic_outcome(const failure_type<T, U> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
     if(!o.has_error())
     {
-    this->_state._status.set_have_error(false);
+      this->_state._status.set_have_error(false);
     }
     if(o.has_exception())
     {
-    this->_state._status.set_have_exception(true);
+      this->_state._status.set_have_exception(true);
     }
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
@@ -7209,7 +7341,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, T, void, void>))
-  constexpr basic_outcome(failure_type<T> &&o, error_failure_tag /*unused*/ = error_failure_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  constexpr basic_outcome(failure_type<T> &&o,
+                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
       , _ptr()
   {
@@ -7223,7 +7356,8 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
-  constexpr basic_outcome(failure_type<T> &&o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
+  constexpr basic_outcome(failure_type<T> &&o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
+  std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
@@ -7238,7 +7372,9 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_make_error_code_compatible_conversion<void, T, void, void>))
-  constexpr basic_outcome(failure_type<T> &&o, explicit_make_error_code_compatible_move_conversion_tag /*unused*/ = explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+  constexpr basic_outcome(failure_type<T> &&o,
+                          explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
+                          explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
       : base{in_place_type<typename base::_error_type>, make_error_code(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
       , _ptr()
   {
@@ -7252,17 +7388,18 @@ SIGNATURE NOT RECOGNISED
 
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<U>::value && predicate::template enable_compatible_conversion<void, T, U, void>))
-  constexpr basic_outcome(failure_type<T, U> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
+  constexpr basic_outcome(failure_type<T, U> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(
+  std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T, U> &&>(o))}
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T, U> &&>(o)))
   {
     if(!o.has_error())
     {
-    this->_state._status.set_have_error(false);
+      this->_state._status.set_have_error(false);
     }
     if(o.has_exception())
     {
-    this->_state._status.set_have_exception(true);
+      this->_state._status.set_have_exception(true);
     }
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<failure_type<T, U> &&>(o));
@@ -7554,7 +7691,8 @@ SIGNATURE NOT RECOGNISED
 */
 
 
-  template <class R, class S, class P, class NoValuePolicy, class U> constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
+  template <class R, class S, class P, class NoValuePolicy, class U>
+  constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
     o->_ptr = static_cast<U &&>(v);  // NOLINT
     o->_state._status.set_have_exception(true);
@@ -7668,12 +7806,16 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_BEGIN
 // Check is trivial in all ways except default constructibility and standard layout
 // static_assert(std::is_trivial<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivial!");
-// static_assert(std::is_trivially_default_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially default constructible!");
+// static_assert(std::is_trivially_default_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially default
+// constructible!");
 static_assert(std::is_trivially_copyable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copyable!");
-static_assert(std::is_trivially_assignable<basic_outcome<int, long, double, policy::all_narrow>, basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially assignable!");
+static_assert(std::is_trivially_assignable<basic_outcome<int, long, double, policy::all_narrow>, basic_outcome<int, long, double, policy::all_narrow>>::value,
+              "outcome<int> is not trivially assignable!");
 static_assert(std::is_trivially_destructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially destructible!");
-static_assert(std::is_trivially_copy_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copy constructible!");
-static_assert(std::is_trivially_move_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially move constructible!");
+static_assert(std::is_trivially_copy_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value,
+              "outcome<int> is not trivially copy constructible!");
+static_assert(std::is_trivially_move_constructible<basic_outcome<int, long, double, policy::all_narrow>>::value,
+              "outcome<int> is not trivially move constructible!");
 static_assert(std::is_trivially_copy_assignable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially copy assignable!");
 static_assert(std::is_trivially_move_assignable<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not trivially move assignable!");
 // Can't be standard layout as non-static member data is defined in more than one inherited class
@@ -8261,7 +8403,8 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_OVERLOAD_MACRO1(name, count) OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
 #define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
 #define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
-#define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
+#define OUTCOME_TRY_CALL_OVERLOAD(name, ...)                                                                                                                     OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
+
 
 #ifndef OUTCOME_TRY_LIKELY
 #if defined(__clang__) || defined(__GNUC__)
@@ -8272,37 +8415,37 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
-#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                                                                                                                                                                                auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                 if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                    ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                    ;                                                                                                                                                            else                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
 
 
-#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                              OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                             auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                              OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                             auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
-#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                                                                                                                                                                                auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                 if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                 return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-
-
-
-#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                              OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                             auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                 return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
-#define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                                                                                                                                                                             auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                 if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                    ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                              OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                             auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+
+
+
+#define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                             auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                    ;                                                                                                                                                            else                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
 
 
-#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                           OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                          auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                           OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                          auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
-#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                                                                                                                                                                             auto &&unique = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                 if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                                                                                                                                                                                 co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                             auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                 co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 
 
 
-#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                                                                                                                                                                                           OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                                                                                                                                                                                          auto && v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                           OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                          auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 
 
 
@@ -8329,7 +8472,7 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...)                                                                                                                                                                                                                                                                                                        ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                                                                                                                                                                                       ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+#define OUTCOME_TRYX(...)                                                                                                                                        ({                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                       ;                                                                                                                                                            else                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                       })
 
 
 
@@ -8342,7 +8485,7 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYX(...)                                                                                                                                                                                                                                                                                                     ({                                                                                                                                                                                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                                                                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                                                                                                                                                                                       ;                                                                                                                                                                                                                                                                                                                            else                                                                                                                                                                                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                 OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                                                                                                                                                                                       })
+#define OUTCOME_CO_TRYX(...)                                                                                                                                     ({                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                       ;                                                                                                                                                            else                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                 OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                       })
 
 
 

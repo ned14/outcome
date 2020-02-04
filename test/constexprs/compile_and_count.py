@@ -22,11 +22,11 @@ _compilers_ = \
     }
 
 _compile_info_ = \
-    { "gcc"        : (_mk_f("g++-9 -std=c++14 -DNDEBUG -O3 -fno-stack-protector -fno-exceptions {} -o {}"), _mk_o("cpp", "out"))
-    , "clang"      : (_mk_f("clang++-9 -std=c++14 -DNDEBUG -O3 -fno-exceptions {} -o {}"), _mk_o("cpp", "out"))
-    , "msvc"       : (_mk_f("cl /c /DNDEBUG /O2 /GS- /GR /Gy /Zc:inline /MT "
+    { "gcc"        : (_mk_f("g++-9 -std=c++17 -DNDEBUG -O3 -fno-stack-protector -fno-exceptions {} -o {}"), _mk_o("cpp", "out"))
+    , "clang"      : (_mk_f("clang++-9 -std=c++17 -DNDEBUG -O3 -fno-exceptions {} -o {}"), _mk_o("cpp", "out"))
+    , "msvc"       : (_mk_f("cl /std:c++17 /c /EHsc /DNDEBUG /O2 /GS- /GR /Gy /Zc:inline /MT "
                            + "/D_UNICODE=1 /DUNICODE=1 {} /Fo{}"), _mk_o("cpp", "obj"))
-    , "msvc_clang" : (_mk_f("clang -std=c++14 -c -DNDEBUG -O3 -fno-exceptions "
+    , "msvc_clang" : (_mk_f("clang -std=c++17 -c -DNDEBUG -O3 -fno-exceptions "
                            + "-D_UNICODE=1 -DUNICODE=1 {} -o {} -fms-compatibility-version=19"), _mk_o("cpp", "out"))
     }
 

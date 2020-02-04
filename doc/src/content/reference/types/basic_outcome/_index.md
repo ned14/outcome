@@ -135,7 +135,7 @@ an exception perhaps carrying a custom payload.
 - `predicate::enable_make_error_code_compatible_conversion<A, B, C, D>` is constexpr boolean true if:
     1. `predicate::constructors_enabled` is true.
     2. `basic_outcome<A, B, C, D>` is not this `basic_outcome` type.
-    3. Trait {{% api "is_error_code_available<E>" %}} is true for decayed `error_type`.
+    3. Trait {{% api "is_error_code_available<T>" %}} is true for decayed `error_type`.
     4. `predicate::enable_compatible_conversion<A, B, C, D>` is not true.
     5. `A` is `void` OR `value_type` is explicitly constructible from `A`.
     6. `error_type` is explicitly constructible from `make_error_code(B)`.
