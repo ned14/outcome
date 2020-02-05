@@ -29,5 +29,7 @@ int main()
   using namespace OUTCOME_V2_NAMESPACE;
   result<int> f(5);
   outcome<void> m(in_place_type<void>);
+  (void) f;
+  (void) m;
   return 0;
 }

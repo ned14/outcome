@@ -1540,6 +1540,15 @@ namespace detail
   {
     static constexpr bool value = std::is_void<T>::value || (std::is_trivially_copy_constructible<T>::value && std::is_trivially_copyable<T>::value);
   };
+  // work around libstdc++ 7 bug
+  template <> struct is_storage_trivial<void>
+  {
+    static constexpr bool value = true;
+  };
+  template <> struct is_storage_trivial<const void>
+  {
+    static constexpr bool value = true;
+  };
 
   template <class T, class E>
   using value_storage_select_trivality =

@@ -107,9 +107,10 @@ template <bool mc, bool ma> struct Throwy
   {
     if(mc)
     {
-      std::cout << id << " move constructor count = " << count << std::endl;
+      std::cout << "   " << id << " move constructor count = " << count << std::endl;
       if(!count)
       {
+        std::cout << "      " << id << " move constructor throws!" << std::endl;
         throw std::bad_alloc();
       }
     }
@@ -122,9 +123,10 @@ template <bool mc, bool ma> struct Throwy
     count = o.count - o.inc;
     if(ma)
     {
-      std::cout << o.id << " move assignment count = " << count << std::endl;
+      std::cout << "   " << o.id << " move assignment count = " << count << std::endl;
       if(!count)
       {
+        std::cout << "      " << o.id << " move assignment throws!" << std::endl;
         throw std::bad_alloc();
       }
     }
@@ -216,6 +218,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
 
     static_assert(!detail::is_nothrow_swappable<throwy_t>::value, "is_nothrow_swappable is not correct!");
 
+    std::cout << "Value first swap succeeds, second swap second move assignment throws:" << std::endl;
     {
       throwy a(3, 78), b(4, 65);
       a.swap(b);
@@ -235,7 +238,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
       BOOST_CHECK(!a.has_lost_consistency());
       BOOST_CHECK(!b.has_lost_consistency());
     }
-    std::cout << std::endl;
+    std::cout << "\nValue second move assignment throws, on recover second move assignment throws:" << std::endl;
     {
       throwy a(2, 78), b(3, 65);  // fails on second assignment, cannot restore
       try
@@ -249,8 +252,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
         BOOST_CHECK(b.has_lost_consistency());
       }
     }
-    std::cout << std::endl;
   }
+  std::cout << "\nError first swap succeeds, second swap first move assignment throws:" << std::endl;
   {  // Does swap implement the strong guarantee?
     using throwy_t = Throwy<true, true>;
     using throwy = resulty2<true, true>;
@@ -280,7 +283,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / swap, "Tests that the outcome swa
       BOOST_CHECK(!a.has_lost_consistency());
       BOOST_CHECK(!b.has_lost_consistency());
     }
-    std::cout << std::endl;
+    std::cout << "\nTodo:" << std::endl;
     {
       throwy a(2, 78), b(3, 65);  // fails on second assignment, cannot restore
       try
