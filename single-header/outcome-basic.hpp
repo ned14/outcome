@@ -2229,7 +2229,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Essentially an internal optional implementation :)
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2017
 
 
@@ -3401,7 +3401,7 @@ namespace detail
       o._status.set_have_moved_from(true);
     }
 
-    ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
+    ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<value_type>::value &&std::is_nothrow_destructible<error_type>::value)
     {
       if(this->_status.have_value())
       {
@@ -3422,7 +3422,7 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value)
+    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&detail::is_nothrow_swappable<error_type>::value)
     {
       using std::swap;
       // empty/empty
@@ -3864,7 +3864,6 @@ namespace policy
 
 namespace detail
 {
-  template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
   template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage;
   template <class R, class EC, class NoValuePolicy>  //
@@ -3881,7 +3880,6 @@ namespace detail
     friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;  // NOLINT
     template <class T, class U, class V>
     friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
-    template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
 
     struct disable_in_place_value_type
     {
@@ -3906,9 +3904,6 @@ namespace detail
     // Used by iostream support to access state
     _state_type &_iostreams_state() { return _state; }
     const _state_type &_iostreams_state() const { return _state; }
-
-    // Hack to work around MSVC bug in /permissive-
-    _state_type &_msvc_nonpermissive_state() { return _state; }
 
   protected:
     basic_result_storage() = default;
@@ -3995,127 +3990,6 @@ namespace detail
     {
     }
   };
-
-// Neither value nor error type can throw during swap
-#ifdef __cpp_exceptions
-  template <> struct basic_result_storage_swap<false, false>
-#else
-  template <bool value_throws, bool error_throws> struct basic_result_storage_swap
-#endif
-  {
-    template <class R, class EC, class NoValuePolicy>
-    constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
-    {
-      using std::swap;
-      a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-      // swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
-    }
-  };
-#ifdef __cpp_exceptions
-  // Swap potentially throwing value first
-  template <> struct basic_result_storage_swap<true, false>
-  {
-    template <class R, class EC, class NoValuePolicy>
-    constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
-    {
-      using std::swap;
-      a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-      // swap(a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
-    }
-  };
-  // Swap potentially throwing error first
-  template <> struct basic_result_storage_swap<false, true>
-  {
-    template <class R, class EC, class NoValuePolicy>
-    constexpr basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
-    {
-      struct _
-      {
-        status_bitfield_type &a, &b;
-        bool all_good{false};
-        ~_()
-        {
-          if(!all_good)
-          {
-            // We lost one of the values
-            a.set_have_lost_consistency(true);
-            b.set_have_lost_consistency(true);
-          }
-        }
-      } _{a._msvc_nonpermissive_state()._status, b._msvc_nonpermissive_state()._status};
-      // strong_swap(_.all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
-      a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-    }
-  };
-  // Both could throw
-  template <> struct basic_result_storage_swap<true, true>
-  {
-    template <class R, class EC, class NoValuePolicy>
-    basic_result_storage_swap(basic_result_storage<R, EC, NoValuePolicy> &a, basic_result_storage<R, EC, NoValuePolicy> &b)
-    {
-      using std::swap;
-      // Swap value and status first, if it throws, status will remain unchanged
-      a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-      bool all_good = false;
-      try
-      {
-        // strong_swap(all_good, a._msvc_nonpermissive_error(), b._msvc_nonpermissive_error());
-      }
-      catch(...)
-      {
-        if(!all_good)
-        {
-          a._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
-          b._msvc_nonpermissive_state()._status.set_have_lost_consistency(true);
-        }
-        else
-        {
-          // We may still be able to rescue tis
-          // First try to put the value and status back
-          try
-          {
-            a._msvc_nonpermissive_state().swap(b._msvc_nonpermissive_state());
-            // If that succeeded, continue by rethrowing the exception
-          }
-          catch(...)
-          {
-            all_good = false;
-          }
-        }
-        if(!all_good)
-        {
-          // We are now trapped. The value swapped, the error did not,
-          // trying to restore the value failed. We now have
-          // inconsistent result objects. Best we can do is fix up the
-          // status bits to prevent has_value() == has_error().
-          auto check = [](basic_result_storage<R, EC, NoValuePolicy> &x) {
-            bool has_value = x._state._status.have_value();
-            bool has_error = x._state._status.have_error();
-            bool has_exception = x._state._status.have_exception();
-            x._state._status.set_have_lost_consistency(true);
-            if(has_value == (has_error || has_exception))
-            {
-              if(has_value)
-              {
-                // We know the value swapped and is now set, so clear error and exception
-                x._state._status.set_have_error(false).set_have_exception(false);
-              }
-              else
-              {
-                // We know the value swapped and is now unset, so set error
-                x._state._status.set_have_error(true);
-                // TODO: Should I default construct reset _error? It's guaranteed default constructible.
-              }
-            }
-          };
-          check(a);
-          check(b);
-        }
-        throw;
-      }
-    }
-  };
-#endif
 
 }  // namespace detail
 OUTCOME_V2_NAMESPACE_END
@@ -5512,9 +5386,7 @@ SIGNATURE NOT RECOGNISED
   constexpr void swap(basic_result &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value)  //
                                                 && (std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value))
   {
-    constexpr bool value_throws = !std::is_void<value_type>::value && !detail::is_nothrow_swappable<value_type>::value;
-    constexpr bool error_throws = !std::is_void<error_type>::value && !detail::is_nothrow_swappable<error_type>::value;
-    detail::basic_result_storage_swap<value_throws, error_throws>(*this, o);
+    this->_state.swap(o._state);
   }
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -6752,7 +6624,7 @@ SIGNATURE NOT RECOGNISED
     if(!exception_throws && !value_throws && !error_throws)
     {
       // Simples
-      detail::basic_result_storage_swap<value_throws, error_throws>(*this, o);
+      this->_state.swap(o._state);
       using std::swap;
       swap(this->_ptr, o._ptr);
       return;
@@ -6806,13 +6678,13 @@ SIGNATURE NOT RECOGNISED
     } _{*this, o};
     strong_swap(_.all_good, this->_ptr, o._ptr);
     _.exceptioned = true;
-    detail::basic_result_storage_swap<value_throws, error_throws>(*this, o);
+    this->_state.swap(o._state);
     _.exceptioned = false;
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 #else
-    detail::basic_result_storage_swap<false, false>(*this, o);
+    this->_state.swap(o._state);
     using std::swap;
     swap(this->_ptr, o._ptr);
 #endif

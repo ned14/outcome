@@ -1,5 +1,5 @@
 /* Essentially an internal optional implementation :)
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2017
 
 
@@ -1160,7 +1160,7 @@ namespace detail
       o._status.set_have_moved_from(true);
     }
 
-    ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<T>::value)
+    ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<value_type>::value &&std::is_nothrow_destructible<error_type>::value)
     {
       if(this->_status.have_value())
       {
@@ -1181,7 +1181,7 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value)
+    constexpr void swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<value_type>::value &&detail::is_nothrow_swappable<error_type>::value)
     {
       using std::swap;
       // empty/empty
