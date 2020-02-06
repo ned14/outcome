@@ -24,12 +24,30 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
+#if __cplusplus >= 202000 || _HAS_CXX20
+// Match LiteralType, even on C++ 20 and later
+template <class T> struct is_literal_type
+{
+  static constexpr bool value =   //
+  std::is_void<T>::value          //
+  || std::is_scalar<T>::value     //
+  || std::is_reference<T>::value  //
+  // leave out is_array for simplicity
+  || (std::is_class<T>::value && std::is_trivially_destructible<T>::value
+      // how does one detect if a type has at least one constexpr constructor without Reflection???
+      )  // leave out union for simplicity
+  ;
+};
+#else
+template <class T> using is_literal_type = std::is_literal_type<T>;
+#endif
+
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome works as intended in a constexpr evaluation context")
 {
   using namespace OUTCOME_V2_NAMESPACE;
 
-  static_assert(std::is_literal_type<result<int, void, void>>::value, "result<int, void, void> is not a literal type!");
-  static_assert(std::is_literal_type<outcome<int, void, void>>::value, "outcome<int, void, void> is not a literal type!");
+  static_assert(is_literal_type<result<int, void, void>>::value, "result<int, void, void> is not a literal type!");
+  static_assert(is_literal_type<outcome<int, void, void>>::value, "outcome<int, void, void> is not a literal type!");
 
   // Unfortunately result<T> can never be a literal type as error_code can never be literal
   //
@@ -39,7 +57,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / constexpr, "Tests that outcome wo
   static_assert(std::is_trivially_destructible<result<void>>::value, "result<void> is not trivially destructible!");
 
   // outcome<T> default has no trivial operations, but if configured it can become so
-  static_assert(std::is_trivially_destructible<outcome<int, std::error_code, void>>::value, "outcome<int, std::error_code, void> is not trivially destructible!");
+  static_assert(std::is_trivially_destructible<outcome<int, std::error_code, void>>::value,
+                "outcome<int, std::error_code, void> is not trivially destructible!");
 
   {
     // Test compatible results can be constructed from one another
