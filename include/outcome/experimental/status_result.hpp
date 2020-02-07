@@ -64,13 +64,13 @@ namespace trait
   };
 #endif
 
-  template<class DomainType> struct is_move_relocating<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+  template<class DomainType> struct is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
   {
-    static constexpr bool value = SYSTEM_ERROR2_NAMESPACE::traits::is_move_relocating<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>::value;
+    static constexpr bool value = SYSTEM_ERROR2_NAMESPACE::traits::is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>::value;
   };
-  template<class DomainType> struct is_move_relocating<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
+  template<class DomainType> struct is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
   {
-    static constexpr bool value = SYSTEM_ERROR2_NAMESPACE::traits::is_move_relocating<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>::value;
+    static constexpr bool value = SYSTEM_ERROR2_NAMESPACE::traits::is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>::value;
   };
 }  // namespace trait
 

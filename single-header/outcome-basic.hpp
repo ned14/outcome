@@ -1198,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 373235ae9331167cba5da4d07deb493f1c0ae9ac
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-05 19:06:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 373235ae
+#define OUTCOME_PREVIOUS_COMMIT_REF 95a98d04c04de0301e0df50afe1a4ffe2a411012
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-07 11:01:07 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 95a98d04
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -2133,7 +2133,7 @@ type definition  is_error_type. Potential doc page: NOT FOUND
 */
 
 
-  template <class T> struct is_move_relocating
+  template <class T> struct is_move_bitcopying
   {
     static constexpr bool value = false;
   };
@@ -3405,7 +3405,7 @@ namespace detail
     {
       if(this->_status.have_value())
       {
-        if(!trait::is_move_relocating<value_type>::value || !this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<value_type>::value || !this->_status.have_moved_from())
         {
           using _value_type_ = devoid<value_type>;
           this->_value.~_value_type_();  // NOLINT
@@ -3414,7 +3414,7 @@ namespace detail
       }
       else if(this->_status.have_error())
       {
-        if(!trait::is_move_relocating<error_type>::value || !this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<error_type>::value || !this->_status.have_moved_from())
         {
           using _error_type_ = devoid<error_type>;
           this->_error.~_error_type_();  // NOLINT
@@ -3478,7 +3478,7 @@ namespace detail
       {
         // Move construct me into other
         new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
-        if(!trait::is_move_relocating<value_type>::value)
+        if(!trait::is_move_bitcopying<value_type>::value)
         {
           this->_value.~value_type();  // NOLINT
         }
@@ -3489,7 +3489,7 @@ namespace detail
       {
         // Move construct other into me
         new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
-        if(!trait::is_move_relocating<value_type>::value)
+        if(!trait::is_move_bitcopying<value_type>::value)
         {
           o._value.~value_type();  // NOLINT
         }
@@ -3500,7 +3500,7 @@ namespace detail
       {
         // Move construct me into other
         new(&o._error) error_type(static_cast<error_type &&>(_error));  // NOLINT
-        if(!trait::is_move_relocating<error_type>::value)
+        if(!trait::is_move_bitcopying<error_type>::value)
         {
           this->_error.~error_type();  // NOLINT
         }
@@ -3511,7 +3511,7 @@ namespace detail
       {
         // Move construct other into me
         new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
-        if(!trait::is_move_relocating<error_type>::value)
+        if(!trait::is_move_bitcopying<error_type>::value)
         {
           o._error.~error_type();  // NOLINT
         }
@@ -3631,7 +3631,7 @@ namespace detail
       }
       if(this->_status.have_value() && !o._status.have_value() && !o._status.have_error())
       {
-        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
           this->_value.~value_type();  // NOLINT
         }
@@ -3648,7 +3648,7 @@ namespace detail
       }
       if(this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
-        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
           this->_error.~error_type();  // NOLINT
         }
@@ -3665,7 +3665,7 @@ namespace detail
       }
       if(this->_status.have_value() && o._status.have_error())
       {
-        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
           this->_value.~value_type();  // NOLINT
         }
@@ -3676,7 +3676,7 @@ namespace detail
       }
       if(this->_status.have_error() && o._status.have_value())
       {
-        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
           this->_error.~error_type();  // NOLINT
         }
@@ -3720,7 +3720,7 @@ namespace detail
       }
       if(this->_status.have_value() && !o._status.have_value() && !o._status.have_error())
       {
-        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
           this->_value.~value_type();  // NOLINT
         }
@@ -3735,7 +3735,7 @@ namespace detail
       }
       if(this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
-        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
           this->_error.~error_type();  // NOLINT
         }
@@ -3750,7 +3750,7 @@ namespace detail
       }
       if(this->_status.have_value() && o._status.have_error())
       {
-        if(!trait::is_move_relocating<value_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
           this->_value.~value_type();  // NOLINT
         }
@@ -3760,7 +3760,7 @@ namespace detail
       }
       if(this->_status.have_error() && o._status.have_value())
       {
-        if(!trait::is_move_relocating<error_type>::value || this->_status.have_moved_from())
+        if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
           this->_error.~error_type();  // NOLINT
         }

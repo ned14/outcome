@@ -48,7 +48,7 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type. Potential doc page: NOT FOUND
 */
-  template <class T> struct is_move_relocating
+  template <class T> struct is_move_bitcopying
   {
     static constexpr bool value = false;
   };
