@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-05T21:27:31 UTC">
+<meta name="revised" content="2020-02-07T11:38:53 UTC">
 <title>Implicit conversion :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2621,7 +2621,7 @@ custom status code as input, and returns an <code>error</code>:</p>
 </span><span class="c1">// which is discovered using ADL. `error` is an alias to the refinement
 </span><span class="c1">// `status_code&lt;erased&lt;intptr_t&gt;&gt;` which is a status code whose value type
 </span><span class="c1">// has been erased into an `intptr_t`. `status_code&lt;erased&lt;intptr_t&gt;&gt;`
-</span><span class="c1">// (i.e. `error`) are move relocating (P1029) i.e. they are move-only
+</span><span class="c1">// (i.e. `error`) are move bitcopying (P1029) i.e. they are move-only
 </span><span class="c1">// types whose move operation is defined to leave the source in the same
 </span><span class="c1">// representation as a default constructed instance, and for whose
 </span><span class="c1">// non-trivial destructor when called upon a default constructed instance
