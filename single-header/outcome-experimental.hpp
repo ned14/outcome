@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 627f7842d55ae80239e1a17d521bc14183653d9d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-03 18:35:18 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 627f7842
+#define OUTCOME_PREVIOUS_COMMIT_REF 5cc291ee21afa522b57a521e46277d68aae113d1
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-05 11:39:26 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 5cc291ee
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -7005,10 +7005,10 @@ SYSTEM_ERROR2_NAMESPACE_BEGIN
 //! Namespace for user specialised traits
 namespace traits
 {
-  /*! Specialise to true if you guarantee that a type is move relocating (i.e.
+  /*! Specialise to true if you guarantee that a type is move bitcopying (i.e.
   its move constructor equals copying bits from old to new, old is left in a
   default constructed state, and calling the destructor on a default constructed
-  instance is trivial). All trivially copyable types are move relocating by
+  instance is trivial). All trivially copyable types are move bitcopying by
   definition, and that is the unspecialised implementation.
   */
 
@@ -7016,7 +7016,7 @@ namespace traits
 
 
 
-  template <class T> struct is_move_relocating
+  template <class T> struct is_move_bitcopying
   {
     static constexpr bool value = std::is_trivially_copyable<T>::value;
   };
@@ -7058,7 +7058,7 @@ namespace detail
 
   template <class To, class From> using is_union_castable = std::integral_constant<bool, !is_static_castable<To, From>::value && !std::is_array<To>::value && !std::is_array<From>::value>;
 
-  template <class To, class From> using is_bit_castable = std::integral_constant<bool, sizeof(To) == sizeof(From) && traits::is_move_relocating<To>::value && traits::is_move_relocating<From>::value>;
+  template <class To, class From> using is_bit_castable = std::integral_constant<bool, sizeof(To) == sizeof(From) && traits::is_move_bitcopying<To>::value && traits::is_move_bitcopying<From>::value>;
 
   template <class To, class From> union bit_cast_union {
     From source;
@@ -7112,7 +7112,7 @@ namespace detail
 
 
 
-  template <class To, class From> using is_erasure_castable = std::integral_constant<bool, traits::is_move_relocating<To>::value && traits::is_move_relocating<From>::value>;
+  template <class To, class From> using is_erasure_castable = std::integral_constant<bool, traits::is_move_bitcopying<To>::value && traits::is_move_bitcopying<From>::value>;
 
   template <class T, bool = std::is_enum<T>::value> struct identity_or_underlying_type
   {
@@ -7128,7 +7128,7 @@ namespace detail
 
   template <class ErasedType, std::size_t N> struct padded_erasure_object
   {
-    static_assert(traits::is_move_relocating<ErasedType>::value, "ErasedType must be TriviallyCopyable or MoveRelocating");
+    static_assert(traits::is_move_bitcopying<ErasedType>::value, "ErasedType must be TriviallyCopyable or MoveBitcopying");
     static_assert(alignof(ErasedType) <= sizeof(ErasedType), "ErasedType must not be over-aligned");
     ErasedType value;
     char padding[N];
@@ -7158,6 +7158,9 @@ namespace detail
 SYSTEM_ERROR2_NAMESPACE_END
 
 #ifndef SYSTEM_ERROR2_FATAL
+#ifdef SYSTEM_ERROR2_NOT_POSIX
+#error If SYSTEM_ERROR2_NOT_POSIX is defined, you must define your own SYSTEM_ERROR2_FATAL implementation!
+#endif
 #include <cstdlib>  // for abort
 #ifdef __APPLE__
 #include <unistd.h>  // for write
@@ -7216,7 +7219,7 @@ namespace detail
   };
   template <class To, class From> struct type_erasure_is_safe
   {
-    static constexpr bool value = traits::is_move_relocating<From>::value  //
+    static constexpr bool value = traits::is_move_bitcopying<From>::value  //
                                   && (sizeof(status_code_sizer<From>) <= sizeof(status_code_sizer<To>));
   };
 }  // namespace detail
@@ -7565,10 +7568,10 @@ namespace mixins
 }  // namespace mixins
 
 /*! A tag for an erased value type for `status_code<D>`.
-Available only if `ErasedType` satisfies `traits::is_move_relocating<ErasedType>::value`.
+Available only if `ErasedType` satisfies `traits::is_move_bitcopying<ErasedType>::value`.
 */
 template <class ErasedType,  //
-          typename std::enable_if<traits::is_move_relocating<ErasedType>::value, bool>::type = true>
+          typename std::enable_if<traits::is_move_bitcopying<ErasedType>::value, bool>::type = true>
 struct erased
 {
   using value_type = ErasedType;
@@ -7711,7 +7714,11 @@ public:
   template <class T> inline bool equivalent(const status_code<T> &o) const noexcept;
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   //! Throw a code as a C++ exception.
-  SYSTEM_ERROR2_NORETURN void throw_exception() const { _domain->_do_throw_exception(*this); }
+  SYSTEM_ERROR2_NORETURN void throw_exception() const
+  {
+    _domain->_do_throw_exception(*this);
+    abort();  // suppress buggy GCC warning
+  }
 #endif
 };
 
@@ -7877,7 +7884,7 @@ public:
   {
   }
   /*! Explicit construction from an erased status code. Available only if
-  `value_type` is trivially copyable or move relocating, and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
+  `value_type` is trivially copyable or move bitcopying, and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
   Does not check if domains are equal.
   */
 
@@ -7906,9 +7913,9 @@ public:
 
 namespace traits
 {
-  template <class DomainType> struct is_move_relocating<status_code<DomainType>>
+  template <class DomainType> struct is_move_bitcopying<status_code<DomainType>>
   {
-    static constexpr bool value = is_move_relocating<typename DomainType::value_type>::value;
+    static constexpr bool value = is_move_bitcopying<typename DomainType::value_type>::value;
   };
 }  // namespace traits
 
@@ -7977,7 +7984,7 @@ public:
       : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
   {
   }
-  //! Implicit move construction from any other status code if its value type is trivially copyable or move relocating and it would fit into our storage
+  //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
   template <class DomainType,  //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value, bool>::type = true>
   SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept  // NOLINT
@@ -8007,7 +8014,7 @@ public:
 
 namespace traits
 {
-  template <class ErasedType> struct is_move_relocating<status_code<erased<ErasedType>>>
+  template <class ErasedType> struct is_move_bitcopying<status_code<erased<ErasedType>>>
   {
     static constexpr bool value = true;
   };
@@ -8790,9 +8797,9 @@ public:
 
 namespace traits
 {
-  template <class DomainType> struct is_move_relocating<errored_status_code<DomainType>>
+  template <class DomainType> struct is_move_bitcopying<errored_status_code<DomainType>>
   {
-    static constexpr bool value = is_move_relocating<typename DomainType::value_type>::value;
+    static constexpr bool value = is_move_bitcopying<typename DomainType::value_type>::value;
   };
 }  // namespace traits
 
@@ -8849,7 +8856,7 @@ public:
   {
     _check();
   }
-  //! Implicit move construction from any other status code if its value type is trivially copyable or move relocating and it would fit into our storage
+  //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
   template <class DomainType,  //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
@@ -8876,7 +8883,7 @@ public:
 
 namespace traits
 {
-  template <class ErasedType> struct is_move_relocating<errored_status_code<erased<ErasedType>>>
+  template <class ErasedType> struct is_move_bitcopying<errored_status_code<erased<ErasedType>>>
   {
     static constexpr bool value = true;
   };
@@ -9007,8 +9014,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef SYSTEM_ERROR2_SYSTEM_CODE_HPP
 #define SYSTEM_ERROR2_SYSTEM_CODE_HPP
+
+#ifndef SYSTEM_ERROR2_NOT_POSIX
 /* Proposed SG14 status_code
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -9033,6 +9042,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef SYSTEM_ERROR2_POSIX_CODE_HPP
 #define SYSTEM_ERROR2_POSIX_CODE_HPP
+
+#ifdef SYSTEM_ERROR2_NOT_POSIX
+#error <posix_code.hpp> is not includable when SYSTEM_ERROR2_NOT_POSIX is defined!
+#endif
 
 
 
@@ -9152,6 +9165,8 @@ inline constexpr const _posix_code_domain &_posix_code_domain::get()
 SYSTEM_ERROR2_NAMESPACE_END
 
 #endif
+#endif
+
 #if defined(_WIN32) || 0
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -10758,7 +10773,7 @@ using system_code = status_code<erased<intptr_t>>;
 
 #ifndef NDEBUG
 static_assert(sizeof(system_code) == 2 * sizeof(void *), "system_code is not exactly two pointers in size!");
-static_assert(traits::is_move_relocating<system_code>::value, "system_code is not move relocating!");
+static_assert(traits::is_move_bitcopying<system_code>::value, "system_code is not move bitcopying!");
 #endif
 
 SYSTEM_ERROR2_NAMESPACE_END
@@ -10781,13 +10796,13 @@ the program is terminated as this is a logic error)
 - Is immutable.
 
 As with `system_code`, it remains guaranteed to be two CPU registers in size,
-and move relocating.
+and move bitcopying.
 */
 using error = errored_status_code<erased<system_code::value_type>>;
 
 #ifndef NDEBUG
 static_assert(sizeof(error) == 2 * sizeof(void *), "error is not exactly two pointers in size!");
-static_assert(traits::is_move_relocating<error>::value, "error is not move relocating!");
+static_assert(traits::is_move_bitcopying<error>::value, "error is not move bitcopying!");
 #endif
 
 SYSTEM_ERROR2_NAMESPACE_END

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010"> 
-  <Type Name="outcome_v2_627f7842::basic_outcome&lt;*&gt;">
+  <Type Name="outcome_v2_5cc291ee::basic_outcome&lt;*&gt;">
     <DisplayString Condition="(_state._status.status_value &amp; 0xff) == 0">empty</DisplayString>
     <DisplayString Condition="(_state._status.status_value &amp; 1) == 1">value {{{_state._value}}}</DisplayString>
     <DisplayString Condition="(_state._status.status_value &amp; 2) == 2">error {{{_error}}}</DisplayString>
@@ -15,7 +15,7 @@
       <Item Condition="(_state._status.status_value &amp; 4) == 4" Name="[exception]">_ptr</Item>
     </Expand>
   </Type>
-  <Type Name="outcome_v2_627f7842::basic_result&lt;*&gt;">
+  <Type Name="outcome_v2_5cc291ee::basic_result&lt;*&gt;">
     <DisplayString Condition="(_state._status.status_value &amp; 0xff) == 0">empty</DisplayString>
     <DisplayString Condition="(_state._status.status_value &amp; 1) == 1">value {{{_state._value}}}</DisplayString>
     <DisplayString Condition="(_state._status.status_value &amp; 2) == 2">error {{{_error}}}</DisplayString>
