@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-11T14:42:51 UTC">
+<meta name="revised" content="2020-02-17T15:02:09 UTC">
 <title>Keeping state :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -139,54 +139,84 @@
       <a href="/outcome/tutorial/essential/">Essential</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/">
-            <code>auto basic_outcome_failure_exception_from_error(const EC &amp;)</code>
+          <a href="/outcome/tutorial/essential/before/">
+            Before we begin
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/policy/error_code/" class="dd-item">
+    <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/result/">result&lt;&gt;</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/result/inspecting/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/error_code/">
-            <code>decltype(auto) error_code(T &amp;&amp;)</code>
+          <a href="/outcome/tutorial/essential/result/inspecting/">
+            Inspecting result<T, EC>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/policy/exception_ptr/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/essential/result/try/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/exception_ptr/">
-            <code>decltype(auto) exception_ptr(T &amp;&amp;)</code>
+          <a href="/outcome/tutorial/essential/result/try/">
+            TRY operations
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(BoostErrorCodeEnum &amp;&amp;)</code>
+          <a href="/outcome/tutorial/essential/result/try_greedy/">
+            TRY is greedy
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/" class="dd-item">
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/outcome/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/outcome/">outcome&lt;&gt;</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/outcome/inspecting/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(ErrorCodeEnum &amp;&amp;)</code>
+          <a href="/outcome/tutorial/essential/outcome/inspecting/">
+            Inspecting outcome<T, EC, EP>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/" class="dd-item">
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/no-value/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/no-value/">No-value policies</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/no-value/custom/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const boost::system::error_code &amp;)</code>
+          <a href="/outcome/tutorial/essential/no-value/custom/">
+            A custom no-value policy
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/essential/no-value/builtin/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)</code>
+          <a href="/outcome/tutorial/essential/no-value/builtin/">
+            Built-in policies
           </a>
         </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/conventions/" class="dd-item
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/conventions/">Conventions</a>
+      </div>
     </li>
         </ul>
     </li>
@@ -2668,7 +2698,7 @@ item-not-found instead of the wrong extended error info.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 02/10/2019
+        <i class='fa fa-calendar'></i> Last update on 03/10/2019
     </div>
     
 
