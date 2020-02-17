@@ -214,32 +214,14 @@ namespace detail
     // value has been moved from
     have_moved_from = (1U << 5U)
   };
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4201)  // nameless struct/union
-#endif
   struct status_bitfield_type
   {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4201)  // nameless struct/union
-#endif
-    union {
-      uint32_t _default{0};
-      struct
-      {
-        status status_value;
-        uint16_t spare_storage_value;  // hooks::spare_storage()
-      };
-    };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+    status status_value{status::none};
+    uint16_t spare_storage_value{0};  // hooks::spare_storage()
 
-    status_bitfield_type() = default;
+    constexpr status_bitfield_type() noexcept {}
     constexpr status_bitfield_type(status v) noexcept
         : status_value(v)
-        , spare_storage_value(0)
     {
     }  // NOLINT
     constexpr status_bitfield_type(status v, uint16_t s) noexcept
@@ -247,6 +229,11 @@ namespace detail
         , spare_storage_value(s)
     {
     }
+    status_bitfield_type(const status_bitfield_type &) = default;
+    status_bitfield_type(status_bitfield_type &&) = default;
+    status_bitfield_type &operator=(const status_bitfield_type &) = default;
+    status_bitfield_type &operator=(status_bitfield_type &&) = default;
+    ~status_bitfield_type() = default;
 
     constexpr bool have_value() const noexcept
     {
@@ -768,9 +755,6 @@ namespace detail
       return *this;
     }
   };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
   static_assert(sizeof(status_bitfield_type) == 4, "status_bitfield_type is not sized 4 bytes!");
   static_assert(std::is_trivially_copyable<status_bitfield_type>::value, "status_bitfield_type is not trivially copyable!");
 
