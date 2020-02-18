@@ -948,15 +948,17 @@ namespace detail
     };
     using _value_type = std::conditional_t<std::is_same<value_type, error_type>::value, disable_in_place_value_type, value_type>;
     using _error_type = std::conditional_t<std::is_same<value_type, error_type>::value, disable_in_place_error_type, error_type>;
+    using _value_type_ = devoid<value_type>;
+    using _error_type_ = devoid<error_type>;
 
     union {
       empty_type _empty1;
-      devoid<value_type> _value;
+      _value_type_ _value;
     };
     status_bitfield_type _status;
     union {
       empty_type _empty2;
-      devoid<error_type> _error;
+      _error_type_ _error;
     };
     value_storage_nontrivial() noexcept
         : _empty1{}
@@ -970,11 +972,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -984,11 +986,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(o._value);  // NOLINT
+        new(&_value) _value_type_(o._value);  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(o._error);  // NOLINT
+        new(&_error) _error_type_(o._error);  // NOLINT
       }
       _status = o._status;
     }
@@ -1092,11 +1094,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type();  // NOLINT
+        new(&_value) _value_type_();  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(o._error);  // NOLINT
+        new(&_error) _error_type_(o._error);  // NOLINT
       }
       _status = o._status;
     }
@@ -1107,11 +1109,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type();  // NOLINT
+        new(&_value) _value_type_();  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -1130,11 +1132,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(o._value);  // NOLINT
+        new(&_value) _value_type_(o._value);  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type();  // NOLINT
+        new(&_error) _error_type_();  // NOLINT
       }
       _status = o._status;
     }
@@ -1145,11 +1147,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type();  // NOLINT
+        new(&_error) _error_type_();  // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -1161,7 +1163,6 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || !this->_status.have_moved_from())
         {
-          using _value_type_ = devoid<value_type>;
           this->_value.~_value_type_();  // NOLINT
         }
         this->_status.set_have_value(false);
@@ -1170,7 +1171,6 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || !this->_status.have_moved_from())
         {
-          using _error_type_ = devoid<error_type>;
           this->_error.~_error_type_();  // NOLINT
         }
         this->_status.set_have_error(false);
@@ -1231,7 +1231,7 @@ namespace detail
       if(_status.have_value() && !o._status.have_error())
       {
         // Move construct me into other
-        new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
+        new(&o._value) _value_type_(static_cast<_value_type_ &&>(_value));  // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           this->_value.~value_type();  // NOLINT
@@ -1242,7 +1242,7 @@ namespace detail
       if(o._status.have_value() && !_status.have_error())
       {
         // Move construct other into me
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           o._value.~value_type();  // NOLINT
@@ -1253,7 +1253,7 @@ namespace detail
       if(_status.have_error() && !o._status.have_value())
       {
         // Move construct me into other
-        new(&o._error) error_type(static_cast<error_type &&>(_error));  // NOLINT
+        new(&o._error) _error_type_(static_cast<_error_type_ &&>(_error));  // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           this->_error.~error_type();  // NOLINT
@@ -1264,7 +1264,7 @@ namespace detail
       if(o._status.have_error() && !_status.have_value())
       {
         // Move construct other into me
-        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           o._error.~error_type();  // NOLINT
@@ -1276,8 +1276,8 @@ namespace detail
       struct _
       {
         status_bitfield_type &a, &b;
-        value_type *value, *o_value;
-        error_type *error, *o_error;
+        _value_type_ *value, *o_value;
+        _error_type_ *error, *o_error;
         bool all_good{true};
         ~_()
         {
