@@ -1225,9 +1225,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF d51f533721477e48ed63ef3440851780dc282ae8
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-12 09:15:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE d51f5337
+#define OUTCOME_PREVIOUS_COMMIT_REF 092272390b2ea12b931acd5b9e1fafad03321092
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-17 14:59:21 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 09227239
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3081,32 +3081,14 @@ namespace detail
     // value has been moved from
     have_moved_from = (1U << 5U)
   };
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4201)  // nameless struct/union
-#endif
   struct status_bitfield_type
   {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4201)  // nameless struct/union
-#endif
-    union {
-      uint32_t _default{0};
-      struct
-      {
-        status status_value;
-        uint16_t spare_storage_value;  // hooks::spare_storage()
-      };
-    };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+    status status_value{status::none};
+    uint16_t spare_storage_value{0};  // hooks::spare_storage()
 
-    status_bitfield_type() = default;
+    constexpr status_bitfield_type() = default;
     constexpr status_bitfield_type(status v) noexcept
         : status_value(v)
-        , spare_storage_value(0)
     {
     }  // NOLINT
     constexpr status_bitfield_type(status v, uint16_t s) noexcept
@@ -3114,6 +3096,11 @@ namespace detail
         , spare_storage_value(s)
     {
     }
+    constexpr status_bitfield_type(const status_bitfield_type &) = default;
+    constexpr status_bitfield_type(status_bitfield_type &&) = default;
+    constexpr status_bitfield_type &operator=(const status_bitfield_type &) = default;
+    constexpr status_bitfield_type &operator=(status_bitfield_type &&) = default;
+    //~status_bitfield_type() = default;  // Do NOT uncomment this, it breaks older clangs!
 
     constexpr bool have_value() const noexcept
     {
@@ -3635,11 +3622,19 @@ namespace detail
       return *this;
     }
   };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#if !defined(NDEBUG)
+  // Check is trivial in all ways except default constructibility
   static_assert(sizeof(status_bitfield_type) == 4, "status_bitfield_type is not sized 4 bytes!");
   static_assert(std::is_trivially_copyable<status_bitfield_type>::value, "status_bitfield_type is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<status_bitfield_type, status_bitfield_type>::value, "status_bitfield_type is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<status_bitfield_type>::value, "status_bitfield_type is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<status_bitfield_type>::value, "status_bitfield_type is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<status_bitfield_type>::value, "status_bitfield_type is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<status_bitfield_type>::value, "status_bitfield_type is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<status_bitfield_type>::value, "status_bitfield_type is not trivially move assignable!");
+  // Also check is standard layout
+  static_assert(std::is_standard_layout<status_bitfield_type>::value, "status_bitfield_type is not a standard layout type!");
+#endif
 
   template <class State> constexpr inline void _set_error_is_errno(State & /*unused*/) {}
 
