@@ -170,7 +170,7 @@ namespace detail
     status status_value{status::none};
     uint16_t spare_storage_value{0};  // hooks::spare_storage()
 
-    constexpr status_bitfield_type() noexcept {}
+    constexpr status_bitfield_type() = default;
     constexpr status_bitfield_type(status v) noexcept
         : status_value(v)
     {
@@ -180,11 +180,11 @@ namespace detail
         , spare_storage_value(s)
     {
     }
-    status_bitfield_type(const status_bitfield_type &) = default;
-    status_bitfield_type(status_bitfield_type &&) = default;
-    status_bitfield_type &operator=(const status_bitfield_type &) = default;
-    status_bitfield_type &operator=(status_bitfield_type &&) = default;
-    ~status_bitfield_type() = default;
+    constexpr status_bitfield_type(const status_bitfield_type &) = default;
+    constexpr status_bitfield_type(status_bitfield_type &&) = default;
+    constexpr status_bitfield_type &operator=(const status_bitfield_type &) = default;
+    constexpr status_bitfield_type &operator=(status_bitfield_type &&) = default;
+    //~status_bitfield_type() = default;  // Do NOT uncomment this, it breaks older clangs!
 
     constexpr bool have_value() const noexcept
     {
@@ -706,8 +706,19 @@ namespace detail
       return *this;
     }
   };
+#if !defined(NDEBUG)
+  // Check is trivial in all ways except default constructibility
   static_assert(sizeof(status_bitfield_type) == 4, "status_bitfield_type is not sized 4 bytes!");
   static_assert(std::is_trivially_copyable<status_bitfield_type>::value, "status_bitfield_type is not trivially copyable!");
+  static_assert(std::is_trivially_assignable<status_bitfield_type, status_bitfield_type>::value, "status_bitfield_type is not trivially assignable!");
+  static_assert(std::is_trivially_destructible<status_bitfield_type>::value, "status_bitfield_type is not trivially destructible!");
+  static_assert(std::is_trivially_copy_constructible<status_bitfield_type>::value, "status_bitfield_type is not trivially copy constructible!");
+  static_assert(std::is_trivially_move_constructible<status_bitfield_type>::value, "status_bitfield_type is not trivially move constructible!");
+  static_assert(std::is_trivially_copy_assignable<status_bitfield_type>::value, "status_bitfield_type is not trivially copy assignable!");
+  static_assert(std::is_trivially_move_assignable<status_bitfield_type>::value, "status_bitfield_type is not trivially move assignable!");
+  // Also check is standard layout
+  static_assert(std::is_standard_layout<status_bitfield_type>::value, "status_bitfield_type is not a standard layout type!");
+#endif
 
   // Used if T is trivial
   template <class T> struct value_storage_trivial
