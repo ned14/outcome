@@ -41,6 +41,7 @@ SIGNATURE NOT RECOGNISED
   struct base
   {
   protected:
+    template <class Impl> static constexpr void _make_ub(Impl &&self) noexcept { return detail::make_ub(static_cast<Impl &&>(self)); }
     template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return self._state._status.have_value(); }
     template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return self._state._status.have_error(); }
     template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return self._state._status.have_exception(); }
@@ -61,21 +62,21 @@ SIGNATURE NOT RECOGNISED
     {
       if(!_has_value(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
       if(!_has_error(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
       if(!_has_exception(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
   };
