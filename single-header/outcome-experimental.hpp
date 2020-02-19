@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 092272390b2ea12b931acd5b9e1fafad03321092
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-17 14:59:21 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 09227239
+#define OUTCOME_PREVIOUS_COMMIT_REF 58371301fd068fe88f033c847d9d679d82b1fa8f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-17 15:07:00 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 58371301
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3215,15 +3215,17 @@ namespace detail
     };
     using _value_type = std::conditional_t<std::is_same<value_type, error_type>::value, disable_in_place_value_type, value_type>;
     using _error_type = std::conditional_t<std::is_same<value_type, error_type>::value, disable_in_place_error_type, error_type>;
+    using _value_type_ = devoid<value_type>;
+    using _error_type_ = devoid<error_type>;
 
     union {
       empty_type _empty1;
-      devoid<value_type> _value;
+      _value_type_ _value;
     };
     status_bitfield_type _status;
     union {
       empty_type _empty2;
-      devoid<error_type> _error;
+      _error_type_ _error;
     };
     value_storage_nontrivial() noexcept
         : _empty1{}
@@ -3237,11 +3239,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -3251,11 +3253,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(o._value);  // NOLINT
+        new(&_value) _value_type_(o._value);  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(o._error);  // NOLINT
+        new(&_error) _error_type_(o._error);  // NOLINT
       }
       _status = o._status;
     }
@@ -3359,11 +3361,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type();  // NOLINT
+        new(&_value) _value_type_();  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(o._error);  // NOLINT
+        new(&_error) _error_type_(o._error);  // NOLINT
       }
       _status = o._status;
     }
@@ -3374,11 +3376,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type();  // NOLINT
+        new(&_value) _value_type_();  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -3397,11 +3399,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(o._value);  // NOLINT
+        new(&_value) _value_type_(o._value);  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type();  // NOLINT
+        new(&_error) _error_type_();  // NOLINT
       }
       _status = o._status;
     }
@@ -3412,11 +3414,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) error_type();  // NOLINT
+        new(&_error) _error_type_();  // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -3428,7 +3430,6 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || !this->_status.have_moved_from())
         {
-          using _value_type_ = devoid<value_type>;
           this->_value.~_value_type_();  // NOLINT
         }
         this->_status.set_have_value(false);
@@ -3437,7 +3438,6 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || !this->_status.have_moved_from())
         {
-          using _error_type_ = devoid<error_type>;
           this->_error.~_error_type_();  // NOLINT
         }
         this->_status.set_have_error(false);
@@ -3498,7 +3498,7 @@ namespace detail
       if(_status.have_value() && !o._status.have_error())
       {
         // Move construct me into other
-        new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
+        new(&o._value) _value_type_(static_cast<_value_type_ &&>(_value));  // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           this->_value.~value_type();  // NOLINT
@@ -3509,7 +3509,7 @@ namespace detail
       if(o._status.have_value() && !_status.have_error())
       {
         // Move construct other into me
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value));  // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           o._value.~value_type();  // NOLINT
@@ -3520,7 +3520,7 @@ namespace detail
       if(_status.have_error() && !o._status.have_value())
       {
         // Move construct me into other
-        new(&o._error) error_type(static_cast<error_type &&>(_error));  // NOLINT
+        new(&o._error) _error_type_(static_cast<_error_type_ &&>(_error));  // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           this->_error.~error_type();  // NOLINT
@@ -3531,7 +3531,7 @@ namespace detail
       if(o._status.have_error() && !_status.have_value())
       {
         // Move construct other into me
-        new(&_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error));  // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           o._error.~error_type();  // NOLINT
@@ -3543,8 +3543,8 @@ namespace detail
       struct _
       {
         status_bitfield_type &a, &b;
-        value_type *value, *o_value;
-        error_type *error, *o_error;
+        _value_type_ *value, *o_value;
+        _error_type_ *error, *o_error;
         bool all_good{true};
         ~_()
         {
@@ -4538,6 +4538,7 @@ SIGNATURE NOT RECOGNISED
   struct base
   {
   protected:
+    template <class Impl> static constexpr void _make_ub(Impl &&self) noexcept { return detail::make_ub(static_cast<Impl &&>(self)); }
     template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return self._state._status.have_value(); }
     template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return self._state._status.have_error(); }
     template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return self._state._status.have_exception(); }
@@ -4558,21 +4559,21 @@ SIGNATURE NOT RECOGNISED
     {
       if(!_has_value(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
       if(!_has_error(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
       if(!_has_exception(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
   };
