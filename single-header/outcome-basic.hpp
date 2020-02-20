@@ -1198,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 092272390b2ea12b931acd5b9e1fafad03321092
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-17 14:59:21 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 09227239
+#define OUTCOME_PREVIOUS_COMMIT_REF c208184ee6ff4e17bee6f335eb436fdbff7bd146
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-19 10:40:06 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c208184e
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4120,6 +4120,7 @@ SIGNATURE NOT RECOGNISED
   struct base
   {
   protected:
+    template <class Impl> static constexpr void _make_ub(Impl &&self) noexcept { return detail::make_ub(static_cast<Impl &&>(self)); }
     template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return self._state._status.have_value(); }
     template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return self._state._status.have_error(); }
     template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return self._state._status.have_exception(); }
@@ -4140,21 +4141,21 @@ SIGNATURE NOT RECOGNISED
     {
       if(!_has_value(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_error_check(Impl &&self) noexcept
     {
       if(!_has_error(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
     template <class Impl> static constexpr void narrow_exception_check(Impl &&self) noexcept
     {
       if(!_has_exception(self))
       {
-        detail::make_ub(self);
+        _make_ub(self);
       }
     }
   };

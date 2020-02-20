@@ -24,8 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-#if __cplusplus >= 202000 || _HAS_CXX20
-// Match LiteralType, even on C++ 20 and later
+#if __cplusplus >= 201700 || _HAS_CXX17
+// Match LiteralType, even on C++ 17 and later
 template <class T> struct is_literal_type
 {
   static constexpr bool value =   //
