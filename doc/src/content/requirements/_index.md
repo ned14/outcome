@@ -11,10 +11,13 @@ point releases of these compiler-platform combinations or better:
 - Visual Studio 2017.9 [Windows]
 - XCode 9 [MacOS]
 
-It is worth turning on C++ 17 if you can, as there are many usability and
-performance improvements. If your compiler implements the Concepts TS, it
-is worth turning support on. Support is automatically
-detected and used.
+For non-Windows non-POSIX platforms (typically embedded systems), Outcome
+is usable in its Outcome.Experimental form with the macro `SYSTEM_ERROR2_NOT_POSIX`
+defined.
+
+It is worth turning on C++ 17 or C++ 20 if you can, as there are many usability and
+performance improvements. Any Concepts TS or Coroutines TS implemented
+by your compiler is automatically detected and used.
 
 
 Partially working compilers (this was last updated January 2019):

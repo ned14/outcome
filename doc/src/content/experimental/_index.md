@@ -39,3 +39,8 @@ experimental Outcome also has a macro-based C interface that enables C
 code to work with the C-compatible subset of `status_result<T, E>`:
 
 - `<outcome/experimental/result.h>`
+
+For non-Windows non-POSIX platforms such as some embedded systems, standalone
+Experimental Outcome can be used with the `SYSTEM_ERROR2_NOT_POSIX` macro
+defined. This does not include POSIX headers, and makes available a high fidelity,
+fully deterministic, alternative to C++ exceptions on such platforms.

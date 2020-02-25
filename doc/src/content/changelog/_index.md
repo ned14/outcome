@@ -14,11 +14,23 @@ optimiser, which caused low quality codegen. Unlike most codegen issues, this wa
 noticeably in empirical benchmarks of real world code, as was shown by
 [P1886 *Error speed benchmarking*](https://wg21.link/P1886).
 
-The safe part of the [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation)
+    The safe part of the [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation)
 Outcome v2.2.0 future branch was merged to Outcome v2.1.3 which includes a new
 status bitfield implementation. This appears to not confuse clang's optimiser,
 and clang 9 produces code which routinely beats GCC 9's code for various canned
 use cases.
+
+Precompiled headers are automatically enabled on new enough cmake's for standalone Outcome
+: If on cmake 3.16 or later, its new precompiled headers build support is used
+to tell consumers of the `outcome::hl` cmake target to precompile Outcome, **if
+and only if** `PROJECT_IS_DEPENDENCY` is false. `PROJECT_IS_DEPENDENCY` is set
+by Outcome's CMakeLists.txt if it detects that it was included using
+`add_subdirectory()`, so for the vast majority of Outcome end users, the use
+of precompiled headers will NOT be enabled.
+
+    Exported targets do NOT request precompilation of headers, as it is
+assumed that importers of the Outcome cmake targets will configure their own
+precompiled headers which incorporate Outcome.
 
 ### Bug fixes:
 

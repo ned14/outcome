@@ -1,5 +1,5 @@
 # Outcome cmake
-# (C) 2016-2019 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -21,7 +21,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
@@ -75,6 +75,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
     function(make_single_header target name)
       add_partial_preprocess(${target}
                             "${name}"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp"
                             ${ARGN}
                             -I ../quickcpplib/include
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
@@ -131,6 +132,7 @@ target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
+  set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS "outcome_hl--coroutine-support")
   include(QuickCppLibMakeStandardTests)
   
   # Enable Coroutines for the coroutines support test
@@ -156,6 +158,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
         add_executable(${target_name} "${testsource}")
         if(NOT first_test_target_noexcept)
           set(first_test_target_noexcept ${target_name})
+        elseif(${target_name} MATCHES "coroutine-support")
+          set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
         elseif(COMMAND target_precompile_headers)
           target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_noexcept})
         endif()
@@ -185,6 +189,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           add_executable(${target_name} "${testsource}")
           if(NOT first_test_target_permissive)
             set(first_test_target_permissive ${target_name})
+          elseif(${target_name} MATCHES "coroutine-support")
+            set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
           elseif(COMMAND target_precompile_headers)
             target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
           endif()
