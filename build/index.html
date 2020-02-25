@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-24T23:07:20 UTC">
+<meta name="revised" content="2020-02-25T11:17:56 UTC">
 <title>Build and install :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2676,7 +2676,7 @@ an unlikely chance that the tarball may not work on a newer compiler.</p>
 
 <h1 id="running-the-unit-test-suite">Running the unit test suite</h1>
 
-<p>To run the unit test suite you will need cmake 3.1 or later installed.</p>
+<p>To run the unit test suite you will need cmake 3.3 or later installed.</p>
 
 <pre><code>mkdir build
 cd build
@@ -2699,12 +2699,24 @@ ctest -C Release
 
 <hr>
 
+<h1 id="cmake-find-package-imported-targets-support">CMake <code>find_package()</code> imported targets support</h1>
+
+<p>Outcome fully complies with cmake install, so by installing Outcome, it can be
+found by cmake&rsquo;s <code>find_package()</code>.</p>
+
+<pre><code>mkdir build
+cd build
+cmake ..
+cmake --build .
+sudo cmake --build . --target install
+</code></pre>
+
 <h1 id="modular-cmake-build-support">Modular CMake build support</h1>
 
 <p>If you are using Outcome in a CMake project, Outcome is a &ldquo;modular cmake&rdquo; project
 using only modern cmake 3 throughout. This lets you add the Outcome directory as a
 cmake subdirectory with no unexpected consequence on the rest of your cmake. You will need
-to be using cmake 3.1 or better.</p>
+to be using cmake 3.3 or better.</p>
 
 <pre><code>add_subdirectory(
   &quot;${CMAKE_CURRENT_SOURCE_DIR}/outcome&quot;  # path to outcome source
@@ -2748,7 +2760,7 @@ suite along with your own.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/10/2019
+        <i class='fa fa-calendar'></i> Last update on 25/02/2020
     </div>
     
 

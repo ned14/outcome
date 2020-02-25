@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-24T23:07:23 UTC">
+<meta name="revised" content="2020-02-25T11:17:59 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2597,17 +2597,28 @@
 
 <dl>
 <dt>Performance of Outcome-based code compiled by clang has been greatly improved</dt>
-<dd>The previous implementation of Outcome&rsquo;s status bitfield confused clang&rsquo;s
+<dd><p>The previous implementation of Outcome&rsquo;s status bitfield confused clang&rsquo;s
 optimiser, which caused low quality codegen. Unlike most codegen issues, this was
 noticeably in empirical benchmarks of real world code, as was shown by
-<a href="https://wg21.link/P1886">P1886 <em>Error speed benchmarking</em></a>.</dd>
-</dl>
+<a href="https://wg21.link/P1886">P1886 <em>Error speed benchmarking</em></a>.</p>
 
 <p>The safe part of the <a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a>
 Outcome v2.2.0 future branch was merged to Outcome v2.1.3 which includes a new
 status bitfield implementation. This appears to not confuse clang&rsquo;s optimiser,
 and clang 9 produces code which routinely beats GCC 9&rsquo;s code for various canned
-use cases.</p>
+use cases.</p></dd>
+<dt>Precompiled headers are automatically enabled on new enough cmake&rsquo;s for standalone Outcome</dt>
+<dd><p>If on cmake 3.16 or later, its new precompiled headers build support is used
+to tell consumers of the <code>outcome::hl</code> cmake target to precompile Outcome, <strong>if
+and only if</strong> <code>PROJECT_IS_DEPENDENCY</code> is false. <code>PROJECT_IS_DEPENDENCY</code> is set
+by Outcome&rsquo;s CMakeLists.txt if it detects that it was included using
+<code>add_subdirectory()</code>, so for the vast majority of Outcome end users, the use
+of precompiled headers will NOT be enabled.</p>
+
+<p>Exported targets do NOT request precompilation of headers, as it is
+assumed that importers of the Outcome cmake targets will configure their own
+precompiled headers which incorporate Outcome.</p></dd>
+</dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
@@ -2904,7 +2915,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 25/02/2020
     </div>
     
 

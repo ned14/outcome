@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-24T23:07:20 UTC">
+<meta name="revised" content="2020-02-25T11:17:56 UTC">
 <title>Prerequisites :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2597,10 +2597,13 @@ point releases of these compiler-platform combinations or better:</p>
 <li>XCode 9 [MacOS]</li>
 </ul>
 
-<p>It is worth turning on C++ 17 if you can, as there are many usability and
-performance improvements. If your compiler implements the Concepts TS, it
-is worth turning support on. Support is automatically
-detected and used.</p>
+<p>For non-Windows non-POSIX platforms (typically embedded systems), Outcome
+is usable in its Outcome.Experimental form with the macro <code>SYSTEM_ERROR2_NOT_POSIX</code>
+defined.</p>
+
+<p>It is worth turning on C++ 17 or C++ 20 if you can, as there are many usability and
+performance improvements. Any Concepts TS or Coroutines TS implemented
+by your compiler is automatically detected and used.</p>
 
 <p>Partially working compilers (this was last updated January 2019):</p>
 
@@ -2653,7 +2656,7 @@ not implement enough of the C++ 14 standard library for Outcome to compile.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/10/2019
+        <i class='fa fa-calendar'></i> Last update on 25/02/2020
     </div>
     
 

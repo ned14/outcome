@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-02-24T23:07:20 UTC">
+<meta name="revised" content="2020-02-25T11:17:57 UTC">
 <title>Experimental :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2640,6 +2640,11 @@ code to work with the C-compatible subset of <code>status_result&lt;T, E&gt;</co
 <li><code>&lt;outcome/experimental/result.h&gt;</code></li>
 </ul>
 
+<p>For non-Windows non-POSIX platforms such as some embedded systems, standalone
+Experimental Outcome can be used with the <code>SYSTEM_ERROR2_NOT_POSIX</code> macro
+defined. This does not include POSIX headers, and makes available a high fidelity,
+fully deterministic, alternative to C++ exceptions on such platforms.</p>
+
 
 
     
@@ -2662,7 +2667,7 @@ code to work with the C-compatible subset of <code>status_result&lt;T, E&gt;</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/10/2019
+        <i class='fa fa-calendar'></i> Last update on 25/02/2020
     </div>
     
 
