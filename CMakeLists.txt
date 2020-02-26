@@ -132,7 +132,12 @@ target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
-  set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS "outcome_hl--coroutine-support")
+  set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS
+    "outcome_hl--coroutine-support"
+    "outcome_hl--outcome-int-int-1"
+    "outcome_hl--result-int-int-1"
+    "outcome_hl--result-int-int-2"
+  )
   include(QuickCppLibMakeStandardTests)
   
   # Enable Coroutines for the coroutines support test
