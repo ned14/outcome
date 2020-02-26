@@ -98,7 +98,7 @@ an unlikely chance that the tarball may not work on a newer compiler.
 
 # Running the unit test suite
 
-To run the unit test suite you will need cmake 3.1 or later installed.
+To run the unit test suite you will need cmake 3.3 or later installed.
 
 ```
 mkdir build
@@ -123,12 +123,25 @@ ctest -C Release
 
 <hr>
 
+# CMake `find_package()` imported targets support
+
+Outcome fully complies with cmake install, so by installing Outcome, it can be
+found by cmake's `find_package()`.
+
+```
+mkdir build
+cd build
+cmake ..
+cmake --build .
+sudo cmake --build . --target install
+```
+
 # Modular CMake build support
 
 If you are using Outcome in a CMake project, Outcome is a "modular cmake" project
 using only modern cmake 3 throughout. This lets you add the Outcome directory as a
 cmake subdirectory with no unexpected consequence on the rest of your cmake. You will need
-to be using cmake 3.1 or better.
+to be using cmake 3.3 or better.
 
 ```
 add_subdirectory(

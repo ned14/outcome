@@ -1,5 +1,5 @@
 # Outcome cmake
-# (C) 2016-2019 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -21,7 +21,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
@@ -33,8 +33,6 @@ ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/v
 project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE)
-# Set how to build a C++ Module for this project
-set(outcome_INTERFACE_SOURCE "include/outcome.ixx")
 
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
@@ -77,6 +75,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
     function(make_single_header target name)
       add_partial_preprocess(${target}
                             "${name}"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp"
                             ${ARGN}
                             -I ../quickcpplib/include
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
@@ -133,6 +132,12 @@ target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
+  set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS
+    "outcome_hl--coroutine-support"
+    "outcome_hl--outcome-int-int-1"
+    "outcome_hl--result-int-int-1"
+    "outcome_hl--result-int-int-2"
+  )
   include(QuickCppLibMakeStandardTests)
   
   # Enable Coroutines for the coroutines support test
@@ -148,12 +153,21 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   
   # Duplicate all tests into C++ exceptions disabled forms
   set(noexcept_tests)
+  set(first_test_target_noexcept)
+  set(first_test_target_permissive)
   foreach(testsource ${outcome_TESTS})
     if(testsource MATCHES ".+/(.+)[.](c|cpp|cxx)$")
       set(testname ${CMAKE_MATCH_1})
       if(NOT testname MATCHES "expected-pass")
         set(target_name "outcome_hl--${testname}-noexcept")
         add_executable(${target_name} "${testsource}")
+        if(NOT first_test_target_noexcept)
+          set(first_test_target_noexcept ${target_name})
+        elseif(${target_name} MATCHES "coroutine-support")
+          set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+        elseif(COMMAND target_precompile_headers)
+          target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_noexcept})
+        endif()
         add_dependencies(_hl ${target_name})
         list(APPEND noexcept_tests ${target_name})
         if(MSVC AND NOT CLANG)
@@ -161,6 +175,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
 #          target_compile_options(${target_name} PRIVATE /permissive-)  # test bug report #142
         endif()
+        target_compile_definitions(${target_name} PRIVATE SYSTEM_ERROR2_NOT_POSIX=1 "SYSTEM_ERROR2_FATAL=::abort()")
         target_link_libraries(${target_name} PRIVATE outcome::hl)
         if(${target_name} MATCHES "coroutine-support")
           apply_cxx_coroutines_to(PRIVATE ${target_name})
@@ -177,6 +192,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
         if(MSVC AND NOT CLANG)
           set(target_name "outcome_hl--${testname}-permissive")
           add_executable(${target_name} "${testsource}")
+          if(NOT first_test_target_permissive)
+            set(first_test_target_permissive ${target_name})
+          elseif(${target_name} MATCHES "coroutine-support")
+            set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+          elseif(COMMAND target_precompile_headers)
+            target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
+          endif()
           add_dependencies(_hl ${target_name})
           target_link_libraries(${target_name} PRIVATE outcome::hl)
           target_compile_options(${target_name} PRIVATE /permissive)
