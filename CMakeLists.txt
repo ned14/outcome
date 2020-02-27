@@ -132,7 +132,13 @@ target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
-  set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS "outcome_hl--coroutine-support")
+  set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS
+    "outcome_hl--coroutine-support"
+    "outcome_hl--fileopen"
+    "outcome_hl--outcome-int-int-1"
+    "outcome_hl--result-int-int-1"
+    "outcome_hl--result-int-int-2"
+  )
   include(QuickCppLibMakeStandardTests)
   
   # Enable Coroutines for the coroutines support test
@@ -158,7 +164,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
         add_executable(${target_name} "${testsource}")
         if(NOT first_test_target_noexcept)
           set(first_test_target_noexcept ${target_name})
-        elseif(${target_name} MATCHES "coroutine-support")
+        elseif(${target_name} MATCHES "coroutine-support|fileopen")
           set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
         elseif(COMMAND target_precompile_headers)
           target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_noexcept})
@@ -189,7 +195,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
           add_executable(${target_name} "${testsource}")
           if(NOT first_test_target_permissive)
             set(first_test_target_permissive ${target_name})
-          elseif(${target_name} MATCHES "coroutine-support")
+          elseif(${target_name} MATCHES "coroutine-support|fileopen")
             set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
           elseif(COMMAND target_precompile_headers)
             target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
