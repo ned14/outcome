@@ -129,7 +129,7 @@ script:
        if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
      fi;
      git clone --depth 1 https://github.com/ned14/quickcpplib.git;
-     pip install --user gitpython;
+     pip3 install --user gitpython;
      python3 quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib outcome outcome::hl https://github.com/ned14/outcome;
      cd test_cpp-pm_install;
      mkdir build;
