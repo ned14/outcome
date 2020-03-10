@@ -15,5 +15,5 @@ outcome::result<int> test1(int x)
 
 int main(void)
 {
-  return test(5).value();
+  return test1(5).value();
 }

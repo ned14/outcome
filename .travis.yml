@@ -128,13 +128,14 @@ script:
        if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
        if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
      fi;
-     git clone https://github.com/ned14/quickcpplib.git;
-     python3 quickcpplib/scripts/test_cpp-pm_install.py https://github.com/ned14/outcome conan/test_package/example.cpp outcome outcome::hl;
+     git clone --depth 1 https://github.com/ned14/quickcpplib.git;
+     pip install --user gitpython;
+     python3 quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib outcome outcome::hl https://github.com/ned14/outcome;
      cd test_cpp-pm_install;
      mkdir build;
      cd build;
-     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=testinstall;
-     make install;
+     cmake .. -DCMAKE_BUILD_TYPE=Release;
+     make;
    fi
  
 after_success:
