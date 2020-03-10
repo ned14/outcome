@@ -30,6 +30,8 @@ addons:
     - cmake-data
 #    - abi-compliance-checker
     - abi-dumper
+    - python3
+    - python3-pip
 
 env:
 # - __="Code bloat tests"
