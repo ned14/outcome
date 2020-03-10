@@ -37,6 +37,7 @@ env:
  - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
  - __="cmake tests osx" NAME=TravisOSXWorker
+ - __="Installability"
  
 matrix:
   exclude:
@@ -92,7 +93,7 @@ script:
      if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisABICheck; fi;
      mkdir build;
      cd build;
-     cmake ..;
+     cmake .. -DCMAKE_BUILD_TYPE=Release;
      make outcome_hl-pp-abi;
      cd ../abi-compliance;
      sh ./check-abi.sh abi_dumps/Outcome/2.1/binary_only.dump;
@@ -120,6 +121,20 @@ script:
      git commit -a -m "Travis CI updates documentation" || true;
      git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/outcome gh-pages;
      cd ../..;
+   fi
+ -
+   if [ "$__" = "Installability" ]; then
+     if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+       if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
+       if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
+     fi;
+     git clone https://github.com/ned14/quickcpplib.git;
+     python3 quickcpplib/scripts/test_cpp-pm_install.py https://github.com/ned14/outcome conan/test_package/example.cpp outcome outcome::hl;
+     cd test_cpp-pm_install;
+     mkdir build;
+     cd build;
+     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=testinstall;
+     make install;
    fi
  
 after_success:

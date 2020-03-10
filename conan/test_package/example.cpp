@@ -1,16 +1,19 @@
-#include <iostream>
-#include <string>
-
 #include <outcome.hpp>
 
 namespace outcome = OUTCOME_V2_NAMESPACE;
 
-outcome::result<std::string> hello()
+outcome::result<int> test2(int x)
 {
-  return "Hello, World!";
+  return x;
 }
 
-int main()
+outcome::result<int> test1(int x)
 {
-  std::cout << hello() << std::endl;
+  OUTCOME_TRY(test2(x));
+  return 0;
+}
+
+int main(void)
+{
+  return test(5).value();
 }
