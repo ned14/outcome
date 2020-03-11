@@ -27,7 +27,7 @@ include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
-ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/status-code/include" "https://github.com/ned14/status-code.git")
+ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status-code/include" "https://github.com/ned14/status-code.git")
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/version.hpp" VERSIONSTRING)
