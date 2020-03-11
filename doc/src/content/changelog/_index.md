@@ -32,6 +32,10 @@ of precompiled headers will NOT be enabled.
 assumed that importers of the Outcome cmake targets will configure their own
 precompiled headers which incorporate Outcome.
 
+Installability is now CI tested per commit
+: Due to installability of Outcome (e.g. `make install`) breaking itself rather
+more frequently than is ideal, installability is now tested on CI per commit.
+
 ### Bug fixes:
 
 [#214](https://github.com/ned14/outcome/issues/214)
