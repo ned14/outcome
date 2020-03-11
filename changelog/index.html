@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-03-10T11:37:17 UTC">
+<meta name="revised" content="2020-03-11T10:54:08 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2618,6 +2618,9 @@ of precompiled headers will NOT be enabled.</p>
 <p>Exported targets do NOT request precompilation of headers, as it is
 assumed that importers of the Outcome cmake targets will configure their own
 precompiled headers which incorporate Outcome.</p></dd>
+<dt>Installability is now CI tested per commit</dt>
+<dd><p>Due to installability of Outcome (e.g. <code>make install</code>) breaking itself rather
+more frequently than is ideal, installability is now tested on CI per commit.</p></dd>
 </dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
@@ -2915,7 +2918,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/02/2020
+        <i class='fa fa-calendar'></i> Last update on 11/03/2020
     </div>
     
 
