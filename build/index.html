@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-03-11T10:54:05 UTC">
+<meta name="revised" content="2020-03-12T10:38:33 UTC">
 <title>Build and install :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2629,6 +2629,39 @@ Outcome/master@ned14/stable
 
 <p>Outcome will be made available by Conan at <code>&lt;outcome.hpp&gt;</code>.</p>
 
+<h2 id="usage-from-the-cmake-hunter-package-manager">Usage from the cmake hunter package manager</h2>
+
+<p>Outcome has not been submitted to the main cmake hunter package manager repo as
+it changes too frequently. You can however add it as a git submodule:</p>
+
+<pre><code>cd yourthirdpartyrepodir
+git submodule add https://github.com/ned14/quickcpplib
+git submodule add https://github.com/ned14/outcome
+cd ..
+git submodule update --init --recursive
+</code></pre>
+
+<p>Now tell cmake hunter about a git submoduled cmake hunter package by
+adding to your project&rsquo;s <code>cmake/Hunter/config.cmake</code>:</p>
+
+<pre><code>hunter_config(quickcpplib GIT_SUBMODULE &quot;yourthirdpartyrepodir/quickcpplib&quot;)
+hunter_config(outcome GIT_SUBMODULE &quot;yourthirdpartyrepodir/outcome&quot;)
+</code></pre>
+
+<p>&hellip; and finally to your <code>CMakeLists.txt</code>, now add outcome as if it were
+an ordinary cmake hunter package:</p>
+
+<pre><code>hunter_add_package(quickcpplib)
+find_package(quickcpplib CONFIG REQUIRED)
+hunter_add_package(outcome)
+find_package(outcome CONFIG REQUIRED)
+</code></pre>
+
+<p>Now you tell cmake to link to outcome as usual (see below for cmake targets):</p>
+
+<pre><code>target_link_libraries(mytarget outcome::hl)
+</code></pre>
+
 <h2 id="usage-as-a-git-submodule">Usage as a git submodule</h2>
 
 <p>If you are very keen on tracking very latest Outcome, you can add it as a git
@@ -2642,7 +2675,7 @@ git submodule update --init --recursive
 
 <p>After this you can bring Outcome into your code using:</p>
 
-<pre><code>#include &quot;outcome/include/outcome.hpp&quot;
+<pre><code>#include &quot;outcome/single-header/outcome.hpp&quot;
 </code></pre>
 
 <p>That&rsquo;s it, you are ready to go. From time to time, you may wish to update to
@@ -2760,7 +2793,7 @@ suite along with your own.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/02/2020
+        <i class='fa fa-calendar'></i> Last update on 12/03/2020
     </div>
     
 
