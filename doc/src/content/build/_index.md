@@ -50,6 +50,43 @@ Outcome/master@ned14/stable
 Outcome will be made available by Conan at `<outcome.hpp>`.
 
 
+## Usage from the cmake hunter package manager
+
+Outcome has not been submitted to the main cmake hunter package manager repo as
+it changes too frequently. You can however add it as a git submodule:
+
+```
+cd yourthirdpartyrepodir
+git submodule add https://github.com/ned14/quickcpplib
+git submodule add https://github.com/ned14/outcome
+cd ..
+git submodule update --init --recursive
+```
+
+Now tell cmake hunter about a git submoduled cmake hunter package by
+adding to your project's `cmake/Hunter/config.cmake`:
+
+```
+hunter_config(quickcpplib GIT_SUBMODULE "yourthirdpartyrepodir/quickcpplib")
+hunter_config(outcome GIT_SUBMODULE "yourthirdpartyrepodir/outcome")
+```
+
+... and finally to your `CMakeLists.txt`, now add outcome as if it were
+an ordinary cmake hunter package:
+
+```
+hunter_add_package(quickcpplib)
+find_package(quickcpplib CONFIG REQUIRED)
+hunter_add_package(outcome)
+find_package(outcome CONFIG REQUIRED)
+```
+
+Now you tell cmake to link to outcome as usual (see below for cmake targets):
+
+```
+target_link_libraries(mytarget outcome::hl)
+```
+
 ## Usage as a git submodule
 
 If you are very keen on tracking very latest Outcome, you can add it as a git
@@ -65,7 +102,7 @@ git submodule update --init --recursive
 After this you can bring Outcome into your code using:
 
 ```
-#include "outcome/include/outcome.hpp"
+#include "outcome/single-header/outcome.hpp"
 ```
 
 That's it, you are ready to go. From time to time, you may wish to update to
