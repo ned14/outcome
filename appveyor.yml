@@ -12,7 +12,9 @@ init:
   - git config --global core.longpaths true
 
 clone_folder: c:\boost.outcome
-platform: x64 
+platform:
+  - x86
+  - x64 
 configuration: Release
 
 before_build:
@@ -20,6 +22,7 @@ before_build:
   - git submodule update --init --recursive
   - pip install ply
 build_script:
+  - if "%PLATFORM" = "x86" set "CTEST_CONFIGURE_OPTIONS=-A Win32"
   - ctest -S .ci.cmake -V
 after_build:
 
