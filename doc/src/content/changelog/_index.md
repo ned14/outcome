@@ -32,6 +32,11 @@ of precompiled headers will NOT be enabled.
 assumed that importers of the Outcome cmake targets will configure their own
 precompiled headers which incorporate Outcome.
 
+Installability is now CI tested per commit
+: Due to installability of standalone Outcome (e.g. `make install`) breaking
+itself rather more frequently than is ideal, installability is now tested on CI
+per commit.
+
 ### Bug fixes:
 
 [#214](https://github.com/ned14/outcome/issues/214)
@@ -43,6 +48,15 @@ to static assert which runs later in the type instantiation sequence.
 : For standalone Outcome, `CMAKE_TOOLCHAIN_FILE` is now passed through during
 dependency superbuild. This should solve build issues for some embedded toolchain
 users.
+
+[#220](https://github.com/ned14/outcome/issues/220)
+: A false positive undefined behaviour sanitiser failure in some use cases of
+Experimental Outcome was worked around to avoid the failure message.
+
+[#221](https://github.com/ned14/outcome/issues/221)
+: Restored compatibility with x86 on Windows, which was failing with link errors.
+It was quite surprising that this bug was not reported sooner, but obviously
+almost nobody is using Outcome with x86 on Windows.
 
 ---
 ## v2.1.2 11th December 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
