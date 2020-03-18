@@ -707,9 +707,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    27333ff6a42e911d7709d20bb6d394d231f6231b
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-03-11 11:27:45 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 27333ff6
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    8a81b159cae78d83b151f756c1fd08a972b44cc4
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-03-16 18:12:07 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 8a81b159
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8f8224166604a514f1ac466d8e98e9d7df784248
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-03-11 10:51:29 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8f822416
+#define OUTCOME_PREVIOUS_COMMIT_REF f2fce2dc31cd1050c4693d1eea852a08c98fc164
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-03-12 10:35:46 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f2fce2dc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1466,8 +1466,10 @@ Distributed under the Boost Software License, Version 1.0.
 #else
 #if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define EXECINFO_DECL inline
-#else
+#elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
+#else
+#define EXECINFO_DECL extern
 #endif
 #endif
 
@@ -1549,10 +1551,17 @@ namespace win32
   _When_((cchWideChar == -1) && (cbMultiByte != 0), _Post_equal_to_(_String_length_(lpMultiByteStr) + 1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr, _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
                                                                                                                                             _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
 #pragma comment(lib, "kernel32.lib")
+#if defined(_WIN64)
 #pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPEAXPEBD@Z=LoadLibraryA")
 #pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YAP6AHXZPEAXPEBD@Z=GetProcAddress")
 #pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YAGKKPEAPEAXPEAK@Z=RtlCaptureStackBackTrace")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
+#else
+#pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YGPAXPBD@Z=__imp__LoadLibraryA@4")
+#pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YGP6GHXZPAXPBD@Z=__imp__GetProcAddress@8")
+#pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YGGKKPAPAXPAK@Z=__imp__RtlCaptureStackBackTrace@16")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
+#endif
 }  // namespace win32
 #else
 #ifndef WIN32_LEAN_AND_MEAN
@@ -1593,8 +1602,8 @@ static HMODULE dbghelp;
   static void load_dbghelp()
   {
 #if defined(__cplusplus) && !defined(__clang__)
-    using win32::LoadLibraryA;
     using win32::GetProcAddress;
+    using win32::LoadLibraryA;
 #endif
     if(dbghelp)
       return;
@@ -1617,121 +1626,122 @@ static HMODULE dbghelp;
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-_Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len)
-{
+  _Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len)
+  {
 #if defined(__cplusplus) && !defined(__clang__)
-  using win32::RtlCaptureStackBackTrace;
+    using win32::RtlCaptureStackBackTrace;
 #endif
-  return RtlCaptureStackBackTrace(1, (unsigned long) len, bt, NULL);
-}
+    return RtlCaptureStackBackTrace(1, (unsigned long) len, bt, NULL);
+  }
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 6385 6386)  // MSVC static analyser can't grok this function. clang's analyser gives it thumbs up.
 #endif
-_Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(len) void *const *bt, _In_ size_t len)
-{
-#if defined(__cplusplus) && !defined(__clang__)
-  using win32::WideCharToMultiByte;
-#endif
-  size_t bytes = (len + 1) * sizeof(void *) + 256, n;
-  if(!len)
-    return NULL;
-  else
+  _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(len) void *const *bt, _In_ size_t len)
   {
-    char **ret = (char **) malloc(bytes);
-    char *p = (char *) (ret + len + 1), *end = (char *) ret + bytes;
-    if(!ret)
+#if defined(__cplusplus) && !defined(__clang__)
+    using win32::WideCharToMultiByte;
+#endif
+    size_t bytes = (len + 1) * sizeof(void *) + 256, n;
+    if(!len)
       return NULL;
-    for(n = 0; n < len + 1; n++)
-      ret[n] = NULL;
-    load_dbghelp();
-    for(n = 0; n < len; n++)
+    else
     {
-      unsigned long displ;
-      IMAGEHLP_LINE64 ihl;
-      memset(&ihl, 0, sizeof(ihl));
-      ihl.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-      int please_realloc = 0;
-      if(!bt[n])
-      {
+      char **ret = (char **) malloc(bytes);
+      char *p = (char *) (ret + len + 1), *end = (char *) ret + bytes;
+      if(!ret)
+        return NULL;
+      for(n = 0; n < len + 1; n++)
         ret[n] = NULL;
-      }
-      else
+      load_dbghelp();
+      for(n = 0; n < len; n++)
       {
-        // Keep offset till later
-        ret[n] = (char *) ((char *) p - (char *) ret);
-        if(!SymGetLineFromAddr64 || !SymGetLineFromAddr64((void *) (size_t) -1 /*GetCurrentProcess()*/, (size_t) bt[n], &displ, &ihl))
+        unsigned long displ;
+        IMAGEHLP_LINE64 ihl;
+        memset(&ihl, 0, sizeof(ihl));
+        ihl.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+        int please_realloc = 0;
+        if(!bt[n])
         {
-          if(n == 0)
-          {
-            free(ret);
-            return NULL;
-          }
-          ihl.FileName = (wchar_t *) L"unknown";
-          ihl.LineNumber = 0;
-        }
-      retry:
-        if(please_realloc)
-        {
-          char **temp = (char **) realloc(ret, bytes + 256);
-          if(!temp)
-          {
-            free(ret);
-            return NULL;
-          }
-          p = (char *) temp + (p - (char *) ret);
-          ret = temp;
-          bytes += 256;
-          end = (char *) ret + bytes;
-        }
-        if(ihl.FileName && ihl.FileName[0])
-        {
-          int plen = WideCharToMultiByte(65001 /*CP_UTF8*/, 0, ihl.FileName, -1, p, (int) (end - p), NULL, NULL);
-          if(!plen)
-          {
-            please_realloc = 1;
-            goto retry;
-          }
-          p[plen - 1] = 0;
-          p += plen - 1;
+          ret[n] = NULL;
         }
         else
         {
+          // Keep offset till later
+          ret[n] = (char *) ((char *) p - (char *) ret);
+          if(!SymGetLineFromAddr64 || !SymGetLineFromAddr64((void *) (size_t) -1 /*GetCurrentProcess()*/, (size_t) bt[n], &displ, &ihl))
+          {
+            if(n == 0)
+            {
+              free(ret);
+              return NULL;
+            }
+            ihl.FileName = (wchar_t *) L"unknown";
+            ihl.LineNumber = 0;
+          }
+        retry:
+          if(please_realloc)
+          {
+            char **temp = (char **) realloc(ret, bytes + 256);
+            if(!temp)
+            {
+              free(ret);
+              return NULL;
+            }
+            p = (char *) temp + (p - (char *) ret);
+            ret = temp;
+            bytes += 256;
+            end = (char *) ret + bytes;
+          }
+          if(ihl.FileName && ihl.FileName[0])
+          {
+            int plen = WideCharToMultiByte(65001 /*CP_UTF8*/, 0, ihl.FileName, -1, p, (int) (end - p), NULL, NULL);
+            if(!plen)
+            {
+              please_realloc = 1;
+              goto retry;
+            }
+            p[plen - 1] = 0;
+            p += plen - 1;
+          }
+          else
+          {
+            if(end - p < 16)
+            {
+              please_realloc = 1;
+              goto retry;
+            }
+            _ui64toa_s((size_t) bt[n], p, end - p, 16);
+            p = strchr(p, 0);
+          }
           if(end - p < 16)
           {
             please_realloc = 1;
             goto retry;
           }
-          _ui64toa_s((size_t) bt[n], p, end - p, 16);
-          p = strchr(p, 0);
+          *p++ = ':';
+          _itoa_s(ihl.LineNumber, p, end - p, 10);
+          p = strchr(p, 0) + 1;
         }
-        if(end - p < 16)
-        {
-          please_realloc = 1;
-          goto retry;
-        }
-        *p++ = ':';
-        _itoa_s(ihl.LineNumber, p, end - p, 10);
-        p = strchr(p, 0) + 1;
       }
+      for(n = 0; n < len; n++)
+      {
+        if(ret[n])
+          ret[n] = (char *) ret + (size_t) ret[n];
+      }
+      return ret;
     }
-    for(n = 0; n < len; n++)
-    {
-      if(ret[n])
-        ret[n] = (char *) ret + (size_t) ret[n];
-    }
-    return ret;
   }
-}
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-// extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
+  // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 
 #ifdef __cplusplus
 }
@@ -7081,11 +7091,11 @@ namespace detail
   };
 
   template <class To, class From,
-            typename std::enable_if<                //
-            is_bit_castable<To, From>::value        //
-            && is_static_castable<To, From>::value  //
+            typename std::enable_if<                 //
+            is_bit_castable<To, From>::value         //
+            && is_static_castable<To, From>::value   //
             && !is_union_castable<To, From>::value,  //
-            bool>::type = true>  //
+            bool>::type = true>                      //
   constexpr To bit_cast(const From &from) noexcept
   {
     return static_cast<To>(from);
@@ -7095,8 +7105,8 @@ namespace detail
             typename std::enable_if<                 //
             is_bit_castable<To, From>::value         //
             && !is_static_castable<To, From>::value  //
-            && is_union_castable<To, From>::value,    //
-            bool>::type = true>  //
+            && is_union_castable<To, From>::value,   //
+            bool>::type = true>                      //
   constexpr To bit_cast(const From &from) noexcept
   {
     return bit_cast_union<To, From>{from}.target;
@@ -7106,8 +7116,8 @@ namespace detail
             typename std::enable_if<                 //
             is_bit_castable<To, From>::value         //
             && !is_static_castable<To, From>::value  //
-            && !is_union_castable<To, From>::value,   //
-            bool>::type = true>  //
+            && !is_union_castable<To, From>::value,  //
+            bool>::type = true>                      //
   To bit_cast(const From &from) noexcept
   {
     bit_cast_union<To, From> ret;
@@ -7190,7 +7200,11 @@ namespace detail
     extern "C" ptrdiff_t write(int, const void *, size_t);
 #elif defined(_MSC_VER)
     extern ptrdiff_t write(int, const void *, size_t);
+#if defined(_WIN64)
 #pragma comment(linker, "/alternatename:?write@avoid_stdio_include@detail@system_error2@@YA_JHPEBX_K@Z=write")
+#else
+#pragma comment(linker, "/alternatename:?write@avoid_stdio_include@detail@system_error2@@YAHHPBXI@Z=_write")
+#endif
 #endif
   }  // namespace avoid_stdio_include
   inline void do_fatal_exit(const char *msg)
@@ -9322,9 +9336,15 @@ namespace win32
   // Converts UTF-16 message string to UTF-8
   extern int __stdcall WideCharToMultiByte(unsigned int CodePage, DWORD dwFlags, const wchar_t *lpWideCharStr, int cchWideChar, char *lpMultiByteStr, int cbMultiByte, const char *lpDefaultChar, int *lpUsedDefaultChar);
 #pragma comment(lib, "kernel32.lib")
+#if defined(_WIN64)
 #pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YAKXZ=GetLastError")
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPEBXKKPEA_WKPEAX@Z=FormatMessageW")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
+#else
+#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=__imp__GetLastError@0")
+#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=__imp__FormatMessageW@28")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
+#endif
 }  // namespace win32
 
 class _win32_code_domain;
@@ -9335,7 +9355,7 @@ using win32_code = status_code<_win32_code_domain>;
 using win32_error = status_error<_win32_code_domain>;
 
 /*! (Windows only) The implementation of the domain for Win32 error codes, those returned by `GetLastError()`.
-*/
+ */
 class _win32_code_domain : public status_code_domain
 {
   template <class DomainType> friend class status_code;
@@ -9472,7 +9492,10 @@ public:
 
 public:
   //! Default constructor
-  constexpr explicit _win32_code_domain(typename _base::unique_id_type id = 0x8cd18ee72d680f1b) noexcept : _base(id) {}
+  constexpr explicit _win32_code_domain(typename _base::unique_id_type id = 0x8cd18ee72d680f1b) noexcept
+      : _base(id)
+  {
+  }
   _win32_code_domain(const _win32_code_domain &) = default;
   _win32_code_domain(_win32_code_domain &&) = default;
   _win32_code_domain &operator=(const _win32_code_domain &) = default;
@@ -9551,7 +9574,11 @@ namespace win32
   // Used to retrieve where the NTDLL DLL is mapped into memory
   extern HMODULE __stdcall GetModuleHandleW(const wchar_t *lpModuleName);
 #pragma comment(lib, "kernel32.lib")
+#if defined(_WIN64)
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPEAXPEB_W@Z=GetModuleHandleW")
+#else
+#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=__imp__GetModuleHandleW@4")
+#endif
 }  // namespace win32
 
 class _nt_code_domain;
@@ -9561,7 +9588,7 @@ using nt_code = status_code<_nt_code_domain>;
 using nt_error = status_error<_nt_code_domain>;
 
 /*! (Windows only) The implementation of the domain for NT error codes, those returned by NT kernel functions.
-*/
+ */
 class _nt_code_domain : public status_code_domain
 {
   template <class DomainType> friend class status_code;
@@ -10753,7 +10780,10 @@ public:
 
 public:
   //! Default constructor
-  constexpr explicit _nt_code_domain(typename _base::unique_id_type id = 0x93f3b4487e4af25b) noexcept : _base(id) {}
+  constexpr explicit _nt_code_domain(typename _base::unique_id_type id = 0x93f3b4487e4af25b) noexcept
+      : _base(id)
+  {
+  }
   _nt_code_domain(const _nt_code_domain &) = default;
   _nt_code_domain(_nt_code_domain &&) = default;
   _nt_code_domain &operator=(const _nt_code_domain &) = default;
