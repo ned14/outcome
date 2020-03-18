@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-03-17T15:25:24 UTC">
+<meta name="revised" content="2020-03-18T10:46:41 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2638,6 +2638,10 @@ users.</dd>
 <dt><a href="https://github.com/ned14/outcome/issues/220">#220</a></dt>
 <dd>A false positive undefined behaviour sanitiser failure in some use cases of
 Experimental Outcome was worked around to avoid the failure message.</dd>
+<dt><a href="https://github.com/ned14/outcome/issues/221">#221</a></dt>
+<dd>Restored compatibility with x86 on Windows, which was failing with link errors.
+It was quite surprising that this bug was not reported sooner, but obviously
+almost nobody is using Outcome with x86 on Windows.</dd>
 </dl>
 
 <hr />
@@ -2922,7 +2926,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 12/03/2020
+        <i class='fa fa-calendar'></i> Last update on 18/03/2020
     </div>
     
 
