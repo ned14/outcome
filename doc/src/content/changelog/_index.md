@@ -53,6 +53,11 @@ users.
 : A false positive undefined behaviour sanitiser failure in some use cases of
 Experimental Outcome was worked around to avoid the failure message.
 
+[#221](https://github.com/ned14/outcome/issues/221)
+: Restored compatibility with x86 on Windows, which was failing with link errors.
+It was quite surprising that this bug was not reported sooner, but obviously
+almost nobody is using Outcome with x86 on Windows.
+
 ---
 ## v2.1.2 11th December 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)
 

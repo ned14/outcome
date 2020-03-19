@@ -22,7 +22,7 @@ before_build:
   - git submodule update --init --recursive
   - pip install ply
 build_script:
-  - if "%PLATFORM" = "x86" set "CTEST_CONFIGURE_OPTIONS=-A Win32"
+  - if "%PLATFORM%" == "x86" set "CTEST_CONFIGURE_OPTIONS=-A Win32"
   - ctest -S .ci.cmake -V
 after_build:
 
