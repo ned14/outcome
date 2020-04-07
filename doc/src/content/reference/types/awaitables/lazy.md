@@ -32,8 +32,8 @@ int r = co_await func(5);
 `lazy<T>` has special semantics if `T` is a type capable of constructing from
 an `exception_ptr` or `error_code` -- any exceptions thrown during the function's body
 are sent via `T`, preferably via the error code route if {{% api "error_from_exception(" %}}`)`
-successfully matches the exception throw. This means that a {{% api "basic_result<T, E, NoValuePolicy>" %}}
-or {{% api "basic_outcome<T, EC, EP, NoValuePolicy>" %}} where one of its types is
+successfully matches the exception throw. This means that a
+{{% api "basic_result<T, E, NoValuePolicy>" %}} or {{% api "basic_outcome<T, EC, EP, NoValuePolicy>" %}} where one of its types is
 is compatible will have its `.error()` or `.exception()` set.
 
 Note that `lazy<T>` does not otherwise transport exception throws, and rethrows

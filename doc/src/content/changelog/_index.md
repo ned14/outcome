@@ -4,7 +4,15 @@ weight = 80
 +++
 
 ---
-## v2.1.3 ??? (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
+## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
+
+{{% notice note %}}
+The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
+becoming the default. You can use the future v2.2 branch now using
+[`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation).
+This branch has a number of major changes to Outcome v2.1, see the front page
+for details.
+{{% /notice %}}
 
 ### Enhancements:
 
@@ -36,6 +44,9 @@ Installability is now CI tested per commit
 : Due to installability of standalone Outcome (e.g. `make install`) breaking
 itself rather more frequently than is ideal, installability is now tested on CI
 per commit.
+
+Coroutines support has been documented
+: The coroutines support added in v2.1.2 has now been properly documented.
 
 ### Bug fixes:
 
