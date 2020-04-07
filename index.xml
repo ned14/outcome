@@ -72,6 +72,16 @@ struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt;
     </item>
     
     <item>
+      <title>Coroutine TRY operation</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</guid>
+      <description>As one cannot call statement return from within a Coroutine, the very first part of Outcome&amp;rsquo;s support for Coroutines is OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr) , which is literally the same as OUTCOME_TRY() except that co_return is called to return early instead of return.
+eager&amp;lt;result&amp;lt;std::string&amp;gt;&amp;gt; to_string(int x) { if(x &amp;gt;= 0) { OUTCOME_CO_TRY(convert(x)); } co_return &amp;#34;out of range&amp;#34;; } </description>
+    </item>
+    
+    <item>
       <title>Define a custom code domain</title>
       <link>https://ned14.github.io/outcome/experimental/worked-example/preamble/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -184,6 +194,16 @@ namespace error_code_extended { // Use the error_code type as the ADL bridge for
 &amp;nbsp;
 all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. The compiler literally compiles no code for an invalid observation &amp;ndash; the CPU &amp;ldquo;runs off&amp;rdquo; into the unknown.
 As bad as this may sound, it generates the most optimal code, and such hard UB is very tool-friendly for detection e.</description>
+    </item>
+    
+    <item>
+      <title>Coroutine awaitables</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</guid>
+      <description>The second part of the support is provided by header &amp;lt;outcome/coroutine_support.hpp&amp;gt; (or &amp;lt;outcome/experimental/coroutine_support.hpp&amp;gt; if you want Coroutine support for Experimental Outcome). This adds into namespace OUTCOME_V2_NAMESPACE::awaitables (or OUTCOME_V2_NAMESPACE::experimental::awaitables) these awaitable types suitable for returning from a Coroutinised function:
+ eager&amp;lt;T&amp;gt; An eagerly evaluated Coroutine: invoking co_await upon a function returning one of these immediately begins the execution of the function now. If the function never suspends, the overhead is similar to calling an ordinary function.</description>
     </item>
     
     <item>
@@ -337,6 +357,17 @@ We start by dealing with the HTTP library. We will integrate this into our appli
     </item>
     
     <item>
+      <title>Returning Outcome types from Coroutines</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</guid>
+      <description>eager&amp;lt;T&amp;gt; and lazy&amp;lt;T&amp;gt; and their atomic editions are completely standard awaitables with no special behaviours, except if T is a basic_result or basic_outcome. In that situation, the following occurs:
+If the Coroutine throws a C++ exception which was not handled inside the Coroutine body, Outcome&amp;rsquo;s awaitable types try to convert it into a form which your Result or Outcome type being returned can transport. For example:
+ If your Coroutine were returning a result&amp;lt;T, std::exception_ptr&amp;gt;, an errored Result with a pointer to the exception thrown would be returned.</description>
+    </item>
+    
+    <item>
       <title>TRY operations</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/try/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -417,6 +448,17 @@ Instead status code domains have a string_ref, which has a polymorphic implement
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/try_greedy/</guid>
       <description>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) has &amp;lsquo;greedier&amp;rsquo; implicit conversion semantics than basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; . For example, this code won&amp;rsquo;t compile:
 outcome::result&amp;lt;int, std::error_code&amp;gt; test(outcome::result&amp;lt;int, std::errc&amp;gt; r) { return r; // you need to use explicit construction here  // i.e. return outcome::result&amp;lt;int&amp;gt;(r); }  This is chosen because there is a non-trivial conversion between std::errc and std::error_code, so even though that conversion is implicit for std::error_code, Outcome does not expose the implicitness here in order to keep the implicit constructor count low (implicit constructors add significantly to build times).</description>
+    </item>
+    
+    <item>
+      <title>`operator co_await` as TRY operator</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/co_await/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/co_await/</guid>
+      <description>Many people have requested that operator co_await be overloaded to behave as a TRY operator when supplied with an Outcome type.
+Outcome does not implement that extension, nor will we accept PRs contributing support for this. We think you should use OUTCOME_CO_TRY() as this will lead to more maintainable and future proof code.
+However, we deliberately do not get in the way of you implementing that overload yourself in your own Outcome-based code.</description>
     </item>
     
     <item>
@@ -2994,10 +3036,10 @@ Header: &amp;lt;outcome/try.hpp&amp;gt;</description>
     
     <item>
       <title>`eager&lt;T&gt;/atomic_eager&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/aliases/eager/</link>
+      <link>https://ned14.github.io/outcome/reference/types/awaitables/eager/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/reference/aliases/eager/</guid>
+      <guid>https://ned14.github.io/outcome/reference/types/awaitables/eager/</guid>
       <description>This is very similar to lazy&amp;lt;T&amp;gt; , except that execution of the eager&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return eager&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
 atomic_eager&amp;lt;T&amp;gt; is like eager&amp;lt;T&amp;gt;, except that the setting of the coroutine result performs an atomic release, whilst the checking of whether the coroutine has finished is an atomic acquire.</description>
     </item>
@@ -3187,10 +3229,10 @@ Header: &amp;lt;outcome/success_failure.hpp&amp;gt;</description>
     
     <item>
       <title>`lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/aliases/lazy/</link>
+      <link>https://ned14.github.io/outcome/reference/types/awaitables/lazy/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/reference/aliases/lazy/</guid>
+      <guid>https://ned14.github.io/outcome/reference/types/awaitables/lazy/</guid>
       <description>This is very similar to eager&amp;lt;T&amp;gt; , except that execution of the lazy&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return lazy&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of lazily executed coroutines, most people will want to use atomic_lazy&amp;lt;T&amp;gt; instead of lazy&amp;lt;T&amp;gt;.</description>
     </item>
     

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Coroutines on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/</link>
+    <description>Recent content in Coroutines on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 07 Apr 2020 10:22:38 +0100</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/tutorial/essential/coroutines/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Coroutine TRY operation</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</guid>
+      <description>As one cannot call statement return from within a Coroutine, the very first part of Outcome&amp;rsquo;s support for Coroutines is OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr) , which is literally the same as OUTCOME_TRY() except that co_return is called to return early instead of return.
+eager&amp;lt;result&amp;lt;std::string&amp;gt;&amp;gt; to_string(int x) { if(x &amp;gt;= 0) { OUTCOME_CO_TRY(convert(x)); } co_return &amp;#34;out of range&amp;#34;; } </description>
+    </item>
+    
+    <item>
+      <title>Coroutine awaitables</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</guid>
+      <description>The second part of the support is provided by header &amp;lt;outcome/coroutine_support.hpp&amp;gt; (or &amp;lt;outcome/experimental/coroutine_support.hpp&amp;gt; if you want Coroutine support for Experimental Outcome). This adds into namespace OUTCOME_V2_NAMESPACE::awaitables (or OUTCOME_V2_NAMESPACE::experimental::awaitables) these awaitable types suitable for returning from a Coroutinised function:
+ eager&amp;lt;T&amp;gt; An eagerly evaluated Coroutine: invoking co_await upon a function returning one of these immediately begins the execution of the function now. If the function never suspends, the overhead is similar to calling an ordinary function.</description>
+    </item>
+    
+    <item>
+      <title>Returning Outcome types from Coroutines</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</guid>
+      <description>eager&amp;lt;T&amp;gt; and lazy&amp;lt;T&amp;gt; and their atomic editions are completely standard awaitables with no special behaviours, except if T is a basic_result or basic_outcome. In that situation, the following occurs:
+If the Coroutine throws a C++ exception which was not handled inside the Coroutine body, Outcome&amp;rsquo;s awaitable types try to convert it into a form which your Result or Outcome type being returned can transport. For example:
+ If your Coroutine were returning a result&amp;lt;T, std::exception_ptr&amp;gt;, an errored Result with a pointer to the exception thrown would be returned.</description>
+    </item>
+    
+    <item>
+      <title>`operator co_await` as TRY operator</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/co_await/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/co_await/</guid>
+      <description>Many people have requested that operator co_await be overloaded to behave as a TRY operator when supplied with an Outcome type.
+Outcome does not implement that extension, nor will we accept PRs contributing support for this. We think you should use OUTCOME_CO_TRY() as this will lead to more maintainable and future proof code.
+However, we deliberately do not get in the way of you implementing that overload yourself in your own Outcome-based code.</description>
+    </item>
+    
+  </channel>
+</rss>

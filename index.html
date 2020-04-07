@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-03-18T15:15:42 UTC">
+<meta name="revised" content="2020-04-07T09:26:38 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -207,6 +207,42 @@
         <div>
           <a href="/outcome/tutorial/essential/no-value/builtin/">
             Built-in policies
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/coroutines/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/coroutines/">Coroutines</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/try/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/try/">
+            Coroutine TRY operation
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/awaitables/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/awaitables/">
+            Coroutine awaitables
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/returning/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/returning/">
+            Returning Outcome types from Coroutines
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/co_await/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/co_await/">
+            <code>operator co_await</code> as TRY operator
           </a>
         </div>
     </li>
@@ -2085,6 +2121,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/eager/">
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/failure_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/failure_type/">
@@ -2096,6 +2139,13 @@
         <div>
           <a href="/outcome/reference/types/in_place_type_t/">
             <code>in_place_type_t&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/lazy/">
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2153,20 +2203,6 @@
         <div>
           <a href="/outcome/reference/aliases/default_policy/">
             <code>default_policy&lt;T, EC, EP&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/eager/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/lazy/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2626,7 +2662,7 @@ to not use exceptions to propagate failure reports across threads, tasks, fibers
 thus making it suitable for use in the global headers of really large codebases. Storage layout is
 guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>, thus making Outcome based code long term ABI-stable.</p>
 
-<div class="notices note" ><p>Ben Craig&rsquo;s work on <a href="https://wg21.link/P1886">P1886 <em>Error speed benchmarking</em></a> has led to
+<div class="notices note" ><p><p>Ben Craig&rsquo;s work on <a href="https://wg21.link/P1886">P1886 <em>Error speed benchmarking</em></a> has led to
 a <a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a> branch intended
 to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing. This branch has a number
 of major changes to Outcome v2:</p>
@@ -2650,7 +2686,7 @@ union storage for trivially copyable types is much easier than for non-TC types.
 
 <li><p>The compile time requirement for <code>E</code> types to have a default constructor is removed.</p></li>
 </ol>
-</div>
+</p></div>
 
 
 <h2 id="sample-usage">Sample usage</h2>
@@ -2686,8 +2722,7 @@ union storage for trivially copyable types is much easier than for non-TC types.
 <p><code>OUTCOME_TRY</code> is a control statement. If the returned <code>result&lt;T&gt;</code> object contains an error information, the enclosing function is immediately returned with <code>result&lt;U&gt;</code> containing the same failure information; otherwise an automatic object of type <code>T</code>
 is available in scope.</p>
 
-<div class="notices note" ><p>This library joined <a href="https://www.boost.org/doc/libs/develop/libs/outcome/doc/html/index.html">the Boost C++ libraries</a> in the 1.70 release (Spring 2019). <a href="https://github.com/boostorg/outcome">It can be grafted into much older Boost releases if desired</a>.</p>
-</div>
+<div class="notices note" ><p>This library joined <a href="https://www.boost.org/doc/libs/develop/libs/outcome/doc/html/index.html">the Boost C++ libraries</a> in the 1.70 release (Spring 2019). <a href="https://github.com/boostorg/outcome">It can be grafted into much older Boost releases if desired</a>.</p></div>
 
 <div class="footnotes">
 

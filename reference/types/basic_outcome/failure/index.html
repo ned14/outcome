@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-03-18T15:15:39 UTC">
+<meta name="revised" content="2020-04-07T09:26:36 UTC">
 <title>`exception_type failure() const noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -206,6 +206,42 @@
         <div>
           <a href="/outcome/tutorial/essential/no-value/builtin/">
             Built-in policies
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/coroutines/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/coroutines/">Coroutines</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/try/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/try/">
+            Coroutine TRY operation
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/awaitables/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/awaitables/">
+            Coroutine awaitables
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/returning/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/returning/">
+            Returning Outcome types from Coroutines
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/co_await/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/co_await/">
+            <code>operator co_await</code> as TRY operator
           </a>
         </div>
     </li>
@@ -2087,6 +2123,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/eager/">
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/types/failure_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/failure_type/">
@@ -2098,6 +2141,13 @@
         <div>
           <a href="/outcome/reference/types/in_place_type_t/">
             <code>in_place_type_t&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/lazy/">
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2155,20 +2205,6 @@
         <div>
           <a href="/outcome/reference/aliases/default_policy/">
             <code>default_policy&lt;T, EC, EP&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/eager/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/aliases/lazy/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/aliases/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2660,8 +2696,10 @@
       <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
       <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
       <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
+      <option value="/outcome/reference/types/awaitables/eager/" >-- `eager&lt;T&gt;/atomic_eager&lt;T&gt;`</option>
       <option value="/outcome/reference/types/failure_type/" >-- `failure_type&lt;EC, EP = void&gt;`</option>
       <option value="/outcome/reference/types/in_place_type_t/" >-- `in_place_type_t&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/lazy/" >-- `lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</option>
       <option value="/outcome/reference/types/success_type/" >-- `success_type&lt;T&gt;`</option>
   
     <option value="/outcome/reference/aliases/" >
@@ -2746,7 +2784,7 @@ that exception (from <code>std::current_exception()</code>) is returned instead.
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/10/2019
+        <i class='fa fa-calendar'></i> Last update on 11/10/2019
     </div>
     
 
