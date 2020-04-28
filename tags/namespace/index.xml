@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/namespace/</link>
     <description>Recent content in Namespace on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Thu, 17 Oct 2019 11:08:05 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 04 Oct 2019 20:49:30 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/namespace/index.xml" rel="self" type="application/rss+xml" />
     
@@ -23,7 +23,7 @@ namespace outcome = OUTCOME_V2_NAMESPACE; View this code on Github On standalone
     <item>
       <title>result&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
-      <pubDate>Thu, 17 Oct 2019 11:08:05 +0100</pubDate>
+      <pubDate>Fri, 04 Oct 2019 20:49:30 +0100</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/</guid>
       <description>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.
