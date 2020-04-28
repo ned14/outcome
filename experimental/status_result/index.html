@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-04-17T19:51:33 UTC">
+<meta name="revised" content="2020-04-28T08:41:50 UTC">
 <title>`status_result` and `status_outcome` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2642,7 +2642,8 @@ with a defaulted <code>NoValuePolicy</code> which selects on the basis of <code>
 instead.</p>
 
 <div class="notices note" ><p>If the <code>E</code> type is not some <code>status_code&lt;&gt;</code>, the default policy selector
-will complain.</p></div>
+will complain.</p>
+</div>
 
 
 <p>The specifications are:</p>
@@ -2671,7 +2672,8 @@ work exactly as you&rsquo;d expect (implicit conversion).</p>
 
 <div class="notices note" ><p>As <code>status_code&lt;erased&lt;T&gt;&gt;</code> is move-only, so is any <code>status_result</code> or <code>status_outcome</code>.
 For some reason this surprises a lot of people, and they tend to react by not using the erased
-form because it seems &ldquo;difficult&rdquo;.</p></div>
+form because it seems &ldquo;difficult&rdquo;.</p>
+</div>
 
 
 <p>It is actually, in fact, a wise discipline to follow to make all functions return
