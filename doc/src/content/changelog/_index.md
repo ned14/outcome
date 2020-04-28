@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
+## v2.1.4 ??? (Boost 1.74) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.4)
 
 {{% notice note %}}
 The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
@@ -13,6 +13,13 @@ becoming the default. You can use the future v2.2 branch now using
 This branch has a number of major changes to Outcome v2.1, see the front page
 for details.
 {{% /notice %}}
+
+### Enhancements:
+
+### Bug fixes:
+
+---
+## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
 
 ### Enhancements:
 
@@ -68,6 +75,10 @@ Experimental Outcome was worked around to avoid the failure message.
 : Restored compatibility with x86 on Windows, which was failing with link errors.
 It was quite surprising that this bug was not reported sooner, but obviously
 almost nobody is using Outcome with x86 on Windows.
+
+[#223](https://github.com/ned14/outcome/issues/223)
+: Fix a segfault in Debug builds only when cloning a `status_code_ptr` in
+Experimental.Outcome only.
 
 ---
 ## v2.1.2 11th December 2019 (Boost 1.72) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.2)

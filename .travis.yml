@@ -11,6 +11,7 @@ osx_image: xcode9
 branches:
   only:
     - develop
+    - better_optimisation
 notifications:
   email:
     recipients:
