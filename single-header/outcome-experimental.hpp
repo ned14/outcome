@@ -707,9 +707,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    8a81b159cae78d83b151f756c1fd08a972b44cc4
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-03-16 18:12:07 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 8a81b159
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    145bcf07762f92a416bd68544d8ad333875dcf22
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-04-06 13:20:37 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 145bcf07
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 7017ed31e440cfc6367c9a6950aaaf4602d46360
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-02-26 10:35:58 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 7017ed31
+#define OUTCOME_PREVIOUS_COMMIT_REF 397753b41f1d9548baf3ce94e823dfdd02af51b7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-04-28 08:48:02 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 397753b4
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -7288,7 +7288,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 #define SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -7495,6 +7495,10 @@ namespace detail
     return static_cast<To>(from);
   }
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
   template <class To, class From,
             typename std::enable_if<                 //
             is_bit_castable<To, From>::value         //
@@ -7505,6 +7509,9 @@ namespace detail
   {
     return bit_cast_union<To, From>{from}.target;
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
   template <class To, class From,
             typename std::enable_if<                 //
@@ -9090,7 +9097,7 @@ namespace detail
 #endif
     virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t /*unused*/) const override  // NOLINT
     {
-      assert(dst.domain() == *this);
+      // Note that dst will not have its domain set
       assert(src.domain() == *this);
       auto &d = static_cast<_mycode &>(dst);               // NOLINT
       const auto &_s = static_cast<const _mycode &>(src);  // NOLINT

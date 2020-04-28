@@ -5,6 +5,7 @@ version: 2.00.{build}-{branch}
 branches:
   only:
     - develop
+    - better_optimisation
 skip_tags: true
  
 image: Visual Studio 2017
