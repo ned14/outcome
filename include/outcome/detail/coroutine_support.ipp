@@ -82,12 +82,12 @@ namespace awaitables
 
     OUTCOME_TEMPLATE(class T, class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
-    inline bool try_set_error(T &e, U *result)
+    inline bool try_set_error(T &&e, U *result)
     {
-      new(result) U(e);
+      new(result) U(static_cast<T&&>(e));
       return true;
     }
-    template <class T> inline bool try_set_error(T & /*unused*/, ...) { return false; }
+    template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
     OUTCOME_TEMPLATE(class T, class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
     inline void set_or_rethrow(T &e, U *result) { new(result) U(e); }
@@ -161,7 +161,7 @@ namespace awaitables
         auto e = std::current_exception();
         auto ec = detail::error_from_exception(static_cast<decltype(e) &&>(e), {});
         // Try to set error code first
-        if(!detail::error_is_set(ec) || !detail::try_set_error(ec, &result))
+        if(!detail::error_is_set(ec) || !detail::try_set_error(static_cast<decltype(ec) &&>(ec), &result))
         {
           detail::set_or_rethrow(e, &result);
         }
