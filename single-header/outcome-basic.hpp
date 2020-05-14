@@ -1198,9 +1198,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF a7b3e0ee2c197a98e2b982b917d7ca61de73b816
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-14 10:06:02 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a7b3e0ee
+#define OUTCOME_PREVIOUS_COMMIT_REF 28df3c45155d4a5a7428b4765eecefd8c0d079d3
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-14 11:00:32 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 28df3c45
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -6527,7 +6527,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Try operation macros
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: July 2017
 
 
@@ -6577,7 +6577,7 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }

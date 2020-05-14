@@ -1,5 +1,5 @@
 /* Try operation macros
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: July 2017
 
 
@@ -49,7 +49,7 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
