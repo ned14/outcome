@@ -756,30 +756,30 @@ namespace detail
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<value_type> /*unused*/,
-                                             Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+                                             Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
         : _value(static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il,
-                                    Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+                                    Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>)
         : _value(il, static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class U>
-    static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value;
+    static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+    constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())  // NOLINT
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+    constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
                                                          value_storage_trivial())  // NOLINT
     {
@@ -846,37 +846,37 @@ namespace detail
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/,
-                                      Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+                                      Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
         : _value(static_cast<Args &&>(args)...)  // NOLINT
         , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<value_type> /*unused*/, std::initializer_list<U> il,
-                             Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+                             Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>)
         : _value(il, static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class U>
-    static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && std::is_constructible<value_type, U>::value;
+    static constexpr bool enable_converting_constructor = !std::is_same<std::decay_t<U>, value_type>::value && detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+    constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U> &o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U> &o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U> &o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, o._value) : value_storage_nontrivial())
     {
       _status = o._status;
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+    constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U> &&o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
                                                             value_storage_nontrivial())
     {
@@ -884,7 +884,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
-    constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(std::is_nothrow_constructible<value_type, U>::value)
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U> &&o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_nontrivial(o._status.have_value() ? value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
                                                             value_storage_nontrivial())
     {

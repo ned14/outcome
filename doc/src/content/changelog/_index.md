@@ -18,6 +18,12 @@ for details.
 
 ### Bug fixes:
 
+[#224](https://github.com/ned14/outcome/issues/224)
+: The clang Apple ships in Xcode 11.4 (currently the latest) has not been patched
+with the fixes to LLVM clang that fix `noexcept(std::is_constructible<T, void>)`
+failing to compile which I originally submitted years ago. So give up waiting on
+Apple to fix their clang, add a workaround to Outcome.
+
 ---
 ## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
 

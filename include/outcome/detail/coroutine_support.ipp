@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <cassert>
 
-#if __cpp_coroutines
+#if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines)
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -81,7 +81,7 @@ namespace awaitables
     template <class T> constexpr inline type_found<exception_type_not_found> extract_exception_type(...) { return {}; }
 
     OUTCOME_TEMPLATE(class T, class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
     inline bool try_set_error(T &&e, U *result)
     {
       new(result) U(static_cast<T&&>(e));
@@ -89,7 +89,7 @@ namespace awaitables
     }
     template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
     OUTCOME_TEMPLATE(class T, class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
     inline void set_or_rethrow(T &e, U *result) { new(result) U(e); }
     template <class T> inline void set_or_rethrow(T &e, ...) { rethrow_exception(e); }
     template <class T> class fake_atomic
