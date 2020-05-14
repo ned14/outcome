@@ -36,6 +36,7 @@ set(outcome_HEADERS
   "include/outcome/experimental/status-code/include/iostream_support.hpp"
   "include/outcome/experimental/status-code/include/nt_code.hpp"
   "include/outcome/experimental/status-code/include/posix_code.hpp"
+  "include/outcome/experimental/status-code/include/quick_status_code_from_enum.hpp"
   "include/outcome/experimental/status-code/include/result.hpp"
   "include/outcome/experimental/status-code/include/status_code.hpp"
   "include/outcome/experimental/status-code/include/status_code_domain.hpp"

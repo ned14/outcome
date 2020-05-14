@@ -21,11 +21,12 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#if defined(__cpp_coroutines)
-
 #include "../../include/outcome/coroutine_support.hpp"
 #include "../../include/outcome/outcome.hpp"
 #include "../../include/outcome/try.hpp"
+
+#if OUTCOME_FOUND_COROUTINE_HEADER
+
 #include "quickcpplib/boost/test/unit_test.hpp"
 
 namespace coroutines

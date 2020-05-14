@@ -278,6 +278,20 @@ namespace detail
   };
   template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
 
+  template <class T, class... Args> struct _is_nothrow_constructible
+  {
+    static constexpr bool value = std::is_nothrow_constructible<T, Args...>::value;
+  };
+  template <class T> struct _is_nothrow_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_nothrow_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class... Args> static constexpr bool is_nothrow_constructible = _is_nothrow_constructible<T, Args...>::value;
+
 #ifndef BOOST_OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
 #if defined(_MSC_VER) && _HAS_CXX17
 #define BOOST_OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1  // MSVC always has std::is_nothrow_swappable

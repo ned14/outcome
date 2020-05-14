@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <cassert>
 
-#if __cpp_coroutines
+#if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines)
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
