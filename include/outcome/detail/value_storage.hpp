@@ -849,7 +849,7 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    && detail::is_constructible<value_type, U> && detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -877,7 +877,7 @@ namespace detail
     };
     template <class V>
     static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -905,7 +905,7 @@ namespace detail
     };
     template <class U>
     static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -1037,7 +1037,7 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    && detail::is_constructible<value_type, U> && detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -1086,7 +1086,7 @@ namespace detail
     };
     template <class V>
     static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -1124,7 +1124,7 @@ namespace detail
     };
     template <class U>
     static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
