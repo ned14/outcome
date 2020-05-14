@@ -52,7 +52,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_COROUTINE_SUPPORT_HPP
 #define OUTCOME_COROUTINE_SUPPORT_HPP
 /* Configure Outcome with QuickCppLib
-(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -708,9 +708,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    145bcf07762f92a416bd68544d8ad333875dcf22
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-04-06 13:20:37 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 145bcf07
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    e6515d51df28804ee8638cbd778d089b53ee1030
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-04-22 08:26:40 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e6515d51
 #endif
 
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
@@ -1225,9 +1225,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 397753b41f1d9548baf3ce94e823dfdd02af51b7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-04-28 08:48:02 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 397753b4
+#define OUTCOME_PREVIOUS_COMMIT_REF c8f8edb2331464b12f1865bc5ab9886b6d1751b5
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-07 08:51:08 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c8f8edb2
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1355,8 +1355,6 @@ namespace detail
   /* True if type is the same or constructible. Works around a bug where clang + libstdc++
   pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
   */
-
-
   template <class T, class U> struct _is_explicitly_constructible
   {
     static constexpr bool value = std::is_constructible<T, U>::value;
@@ -1384,6 +1382,20 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
+
+  template <class T, class... Args> struct _is_nothrow_constructible
+  {
+    static constexpr bool value = std::is_nothrow_constructible<T, Args...>::value;
+  };
+  template <class T> struct _is_nothrow_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_nothrow_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class... Args> static constexpr bool is_nothrow_constructible = _is_nothrow_constructible<T, Args...>::value;
 
 #ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
 #if defined(_MSC_VER) && _HAS_CXX17
@@ -1991,7 +2003,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <cassert>
 
-#if __cpp_coroutines
+#if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines)
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -2041,12 +2053,12 @@ namespace awaitables
 
     OUTCOME_TEMPLATE(class T, class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
-    inline bool try_set_error(T &e, U *result)
+    inline bool try_set_error(T &&e, U *result)
     {
-      new(result) U(e);
+      new(result) U(static_cast<T&&>(e));
       return true;
     }
-    template <class T> inline bool try_set_error(T & /*unused*/, ...) { return false; }
+    template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
     OUTCOME_TEMPLATE(class T, class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
     inline void set_or_rethrow(T &e, U *result) { new(result) U(e); }
@@ -2120,7 +2132,7 @@ namespace awaitables
         auto e = std::current_exception();
         auto ec = detail::error_from_exception(static_cast<decltype(e) &&>(e), {});
         // Try to set error code first
-        if(!detail::error_is_set(ec) || !detail::try_set_error(ec, &result))
+        if(!detail::error_is_set(ec) || !detail::try_set_error(static_cast<decltype(ec) &&>(ec), &result))
         {
           detail::set_or_rethrow(e, &result);
         }
@@ -2751,8 +2763,6 @@ namespace trait
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class R>                                                             //
   static constexpr bool type_can_be_used_in_basic_result =                       //
   (!std::is_reference<R>::value                                                  //
@@ -2767,8 +2777,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type. Potential doc page: NOT FOUND
 */
-
-
   template <class T> struct is_move_bitcopying
   {
     static constexpr bool value = false;
@@ -2777,8 +2785,6 @@ type definition  is_error_type. Potential doc page: NOT FOUND
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type. Potential doc page: NOT FOUND
 */
-
-
   template <class E> struct is_error_type
   {
     static constexpr bool value = false;
@@ -2787,8 +2793,6 @@ type definition  is_error_type. Potential doc page: NOT FOUND
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type_enum. Potential doc page: NOT FOUND
 */
-
-
   template <class E, class Enum> struct is_error_type_enum
   {
     static constexpr bool value = false;
@@ -2837,8 +2841,6 @@ type definition  is_error_type_enum. Potential doc page: NOT FOUND
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_code_available. Potential doc page: NOT FOUND
 */
-
-
   template <class T> struct is_error_code_available
   {
     static constexpr bool value = detail::_is_error_code_available<std::decay_t<T>>::value;
@@ -2849,8 +2851,6 @@ type definition  is_error_code_available. Potential doc page: NOT FOUND
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 */
-
-
   template <class T> struct is_exception_ptr_available
   {
     static constexpr bool value = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
@@ -3051,17 +3051,6 @@ namespace detail
   to change the value to one of the enum's values. This is stupid to look at in source code,
   but it make clang's optimiser do the right thing, so it's worth it.
   */
-
-
-
-
-
-
-
-
-
-
-
 #define OUTCOME_USE_CONSTEXPR_ENUM_STATUS 0
   enum class status : uint16_t
   {
@@ -3691,21 +3680,21 @@ namespace detail
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<_value_type> /*unused*/,
-                                             Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+                                             Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
         : _value(static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<_value_type> /*unused*/, std::initializer_list<U> il,
-                                    Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+                                    Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>)
         : _value(il, static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<_error_type> /*unused*/,
-                                             Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+                                             Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
         : _error(static_cast<Args &&>(args)...)
         , _status(status::have_error)
     {
@@ -3713,7 +3702,7 @@ namespace detail
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il,
-                                    Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+                                    Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>)
         : _error(il, static_cast<Args &&>(args)...)
         , _status(status::have_error)
     {
@@ -3730,7 +3719,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    detail::is_nothrow_constructible<value_type, U> &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_trivial(o._status.have_value() ?
                                 value_storage_trivial(in_place_type<value_type>, o._value) :
                                 (o._status.have_error() ? value_storage_trivial(in_place_type<error_type>, o._error) : value_storage_trivial()))  // NOLINT
@@ -3740,7 +3729,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U, V> &&o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    detail::is_nothrow_constructible<value_type, U> &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_trivial(
           o._status.have_value() ?
           value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
@@ -3758,7 +3747,7 @@ namespace detail
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    std::is_nothrow_default_constructible<value_type>::value &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_trivial(o._status.have_value() ?
                                 value_storage_trivial(in_place_type<value_type>) :
                                 (o._status.have_error() ? value_storage_trivial(in_place_type<error_type>, o._error) : value_storage_trivial()))  // NOLINT
@@ -3768,7 +3757,7 @@ namespace detail
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     constexpr explicit value_storage_trivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    std::is_nothrow_default_constructible<value_type>::value &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_trivial(
           o._status.have_value() ?
           value_storage_trivial(in_place_type<value_type>) :
@@ -3786,7 +3775,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
+    detail::is_nothrow_constructible<value_type, U> &&std::is_nothrow_default_constructible<error_type>::value)
         : value_storage_trivial(o._status.have_value() ?
                                 value_storage_trivial(in_place_type<value_type>, o._value) :
                                 (o._status.have_error() ? value_storage_trivial(in_place_type<error_type>) : value_storage_trivial()))  // NOLINT
@@ -3796,7 +3785,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
+    detail::is_nothrow_constructible<value_type, U> &&std::is_nothrow_default_constructible<error_type>::value)
         : value_storage_trivial(o._status.have_value() ?
                                 value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
                                 (o._status.have_error() ? value_storage_trivial(in_place_type<error_type>) : value_storage_trivial()))  // NOLINT
@@ -3879,21 +3868,21 @@ namespace detail
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<_value_type> /*unused*/,
-                                      Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+                                      Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
         : _value(static_cast<Args &&>(args)...)  // NOLINT
         , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<_value_type> /*unused*/, std::initializer_list<U> il,
-                             Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+                             Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>)
         : _value(il, static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<_error_type> /*unused*/,
-                                      Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+                                      Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
         : _status(status::have_error)
         , _error(static_cast<Args &&>(args)...)  // NOLINT
     {
@@ -3901,7 +3890,7 @@ namespace detail
     }
     template <class U, class... Args>
     value_storage_nontrivial(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il,
-                             Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+                             Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>)
         : _status(status::have_error)
         , _error(il, static_cast<Args &&>(args)...)
     {
@@ -3918,7 +3907,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    detail::is_nothrow_constructible<value_type, U> &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_nontrivial(o._status.have_value() ?
                                    value_storage_nontrivial(in_place_type<value_type>, o._value) :
                                    (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) : value_storage_nontrivial()))
@@ -3928,7 +3917,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(value_storage_trivial<U, V> &&o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    detail::is_nothrow_constructible<value_type, U> &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_nontrivial(
           o._status.have_value() ?
           value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
@@ -3939,7 +3928,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(const value_storage_nontrivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    detail::is_nothrow_constructible<value_type, U> &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_nontrivial(o._status.have_value() ?
                                    value_storage_nontrivial(in_place_type<value_type>, o._value) :
                                    (o._status.have_error() ? value_storage_nontrivial(in_place_type<error_type>, o._error) : value_storage_nontrivial()))
@@ -3949,7 +3938,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(value_storage_nontrivial<U, V> &&o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    detail::is_nothrow_constructible<value_type, U> &&detail::is_nothrow_constructible<error_type, V>)
         : value_storage_nontrivial(
           o._status.have_value() ?
           value_storage_nontrivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
@@ -3967,7 +3956,7 @@ namespace detail
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    std::is_nothrow_default_constructible<value_type>::value &&detail::is_nothrow_constructible<error_type, V>)
     {
       if(o._status.have_value())
       {
@@ -3982,7 +3971,7 @@ namespace detail
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     explicit value_storage_nontrivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_default_constructible<value_type>::value &&std::is_nothrow_constructible<error_type, V>::value)
+    std::is_nothrow_default_constructible<value_type>::value &&detail::is_nothrow_constructible<error_type, V>)
     {
       if(o._status.have_value())
       {
@@ -4005,7 +3994,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
+    detail::is_nothrow_constructible<value_type, U> &&std::is_nothrow_default_constructible<error_type>::value)
     {
       if(o._status.have_value())
       {
@@ -4020,7 +4009,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     explicit value_storage_nontrivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
-    std::is_nothrow_constructible<value_type, U>::value &&std::is_nothrow_default_constructible<error_type>::value)
+    detail::is_nothrow_constructible<value_type, U> &&std::is_nothrow_default_constructible<error_type>::value)
     {
       if(o._status.have_value())
       {
@@ -4546,25 +4535,25 @@ namespace detail
 
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_value_type> _,
-                                            Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, Args...>::value)
+                                            Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type, Args...>)
         : _state{_, static_cast<Args &&>(args)...}
     {
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_value_type> _, std::initializer_list<U> il,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type, std::initializer_list<U>, Args...>)
         : _state{_, il, static_cast<Args &&>(args)...}
     {
     }
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_error_type> _,
-                                            Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, Args...>::value)
+                                            Args &&... args) noexcept(detail::is_nothrow_constructible<_error_type, Args...>)
         : _state{_, static_cast<Args &&>(args)...}
     {
     }
     template <class U, class... Args>
     constexpr basic_result_storage(in_place_type_t<_error_type> _, std::initializer_list<U> il,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<_error_type, std::initializer_list<U>, Args...>)
         : _state{_, il, static_cast<Args &&>(args)...}
     {
     }
@@ -4574,13 +4563,13 @@ namespace detail
     };
     template <class T, class U, class V>
     constexpr basic_result_storage(compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
-    std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    detail::is_nothrow_constructible<_value_type, T> &&detail::is_nothrow_constructible<_error_type, U>)
         : _state(o._state)
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
-    std::is_nothrow_constructible<_value_type, T>::value &&std::is_nothrow_constructible<_error_type, U>::value)
+    detail::is_nothrow_constructible<_value_type, T> &&detail::is_nothrow_constructible<_error_type, U>)
         : _state(static_cast<decltype(o._state) &&>(o._state))
     {
     }
@@ -4590,14 +4579,14 @@ namespace detail
     };
     template <class T, class U, class V>
     constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
-    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+    detail::is_nothrow_constructible<_value_type, T> &&noexcept(make_error_code(std::declval<U>())))
         : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, o._state._value) :
                                                  _state_type(in_place_type<_error_type>, make_error_code(o._state._error)))
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(make_error_code_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
-    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_error_code(std::declval<U>())))
+    detail::is_nothrow_constructible<_value_type, T> &&noexcept(make_error_code(std::declval<U>())))
         : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, static_cast<T &&>(o._state._value)) :
                                                  _state_type(in_place_type<_error_type>, make_error_code(static_cast<U &&>(o._state._error))))
     {
@@ -4608,14 +4597,14 @@ namespace detail
     };
     template <class T, class U, class V>
     constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, const basic_result_storage<T, U, V> &o) noexcept(
-    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+    detail::is_nothrow_constructible<_value_type, T> &&noexcept(make_exception_ptr(std::declval<U>())))
         : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, o._state._value) :
                                                  _state_type(in_place_type<_error_type>, make_exception_ptr(o._state._error)))
     {
     }
     template <class T, class U, class V>
     constexpr basic_result_storage(make_exception_ptr_compatible_conversion_tag /*unused*/, basic_result_storage<T, U, V> &&o) noexcept(
-    std::is_nothrow_constructible<_value_type, T>::value &&noexcept(make_exception_ptr(std::declval<U>())))
+    detail::is_nothrow_constructible<_value_type, T> &&noexcept(make_exception_ptr(std::declval<U>())))
         : _state(o._state._status.have_value() ? _state_type(in_place_type<_value_type>, static_cast<T &&>(o._state._value)) :
                                                  _state_type(in_place_type<_error_type>, make_exception_ptr(static_cast<U &&>(o._state._error))))
     {
@@ -4646,8 +4635,6 @@ namespace convert
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-
-
   template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = requires(U a)
   {
     {
@@ -4660,9 +4647,6 @@ namespace convert
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-
-
-
   template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = requires(U a)
   {
     {
@@ -4693,16 +4677,11 @@ namespace convert
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-
-
   template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
   /* The `ValueOrError` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-
-
-
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
 #endif
 
@@ -4725,8 +4704,6 @@ namespace convert
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  value_or_error. Potential doc page: NOT FOUND
 */
-
-
   template <class T, class U> struct value_or_error
   {
     static constexpr bool enable_result_inputs = false;
@@ -5143,8 +5120,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   struct base
   {
   protected:
@@ -5199,8 +5174,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  all_narrow. Potential doc page: `all_narrow`
 */
-
-
   struct all_narrow : base
   {
     template <class Impl> static constexpr void wide_value_check(Impl &&self) { base::narrow_value_check(static_cast<Impl &&>(self)); }
@@ -5250,8 +5223,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  terminate. Potential doc page: `terminate`
 */
-
-
   struct terminate : base
   {
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
@@ -5423,26 +5394,18 @@ namespace hooks
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U> constexpr inline void hook_result_construction(T * /*unused*/, U && /*unused*/) noexcept {}
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U> constexpr inline void hook_result_copy_construction(T * /*unused*/, U && /*unused*/) noexcept {}
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U> constexpr inline void hook_result_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U, class... Args>
   constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
   {
@@ -5451,8 +5414,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept
   {
     return r->_state._status.spare_storage_value;
@@ -5460,8 +5421,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class R, class S, class NoValuePolicy>
   constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept
   {
@@ -5606,40 +5565,28 @@ public:
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   basic_result() = delete;
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   basic_result(basic_result && /*unused*/) = default;  // NOLINT
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   basic_result(const basic_result & /*unused*/) = default;
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   basic_result &operator=(basic_result && /*unused*/) = default;  // NOLINT
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   basic_result &operator=(const basic_result & /*unused*/) = default;
   ~basic_result() = default;
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class Arg, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!predicate::constructors_enabled && (sizeof...(Args) >= 0)))
   basic_result(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_result<T, T> is NOT SUPPORTED, see docs!
@@ -5647,8 +5594,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T>) )))
@@ -5658,12 +5603,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr basic_result(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(
-  std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<value_type, T>)  // NOLINT
       : base{in_place_type<typename base::value_type>, static_cast<T &&>(t)}
   {
     using namespace hooks;
@@ -5672,12 +5615,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr basic_result(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
       : base{in_place_type<typename base::error_type>, static_cast<T &&>(t)}
   {
     using namespace hooks;
@@ -5686,8 +5627,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
@@ -5702,8 +5641,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),  //
                     OUTCOME_TEXPR(convert::value_or_error<basic_result, std::decay_t<T>>{}(std::declval<T>())))
@@ -5715,14 +5652,12 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
   constexpr explicit basic_result(
   const basic_result<T, U, V> &o,
   explicit_compatible_copy_conversion_tag /*unused*/ =
-  explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+  explicit_compatible_copy_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T> &&detail::is_nothrow_constructible<error_type, U>)
       : base{typename base::compatible_conversion_tag(), o}
   {
     using namespace hooks;
@@ -5731,14 +5666,12 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V>))
   constexpr explicit basic_result(
   basic_result<T, U, V> &&o,
   explicit_compatible_move_conversion_tag /*unused*/ =
-  explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value)
+  explicit_compatible_move_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T> &&detail::is_nothrow_constructible<error_type, U>)
       : base{typename base::compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
   {
     using namespace hooks;
@@ -5747,13 +5680,11 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<T, U, V>))
   constexpr explicit basic_result(const basic_result<T, U, V> &o,
                                   explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
-                                  explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                  explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T>
                                                                                                       &&noexcept(make_error_code(std::declval<U>())))
       : base{typename base::make_error_code_compatible_conversion_tag(), o}
   {
@@ -5763,13 +5694,11 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<T, U, V>))
   constexpr explicit basic_result(basic_result<T, U, V> &&o,
                                   explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
-                                  explicit_make_error_code_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                  explicit_make_error_code_compatible_move_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T>
                                                                                                       &&noexcept(make_error_code(std::declval<U>())))
       : base{typename base::make_error_code_compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
   {
@@ -5779,13 +5708,11 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<T, U, V>))
   constexpr explicit basic_result(const basic_result<T, U, V> &o,
                                   explicit_make_exception_ptr_compatible_copy_conversion_tag /*unused*/ =
-                                  explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                  explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T>
                                                                                                          &&noexcept(make_exception_ptr(std::declval<U>())))
       : base{typename base::make_exception_ptr_compatible_conversion_tag(), o}
   {
@@ -5795,13 +5722,11 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<T, U, V>))
   constexpr explicit basic_result(basic_result<T, U, V> &&o,
                                   explicit_make_exception_ptr_compatible_move_conversion_tag /*unused*/ =
-                                  explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                  explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T>
                                                                                                          &&noexcept(make_exception_ptr(std::declval<U>())))
       : base{typename base::make_exception_ptr_compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
   {
@@ -5812,11 +5737,9 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
-  constexpr explicit basic_result(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+  constexpr explicit basic_result(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
   {
     using namespace hooks;
@@ -5825,12 +5748,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit basic_result(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il,
-                                  Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+                                  Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>)
       : base{_, il, static_cast<Args &&>(args)...}
   {
     using namespace hooks;
@@ -5839,11 +5760,9 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
-  constexpr explicit basic_result(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+  constexpr explicit basic_result(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
   {
     using namespace hooks;
@@ -5852,12 +5771,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit basic_result(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il,
-                                  Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+                                  Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>)
       : base{_, il, static_cast<Args &&>(args)...}
   {
     using namespace hooks;
@@ -5866,8 +5783,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class A1, class A2, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_constructor<A1, A2, Args...>))
   constexpr basic_result(A1 &&a1, A2 &&a2, Args &&... args) noexcept(noexcept(
@@ -5878,8 +5793,6 @@ SIGNATURE NOT RECOGNISED
     /* I was a little surprised that the below is needed given that we forward to another constructor.
     But it turns out that ADL only fires on the first constructor for some reason.
     */
-
-
     using namespace hooks;
     // hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
   }
@@ -5887,8 +5800,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   constexpr basic_result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)  // NOLINT
       : base{in_place_type<value_type_if_enabled>}
   {
@@ -5898,11 +5809,9 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
-  constexpr basic_result(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  constexpr basic_result(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
       : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(o)}
   {
     using namespace hooks;
@@ -5911,11 +5820,9 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void>))
-  constexpr basic_result(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  constexpr basic_result(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
       : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(static_cast<success_type<T> &&>(o))}
   {
     using namespace hooks;
@@ -5924,12 +5831,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr basic_result(const failure_type<T> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o)}
   {
     using namespace hooks;
@@ -5938,12 +5843,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr basic_result(failure_type<T> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
   {
     using namespace hooks;
@@ -5952,8 +5855,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<void, T, void>))
   constexpr basic_result(const failure_type<T> &o,
@@ -5967,8 +5868,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<void, T, void>))
   constexpr basic_result(failure_type<T> &&o,
@@ -5982,8 +5881,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<void, T, void>))
   constexpr basic_result(const failure_type<T> &o,
@@ -5997,8 +5894,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<void, T, void>))
   constexpr basic_result(failure_type<T> &&o,
@@ -6013,8 +5908,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   constexpr void swap(basic_result &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value)  //
                                                 && (std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value))
   {
@@ -6024,14 +5917,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   auto as_failure() const & { return failure(this->assume_error()); }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   auto as_failure() &&
   {
     this->_state._status.set_have_moved_from(true);
@@ -6141,7 +6030,6 @@ namespace policy
   {
     /* Pass through `make_error_code` function for `std::error_code`.
      */
-
     inline std::error_code make_error_code(std::error_code v) { return v; }
 
     // Try ADL, if not use fall backs above
@@ -6155,15 +6043,11 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T> constexpr inline decltype(auto) error_code(T &&v) { return detail::error_code(std::forward<T>(v)); }
 
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   // inline void outcome_throw_as_system_error_with_payload(...) = delete;  // To use the error_code_throw_as_system_error policy with a custom Error type, you must define a outcome_throw_as_system_error_with_payload() free function to say how to handle the payload
   inline void outcome_throw_as_system_error_with_payload(const std::error_code &error) { OUTCOME_THROW_EXCEPTION(std::system_error(error)); }  // NOLINT
   OUTCOME_TEMPLATE(class Error)
@@ -6238,7 +6122,6 @@ namespace policy
   {
     /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
     */
-
     inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
 
     // Try ADL, if not use fall backs above
@@ -6248,8 +6131,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
 
   namespace detail
@@ -6435,26 +6316,18 @@ public:
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   const S &error() const & { return _error; }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   S &error() & { return _error; }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   const S &&error() const && { return _error; }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   S &&error() && { return _error; }
 };
 
@@ -6483,8 +6356,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class EC> struct error_code_throw_as_system_error<T, EC, void> : base
   {
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
@@ -6549,8 +6420,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class EC, class E> struct exception_ptr_rethrow;
   template <class T, class EC> struct exception_ptr_rethrow<T, EC, void> : base
   {
@@ -6616,8 +6485,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  throw_bad_result_access. Potential doc page: NOT FOUND
 */
-
-
   template <class EC, class EP> struct throw_bad_result_access : base
   {
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
@@ -6678,8 +6545,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class EC, class E>
   using default_policy = std::conditional_t<  //
   std::is_void<EC>::value && std::is_void<E>::value,
@@ -7089,26 +6954,18 @@ namespace hooks
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class... U> constexpr inline void hook_outcome_construction(T * /*unused*/, U &&... /*unused*/) noexcept {}
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U> constexpr inline void hook_outcome_copy_construction(T * /*unused*/, U && /*unused*/) noexcept {}
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U> constexpr inline void hook_outcome_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class T, class U, class... Args>
   constexpr inline void hook_outcome_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
   {
@@ -7117,8 +6974,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class R, class S, class P, class NoValuePolicy, class U>
   constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
 }  // namespace hooks
@@ -7316,8 +7171,6 @@ public:
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class Arg, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) >= 0)))
   basic_outcome(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
@@ -7325,8 +7178,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T> ||
@@ -7337,12 +7188,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr basic_outcome(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(
-  std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<value_type, T>)  // NOLINT
       : base{in_place_type<typename base::_value_type>, static_cast<T &&>(t)}
       , _ptr()
   {
@@ -7352,12 +7201,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr basic_outcome(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
       : base{in_place_type<typename base::_error_type>, static_cast<T &&>(t)}
       , _ptr()
   {
@@ -7367,8 +7214,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
@@ -7382,12 +7227,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_exception_converting_constructor<T>))
   constexpr basic_outcome(T &&t, exception_converting_constructor_tag /*unused*/ = exception_converting_constructor_tag()) noexcept(
-  std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
       : base()
       , _ptr(static_cast<T &&>(t))
   {
@@ -7398,12 +7241,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_exception_converting_constructor<T, U>))
   constexpr basic_outcome(T &&a, U &&b, error_exception_converting_constructor_tag /*unused*/ = error_exception_converting_constructor_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>)  // NOLINT
       : base{in_place_type<typename base::_error_type>, static_cast<T &&>(a)}
       , _ptr(static_cast<U &&>(b))
   {
@@ -7415,8 +7256,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),    //
                     OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !is_basic_outcome_v<T>),  //
@@ -7429,15 +7268,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
   constexpr explicit basic_outcome(
   const basic_outcome<T, U, V, W> &o,
   explicit_compatible_copy_conversion_tag /*unused*/ =
-  explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
-                                                      &&std::is_nothrow_constructible<exception_type, V>::value)
+  explicit_compatible_copy_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T> &&detail::is_nothrow_constructible<error_type, U>
+                                                      &&detail::is_nothrow_constructible<exception_type, V>)
       : base{typename base::compatible_conversion_tag(), o}
       , _ptr(o._ptr)
   {
@@ -7447,15 +7284,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, U, V, W>))
   constexpr explicit basic_outcome(
   basic_outcome<T, U, V, W> &&o,
   explicit_compatible_move_conversion_tag /*unused*/ =
-  explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
-                                                      &&std::is_nothrow_constructible<exception_type, V>::value)
+  explicit_compatible_move_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T> &&detail::is_nothrow_constructible<error_type, U>
+                                                      &&detail::is_nothrow_constructible<exception_type, V>)
       : base{typename base::compatible_conversion_tag(), static_cast<basic_outcome<T, U, V, W> &&>(o)}
       , _ptr(static_cast<typename basic_outcome<T, U, V, W>::exception_type &&>(o._ptr))
   {
@@ -7465,15 +7300,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_compatible_conversion<T, U, V>))
   constexpr explicit basic_outcome(
   const basic_result<T, U, V> &o,
   explicit_compatible_copy_conversion_tag /*unused*/ =
-  explicit_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
-                                                      &&std::is_nothrow_constructible<exception_type>::value)
+  explicit_compatible_copy_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T> &&detail::is_nothrow_constructible<error_type, U>
+                                                      &&detail::is_nothrow_constructible<exception_type>)
       : base{typename base::compatible_conversion_tag(), o}
       , _ptr()
   {
@@ -7483,15 +7316,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_compatible_conversion<T, U, V>))
   constexpr explicit basic_outcome(
   basic_result<T, U, V> &&o,
   explicit_compatible_move_conversion_tag /*unused*/ =
-  explicit_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value &&std::is_nothrow_constructible<error_type, U>::value
-                                                      &&std::is_nothrow_constructible<exception_type>::value)
+  explicit_compatible_move_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T> &&detail::is_nothrow_constructible<error_type, U>
+                                                      &&detail::is_nothrow_constructible<exception_type>)
       : base{typename base::compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
       , _ptr()
   {
@@ -7501,15 +7332,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_make_error_code_compatible_conversion<T, U, V>))
   constexpr explicit basic_outcome(const basic_result<T, U, V> &o,
                                    explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
-                                   explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                   explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T>
                                                                                                        &&noexcept(make_error_code(std::declval<U>())) &&
-                                                                                                       std::is_nothrow_constructible<exception_type>::value)
+                                                                                                       detail::is_nothrow_constructible<exception_type>)
       : base{typename base::make_error_code_compatible_conversion_tag(), o}
       , _ptr()
   {
@@ -7519,15 +7348,13 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(detail::result_predicates<value_type, error_type>::template enable_make_error_code_compatible_conversion<T, U, V>))
   constexpr explicit basic_outcome(basic_result<T, U, V> &&o,
                                    explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
-                                   explicit_make_error_code_compatible_move_conversion_tag()) noexcept(std::is_nothrow_constructible<value_type, T>::value
+                                   explicit_make_error_code_compatible_move_conversion_tag()) noexcept(detail::is_nothrow_constructible<value_type, T>
                                                                                                        &&noexcept(make_error_code(std::declval<U>())) &&
-                                                                                                       std::is_nothrow_constructible<exception_type>::value)
+                                                                                                       detail::is_nothrow_constructible<exception_type>)
       : base{typename base::make_error_code_compatible_conversion_tag(), static_cast<basic_result<T, U, V> &&>(o)}
       , _ptr()
   {
@@ -7539,12 +7366,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
   constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7554,12 +7379,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _, std::initializer_list<U> il,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, std::initializer_list<U>, Args...>)
       : base{_, il, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7569,12 +7392,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
   constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<error_type, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7584,12 +7405,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _, std::initializer_list<U> il,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, std::initializer_list<U>, Args...>)
       : base{_, il, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -7599,12 +7418,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_exception_constructor<Args...>))
   constexpr explicit basic_outcome(in_place_type_t<exception_type_if_enabled> /*unused*/,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<exception_type, Args...>)
       : base()
       , _ptr(static_cast<Args &&>(args)...)
   {
@@ -7615,12 +7432,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class U, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_exception_constructor<std::initializer_list<U>, Args...>))
   constexpr explicit basic_outcome(in_place_type_t<exception_type_if_enabled> /*unused*/, std::initializer_list<U> il,
-                                   Args &&... args) noexcept(std::is_nothrow_constructible<exception_type, std::initializer_list<U>, Args...>::value)
+                                   Args &&... args) noexcept(detail::is_nothrow_constructible<exception_type, std::initializer_list<U>, Args...>)
       : base()
       , _ptr(il, static_cast<Args &&>(args)...)
   {
@@ -7631,8 +7446,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class A1, class A2, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_error_exception_constructor<A1, A2, Args...>))
   constexpr basic_outcome(A1 &&a1, A2 &&a2, Args &&... args) noexcept(
@@ -7646,8 +7459,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   constexpr basic_outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)  // NOLINT
       : base{in_place_type<typename base::_value_type>}
   {
@@ -7657,11 +7468,9 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void, void>))
-  constexpr basic_outcome(const success_type<T> &o) noexcept(std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  constexpr basic_outcome(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
       : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(o)}
   {
     using namespace hooks;
@@ -7670,11 +7479,9 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void, void>))
-  constexpr basic_outcome(success_type<T> &&o) noexcept(std::is_nothrow_constructible<value_type, T>::value)  // NOLINT
+  constexpr basic_outcome(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
       : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(static_cast<success_type<T> &&>(o))}
   {
     using namespace hooks;
@@ -7684,12 +7491,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(const failure_type<T> &o,
-                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(detail::is_nothrow_constructible<error_type, T>)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr()
   {
@@ -7699,12 +7504,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
   constexpr basic_outcome(const failure_type<T> &o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -7715,8 +7518,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_make_error_code_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(const failure_type<T> &o,
@@ -7731,12 +7532,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<U>::value && predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr basic_outcome(const failure_type<T, U> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -7755,12 +7554,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(failure_type<T> &&o,
-                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(std::is_nothrow_constructible<error_type, T>::value)  // NOLINT
+                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(detail::is_nothrow_constructible<error_type, T>)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
       , _ptr()
   {
@@ -7770,12 +7567,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
   constexpr basic_outcome(failure_type<T> &&o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  std::is_nothrow_constructible<exception_type, T>::value)  // NOLINT
+  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
@@ -7786,8 +7581,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_make_error_code_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(failure_type<T> &&o,
@@ -7802,12 +7595,10 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<U>::value && predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr basic_outcome(failure_type<T, U> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(
-  std::is_nothrow_constructible<error_type, T>::value &&std::is_nothrow_constructible<exception_type, U>::value)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>)  // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T, U> &&>(o))}
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T, U> &&>(o)))
   {
@@ -7826,15 +7617,11 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   using base::operator==;
   using base::operator!=;
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()),  //
                     OUTCOME_TEXPR(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()),  //
@@ -7866,8 +7653,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() == std::declval<T>()),  //
                     OUTCOME_TEXPR(std::declval<exception_type>() == std::declval<U>()))
@@ -7892,8 +7677,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()),  //
                     OUTCOME_TEXPR(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()),  //
@@ -7925,8 +7708,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() != std::declval<T>()),  //
                     OUTCOME_TEXPR(std::declval<exception_type>() != std::declval<U>()))
@@ -7952,8 +7733,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   constexpr void swap(basic_outcome &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value)     //
                                                  && (std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value)  //
                                                  && (std::is_void<exception_type>::value || detail::is_nothrow_swappable<exception_type>::value))
@@ -8038,8 +7817,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   failure_type<error_type, exception_type> as_failure() const &
   {
     if(this->has_error() && this->has_exception())
@@ -8056,8 +7833,6 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   failure_type<error_type, exception_type> as_failure() &&
   {
     this->_state._status.set_have_moved_from(true);
@@ -8073,6 +7848,7 @@ SIGNATURE NOT RECOGNISED
   }
 };
 
+#if __cplusplus <= 202000
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -8095,6 +7871,7 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<
 {
   return b != a;
 }
+#endif
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -8108,8 +7885,6 @@ namespace hooks
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-
-
   template <class R, class S, class P, class NoValuePolicy, class U>
   constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
@@ -8296,8 +8071,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  error_code_throw_as_system_error. Potential doc page: NOT FOUND
 */
-
-
   template <class T, class EC, class E> struct error_code_throw_as_system_error : base
   {
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
@@ -8372,8 +8145,6 @@ namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  exception_ptr_rethrow. Potential doc page: NOT FOUND
 */
-
-
   template <class T, class EC, class E> struct exception_ptr_rethrow : base
   {
     template <class Impl> static constexpr void wide_value_check(Impl &&self)
@@ -8704,7 +8475,7 @@ OUTCOME_V2_NAMESPACE_END
 
 #endif
 /* Try operation macros
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: July 2017
 
 
@@ -8754,7 +8525,7 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
