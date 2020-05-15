@@ -1363,6 +1363,8 @@ namespace detail
     value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
     std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
     {
+      using _value_type_ = typename Base::_value_type_;
+      using _error_type_ = typename Base::_error_type_;
       if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
         this->_status = o._status;
@@ -1371,14 +1373,14 @@ namespace detail
       }
       if(this->_status.have_value() && o._status.have_value())
       {
-        this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_value  = static_cast<_value_type_&&>(o._value);  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
       }
       if(this->_status.have_error() && o._status.have_error())
       {
-        this->_error = static_cast<error_type &&>(o._error);  // NOLINT
+        this->_error  = static_cast<_error_type_&&>(o._error);  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -1387,7 +1389,7 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status = o._status;
         o._status.set_have_moved_from(true);
@@ -1395,7 +1397,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -1404,7 +1406,7 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status = o._status;
         o._status.set_have_moved_from(true);
@@ -1412,7 +1414,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -1421,9 +1423,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
-        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -1432,9 +1434,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -1455,7 +1457,10 @@ namespace detail
     value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
     std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
-      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      using _value_type_ = typename Base::_value_type_;
+      using _error_type_ = typename Base::_error_type_;
+      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value()
+         && !o._status.have_error())
       {
         this->_status = o._status;
         return *this;
@@ -1476,14 +1481,14 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status = o._status;
         return *this;
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) _value_type_(o._value);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -1491,14 +1496,14 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status = o._status;
         return *this;
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) error_type(o._error);  // NOLINT
+        new(&this->_error) _error_type_(o._error);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -1506,9 +1511,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
-        new(&this->_error) error_type(o._error);  // NOLINT
+        new(&this->_error) _error_type_(o._error);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -1516,9 +1521,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) _value_type_(o._value);  // NOLINT
         this->_status = o._status;
         return *this;
       }
