@@ -1,5 +1,5 @@
 /* A less simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: June 2017
 
 
@@ -1069,6 +1069,10 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
+
+#ifdef __APPLE__
+  failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 #if __cplusplus <= 202000L
