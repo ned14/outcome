@@ -706,6 +706,10 @@ SIGNATURE NOT RECOGNISED
     this->_state._status.set_have_moved_from(true);
     return failure(static_cast<basic_result &&>(*this).assume_error());
   }
+
+#ifdef __APPLE__
+  failure_type<error_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
