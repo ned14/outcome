@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 /* A less simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: June 2017
 
 
@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 28df3c45155d4a5a7428b4765eecefd8c0d079d3
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-14 11:00:32 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 28df3c45
+#define OUTCOME_PREVIOUS_COMMIT_REF 8ddef87aeb198d7274443f06a16b05f26f07d7b3
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-15 20:25:29 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8ddef87a
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -4949,6 +4949,10 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   auto as_failure() && { return failure(static_cast<basic_result &&>(*this).assume_error()); }
+
+#ifdef __APPLE__
+  failure_type<error_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -6179,6 +6183,10 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
+
+#ifdef __APPLE__
+  failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 #if __cplusplus <= 202000
@@ -6882,13 +6890,24 @@ namespace traits
 
 namespace detail
 {
-  inline SYSTEM_ERROR2_CONSTEXPR14 size_t cstrlen(const char *str)
+#if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
+  inline constexpr size_t cstrlen(const char *str)
   {
     const char *end = nullptr;
     for(end = str; *end != 0; ++end)  // NOLINT
       ;
     return end - str;
   }
+#else
+  inline constexpr size_t cstrlen_(const char *str, size_t acc)
+  {
+    return (str[0] == 0) ? acc : cstrlen_(str + 1, acc + 1);
+  }
+  inline constexpr size_t cstrlen(const char *str)
+  {
+    return cstrlen_(str, 0);
+  }
+#endif
 
   /* A partially compliant implementation of C++20's std::bit_cast function contributed
   by Jesse Towner. TODO FIXME Replace with C++ 20 bit_cast when available.
@@ -7729,6 +7748,9 @@ public:
   //! The type of a reference to a message string.
   using string_ref = typename domain_type::string_ref;
 
+protected:
+  using _base::_base;
+
 public:
   //! Default construction to empty
   status_code() = default;
@@ -7759,24 +7781,24 @@ public:
       : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
   }
-  //! Explicit in-place construction.
+  //! Explicit in-place construction. Disables if `domain_type::get()` is not a valid expression.
   template <class... Args>
   constexpr explicit status_code(in_place_t /*unused */, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args &&...>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), static_cast<Args &&>(args)...)
   {
   }
-  //! Explicit in-place construction from initialiser list.
+  //! Explicit in-place construction from initialiser list. Disables if `domain_type::get()` is not a valid expression.
   template <class T, class... Args>
   constexpr explicit status_code(in_place_t /*unused */, std::initializer_list<T> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<T>, Args &&...>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), il, static_cast<Args &&>(args)...)
   {
   }
-  //! Explicit copy construction from a `value_type`.
+  //! Explicit copy construction from a `value_type`. Disables if `domain_type::get()` is not a valid expression.
   constexpr explicit status_code(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), v)
   {
   }
-  //! Explicit move construction from a `value_type`.
+  //! Explicit move construction from a `value_type`. Disables if `domain_type::get()` is not a valid expression.
   constexpr explicit status_code(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), static_cast<value_type &&>(v))
   {
@@ -8396,7 +8418,6 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-#if __cplusplus >= 201400 || _MSC_VER >= 1910
 /*! Specialise this template to quickly wrap a third party enumeration into a
 custom status code domain. C++ 14 or later is required.
 
@@ -8411,7 +8432,7 @@ template <> struct quick_status_code_from_enum<AnotherCode> : quick_status_code_
   // Unique UUID for the enum. PLEASE use https://www.random.org/cgi-bin/randbyte?nbytes=16&format=h
   static constexpr const auto domain_uuid = "{be201f65-3962-dd0e-1266-a72e63776a42}";
   // Map of each enum value to its text string, and list of semantically equivalent errc's
-  static const auto &value_mappings()
+  static const std::initializer_list<mapping> &value_mappings()
   {
     static const std::initializer_list<mapping<AnotherCode>> v = {
     // Format is: { enum value, "string representation", { list of errc mappings ... } }
@@ -8458,7 +8479,7 @@ template <class Enum> struct quick_status_code_from_enum_defaults
     const std::initializer_list<errc> code_mappings;
   };
   //! Used within `quick_status_code_from_enum` to define mixins for the status code wrapping `Enum`
-  template<class Base> struct mixin : Base
+  template <class Base> struct mixin : Base
   {
     using Base::Base;
   };
@@ -8491,7 +8512,15 @@ public:
   _quick_status_code_from_enum_domain &operator=(_quick_status_code_from_enum_domain &&) = default;
   ~_quick_status_code_from_enum_domain() = default;
 
+#if __cplusplus < 201402 && !defined(_MSC_VER)
+  static inline const _quick_status_code_from_enum_domain &get()
+  {
+    static _quick_status_code_from_enum_domain v;
+    return v;
+  }
+#else
   static inline constexpr const _quick_status_code_from_enum_domain &get();
+#endif
 
   virtual string_ref name() const noexcept override { return string_ref(_src::domain_name); }
 
@@ -8597,11 +8626,13 @@ namespace detail
   };
 }  // namespace detail
 
+#if __cplusplus >= 201402 || defined(_MSC_VER)
 template <class Enum> constexpr _quick_status_code_from_enum_domain<Enum> quick_status_code_from_enum_domain = {};
 template <class Enum> inline constexpr const _quick_status_code_from_enum_domain<Enum> &_quick_status_code_from_enum_domain<Enum>::get()
 {
   return quick_status_code_from_enum_domain<Enum>;
 }
+#endif
 
 //! Declare an implicit conversion from `Enum` into `quick_status_code_from_domain_enum_code<Enum>`.
 template <class Enum, typename = decltype(quick_status_code_from_enum<Enum>::domain_name)>  //
@@ -8617,7 +8648,6 @@ namespace mixins
     using quick_status_code_from_enum<Enum>::template mixin<Base>::mixin;
   };
 }  // namespace mixins
-#endif
 
 SYSTEM_ERROR2_NAMESPACE_END
 
@@ -11222,7 +11252,11 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
+#ifdef __APPLE__
+  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+#else
+  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }

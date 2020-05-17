@@ -49,11 +49,11 @@ namespace detail
   struct value_overload
   {
   };
-#ifdef __APPLE__
-  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
-#else
+//#ifdef __APPLE__
+//  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+//#else
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
-#endif
+//#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
