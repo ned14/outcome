@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 /* A less simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: June 2017
 
 
@@ -1224,9 +1224,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c8f8edb2331464b12f1865bc5ab9886b6d1751b5
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-07 08:51:08 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c8f8edb2
+#define OUTCOME_PREVIOUS_COMMIT_REF 9e7de8ea9ab9394ffc146f526185352701c85c7b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-17 19:48:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9e7de8ea
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1395,6 +1395,20 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class... Args> static constexpr bool is_nothrow_constructible = _is_nothrow_constructible<T, Args...>::value;
+
+  template <class T, class... Args> struct _is_constructible
+  {
+    static constexpr bool value = std::is_constructible<T, Args...>::value;
+  };
+  template <class T> struct _is_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class... Args> static constexpr bool is_constructible = _is_constructible<T, Args...>::value;
 
 #ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
 #if defined(_MSC_VER) && _HAS_CXX17
@@ -3115,7 +3129,7 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    && detail::is_constructible<value_type, U> && detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3143,7 +3157,7 @@ namespace detail
     };
     template <class V>
     static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3171,7 +3185,7 @@ namespace detail
     };
     template <class U>
     static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3303,7 +3317,7 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    && detail::is_constructible<value_type, U> && detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3352,7 +3366,7 @@ namespace detail
     };
     template <class V>
     static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3390,7 +3404,7 @@ namespace detail
     };
     template <class U>
     static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3629,6 +3643,8 @@ namespace detail
     value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
     std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
     {
+      using _value_type_ = typename Base::_value_type_;
+      using _error_type_ = typename Base::_error_type_;
       if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
         this->_status = o._status;
@@ -3637,14 +3653,14 @@ namespace detail
       }
       if(this->_status.have_value() && o._status.have_value())
       {
-        this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_value  = static_cast<_value_type_&&>(o._value);  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
       }
       if(this->_status.have_error() && o._status.have_error())
       {
-        this->_error = static_cast<error_type &&>(o._error);  // NOLINT
+        this->_error  = static_cast<_error_type_&&>(o._error);  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3653,7 +3669,7 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status = o._status;
         o._status.set_have_moved_from(true);
@@ -3661,7 +3677,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3670,7 +3686,7 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status = o._status;
         o._status.set_have_moved_from(true);
@@ -3678,7 +3694,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3687,9 +3703,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
-        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3698,9 +3714,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3721,7 +3737,10 @@ namespace detail
     value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
     std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
-      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      using _value_type_ = typename Base::_value_type_;
+      using _error_type_ = typename Base::_error_type_;
+      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value()
+         && !o._status.have_error())
       {
         this->_status = o._status;
         return *this;
@@ -3742,14 +3761,14 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status = o._status;
         return *this;
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) _value_type_(o._value);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -3757,14 +3776,14 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status = o._status;
         return *this;
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) error_type(o._error);  // NOLINT
+        new(&this->_error) _error_type_(o._error);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -3772,9 +3791,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
-        new(&this->_error) error_type(o._error);  // NOLINT
+        new(&this->_error) _error_type_(o._error);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -3782,9 +3801,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) _value_type_(o._value);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -4741,13 +4760,13 @@ namespace detail
     struct disable_inplace_value_error_constructor;
     template <class... Args>
     using choose_inplace_value_error_constructor = std::conditional_t<                                       //
-    std::is_constructible<value_type, Args...>::value && std::is_constructible<error_type, Args...>::value,  //
+    detail::is_constructible<value_type, Args...> && detail::is_constructible<error_type, Args...>,  //
     disable_inplace_value_error_constructor,                                                                 //
     std::conditional_t<                                                                                      //
-    std::is_constructible<value_type, Args...>::value,                                                       //
+    detail::is_constructible<value_type, Args...>,                                                       //
     value_type,                                                                                              //
     std::conditional_t<                                                                                      //
-    std::is_constructible<error_type, Args...>::value,                                                       //
+    detail::is_constructible<error_type, Args...>,                                                       //
     error_type,                                                                                              //
     disable_inplace_value_error_constructor>>>;
     template <class... Args>
@@ -4944,14 +4963,14 @@ protected:
     static constexpr bool enable_inplace_value_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<value_type>::value                       //
-        || std::is_constructible<value_type, Args...>::value);
+        || detail::is_constructible<value_type, Args...>);
 
     // Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<error_type>::value                       //
-        || std::is_constructible<error_type, Args...>::value);
+        || detail::is_constructible<error_type, Args...>);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
@@ -5326,6 +5345,10 @@ SIGNATURE NOT RECOGNISED
     this->_state._status.set_have_moved_from(true);
     return failure(static_cast<basic_result &&>(*this).assume_error());
   }
+
+#ifdef __APPLE__
+  failure_type<error_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5605,17 +5628,17 @@ namespace detail
     struct disable_inplace_value_error_exception_constructor;
     template <class... Args>
     using choose_inplace_value_error_exception_constructor = std::conditional_t<  //
-    ((static_cast<int>(std::is_constructible<value_type, Args...>::value) + static_cast<int>(std::is_constructible<error_type, Args...>::value) +
-      static_cast<int>(std::is_constructible<exception_type, Args...>::value)) > 1),  //
+    ((static_cast<int>(detail::is_constructible<value_type, Args...>) + static_cast<int>(detail::is_constructible<error_type, Args...>) +
+      static_cast<int>(detail::is_constructible<exception_type, Args...>)) > 1),  //
     disable_inplace_value_error_exception_constructor,                                //
     std::conditional_t<                                                               //
-    std::is_constructible<value_type, Args...>::value,                                //
+    detail::is_constructible<value_type, Args...>,                                //
     value_type,                                                                       //
     std::conditional_t<                                                               //
-    std::is_constructible<error_type, Args...>::value,                                //
+    detail::is_constructible<error_type, Args...>,                                //
     error_type,                                                                       //
     std::conditional_t<                                                               //
-    std::is_constructible<exception_type, Args...>::value,                            //
+    detail::is_constructible<exception_type, Args...>,                            //
     exception_type,                                                                   //
     disable_inplace_value_error_exception_constructor>>>>;
     template <class... Args>
@@ -5842,21 +5865,21 @@ protected:
     static constexpr bool enable_inplace_value_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<value_type>::value                       //
-        || std::is_constructible<value_type, Args...>::value);
+        || detail::is_constructible<value_type, Args...>);
 
     // Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<error_type>::value                       //
-        || std::is_constructible<error_type, Args...>::value);
+        || detail::is_constructible<error_type, Args...>);
 
     // Predicate for the inplace construction of exception to be available.
     template <class... Args>
     static constexpr bool enable_inplace_exception_constructor =  //
     constructors_enabled                                          //
     && (std::is_void<exception_type>::value                       //
-        || std::is_constructible<exception_type, Args...>::value);
+        || detail::is_constructible<exception_type, Args...>);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
@@ -6557,6 +6580,10 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
+
+#ifdef __APPLE__
+  failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 #if __cplusplus <= 202000
@@ -7260,13 +7287,24 @@ namespace traits
 
 namespace detail
 {
-  inline SYSTEM_ERROR2_CONSTEXPR14 size_t cstrlen(const char *str)
+#if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
+  inline constexpr size_t cstrlen(const char *str)
   {
     const char *end = nullptr;
     for(end = str; *end != 0; ++end)  // NOLINT
       ;
     return end - str;
   }
+#else
+  inline constexpr size_t cstrlen_(const char *str, size_t acc)
+  {
+    return (str[0] == 0) ? acc : cstrlen_(str + 1, acc + 1);
+  }
+  inline constexpr size_t cstrlen(const char *str)
+  {
+    return cstrlen_(str, 0);
+  }
+#endif
 
   /* A partially compliant implementation of C++20's std::bit_cast function contributed
   by Jesse Towner. TODO FIXME Replace with C++ 20 bit_cast when available.
@@ -8107,6 +8145,9 @@ public:
   //! The type of a reference to a message string.
   using string_ref = typename domain_type::string_ref;
 
+protected:
+  using _base::_base;
+
 public:
   //! Default construction to empty
   status_code() = default;
@@ -8137,24 +8178,24 @@ public:
       : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
   }
-  //! Explicit in-place construction.
+  //! Explicit in-place construction. Disables if `domain_type::get()` is not a valid expression.
   template <class... Args>
   constexpr explicit status_code(in_place_t /*unused */, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args &&...>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), static_cast<Args &&>(args)...)
   {
   }
-  //! Explicit in-place construction from initialiser list.
+  //! Explicit in-place construction from initialiser list. Disables if `domain_type::get()` is not a valid expression.
   template <class T, class... Args>
   constexpr explicit status_code(in_place_t /*unused */, std::initializer_list<T> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<T>, Args &&...>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), il, static_cast<Args &&>(args)...)
   {
   }
-  //! Explicit copy construction from a `value_type`.
+  //! Explicit copy construction from a `value_type`. Disables if `domain_type::get()` is not a valid expression.
   constexpr explicit status_code(const value_type &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), v)
   {
   }
-  //! Explicit move construction from a `value_type`.
+  //! Explicit move construction from a `value_type`. Disables if `domain_type::get()` is not a valid expression.
   constexpr explicit status_code(value_type &&v) noexcept(std::is_nothrow_move_constructible<value_type>::value)
       : _base(typename _base::_value_type_constructor{}, &domain_type::get(), static_cast<value_type &&>(v))
   {
@@ -8774,7 +8815,6 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 
-#if __cplusplus >= 201400 || _MSC_VER >= 1910
 /*! Specialise this template to quickly wrap a third party enumeration into a
 custom status code domain. C++ 14 or later is required.
 
@@ -8789,7 +8829,7 @@ template <> struct quick_status_code_from_enum<AnotherCode> : quick_status_code_
   // Unique UUID for the enum. PLEASE use https://www.random.org/cgi-bin/randbyte?nbytes=16&format=h
   static constexpr const auto domain_uuid = "{be201f65-3962-dd0e-1266-a72e63776a42}";
   // Map of each enum value to its text string, and list of semantically equivalent errc's
-  static const auto &value_mappings()
+  static const std::initializer_list<mapping> &value_mappings()
   {
     static const std::initializer_list<mapping<AnotherCode>> v = {
     // Format is: { enum value, "string representation", { list of errc mappings ... } }
@@ -8836,7 +8876,7 @@ template <class Enum> struct quick_status_code_from_enum_defaults
     const std::initializer_list<errc> code_mappings;
   };
   //! Used within `quick_status_code_from_enum` to define mixins for the status code wrapping `Enum`
-  template<class Base> struct mixin : Base
+  template <class Base> struct mixin : Base
   {
     using Base::Base;
   };
@@ -8869,7 +8909,15 @@ public:
   _quick_status_code_from_enum_domain &operator=(_quick_status_code_from_enum_domain &&) = default;
   ~_quick_status_code_from_enum_domain() = default;
 
+#if __cplusplus < 201402 && !defined(_MSC_VER)
+  static inline const _quick_status_code_from_enum_domain &get()
+  {
+    static _quick_status_code_from_enum_domain v;
+    return v;
+  }
+#else
   static inline constexpr const _quick_status_code_from_enum_domain &get();
+#endif
 
   virtual string_ref name() const noexcept override { return string_ref(_src::domain_name); }
 
@@ -8975,11 +9023,13 @@ namespace detail
   };
 }  // namespace detail
 
+#if __cplusplus >= 201402 || defined(_MSC_VER)
 template <class Enum> constexpr _quick_status_code_from_enum_domain<Enum> quick_status_code_from_enum_domain = {};
 template <class Enum> inline constexpr const _quick_status_code_from_enum_domain<Enum> &_quick_status_code_from_enum_domain<Enum>::get()
 {
   return quick_status_code_from_enum_domain<Enum>;
 }
+#endif
 
 //! Declare an implicit conversion from `Enum` into `quick_status_code_from_domain_enum_code<Enum>`.
 template <class Enum, typename = decltype(quick_status_code_from_enum<Enum>::domain_name)>  //
@@ -8995,7 +9045,6 @@ namespace mixins
     using quick_status_code_from_enum<Enum>::template mixin<Base>::mixin;
   };
 }  // namespace mixins
-#endif
 
 SYSTEM_ERROR2_NAMESPACE_END
 
@@ -11609,7 +11658,11 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
+//#ifdef __APPLE__
+//  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+//#else
+  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+//#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }

@@ -1225,9 +1225,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF c8f8edb2331464b12f1865bc5ab9886b6d1751b5
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-07 08:51:08 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c8f8edb2
+#define OUTCOME_PREVIOUS_COMMIT_REF 9e7de8ea9ab9394ffc146f526185352701c85c7b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-17 19:48:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9e7de8ea
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1396,6 +1396,20 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class... Args> static constexpr bool is_nothrow_constructible = _is_nothrow_constructible<T, Args...>::value;
+
+  template <class T, class... Args> struct _is_constructible
+  {
+    static constexpr bool value = std::is_constructible<T, Args...>::value;
+  };
+  template <class T> struct _is_constructible<T, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <> struct _is_constructible<void, void>
+  {
+    static constexpr bool value = false;
+  };
+  template <class T, class... Args> static constexpr bool is_constructible = _is_constructible<T, Args...>::value;
 
 #ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
 #if defined(_MSC_VER) && _HAS_CXX17
@@ -2052,7 +2066,7 @@ namespace awaitables
     template <class T> constexpr inline type_found<exception_type_not_found> extract_exception_type(...) { return {}; }
 
     OUTCOME_TEMPLATE(class T, class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
     inline bool try_set_error(T &&e, U *result)
     {
       new(result) U(static_cast<T&&>(e));
@@ -2060,7 +2074,7 @@ namespace awaitables
     }
     template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
     OUTCOME_TEMPLATE(class T, class U)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_constructible<U, T>::value))
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
     inline void set_or_rethrow(T &e, U *result) { new(result) U(e); }
     template <class T> inline void set_or_rethrow(T &e, ...) { rethrow_exception(e); }
     template <class T> class fake_atomic
@@ -3715,7 +3729,7 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    && detail::is_constructible<value_type, U> && detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3743,7 +3757,7 @@ namespace detail
     };
     template <class V>
     static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3771,7 +3785,7 @@ namespace detail
     };
     template <class U>
     static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3903,7 +3917,7 @@ namespace detail
     template <class U, class V>
     static constexpr bool enable_nonvoid_converting_constructor =
     !(std::is_same<std::decay_t<U>, value_type>::value && std::is_same<std::decay_t<V>, error_type>::value)  //
-    && std::is_constructible<value_type, U>::value && std::is_constructible<error_type, V>::value;
+    && detail::is_constructible<value_type, U> && detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class U, class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_nonvoid_converting_constructor<U, V>))
     constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, V> &o, nonvoid_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3952,7 +3966,7 @@ namespace detail
     };
     template <class V>
     static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&std::is_constructible<error_type, V>::value;
+    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -3990,7 +4004,7 @@ namespace detail
     };
     template <class U>
     static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&std::is_constructible<value_type, U>::value;
+    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -4229,6 +4243,8 @@ namespace detail
     value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
     std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value)  // NOLINT
     {
+      using _value_type_ = typename Base::_value_type_;
+      using _error_type_ = typename Base::_error_type_;
       if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
         this->_status = o._status;
@@ -4237,14 +4253,14 @@ namespace detail
       }
       if(this->_status.have_value() && o._status.have_value())
       {
-        this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_value  = static_cast<_value_type_&&>(o._value);  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
       }
       if(this->_status.have_error() && o._status.have_error())
       {
-        this->_error = static_cast<error_type &&>(o._error);  // NOLINT
+        this->_error  = static_cast<_error_type_&&>(o._error);  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -4253,7 +4269,7 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status = o._status;
         o._status.set_have_moved_from(true);
@@ -4261,7 +4277,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -4270,7 +4286,7 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status = o._status;
         o._status.set_have_moved_from(true);
@@ -4278,7 +4294,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -4287,9 +4303,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
-        new(&this->_error) error_type(static_cast<error_type &&>(o._error));  // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -4298,9 +4314,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value));  // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -4321,7 +4337,10 @@ namespace detail
     value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
     std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
-      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
+      using _value_type_ = typename Base::_value_type_;
+      using _error_type_ = typename Base::_error_type_;
+      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value()
+         && !o._status.have_error())
       {
         this->_status = o._status;
         return *this;
@@ -4342,14 +4361,14 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
         this->_status = o._status;
         return *this;
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) _value_type_(o._value);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -4357,14 +4376,14 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
         this->_status = o._status;
         return *this;
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) error_type(o._error);  // NOLINT
+        new(&this->_error) _error_type_(o._error);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -4372,9 +4391,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<value_type>::value || this->_status.have_moved_from())
         {
-          this->_value.~value_type();  // NOLINT
+          this->_value.~_value_type_();  // NOLINT
         }
-        new(&this->_error) error_type(o._error);  // NOLINT
+        new(&this->_error) _error_type_(o._error);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -4382,9 +4401,9 @@ namespace detail
       {
         if(!trait::is_move_bitcopying<error_type>::value || this->_status.have_moved_from())
         {
-          this->_error.~error_type();  // NOLINT
+          this->_error.~_error_type_();  // NOLINT
         }
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) _value_type_(o._value);  // NOLINT
         this->_status = o._status;
         return *this;
       }
@@ -5341,13 +5360,13 @@ namespace detail
     struct disable_inplace_value_error_constructor;
     template <class... Args>
     using choose_inplace_value_error_constructor = std::conditional_t<                                       //
-    std::is_constructible<value_type, Args...>::value && std::is_constructible<error_type, Args...>::value,  //
+    detail::is_constructible<value_type, Args...> && detail::is_constructible<error_type, Args...>,  //
     disable_inplace_value_error_constructor,                                                                 //
     std::conditional_t<                                                                                      //
-    std::is_constructible<value_type, Args...>::value,                                                       //
+    detail::is_constructible<value_type, Args...>,                                                       //
     value_type,                                                                                              //
     std::conditional_t<                                                                                      //
-    std::is_constructible<error_type, Args...>::value,                                                       //
+    detail::is_constructible<error_type, Args...>,                                                       //
     error_type,                                                                                              //
     disable_inplace_value_error_constructor>>>;
     template <class... Args>
@@ -5544,14 +5563,14 @@ protected:
     static constexpr bool enable_inplace_value_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<value_type>::value                       //
-        || std::is_constructible<value_type, Args...>::value);
+        || detail::is_constructible<value_type, Args...>);
 
     // Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<error_type>::value                       //
-        || std::is_constructible<error_type, Args...>::value);
+        || detail::is_constructible<error_type, Args...>);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
@@ -5926,6 +5945,10 @@ SIGNATURE NOT RECOGNISED
     this->_state._status.set_have_moved_from(true);
     return failure(static_cast<basic_result &&>(*this).assume_error());
   }
+
+#ifdef __APPLE__
+  failure_type<error_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -6624,7 +6647,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_STD_OUTCOME_HPP
 #define OUTCOME_STD_OUTCOME_HPP
 /* A less simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: June 2017
 
 
@@ -6894,17 +6917,17 @@ namespace detail
     struct disable_inplace_value_error_exception_constructor;
     template <class... Args>
     using choose_inplace_value_error_exception_constructor = std::conditional_t<  //
-    ((static_cast<int>(std::is_constructible<value_type, Args...>::value) + static_cast<int>(std::is_constructible<error_type, Args...>::value) +
-      static_cast<int>(std::is_constructible<exception_type, Args...>::value)) > 1),  //
+    ((static_cast<int>(detail::is_constructible<value_type, Args...>) + static_cast<int>(detail::is_constructible<error_type, Args...>) +
+      static_cast<int>(detail::is_constructible<exception_type, Args...>)) > 1),  //
     disable_inplace_value_error_exception_constructor,                                //
     std::conditional_t<                                                               //
-    std::is_constructible<value_type, Args...>::value,                                //
+    detail::is_constructible<value_type, Args...>,                                //
     value_type,                                                                       //
     std::conditional_t<                                                               //
-    std::is_constructible<error_type, Args...>::value,                                //
+    detail::is_constructible<error_type, Args...>,                                //
     error_type,                                                                       //
     std::conditional_t<                                                               //
-    std::is_constructible<exception_type, Args...>::value,                            //
+    detail::is_constructible<exception_type, Args...>,                            //
     exception_type,                                                                   //
     disable_inplace_value_error_exception_constructor>>>>;
     template <class... Args>
@@ -7131,21 +7154,21 @@ protected:
     static constexpr bool enable_inplace_value_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<value_type>::value                       //
-        || std::is_constructible<value_type, Args...>::value);
+        || detail::is_constructible<value_type, Args...>);
 
     // Predicate for the inplace construction of error to be available.
     template <class... Args>
     static constexpr bool enable_inplace_error_constructor =  //
     constructors_enabled                                      //
     && (std::is_void<error_type>::value                       //
-        || std::is_constructible<error_type, Args...>::value);
+        || detail::is_constructible<error_type, Args...>);
 
     // Predicate for the inplace construction of exception to be available.
     template <class... Args>
     static constexpr bool enable_inplace_exception_constructor =  //
     constructors_enabled                                          //
     && (std::is_void<exception_type>::value                       //
-        || std::is_constructible<exception_type, Args...>::value);
+        || detail::is_constructible<exception_type, Args...>);
 
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
@@ -7846,6 +7869,10 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
+
+#ifdef __APPLE__
+  failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 #if __cplusplus <= 202000
@@ -8525,7 +8552,11 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
+//#ifdef __APPLE__
+//  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+//#else
+  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+//#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
