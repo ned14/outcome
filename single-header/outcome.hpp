@@ -1225,9 +1225,9 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 28df3c45155d4a5a7428b4765eecefd8c0d079d3
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-14 11:00:32 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 28df3c45
+#define OUTCOME_PREVIOUS_COMMIT_REF 8ddef87aeb198d7274443f06a16b05f26f07d7b3
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-15 20:25:29 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8ddef87a
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5549,6 +5549,10 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   auto as_failure() && { return failure(static_cast<basic_result &&>(*this).assume_error()); }
+
+#ifdef __APPLE__
+  failure_type<error_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -6247,7 +6251,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_STD_OUTCOME_HPP
 #define OUTCOME_STD_OUTCOME_HPP
 /* A less simple result type
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: June 2017
 
 
@@ -7468,6 +7472,10 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
+
+#ifdef __APPLE__
+  failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
+#endif
 };
 
 #if __cplusplus <= 202000
@@ -8117,7 +8125,11 @@ namespace detail
   struct value_overload
   {
   };
-  OUTCOME_TEMPLATE(class T, class R = decltype(static_cast<T &&>(std::declval<T>()).as_failure()))
+#ifdef __APPLE__
+  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+#else
+  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
+#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
