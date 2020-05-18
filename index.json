@@ -1855,14 +1855,14 @@
 	"content": "Overridable: All of the following macros are overridable, define before inclusion.\nHeader: \u0026lt;outcome/config.hpp\u0026gt;\nThese macros expand into either the syntax for directly specifying constrained templates in C++ 20, or into a SFINAE based emulation for earlier C++ versions. Form of usage looks as follows:\nOUTCOME_TEMPLATE(classErrorCondEnum) OUTCOME_TREQUIRES( // If this is a valid expression  OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), // If this predicate is true  OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor\u0026lt;ErrorCondEnum\u0026gt;) // Any additional requirements follow here ...  ) constexpr basic_result(ErrorCondEnum \u0026amp;\u0026amp;t, error_condition_converting_constructor_tag /*unused*/ = {});  Be aware that slightly different semantics occur for real C++ 20 constrained templates than for the SFINAE emulation.\n OUTCOME_TEMPLATE(template args ...)\nBegins a constrained template declaration.\n OUTCOME_TREQUIRES(requirements ...)\nSpecifies the requirements for the constrained template to be available for selection by the compiler.\n OUTCOME_TEXPR(expression)\nA requirement that the given expression is valid.\n OUTCOME_TPRED(boolean)\nA requirement that the given constant time expression is true.\n  "
 },
 {
-	"uri": "https://ned14.github.io/outcome/categories/constructors/",
+	"uri": "https://ned14.github.io/outcome/tags/constructors/",
 	"title": "Constructors",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://ned14.github.io/outcome/tags/constructors/",
+	"uri": "https://ned14.github.io/outcome/categories/constructors/",
 	"title": "Constructors",
 	"tags": [],
 	"description": "",
