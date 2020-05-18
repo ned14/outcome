@@ -21,7 +21,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 /* A less simple result type
@@ -47,7 +46,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_OUTCOME_HPP
 #define OUTCOME_BASIC_OUTCOME_HPP
 /* Configure Outcome with QuickCppLib
@@ -73,7 +71,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_V2_CONFIG_HPP
 #define OUTCOME_V2_CONFIG_HPP
 /* Sets Outcome version
@@ -98,16 +95,14 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MAJOR    2
+#define OUTCOME_VERSION_MAJOR 2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR    2
+#define OUTCOME_VERSION_MINOR 2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_PATCH    0
+#define OUTCOME_VERSION_PATCH 0
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_REVISION 0  // Revision version for cmake and DLL version stamping
-
+#define OUTCOME_VERSION_REVISION 0 // Revision version for cmake and DLL version stamping
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #ifndef OUTCOME_DISABLE_ABI_PERMUTATION
 #define OUTCOME_UNSTABLE_VERSION
@@ -138,7 +133,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef QUICKCPPLIB_CONFIG_HPP
 #define QUICKCPPLIB_CONFIG_HPP
 /* Provides SG-10 feature checking for all C++ compilers
@@ -164,12 +158,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-
 #if __cplusplus >= 201103
-
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -223,91 +214,69 @@ Distributed under the Boost Software License, Version 1.0.
 ////#if !defined(__cpp_unrestricted_unions)
 ////#define __cpp_unrestricted_unions 190000
 ////#endif
-
 #if !defined(__cpp_alias_templates)
 #define __cpp_alias_templates 190000
 #endif
-
 #if !defined(__cpp_attributes)
 #define __cpp_attributes 190000
 #endif
-
 #if !defined(__cpp_constexpr)
 #if __cplusplus >= 201402
-#define __cpp_constexpr 201304  // relaxed constexpr
+#define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
 #endif
 #endif
-
 #if !defined(__cpp_decltype)
 #define __cpp_decltype 190000
 #endif
-
 #if !defined(__cpp_delegating_constructors)
 #define __cpp_delegating_constructors 190000
 #endif
-
-#if !defined(__cpp_explicit_conversion)   //// renamed from __cpp_explicit_conversions
+#if !defined(__cpp_explicit_conversion) //// renamed from __cpp_explicit_conversions
 #define __cpp_explicit_conversion 190000
 #endif
-
 #if !defined(__cpp_inheriting_constructors)
 #define __cpp_inheriting_constructors 190000
 #endif
-
-#if !defined(__cpp_initializer_lists)   //// NEW
+#if !defined(__cpp_initializer_lists) //// NEW
 #define __cpp_initializer_lists 190000
 #endif
-
 #if !defined(__cpp_lambdas)
 #define __cpp_lambdas 190000
 #endif
-
 #if !defined(__cpp_nsdmi)
-#define __cpp_nsdmi 190000  //// NEW
+#define __cpp_nsdmi 190000 //// NEW
 #endif
-
-#if !defined(__cpp_range_based_for)   //// renamed from __cpp_range_for
+#if !defined(__cpp_range_based_for) //// renamed from __cpp_range_for
 #define __cpp_range_based_for 190000
 #endif
-
 #if !defined(__cpp_raw_strings)
 #define __cpp_raw_strings 190000
 #endif
-
-#if !defined(__cpp_ref_qualifiers)   //// renamed from __cpp_reference_qualified_functions
+#if !defined(__cpp_ref_qualifiers) //// renamed from __cpp_reference_qualified_functions
 #define __cpp_ref_qualifiers 190000
 #endif
-
 #if !defined(__cpp_rvalue_references)
 #define __cpp_rvalue_references 190000
 #endif
-
 #if !defined(__cpp_static_assert)
 #define __cpp_static_assert 190000
 #endif
-
-#if !defined(__cpp_unicode_characters)   //// NEW
+#if !defined(__cpp_unicode_characters) //// NEW
 #define __cpp_unicode_characters 190000
 #endif
-
 #if !defined(__cpp_unicode_literals)
 #define __cpp_unicode_literals 190000
 #endif
-
 #if !defined(__cpp_user_defined_literals)
 #define __cpp_user_defined_literals 190000
 #endif
-
 #if !defined(__cpp_variadic_templates)
 #define __cpp_variadic_templates 190000
 #endif
-
 #endif
-
 #if __cplusplus >= 201402
-
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -322,336 +291,242 @@ Distributed under the Boost Software License, Version 1.0.
 ////#if !defined(__cpp_runtime_arrays)
 ////# define __cpp_runtime_arrays 190000
 ////#endif
-
-
 #if !defined(__cpp_aggregate_nsdmi)
 #define __cpp_aggregate_nsdmi 190000
 #endif
-
 #if !defined(__cpp_binary_literals)
 #define __cpp_binary_literals 190000
 #endif
-
 #if !defined(__cpp_decltype_auto)
 #define __cpp_decltype_auto 190000
 #endif
-
 #if !defined(__cpp_generic_lambdas)
 #define __cpp_generic_lambdas 190000
 #endif
-
 #if !defined(__cpp_init_captures)
 #define __cpp_init_captures 190000
 #endif
-
 #if !defined(__cpp_return_type_deduction)
 #define __cpp_return_type_deduction 190000
 #endif
-
 #if !defined(__cpp_sized_deallocation)
 #define __cpp_sized_deallocation 190000
 #endif
-
 #if !defined(__cpp_variable_templates)
 #define __cpp_variable_templates 190000
 #endif
-
 #endif
-
-
 // VS2010: _MSC_VER=1600
 // VS2012: _MSC_VER=1700
 // VS2013: _MSC_VER=1800
 // VS2015: _MSC_VER=1900
 // VS2017: _MSC_VER=1910
 #if defined(_MSC_VER) && !defined(__clang__)
-
 #if !defined(__cpp_exceptions) && defined(_CPPUNWIND)
 #define __cpp_exceptions 190000
 #endif
-
 #if !defined(__cpp_rtti) && defined(_CPPRTTI)
 #define __cpp_rtti 190000
 #endif
-
-
 // C++ 11
-
 #if !defined(__cpp_alias_templates) && _MSC_VER >= 1800
 #define __cpp_alias_templates 190000
 #endif
-
 #if !defined(__cpp_attributes)
 #define __cpp_attributes 190000
 #endif
-
 #if !defined(__cpp_constexpr) && _MSC_FULL_VER >= 190023506 /* VS2015 */
 #define __cpp_constexpr 190000
 #endif
-
 #if !defined(__cpp_decltype) && _MSC_VER >= 1600
 #define __cpp_decltype 190000
 #endif
-
 #if !defined(__cpp_delegating_constructors) && _MSC_VER >= 1800
 #define __cpp_delegating_constructors 190000
 #endif
-
 #if !defined(__cpp_explicit_conversion) && _MSC_VER >= 1800
 #define __cpp_explicit_conversion 190000
 #endif
-
 #if !defined(__cpp_inheriting_constructors) && _MSC_VER >= 1900
 #define __cpp_inheriting_constructors 190000
 #endif
-
 #if !defined(__cpp_initializer_lists) && _MSC_VER >= 1900
 #define __cpp_initializer_lists 190000
 #endif
-
 #if !defined(__cpp_lambdas) && _MSC_VER >= 1600
 #define __cpp_lambdas 190000
 #endif
-
 #if !defined(__cpp_nsdmi) && _MSC_VER >= 1900
 #define __cpp_nsdmi 190000
 #endif
-
 #if !defined(__cpp_range_based_for) && _MSC_VER >= 1700
 #define __cpp_range_based_for 190000
 #endif
-
 #if !defined(__cpp_raw_strings) && _MSC_VER >= 1800
 #define __cpp_raw_strings 190000
 #endif
-
 #if !defined(__cpp_ref_qualifiers) && _MSC_VER >= 1900
 #define __cpp_ref_qualifiers 190000
 #endif
-
 #if !defined(__cpp_rvalue_references) && _MSC_VER >= 1600
 #define __cpp_rvalue_references 190000
 #endif
-
 #if !defined(__cpp_static_assert) && _MSC_VER >= 1600
 #define __cpp_static_assert 190000
 #endif
-
 //#if !defined(__cpp_unicode_literals)
 //# define __cpp_unicode_literals 190000
 //#endif
-
 #if !defined(__cpp_user_defined_literals) && _MSC_VER >= 1900
 #define __cpp_user_defined_literals 190000
 #endif
-
 #if !defined(__cpp_variadic_templates) && _MSC_VER >= 1800
 #define __cpp_variadic_templates 190000
 #endif
-
-
 // C++ 14
-
 //#if !defined(__cpp_aggregate_nsdmi)
 //#define __cpp_aggregate_nsdmi 190000
 //#endif
-
 #if !defined(__cpp_binary_literals) && _MSC_VER >= 1900
 #define __cpp_binary_literals 190000
 #endif
-
 #if !defined(__cpp_decltype_auto) && _MSC_VER >= 1900
 #define __cpp_decltype_auto 190000
 #endif
-
 #if !defined(__cpp_generic_lambdas) && _MSC_VER >= 1900
 #define __cpp_generic_lambdas 190000
 #endif
-
 #if !defined(__cpp_init_captures) && _MSC_VER >= 1900
 #define __cpp_init_captures 190000
 #endif
-
 #if !defined(__cpp_return_type_deduction) && _MSC_VER >= 1900
 #define __cpp_return_type_deduction 190000
 #endif
-
 #if !defined(__cpp_sized_deallocation) && _MSC_VER >= 1900
 #define __cpp_sized_deallocation 190000
 #endif
-
 #if !defined(__cpp_variable_templates) && _MSC_FULL_VER >= 190023506
 #define __cpp_variable_templates 190000
 #endif
-
-#endif  // _MSC_VER
-
-
+#endif // _MSC_VER
 // Much to my surprise, GCC's support of these is actually incomplete, so fill in the gaps
 #if (defined(__GNUC__) && !defined(__clang__))
-
 #define QUICKCPPLIB_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-
 #if !defined(__cpp_exceptions) && defined(__EXCEPTIONS)
 #define __cpp_exceptions 190000
 #endif
-
 #if !defined(__cpp_rtti) && defined(__GXX_RTTI)
 #define __cpp_rtti 190000
 #endif
-
-
 // C++ 11
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
-
 #if !defined(__cpp_alias_templates) && (QUICKCPPLIB_GCC >= 40700)
 #define __cpp_alias_templates 190000
 #endif
-
 #if !defined(__cpp_attributes) && (QUICKCPPLIB_GCC >= 40800)
 #define __cpp_attributes 190000
 #endif
-
 #if !defined(__cpp_constexpr) && (QUICKCPPLIB_GCC >= 40600)
 #define __cpp_constexpr 190000
 #endif
-
 #if !defined(__cpp_decltype) && (QUICKCPPLIB_GCC >= 40300)
 #define __cpp_decltype 190000
 #endif
-
 #if !defined(__cpp_delegating_constructors) && (QUICKCPPLIB_GCC >= 40700)
 #define __cpp_delegating_constructors 190000
 #endif
-
 #if !defined(__cpp_explicit_conversion) && (QUICKCPPLIB_GCC >= 40500)
 #define __cpp_explicit_conversion 190000
 #endif
-
 #if !defined(__cpp_inheriting_constructors) && (QUICKCPPLIB_GCC >= 40800)
 #define __cpp_inheriting_constructors 190000
 #endif
-
 #if !defined(__cpp_initializer_lists) && (QUICKCPPLIB_GCC >= 40800)
 #define __cpp_initializer_lists 190000
 #endif
-
 #if !defined(__cpp_lambdas) && (QUICKCPPLIB_GCC >= 40500)
 #define __cpp_lambdas 190000
 #endif
-
 #if !defined(__cpp_nsdmi) && (QUICKCPPLIB_GCC >= 40700)
 #define __cpp_nsdmi 190000
 #endif
-
 #if !defined(__cpp_range_based_for) && (QUICKCPPLIB_GCC >= 40600)
 #define __cpp_range_based_for 190000
 #endif
-
 #if !defined(__cpp_raw_strings) && (QUICKCPPLIB_GCC >= 40500)
 #define __cpp_raw_strings 190000
 #endif
-
 #if !defined(__cpp_ref_qualifiers) && (QUICKCPPLIB_GCC >= 40801)
 #define __cpp_ref_qualifiers 190000
 #endif
-
 // __cpp_rvalue_reference deviation
 #if !defined(__cpp_rvalue_references) && defined(__cpp_rvalue_reference)
 #define __cpp_rvalue_references __cpp_rvalue_reference
 #endif
-
 #if !defined(__cpp_static_assert) && (QUICKCPPLIB_GCC >= 40300)
 #define __cpp_static_assert 190000
 #endif
-
 #if !defined(__cpp_unicode_characters) && (QUICKCPPLIB_GCC >= 40500)
 #define __cpp_unicode_characters 190000
 #endif
-
 #if !defined(__cpp_unicode_literals) && (QUICKCPPLIB_GCC >= 40500)
 #define __cpp_unicode_literals 190000
 #endif
-
 #if !defined(__cpp_user_defined_literals) && (QUICKCPPLIB_GCC >= 40700)
 #define __cpp_user_defined_literals 190000
 #endif
-
 #if !defined(__cpp_variadic_templates) && (QUICKCPPLIB_GCC >= 40400)
 #define __cpp_variadic_templates 190000
 #endif
-
-
 // C++ 14
 // Every C++ 14 supporting GCC does the right thing here
-
-#endif  // __GXX_EXPERIMENTAL_CXX0X__
-
-#endif  // GCC
-
-
+#endif // __GXX_EXPERIMENTAL_CXX0X__
+#endif // GCC
 // clang deviates in some places from the present SG-10 draft, plus older
 // clangs are quite incomplete
 #if defined(__clang__)
-
 #define QUICKCPPLIB_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
-
 #if !defined(__cpp_exceptions) && (defined(__EXCEPTIONS) || defined(_CPPUNWIND))
 #define __cpp_exceptions 190000
 #endif
-
 #if !defined(__cpp_rtti) && (defined(__GXX_RTTI) || defined(_CPPRTTI))
 #define __cpp_rtti 190000
 #endif
-
-
 // C++ 11
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
-
 #if !defined(__cpp_alias_templates) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_alias_templates 190000
 #endif
-
 #if !defined(__cpp_attributes) && (QUICKCPPLIB_CLANG >= 30300)
 #define __cpp_attributes 190000
 #endif
-
 #if !defined(__cpp_constexpr) && (QUICKCPPLIB_CLANG >= 30100)
 #define __cpp_constexpr 190000
 #endif
-
 #if !defined(__cpp_decltype) && (QUICKCPPLIB_CLANG >= 20900)
 #define __cpp_decltype 190000
 #endif
-
 #if !defined(__cpp_delegating_constructors) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_delegating_constructors 190000
 #endif
-
 #if !defined(__cpp_explicit_conversion) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_explicit_conversion 190000
 #endif
-
 #if !defined(__cpp_inheriting_constructors) && (QUICKCPPLIB_CLANG >= 30300)
 #define __cpp_inheriting_constructors 190000
 #endif
-
 #if !defined(__cpp_initializer_lists) && (QUICKCPPLIB_CLANG >= 30100)
 #define __cpp_initializer_lists 190000
 #endif
-
 #if !defined(__cpp_lambdas) && (QUICKCPPLIB_CLANG >= 30100)
 #define __cpp_lambdas 190000
 #endif
-
 #if !defined(__cpp_nsdmi) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_nsdmi 190000
 #endif
-
 #if !defined(__cpp_range_based_for) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_range_based_for 190000
 #endif
-
 // __cpp_raw_string_literals deviation
 #if !defined(__cpp_raw_strings) && defined(__cpp_raw_string_literals)
 #define __cpp_raw_strings __cpp_raw_string_literals
@@ -659,11 +534,9 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_raw_strings) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_raw_strings 190000
 #endif
-
 #if !defined(__cpp_ref_qualifiers) && (QUICKCPPLIB_CLANG >= 20900)
 #define __cpp_ref_qualifiers 190000
 #endif
-
 // __cpp_rvalue_reference deviation
 #if !defined(__cpp_rvalue_references) && defined(__cpp_rvalue_reference)
 #define __cpp_rvalue_references __cpp_rvalue_reference
@@ -671,19 +544,15 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_rvalue_references) && (QUICKCPPLIB_CLANG >= 20900)
 #define __cpp_rvalue_references 190000
 #endif
-
 #if !defined(__cpp_static_assert) && (QUICKCPPLIB_CLANG >= 20900)
 #define __cpp_static_assert 190000
 #endif
-
 #if !defined(__cpp_unicode_characters) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_unicode_characters 190000
 #endif
-
 #if !defined(__cpp_unicode_literals) && (QUICKCPPLIB_CLANG >= 30000)
 #define __cpp_unicode_literals 190000
 #endif
-
 // __cpp_user_literals deviation
 #if !defined(__cpp_user_defined_literals) && defined(__cpp_user_literals)
 #define __cpp_user_defined_literals __cpp_user_literals
@@ -691,43 +560,23 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_user_defined_literals) && (QUICKCPPLIB_CLANG >= 30100)
 #define __cpp_user_defined_literals 190000
 #endif
-
 #if !defined(__cpp_variadic_templates) && (QUICKCPPLIB_CLANG >= 20900)
 #define __cpp_variadic_templates 190000
 #endif
-
-
 // C++ 14
 // Every C++ 14 supporting clang does the right thing here
-
-#endif  // __GXX_EXPERIMENTAL_CXX0X__
-
-#endif  // clang
-
+#endif // __GXX_EXPERIMENTAL_CXX0X__
+#endif // clang
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF    e6515d51df28804ee8638cbd778d089b53ee1030
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE   "2020-04-22 08:26:40 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF e6515d51df28804ee8638cbd778d089b53ee1030
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-04-22 08:26:40 +00:00"
 #define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e6515d51
 #endif
-
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
-
 // clang-format off
-
-
-
-
-
-
-
-
-
-
-
-
 #if defined(QUICKCPPLIB_DISABLE_ABI_PERMUTATION)
 #define QUICKCPPLIB_NAMESPACE quickcpplib
 #define QUICKCPPLIB_NAMESPACE_BEGIN namespace quickcpplib {
@@ -738,7 +587,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_NAMESPACE_END } }
 #endif
 // clang-format on
-
 #ifdef _MSC_VER
 #define QUICKCPPLIB_BIND_MESSAGE_PRAGMA2(x) __pragma(message(x))
 #define QUICKCPPLIB_BIND_MESSAGE_PRAGMA(x) QUICKCPPLIB_BIND_MESSAGE_PRAGMA2(x)
@@ -757,22 +605,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_WARNING(msg) QUICKCPPLIB_BIND_MESSAGE_(GCC warning, QUICKCPPLIB_BIND_MESSAGE_PREFIX("warning"), msg)
 //! Have the compiler output an error
 #define QUICKCPPLIB_ERROR(msg) QUICKCPPLIB_BIND_MESSAGE_(GCC error, QUICKCPPLIB_BIND_MESSAGE_PREFIX("error"), msg)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #define QUICKCPPLIB_ANNOTATE_RWLOCK_CREATE(p)
 #define QUICKCPPLIB_ANNOTATE_RWLOCK_DESTROY(p)
 #define QUICKCPPLIB_ANNOTATE_RWLOCK_ACQUIRED(p, s)
@@ -784,8 +616,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_DRD_IGNORE_VAR(x)
 #define QUICKCPPLIB_DRD_STOP_IGNORING_VAR(x)
 #define QUICKCPPLIB_RUNNING_ON_VALGRIND (0)
-
-
 #ifndef QUICKCPPLIB_IN_THREAD_SANITIZER
 #if defined(__has_feature)
 #if __has_feature(thread_sanitizer)
@@ -798,13 +628,11 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef QUICKCPPLIB_IN_THREAD_SANITIZER
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 0
 #endif
-
 #if QUICKCPPLIB_IN_THREAD_SANITIZER
 #define QUICKCPPLIB_DISABLE_THREAD_SANITIZE __attribute__((no_sanitize_thread))
 #else
 #define QUICKCPPLIB_DISABLE_THREAD_SANITIZE
 #endif
-
 #ifndef QUICKCPPLIB_SMT_PAUSE
 #if !defined(__clang__) && defined(_MSC_VER) && _MSC_VER >= 1310 && (defined(_M_IX86) || defined(_M_X64))
 extern "C" void _mm_pause();
@@ -814,7 +642,6 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_SMT_PAUSE __asm__ __volatile__("rep; nop" : : : "memory");
 #endif
 #endif
-
 #ifndef QUICKCPPLIB_FORCEINLINE
 #if defined(_MSC_VER)
 #define QUICKCPPLIB_FORCEINLINE __forceinline
@@ -824,7 +651,6 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_FORCEINLINE
 #endif
 #endif
-
 #ifndef QUICKCPPLIB_NOINLINE
 #if defined(_MSC_VER)
 #define QUICKCPPLIB_NOINLINE __declspec(noinline)
@@ -834,13 +660,11 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_NOINLINE
 #endif
 #endif
-
 #ifdef __has_cpp_attribute
 #define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
 #else
 #define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr) (0)
 #endif
-
 #if !defined(QUICKCPPLIB_NORETURN)
 #if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(noreturn)
 #define QUICKCPPLIB_NORETURN [[noreturn]]
@@ -852,7 +676,6 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_NORETURN
 #endif
 #endif
-
 #ifndef QUICKCPPLIB_NODISCARD
 #if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
@@ -861,25 +684,16 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_NODISCARD
 #if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(nodiscard)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
-#elif defined(__clang__)  // deliberately not GCC
+#elif defined(__clang__) // deliberately not GCC
 #define QUICKCPPLIB_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this
-#define QUICKCPPLIB_NODISCARD                                                                                                                                                                                                                                                                                                    __declspec("SAL_name"                                                                                                                                                                                                                                                                                                                     "("                                                                                                                                                                                                                                                                                                                            "\"_Must_inspect_result_\""                                                                                                                                                                                                                                                                                                    ","                                                                                                                                                                                                                                                                                                                            "\"\""                                                                                                                                                                                                                                                                                                                         ","                                                                                                                                                                                                                                                                                                                            "\"2\""                                                                                                                                                                                                                                                                                                                        ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
-
-
-
-
-
-
-
-
+#define QUICKCPPLIB_NODISCARD __declspec("SAL_name" "(" "\"_Must_inspect_result_\"" "," "\"\"" "," "\"2\"" ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
 #define QUICKCPPLIB_NODISCARD
 #endif
-
 #ifndef QUICKCPPLIB_SYMBOL_VISIBLE
 #if defined(_MSC_VER)
 #define QUICKCPPLIB_SYMBOL_VISIBLE
@@ -889,7 +703,6 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
 #endif
-
 #ifndef QUICKCPPLIB_SYMBOL_EXPORT
 #if defined(_MSC_VER)
 #define QUICKCPPLIB_SYMBOL_EXPORT __declspec(dllexport)
@@ -899,7 +712,6 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 #endif
-
 #ifndef QUICKCPPLIB_SYMBOL_IMPORT
 #if defined(_MSC_VER)
 #define QUICKCPPLIB_SYMBOL_IMPORT __declspec(dllimport)
@@ -909,7 +721,6 @@ extern "C" void _mm_pause();
 #define QUICKCPPLIB_SYMBOL_IMPORT
 #endif
 #endif
-
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
@@ -958,34 +769,24 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef QUICKCPPLIB_PREPROCESSOR_MACRO_OVERLOAD_H
 #define QUICKCPPLIB_PREPROCESSOR_MACRO_OVERLOAD_H
-
 #define QUICKCPPLIB_GLUE(x, y) x y
-
 #define QUICKCPPLIB_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
 #define QUICKCPPLIB_EXPAND_ARGS(args) QUICKCPPLIB_RETURN_ARG_COUNT args
 #define QUICKCPPLIB_COUNT_ARGS_MAX8(...) QUICKCPPLIB_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-
 #define QUICKCPPLIB_OVERLOAD_MACRO2(name, count) name##count
 #define QUICKCPPLIB_OVERLOAD_MACRO1(name, count) QUICKCPPLIB_OVERLOAD_MACRO2(name, count)
 #define QUICKCPPLIB_OVERLOAD_MACRO(name, count) QUICKCPPLIB_OVERLOAD_MACRO1(name, count)
-
 #define QUICKCPPLIB_CALL_OVERLOAD(name, ...) QUICKCPPLIB_GLUE(QUICKCPPLIB_OVERLOAD_MACRO(name, QUICKCPPLIB_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
-
 #define QUICKCPPLIB_GLUE_(x, y) x y
-
 #define QUICKCPPLIB_RETURN_ARG_COUNT_(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
 #define QUICKCPPLIB_EXPAND_ARGS_(args) QUICKCPPLIB_RETURN_ARG_COUNT_ args
 #define QUICKCPPLIB_COUNT_ARGS_MAX8_(...) QUICKCPPLIB_EXPAND_ARGS_((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-
 #define QUICKCPPLIB_OVERLOAD_MACRO2_(name, count) name##count
 #define QUICKCPPLIB_OVERLOAD_MACRO1_(name, count) QUICKCPPLIB_OVERLOAD_MACRO2_(name, count)
 #define QUICKCPPLIB_OVERLOAD_MACRO_(name, count) QUICKCPPLIB_OVERLOAD_MACRO1_(name, count)
-
 #define QUICKCPPLIB_CALL_OVERLOAD_(name, ...) QUICKCPPLIB_GLUE_(QUICKCPPLIB_OVERLOAD_MACRO_(name, QUICKCPPLIB_COUNT_ARGS_MAX8_(__VA_ARGS__)), (__VA_ARGS__))
-
 #endif
 #if defined(__cpp_concepts) && !defined(QUICKCPPLIB_DISABLE_CONCEPTS_SUPPORT)
 #define QUICKCPPLIB_TREQUIRES_EXPAND8(a, b, c, d, e, f, g, h) a &&QUICKCPPLIB_TREQUIRES_EXPAND7(b, c, d, e, f, g, h)
@@ -996,15 +797,12 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_TREQUIRES_EXPAND3(a, b, c) a &&QUICKCPPLIB_TREQUIRES_EXPAND2(b, c)
 #define QUICKCPPLIB_TREQUIRES_EXPAND2(a, b) a &&QUICKCPPLIB_TREQUIRES_EXPAND1(b)
 #define QUICKCPPLIB_TREQUIRES_EXPAND1(a) a
-
 //! Expands into a && b && c && ...
 #define QUICKCPPLIB_TREQUIRES(...) requires QUICKCPPLIB_CALL_OVERLOAD(QUICKCPPLIB_TREQUIRES_EXPAND, __VA_ARGS__)
-
 #define QUICKCPPLIB_TEMPLATE(...) template <__VA_ARGS__>
-#define QUICKCPPLIB_TEXPR(...)                                                                                                                                                                                                                                                                                                   requires { (__VA_ARGS__); }
-
+#define QUICKCPPLIB_TEXPR(...) requires { (__VA_ARGS__); }
 #define QUICKCPPLIB_TPRED(...) (__VA_ARGS__)
-#if !defined(_MSC_VER) || _MSC_FULL_VER >= 192400000  // VS 2019 16.3 is broken here
+#if !defined(_MSC_VER) || _MSC_FULL_VER >= 192400000 // VS 2019 16.3 is broken here
 #define QUICKCPPLIB_REQUIRES(...) requires(__VA_ARGS__)
 #else
 #define QUICKCPPLIB_REQUIRES(...)
@@ -1022,8 +820,6 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #define QUICKCPPLIB_REQUIRES(...)
 #endif
-
-
 #endif
 #ifndef __cpp_variadic_templates
 #error Outcome needs variadic template support in the compiler
@@ -1037,20 +833,6 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 6
 #error Due to a bug in nested template variables parsing, Outcome does not work on GCCs earlier than v6.
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #ifndef OUTCOME_SYMBOL_VISIBLE
 #define OUTCOME_SYMBOL_VISIBLE QUICKCPPLIB_SYMBOL_VISIBLE
 #endif
@@ -1101,16 +883,12 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef QUICKCPPLIB_BIND_IMPORT_HPP
 #define QUICKCPPLIB_BIND_IMPORT_HPP
-
 /* 2014-10-9 ned: I lost today figuring out the below. I really hate the C preprocessor now.
  *
  * Anyway, infinity = 8. It's easy to expand below if needed.
  */
-
-
 #define QUICKCPPLIB_BIND_STRINGIZE(a) #a
 #define QUICKCPPLIB_BIND_STRINGIZE2(a) QUICKCPPLIB_BIND_STRINGIZE(a)
 #define QUICKCPPLIB_BIND_NAMESPACE_VERSION8(a, b, c, d, e, f, g, h) a##_##b##_##c##_##d##_##e##_##f##_##g##_##h
@@ -1123,15 +901,13 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_BIND_NAMESPACE_VERSION1(a) a
 //! Concatenates each parameter with _
 #define QUICKCPPLIB_BIND_NAMESPACE_VERSION(...) QUICKCPPLIB_CALL_OVERLOAD(QUICKCPPLIB_BIND_NAMESPACE_VERSION, __VA_ARGS__)
-
 #define QUICKCPPLIB_BIND_NAMESPACE_SELECT_2(name, modifier) name
 #define QUICKCPPLIB_BIND_NAMESPACE_SELECT2(name, modifier) ::name
 #define QUICKCPPLIB_BIND_NAMESPACE_SELECT_1(name) name
 #define QUICKCPPLIB_BIND_NAMESPACE_SELECT1(name) ::name
 #define QUICKCPPLIB_BIND_NAMESPACE_SELECT_(...) QUICKCPPLIB_CALL_OVERLOAD_(QUICKCPPLIB_BIND_NAMESPACE_SELECT_, __VA_ARGS__)
 #define QUICKCPPLIB_BIND_NAMESPACE_SELECT(...) QUICKCPPLIB_CALL_OVERLOAD_(QUICKCPPLIB_BIND_NAMESPACE_SELECT, __VA_ARGS__)
-#define QUICKCPPLIB_BIND_NAMESPACE_EXPAND8(a, b, c, d, e, f, g, h)                                                                                                                                                                                                                                                               QUICKCPPLIB_BIND_NAMESPACE_SELECT_ a QUICKCPPLIB_BIND_NAMESPACE_SELECT b QUICKCPPLIB_BIND_NAMESPACE_SELECT c QUICKCPPLIB_BIND_NAMESPACE_SELECT d QUICKCPPLIB_BIND_NAMESPACE_SELECT e QUICKCPPLIB_BIND_NAMESPACE_SELECT f QUICKCPPLIB_BIND_NAMESPACE_SELECT g QUICKCPPLIB_BIND_NAMESPACE_SELECT h
-
+#define QUICKCPPLIB_BIND_NAMESPACE_EXPAND8(a, b, c, d, e, f, g, h) QUICKCPPLIB_BIND_NAMESPACE_SELECT_ a QUICKCPPLIB_BIND_NAMESPACE_SELECT b QUICKCPPLIB_BIND_NAMESPACE_SELECT c QUICKCPPLIB_BIND_NAMESPACE_SELECT d QUICKCPPLIB_BIND_NAMESPACE_SELECT e QUICKCPPLIB_BIND_NAMESPACE_SELECT f QUICKCPPLIB_BIND_NAMESPACE_SELECT g QUICKCPPLIB_BIND_NAMESPACE_SELECT h
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPAND7(a, b, c, d, e, f, g) QUICKCPPLIB_BIND_NAMESPACE_SELECT_ a QUICKCPPLIB_BIND_NAMESPACE_SELECT b QUICKCPPLIB_BIND_NAMESPACE_SELECT c QUICKCPPLIB_BIND_NAMESPACE_SELECT d QUICKCPPLIB_BIND_NAMESPACE_SELECT e QUICKCPPLIB_BIND_NAMESPACE_SELECT f QUICKCPPLIB_BIND_NAMESPACE_SELECT g
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPAND6(a, b, c, d, e, f) QUICKCPPLIB_BIND_NAMESPACE_SELECT_ a QUICKCPPLIB_BIND_NAMESPACE_SELECT b QUICKCPPLIB_BIND_NAMESPACE_SELECT c QUICKCPPLIB_BIND_NAMESPACE_SELECT d QUICKCPPLIB_BIND_NAMESPACE_SELECT e QUICKCPPLIB_BIND_NAMESPACE_SELECT f
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPAND5(a, b, c, d, e) QUICKCPPLIB_BIND_NAMESPACE_SELECT_ a QUICKCPPLIB_BIND_NAMESPACE_SELECT b QUICKCPPLIB_BIND_NAMESPACE_SELECT c QUICKCPPLIB_BIND_NAMESPACE_SELECT d QUICKCPPLIB_BIND_NAMESPACE_SELECT e
@@ -1141,13 +917,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPAND1(a) QUICKCPPLIB_BIND_NAMESPACE_SELECT_ a
 //! Expands into a::b::c:: ...
 #define QUICKCPPLIB_BIND_NAMESPACE(...) QUICKCPPLIB_CALL_OVERLOAD(QUICKCPPLIB_BIND_NAMESPACE_EXPAND, __VA_ARGS__)
-
-#define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT2(name, modifier)                                                                                                                                                                                                                                                       modifier namespace name                                                                                                                                                                                                                                                                                                        {
-
-
-#define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT1(name)                                                                                                                                                                                                                                                                 namespace name                                                                                                                                                                                                                                                                                                                 {
-
-
+#define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT2(name, modifier) modifier namespace name {
+#define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT1(name) namespace name {
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT(...) QUICKCPPLIB_CALL_OVERLOAD_(QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT, __VA_ARGS__)
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND8(a, b, c, d, e, f, g, h) QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND7(b, c, d, e, f, g, h)
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND7(a, b, c, d, e, f, g) QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND6(b, c, d, e, f, g)
@@ -1157,16 +928,10 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND3(a, b, c) QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND2(b, c)
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND2(a, b) QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND1(b)
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND1(a) QUICKCPPLIB_BIND_NAMESPACE_BEGIN_NAMESPACE_SELECT a
-
 //! Expands into namespace a { namespace b { namespace c ...
 #define QUICKCPPLIB_BIND_NAMESPACE_BEGIN(...) QUICKCPPLIB_CALL_OVERLOAD(QUICKCPPLIB_BIND_NAMESPACE_BEGIN_EXPAND, __VA_ARGS__)
-
-#define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT2(name, modifier)                                                                                                                                                                                                                                                modifier namespace name                                                                                                                                                                                                                                                                                                        {
-
-
-#define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT1(name)                                                                                                                                                                                                                                                          export namespace name                                                                                                                                                                                                                                                                                                          {
-
-
+#define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT2(name, modifier) modifier namespace name {
+#define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT1(name) export namespace name {
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT(...) QUICKCPPLIB_CALL_OVERLOAD_(QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT, __VA_ARGS__)
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND8(a, b, c, d, e, f, g, h) QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND7(b, c, d, e, f, g, h)
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND7(a, b, c, d, e, f, g) QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND6(b, c, d, e, f, g)
@@ -1176,10 +941,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND3(a, b, c) QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND2(b, c)
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND2(a, b) QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND1(b)
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND1(a) QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_NAMESPACE_SELECT a
-
 //! Expands into export namespace a { namespace b { namespace c ...
 #define QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN(...) QUICKCPPLIB_CALL_OVERLOAD(QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN_EXPAND, __VA_ARGS__)
-
 #define QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT2(name, modifier) }
 #define QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT1(name) }
 #define QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT(...) QUICKCPPLIB_CALL_OVERLOAD_(QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT, __VA_ARGS__)
@@ -1191,13 +954,10 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_BIND_NAMESPACE_END_EXPAND3(a, b, c) QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_END_EXPAND2(b, c)
 #define QUICKCPPLIB_BIND_NAMESPACE_END_EXPAND2(a, b) QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT a QUICKCPPLIB_BIND_NAMESPACE_END_EXPAND1(b)
 #define QUICKCPPLIB_BIND_NAMESPACE_END_EXPAND1(a) QUICKCPPLIB_BIND_NAMESPACE_END_NAMESPACE_SELECT a
-
 //! Expands into } } ...
 #define QUICKCPPLIB_BIND_NAMESPACE_END(...) QUICKCPPLIB_CALL_OVERLOAD(QUICKCPPLIB_BIND_NAMESPACE_END_EXPAND, __VA_ARGS__)
-
 //! Expands into a static const char string array used to mark BindLib compatible namespaces
 #define QUICKCPPLIB_BIND_DECLARE(decl, desc) static const char *quickcpplib_out[] = {#decl, desc};
-
 #endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 /* UPDATED BY SCRIPT
@@ -1222,16 +982,14 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 8ddef87aeb198d7274443f06a16b05f26f07d7b3
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-15 20:25:29 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 8ddef87a
+#define OUTCOME_PREVIOUS_COMMIT_REF cdb9621da2645d6ef8315698b1c615334bf1da33
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-18 15:00:52 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE cdb9621d
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #endif
-
 #if defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 #define OUTCOME_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(OUTCOME_V2)
 #define OUTCOME_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(OUTCOME_V2)
@@ -1243,24 +1001,21 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(OUTCOME_V2)
 #define OUTCOME_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(OUTCOME_V2)
 #endif
-
-#include <cstdint>  // for uint32_t etc
+#include <cstdint> // for uint32_t etc
 #include <initializer_list>
-#include <iosfwd>  // for future serialisation
-#include <new>     // for placement in moves etc
+#include <iosfwd> // for future serialisation
+#include <new> // for placement in moves etc
 #include <type_traits>
-
 #ifndef OUTCOME_USE_STD_IN_PLACE_TYPE
 #if defined(_MSC_VER) && _HAS_CXX17
-#define OUTCOME_USE_STD_IN_PLACE_TYPE 1  // MSVC always has std::in_place_type
+#define OUTCOME_USE_STD_IN_PLACE_TYPE 1 // MSVC always has std::in_place_type
 #elif __cplusplus >= 201700
 // libstdc++ before GCC 6 doesn't have it, despite claiming C++ 17 support
 #ifdef __has_include
 #if !__has_include(<variant>)
-#define OUTCOME_USE_STD_IN_PLACE_TYPE 0  // must have it if <variant> is present
+#define OUTCOME_USE_STD_IN_PLACE_TYPE 0 // must have it if <variant> is present
 #endif
 #endif
-
 #ifndef OUTCOME_USE_STD_IN_PLACE_TYPE
 #define OUTCOME_USE_STD_IN_PLACE_TYPE 1
 #endif
@@ -1268,10 +1023,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_USE_STD_IN_PLACE_TYPE 0
 #endif
 #endif
-
 #if OUTCOME_USE_STD_IN_PLACE_TYPE
-#include <utility>  // for in_place_type_t
-
+#include <utility> // for in_place_type_t
 OUTCOME_V2_NAMESPACE_BEGIN
 template <class T> using in_place_type_t = std::in_place_type_t<T>;
 using std::in_place_type;
@@ -1291,7 +1044,6 @@ SIGNATURE NOT RECOGNISED
 template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
-
 #ifndef OUTCOME_TRIVIAL_ABI
 #if 0 || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
@@ -1300,7 +1052,6 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRIVIAL_ABI
 #endif
 #endif
-
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace detail
 {
@@ -1313,7 +1064,6 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-
   // Replace void with constructible void_type
   struct empty_type
   {
@@ -1325,32 +1075,28 @@ namespace detail
     constexpr bool operator!=(void_type /*unused*/) const noexcept { return false; }
   };
   template <class T> using devoid = std::conditional_t<std::is_void<T>::value, void_type, T>;
-
   template <class Output, class Input> using rebind_type5 = Output;
   template <class Output, class Input>
-  using rebind_type4 = std::conditional_t<                                   //
-  std::is_volatile<Input>::value,                                            //
-  std::add_volatile_t<rebind_type5<Output, std::remove_volatile_t<Input>>>,  //
+  using rebind_type4 = std::conditional_t< //
+  std::is_volatile<Input>::value, //
+  std::add_volatile_t<rebind_type5<Output, std::remove_volatile_t<Input>>>, //
   rebind_type5<Output, Input>>;
   template <class Output, class Input>
-  using rebind_type3 = std::conditional_t<                             //
-  std::is_const<Input>::value,                                         //
-  std::add_const_t<rebind_type4<Output, std::remove_const_t<Input>>>,  //
+  using rebind_type3 = std::conditional_t< //
+  std::is_const<Input>::value, //
+  std::add_const_t<rebind_type4<Output, std::remove_const_t<Input>>>, //
   rebind_type4<Output, Input>>;
   template <class Output, class Input>
-  using rebind_type2 = std::conditional_t<                                            //
-  std::is_lvalue_reference<Input>::value,                                             //
-  std::add_lvalue_reference_t<rebind_type3<Output, std::remove_reference_t<Input>>>,  //
+  using rebind_type2 = std::conditional_t< //
+  std::is_lvalue_reference<Input>::value, //
+  std::add_lvalue_reference_t<rebind_type3<Output, std::remove_reference_t<Input>>>, //
   rebind_type3<Output, Input>>;
   template <class Output, class Input>
-  using rebind_type = std::conditional_t<                                             //
-  std::is_rvalue_reference<Input>::value,                                             //
-  std::add_rvalue_reference_t<rebind_type2<Output, std::remove_reference_t<Input>>>,  //
+  using rebind_type = std::conditional_t< //
+  std::is_rvalue_reference<Input>::value, //
+  std::add_rvalue_reference_t<rebind_type2<Output, std::remove_reference_t<Input>>>, //
   rebind_type2<Output, Input>>;
-
   // static_assert(std::is_same_v<rebind_type<int, volatile const double &&>, volatile const int &&>, "");
-
-
   /* True if type is the same or constructible. Works around a bug where clang + libstdc++
   pukes on std::is_constructible<filesystem::path, void> (this bug is fixed upstream).
   */
@@ -1367,7 +1113,6 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class U> static constexpr bool is_explicitly_constructible = _is_explicitly_constructible<T, U>::value;
-
   template <class T, class U> struct _is_implicitly_constructible
   {
     static constexpr bool value = std::is_convertible<U, T>::value;
@@ -1381,7 +1126,6 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class U> static constexpr bool is_implicitly_constructible = _is_implicitly_constructible<T, U>::value;
-
   template <class T, class... Args> struct _is_nothrow_constructible
   {
     static constexpr bool value = std::is_nothrow_constructible<T, Args...>::value;
@@ -1395,7 +1139,6 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class... Args> static constexpr bool is_nothrow_constructible = _is_nothrow_constructible<T, Args...>::value;
-
   template <class T, class... Args> struct _is_constructible
   {
     static constexpr bool value = std::is_constructible<T, Args...>::value;
@@ -1409,10 +1152,9 @@ namespace detail
     static constexpr bool value = false;
   };
   template <class T, class... Args> static constexpr bool is_constructible = _is_constructible<T, Args...>::value;
-
 #ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
 #if defined(_MSC_VER) && _HAS_CXX17
-#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1  // MSVC always has std::is_nothrow_swappable
+#define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1 // MSVC always has std::is_nothrow_swappable
 #elif __cplusplus >= 201700
 // libstdc++ before GCC 6 doesn't have it, despite claiming C++ 17 support
 #ifdef __has_include
@@ -1420,7 +1162,6 @@ namespace detail
 #define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 0
 #endif
 #endif
-
 #ifndef OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
 #define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 1
 #endif
@@ -1428,7 +1169,6 @@ namespace detail
 #define OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE 0
 #endif
 #endif
-
 // True if type is nothrow swappable
 #if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
@@ -1438,19 +1178,15 @@ namespace detail
     static constexpr bool value = std::is_nothrow_move_constructible<T>::value && std::is_nothrow_move_assignable<T>::value;
   };
 #endif
-}  // namespace detail
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
-
 #ifndef OUTCOME_THROW_EXCEPTION
 #ifdef __cpp_exceptions
 #define OUTCOME_THROW_EXCEPTION(expr) throw expr
 #else
-
 #ifdef __ANDROID__
 #define OUTCOME_DISABLE_EXECINFO
 #endif
-
 #ifndef OUTCOME_DISABLE_EXECINFO
 #ifdef _WIN32
 /* Implements backtrace() et al from glibc on win64
@@ -1476,17 +1212,13 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef BOOST_BINDLIB_EXECINFO_WIN64_H
 #define BOOST_BINDLIB_EXECINFO_WIN64_H
-
 #ifndef _WIN32
 #error Can only be included on Windows
 #endif
-
 #include <sal.h>
 #include <stddef.h>
-
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
@@ -1498,22 +1230,16 @@ Distributed under the Boost Software License, Version 1.0.
 #define EXECINFO_DECL extern
 #endif
 #endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 //! Fill the array of void * at bt with up to len entries, returning entries filled.
 EXECINFO_DECL _Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len);
-
 //! Returns a malloced block of string representations of the input backtrace.
 EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(len) void *const *bt, _In_ size_t len);
-
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
-
 #ifdef __cplusplus
 }
-
 #if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
@@ -1562,9 +1288,8 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-#include <stdlib.h>  // for abort
+#include <stdlib.h> // for abort
 #include <string.h>
-
 // To avoid including windows.h, this source has been macro expanded and win32 function shimmed for C++ only
 #if defined(__cplusplus) && !defined(__clang__)
 namespace win32
@@ -1588,7 +1313,7 @@ namespace win32
 #pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YGGKKPAPAXPAK@Z=__imp__RtlCaptureStackBackTrace@16")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
 #endif
-}  // namespace win32
+} // namespace win32
 #else
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -1598,12 +1323,10 @@ namespace win32
 #endif
 #include <Windows.h>
 #endif
-
 #ifdef __cplusplus
 namespace
 {
 #endif
-
   typedef struct _IMAGEHLP_LINE64
   {
     unsigned long SizeOfStruct;
@@ -1612,11 +1335,8 @@ namespace
     wchar_t *FileName;
     unsigned long long int Address;
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
-
   typedef int(__stdcall *SymInitialize_t)(_In_ void *hProcess, _In_opt_ const wchar_t *UserSearchPath, _In_ int fInvadeProcess);
-
   typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
-
 #if defined(__cplusplus) && !defined(__clang__)
   static void *dbghelp;
 #else
@@ -1624,7 +1344,6 @@ static HMODULE dbghelp;
 #endif
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
-
   static void load_dbghelp()
   {
 #if defined(__cplusplus) && !defined(__clang__)
@@ -1646,16 +1365,13 @@ static HMODULE dbghelp;
         abort();
     }
   }
-
 #ifdef __cplusplus
 }
 #endif
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
   _Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len)
   {
 #if defined(__cplusplus) && !defined(__clang__)
@@ -1663,10 +1379,9 @@ extern "C"
 #endif
     return RtlCaptureStackBackTrace(1, (unsigned long) len, bt, NULL);
   }
-
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 6385 6386)  // MSVC static analyser can't grok this function. clang's analyser gives it thumbs up.
+#pragma warning(disable : 6385 6386) // MSVC static analyser can't grok this function. clang's analyser gives it thumbs up.
 #endif
   _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(len) void *const *bt, _In_ size_t len)
   {
@@ -1766,22 +1481,18 @@ extern "C"
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
   // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
-
 #ifdef __cplusplus
 }
 #endif
 #undef QUICKCPPLIB_INCLUDED_BY_HEADER
 #endif
-
 #endif
-
 #endif
 #else
 #include <execinfo.h>
 #endif
-#endif  // OUTCOME_DISABLE_EXECINFO
+#endif // OUTCOME_DISABLE_EXECINFO
 #include <cstdio>
 #include <cstdlib>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1791,33 +1502,30 @@ namespace detail
   {
 #if !defined(OUTCOME_DISABLE_EXECINFO)
     void *bt[16];
-    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));                                // NOLINT
+    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0])); // NOLINT
 #endif
-    fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);  // NOLINT
+    fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr); // NOLINT
 #if !defined(OUTCOME_DISABLE_EXECINFO)
-    char **bts = backtrace_symbols(bt, btlen);                                               // NOLINT
+    char **bts = backtrace_symbols(bt, btlen); // NOLINT
     if(bts != nullptr)
     {
       for(size_t n = 0; n < btlen; n++)
       {
-        fprintf(stderr, "  %s\n", bts[n]);  // NOLINT
+        fprintf(stderr, "  %s\n", bts[n]); // NOLINT
       }
-      free(bts);  // NOLINT
+      free(bts); // NOLINT
     }
 #endif
     abort();
   }
-}  // namespace detail
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_THROW_EXCEPTION(expr) OUTCOME_V2_NAMESPACE::detail::do_fatal_exit(#expr), (void) (expr)
-
 #endif
 #endif
-
 #ifndef BOOST_OUTCOME_AUTO_TEST_CASE
 #define BOOST_OUTCOME_AUTO_TEST_CASE(a, b) BOOST_AUTO_TEST_CASE(a, b)
 #endif
-
 #endif
 /* A very simple result type
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -1842,7 +1550,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_RESULT_HPP
 #define OUTCOME_BASIC_RESULT_HPP
 /* Says how to convert value, error and exception types
@@ -1868,7 +1575,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_CONVERT_HPP
 #define OUTCOME_CONVERT_HPP
 /* Storage for a very simple basic_result type
@@ -1894,7 +1600,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_RESULT_STORAGE_HPP
 #define OUTCOME_BASIC_RESULT_STORAGE_HPP
 /* Type sugar for success and failure
@@ -1920,38 +1625,30 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_SUCCESS_FAILURE_HPP
 #define OUTCOME_SUCCESS_FAILURE_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_BEGIN
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class T> success_type. Potential doc page: `success_type<T>`
 */
 template <class T> struct OUTCOME_NODISCARD success_type
 {
   using value_type = T;
-
 private:
   value_type _value;
-
 public:
   success_type() = default;
   success_type(const success_type &) = default;
-  success_type(success_type &&) = default;  // NOLINT
+  success_type(success_type &&) = default; // NOLINT
   success_type &operator=(const success_type &) = default;
-  success_type &operator=(success_type &&) = default;  // NOLINT
+  success_type &operator=(success_type &&) = default; // NOLINT
   ~success_type() = default;
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
   constexpr explicit success_type(U &&v)
-      : _value(static_cast<U &&>(v))  // NOLINT
+      : _value(static_cast<U &&>(v)) // NOLINT
   {
   }
-
   constexpr value_type &value() & { return _value; }
   constexpr const value_type &value() const & { return _value; }
   constexpr value_type &&value() && { return static_cast<value_type &&>(_value); }
@@ -1975,7 +1672,6 @@ template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
 {
   return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
 }
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class EC, class E = void> failure_type. Potential doc page: `failure_type<EC, EP = void>`
 */
@@ -1983,25 +1679,22 @@ template <class EC, class E = void> struct OUTCOME_NODISCARD failure_type
 {
   using error_type = EC;
   using exception_type = E;
-
 private:
   bool _have_error{}, _have_exception{};
   error_type _error;
   exception_type _exception;
-
   struct error_init_tag
   {
   };
   struct exception_init_tag
   {
   };
-
 public:
   failure_type() = default;
   failure_type(const failure_type &) = default;
-  failure_type(failure_type &&) = default;  // NOLINT
+  failure_type(failure_type &&) = default; // NOLINT
   failure_type &operator=(const failure_type &) = default;
-  failure_type &operator=(failure_type &&) = default;  // NOLINT
+  failure_type &operator=(failure_type &&) = default; // NOLINT
   ~failure_type() = default;
   template <class U, class V>
   constexpr explicit failure_type(U &&u, V &&v)
@@ -2025,15 +1718,12 @@ public:
       , _exception(static_cast<U &&>(u))
   {
   }
-
   constexpr bool has_error() const { return _have_error; }
   constexpr bool has_exception() const { return _have_exception; }
-
   constexpr error_type &error() & { return _error; }
   constexpr const error_type &error() const & { return _error; }
   constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
-
   constexpr exception_type &exception() & { return _exception; }
   constexpr const exception_type &exception() const & { return _exception; }
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
@@ -2043,24 +1733,21 @@ template <class EC> struct OUTCOME_NODISCARD failure_type<EC, void>
 {
   using error_type = EC;
   using exception_type = void;
-
 private:
   error_type _error;
-
 public:
   failure_type() = default;
   failure_type(const failure_type &) = default;
-  failure_type(failure_type &&) = default;  // NOLINT
+  failure_type(failure_type &&) = default; // NOLINT
   failure_type &operator=(const failure_type &) = default;
-  failure_type &operator=(failure_type &&) = default;  // NOLINT
+  failure_type &operator=(failure_type &&) = default; // NOLINT
   ~failure_type() = default;
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
   constexpr explicit failure_type(U &&u)
-      : _error(static_cast<U &&>(u))  // NOLINT
+      : _error(static_cast<U &&>(u)) // NOLINT
   {
   }
-
   constexpr error_type &error() & { return _error; }
   constexpr const error_type &error() const & { return _error; }
   constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
@@ -2070,24 +1757,21 @@ template <class E> struct OUTCOME_NODISCARD failure_type<void, E>
 {
   using error_type = void;
   using exception_type = E;
-
 private:
   exception_type _exception;
-
 public:
   failure_type() = default;
   failure_type(const failure_type &) = default;
-  failure_type(failure_type &&) = default;  // NOLINT
+  failure_type(failure_type &&) = default; // NOLINT
   failure_type &operator=(const failure_type &) = default;
-  failure_type &operator=(failure_type &&) = default;  // NOLINT
+  failure_type &operator=(failure_type &&) = default; // NOLINT
   ~failure_type() = default;
   OUTCOME_TEMPLATE(class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
   constexpr explicit failure_type(V &&v)
-      : _exception(static_cast<V &&>(v))  // NOLINT
+      : _exception(static_cast<V &&>(v)) // NOLINT
   {
   }
-
   constexpr exception_type &exception() & { return _exception; }
   constexpr const exception_type &exception() const & { return _exception; }
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
@@ -2107,7 +1791,6 @@ template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std
 {
   return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), static_cast<E &&>(w)};
 }
-
 namespace detail
 {
   template <class T> struct is_success_type
@@ -2126,20 +1809,16 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-}  // namespace detail
-
+} // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_success_type = detail::is_success_type<std::decay_t<T>>::value;
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_failure_type = detail::is_failure_type<std::decay_t<T>>::value;
-
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Traits for Outcome
 (C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
@@ -2164,30 +1843,24 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_TRAIT_HPP
 #define OUTCOME_TRAIT_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_BEGIN
-
 namespace trait
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R>                                                             //
-  static constexpr bool type_can_be_used_in_basic_result =                       //
-  (!std::is_reference<R>::value                                                  //
-   && !OUTCOME_V2_NAMESPACE::detail::is_in_place_type_t<std::decay_t<R>>::value  //
-   && !is_success_type<R>                                                        //
-   && !is_failure_type<R>                                                        //
-   && !std::is_array<R>::value                                                   //
-   && (std::is_void<R>::value || (std::is_object<R>::value                       //
-                                  && std::is_destructible<R>::value))            //
+  template <class R> //
+  static constexpr bool type_can_be_used_in_basic_result = //
+  (!std::is_reference<R>::value //
+   && !OUTCOME_V2_NAMESPACE::detail::is_in_place_type_t<std::decay_t<R>>::value //
+   && !is_success_type<R> //
+   && !is_failure_type<R> //
+   && !std::is_array<R>::value //
+   && (std::is_void<R>::value || (std::is_object<R>::value //
+                                  && std::is_destructible<R>::value)) //
   );
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type. Potential doc page: NOT FOUND
 */
@@ -2195,7 +1868,6 @@ type definition  is_error_type. Potential doc page: NOT FOUND
   {
     static constexpr bool value = false;
   };
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_type_enum. Potential doc page: NOT FOUND
 */
@@ -2203,12 +1875,10 @@ type definition  is_error_type_enum. Potential doc page: NOT FOUND
   {
     static constexpr bool value = false;
   };
-
   namespace detail
   {
     template <class T> using devoid = OUTCOME_V2_NAMESPACE::detail::devoid<T>;
     template <class T> std::add_rvalue_reference_t<devoid<T>> declval() noexcept;
-
     // From http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4436.pdf
     namespace detector_impl
     {
@@ -2223,15 +1893,12 @@ type definition  is_error_type_enum. Potential doc page: NOT FOUND
         static constexpr bool value = true;
         using type = Op<Args...>;
       };
-    }  // namespace detector_impl
+    } // namespace detector_impl
     template <template <class...> class Op, class... Args> using is_detected = detector_impl::detector<void, void, Op, Args...>;
-
     template <class Arg> using result_of_make_error_code = decltype(make_error_code(declval<Arg>()));
     template <class Arg> using introspect_make_error_code = is_detected<result_of_make_error_code, Arg>;
-
     template <class Arg> using result_of_make_exception_ptr = decltype(make_exception_ptr(declval<Arg>()));
     template <class Arg> using introspect_make_exception_ptr = is_detected<result_of_make_exception_ptr, Arg>;
-
     template <class T> struct _is_error_code_available
     {
       static constexpr bool value = detail::introspect_make_error_code<T>::value;
@@ -2242,8 +1909,7 @@ type definition  is_error_type_enum. Potential doc page: NOT FOUND
       static constexpr bool value = detail::introspect_make_exception_ptr<T>::value;
       using type = typename detail::introspect_make_exception_ptr<T>::type;
     };
-  }  // namespace detail
-
+  } // namespace detail
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_error_code_available. Potential doc page: NOT FOUND
 */
@@ -2253,7 +1919,6 @@ type definition  is_error_code_available. Potential doc page: NOT FOUND
     using type = typename detail::_is_error_code_available<std::decay_t<T>>::type;
   };
   template <class T> constexpr bool is_error_code_available_v = detail::_is_error_code_available<std::decay_t<T>>::value;
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 */
@@ -2263,12 +1928,8 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
     using type = typename detail::_is_exception_ptr_available<std::decay_t<T>>::type;
   };
   template <class T> constexpr bool is_exception_ptr_available_v = detail::_is_exception_ptr_available<std::decay_t<T>>::value;
-
-
-}  // namespace trait
-
+} // namespace trait
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Essentially an internal optional implementation :)
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
@@ -2293,16 +1954,10 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_VALUE_STORAGE_HPP
 #define OUTCOME_VALUE_STORAGE_HPP
-
-
-
 #include <cassert>
-
 OUTCOME_V2_NAMESPACE_BEGIN
-
 namespace detail
 {
   template <class T, bool nothrow> struct strong_swap_impl
@@ -2339,7 +1994,7 @@ namespace detail
           allgood = false;
           // throw away second exception
         }
-        throw;  // rethrow original exception
+        throw; // rethrow original exception
       }
       // b has been moved to a, try to move v to b
       try
@@ -2361,13 +2016,12 @@ namespace detail
           allgood = false;
           // throw away second exception
         }
-        throw;  // rethrow original exception
+        throw; // rethrow original exception
       }
     }
   };
 #endif
-}  // namespace detail
-
+} // namespace detail
 /*!
  */
 OUTCOME_TEMPLATE(class T)
@@ -2376,7 +2030,6 @@ constexpr inline void strong_swap(bool &allgood, T &a, T &b) noexcept(detail::is
 {
   detail::strong_swap_impl<T, detail::is_nothrow_swappable<T>::value>(allgood, a, b);
 }
-
 namespace detail
 {
   template <class T>
@@ -2388,14 +2041,13 @@ namespace detail
 #endif
   void make_ub(T && /*unused*/)
   {
-    assert(false);  // NOLINT
+    assert(false); // NOLINT
 #if defined(__GNUC__) || defined(__clang__)
     __builtin_unreachable();
 #elif defined(_MSC_VER)
     __assume(0);
 #endif
   }
-
   /* Outcome v1 used a C bitfield whose values were tracked by compiler optimisers nicely,
   but that produces ICEs when used in constexpr.
 
@@ -2413,40 +2065,34 @@ namespace detail
   {
     // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
     none = 0,
-
     have_value = (1U << 0U),
     have_error = (1U << 1U),
     have_exception = (2U << 1U),
     have_error_exception = (3U << 1U),
-
     // failed to complete a strong swap
     have_lost_consistency = (1U << 3U),
     have_value_lost_consistency = (1U << 0U) | (1U << 3U),
     have_error_lost_consistency = (1U << 1U) | (1U << 3U),
     have_exception_lost_consistency = (2U << 1U) | (1U << 3U),
     have_error_exception_lost_consistency = (3U << 1U) | (1U << 3U),
-
     // can errno be set from this error?
     have_error_is_errno = (1U << 4U),
     have_error_error_is_errno = (1U << 1U) | (1U << 4U),
     have_error_exception_error_is_errno = (3U << 1U) | (1U << 4U),
-
     have_error_lost_consistency_error_is_errno = (1U << 1U) | (1U << 3U) | (1U << 4U),
     have_error_exception_lost_consistency_error_is_errno = (3U << 1U) | (1U << 3U) | (1U << 4U),
-
     // value has been moved from
     have_moved_from = (1U << 5U)
   };
   struct status_bitfield_type
   {
     status status_value{status::none};
-    uint16_t spare_storage_value{0};  // hooks::spare_storage()
-
+    uint16_t spare_storage_value{0}; // hooks::spare_storage()
     constexpr status_bitfield_type() = default;
     constexpr status_bitfield_type(status v) noexcept
         : status_value(v)
     {
-    }  // NOLINT
+    } // NOLINT
     constexpr status_bitfield_type(status v, uint16_t s) noexcept
         : status_value(v)
         , spare_storage_value(s)
@@ -2457,524 +2103,64 @@ namespace detail
     constexpr status_bitfield_type &operator=(const status_bitfield_type &) = default;
     constexpr status_bitfield_type &operator=(status_bitfield_type &&) = default;
     //~status_bitfield_type() = default;  // Do NOT uncomment this, it breaks older clangs!
-
     constexpr bool have_value() const noexcept
     {
-
-
-
-
-
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0;
-
     }
     constexpr bool have_error() const noexcept
     {
-
-
-
-
-
-
-
-
-
-
-
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0;
-
     }
     constexpr bool have_exception() const noexcept
     {
-
-
-
-
-
-
-
-
-
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0;
-
     }
     constexpr bool have_lost_consistency() const noexcept
     {
-
-
-
-
-
-
-
-
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_lost_consistency)) != 0;
-
     }
     constexpr bool have_error_is_errno() const noexcept
     {
-
-
-
-
-
-
-
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error_is_errno)) != 0;
-
     }
     constexpr bool have_moved_from() const noexcept
     {
-
-
-
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0;
-
     }
-
     constexpr status_bitfield_type &set_have_value(bool v) noexcept
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_value)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_value)));
-
       return *this;
     }
     constexpr status_bitfield_type &set_have_error(bool v) noexcept
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_error)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_error)));
-
       return *this;
     }
     constexpr status_bitfield_type &set_have_exception(bool v) noexcept
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_exception)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_exception)));
-
       return *this;
     }
     constexpr status_bitfield_type &set_have_error_is_errno(bool v) noexcept
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_error_is_errno)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_error_is_errno)));
-
       return *this;
     }
     constexpr status_bitfield_type &set_have_lost_consistency(bool v) noexcept
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_lost_consistency)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_lost_consistency)));
-
       return *this;
     }
     constexpr status_bitfield_type &set_have_moved_from(bool v) noexcept
     {
-
-
-
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_moved_from)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_moved_from)));
-
       return *this;
     }
   };
@@ -2991,7 +2177,6 @@ namespace detail
   // Also check is standard layout
   static_assert(std::is_standard_layout<status_bitfield_type>::value, "status_bitfield_type is not a standard layout type!");
 #endif
-
   // Used if T is trivial
   template <class T> struct value_storage_trivial
   {
@@ -3016,10 +2201,10 @@ namespace detail
         , _status(o._status)
     {
     }
-    value_storage_trivial(const value_storage_trivial &) = default;             // NOLINT
-    value_storage_trivial(value_storage_trivial &&) = default;                  // NOLINT
-    value_storage_trivial &operator=(const value_storage_trivial &) = default;  // NOLINT
-    value_storage_trivial &operator=(value_storage_trivial &&) = default;       // NOLINT
+    value_storage_trivial(const value_storage_trivial &) = default; // NOLINT
+    value_storage_trivial(value_storage_trivial &&) = default; // NOLINT
+    value_storage_trivial &operator=(const value_storage_trivial &) = default; // NOLINT
+    value_storage_trivial &operator=(value_storage_trivial &&) = default; // NOLINT
     ~value_storage_trivial() = default;
     constexpr explicit value_storage_trivial(status_bitfield_type status)
         : _empty()
@@ -3045,7 +2230,7 @@ namespace detail
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U> &o) noexcept(detail::is_nothrow_constructible<value_type, U>)
-        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial())  // NOLINT
+        : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, o._value) : value_storage_trivial()) // NOLINT
     {
       _status = o._status;
     }
@@ -3053,7 +2238,7 @@ namespace detail
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_converting_constructor<U>))
     constexpr explicit value_storage_trivial(value_storage_trivial<U> &&o) noexcept(detail::is_nothrow_constructible<value_type, U>)
         : value_storage_trivial(o._status.have_value() ? value_storage_trivial(in_place_type<value_type>, static_cast<U &&>(o._value)) :
-                                                         value_storage_trivial())  // NOLINT
+                                                         value_storage_trivial()) // NOLINT
     {
       _status = o._status;
     }
@@ -3078,15 +2263,15 @@ namespace detail
         : _empty{}
     {
     }
-    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default;  // if reaches here, copy assignment is trivial
-    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default;       // NOLINT if reaches here, move assignment is trivial
-    value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value)  // NOLINT
+    value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
+    value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // NOLINT if reaches here, move assignment is trivial
+    value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(std::is_nothrow_move_constructible<value_type>::value) // NOLINT
         : _status(o._status)
     {
       if(this->_status.have_value())
       {
         this->_status.set_have_value(false);
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&_value) value_type(static_cast<value_type &&>(o._value)); // NOLINT
         _status = o._status;
       }
     }
@@ -3096,7 +2281,7 @@ namespace detail
       if(this->_status.have_value())
       {
         this->_status.set_have_value(false);
-        new(&_value) value_type(o._value);  // NOLINT
+        new(&_value) value_type(o._value); // NOLINT
         _status = o._status;
       }
     }
@@ -3107,7 +2292,7 @@ namespace detail
       if(this->_status.have_value())
       {
         this->_status.set_have_value(false);
-        new(&_value) value_type;  // NOLINT
+        new(&_value) value_type; // NOLINT
         _status = o._status;
       }
     }
@@ -3119,7 +2304,7 @@ namespace detail
     template <class... Args>
     explicit value_storage_nontrivial(in_place_type_t<value_type> /*unused*/,
                                       Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
-        : _value(static_cast<Args &&>(args)...)  // NOLINT
+        : _value(static_cast<Args &&>(args)...) // NOLINT
         , _status(status::have_value)
     {
     }
@@ -3166,7 +2351,7 @@ namespace detail
     {
       if(this->_status.have_value())
       {
-        this->_value.~value_type();  // NOLINT
+        this->_value.~value_type(); // NOLINT
         this->_status.set_have_value(false);
       }
     }
@@ -3202,48 +2387,48 @@ namespace detail
       if(_status.have_value())
       {
         // Move construct me into other
-        new(&o._value) value_type(static_cast<value_type &&>(_value));  // NOLINT
-        this->_value.~value_type();                                     // NOLINT
+        new(&o._value) value_type(static_cast<value_type &&>(_value)); // NOLINT
+        this->_value.~value_type(); // NOLINT
         swap(_status, o._status);
       }
       else
       {
         // Move construct other into me
-        new(&_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
-        o._value.~value_type();                                         // NOLINT
+        new(&_value) value_type(static_cast<value_type &&>(o._value)); // NOLINT
+        o._value.~value_type(); // NOLINT
         swap(_status, o._status);
       }
     }
   };
-  template <class Base> struct value_storage_delete_copy_constructor : Base  // NOLINT
+  template <class Base> struct value_storage_delete_copy_constructor : Base // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_delete_copy_constructor() = default;
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
-    value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default;  // NOLINT
+    value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default; // NOLINT
   };
-  template <class Base> struct value_storage_delete_copy_assignment : Base  // NOLINT
+  template <class Base> struct value_storage_delete_copy_assignment : Base // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_delete_copy_assignment() = default;
     value_storage_delete_copy_assignment(const value_storage_delete_copy_assignment &) = default;
-    value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default;  // NOLINT
+    value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default; // NOLINT
     value_storage_delete_copy_assignment &operator=(const value_storage_delete_copy_assignment &o) = delete;
-    value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default;  // NOLINT
+    value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default; // NOLINT
   };
-  template <class Base> struct value_storage_delete_move_assignment : Base  // NOLINT
+  template <class Base> struct value_storage_delete_move_assignment : Base // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_delete_move_assignment() = default;
     value_storage_delete_move_assignment(const value_storage_delete_move_assignment &) = default;
-    value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default;  // NOLINT
+    value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default; // NOLINT
     value_storage_delete_move_assignment &operator=(const value_storage_delete_move_assignment &o) = default;
     value_storage_delete_move_assignment &operator=(value_storage_delete_move_assignment &&o) = delete;
   };
-  template <class Base> struct value_storage_delete_move_constructor : Base  // NOLINT
+  template <class Base> struct value_storage_delete_move_constructor : Base // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
@@ -3251,61 +2436,60 @@ namespace detail
     value_storage_delete_move_constructor(const value_storage_delete_move_constructor &) = default;
     value_storage_delete_move_constructor(value_storage_delete_move_constructor &&) = delete;
   };
-  template <class Base> struct value_storage_nontrivial_move_assignment : Base  // NOLINT
+  template <class Base> struct value_storage_nontrivial_move_assignment : Base // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_nontrivial_move_assignment() = default;
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
-    value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default;  // NOLINT
+    value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default; // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
     value_storage_nontrivial_move_assignment &
-    operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value)  // NOLINT
+    operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value) // NOLINT
     {
       if(this->_status.have_value() && o._status.have_value())
       {
-        this->_value = static_cast<value_type &&>(o._value);  // NOLINT
+        this->_value = static_cast<value_type &&>(o._value); // NOLINT
       }
       else if(this->_status.have_value() && !o._status.have_value())
       {
-        this->_value.~value_type();  // NOLINT
+        this->_value.~value_type(); // NOLINT
       }
       else if(!this->_status.have_value() && o._status.have_value())
       {
-        new(&this->_value) value_type(static_cast<value_type &&>(o._value));  // NOLINT
+        new(&this->_value) value_type(static_cast<value_type &&>(o._value)); // NOLINT
       }
       this->_status = o._status;
       return *this;
     }
   };
-  template <class Base> struct value_storage_nontrivial_copy_assignment : Base  // NOLINT
+  template <class Base> struct value_storage_nontrivial_copy_assignment : Base // NOLINT
   {
     using Base::Base;
     using value_type = typename Base::value_type;
     value_storage_nontrivial_copy_assignment() = default;
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
-    value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default;              // NOLINT
-    value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default;  // NOLINT
+    value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default; // NOLINT
+    value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default; // NOLINT
     value_storage_nontrivial_copy_assignment &
     operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(std::is_nothrow_copy_assignable<value_type>::value)
     {
       if(this->_status.have_value() && o._status.have_value())
       {
-        this->_value = o._value;  // NOLINT
+        this->_value = o._value; // NOLINT
       }
       else if(this->_status.have_value() && !o._status.have_value())
       {
-        this->_value.~value_type();  // NOLINT
+        this->_value.~value_type(); // NOLINT
       }
       else if(!this->_status.have_value() && o._status.have_value())
       {
-        new(&this->_value) value_type(o._value);  // NOLINT
+        new(&this->_value) value_type(o._value); // NOLINT
       }
       this->_status = o._status;
       return *this;
     }
   };
-
   // We don't actually need all of std::is_trivial<>, std::is_trivially_copyable<> is sufficient
   template <class T>
   using value_storage_select_trivality =
@@ -3345,90 +2529,71 @@ namespace detail
   // Also check is standard layout
   static_assert(std::is_standard_layout<value_storage_select_impl<int>>::value, "value_storage_select_impl<int> is not a standard layout type!");
 #endif
-}  // namespace detail
-
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace detail
 {
   template <class State, class E> constexpr inline void _set_error_is_errno(State & /*unused*/, const E & /*unused*/) {}
   template <class R, class S, class NoValuePolicy> class basic_result_final;
-}  // namespace detail
-
+} // namespace detail
 namespace hooks
 {
   template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
   template <class R, class S, class NoValuePolicy>
   constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
-}  // namespace hooks
-
+} // namespace hooks
 namespace policy
 {
   struct base;
-}  // namespace policy
-
+} // namespace policy
 namespace detail
 {
   template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
-  template <class R, class EC, class NoValuePolicy>  //
+  template <class R, class EC, class NoValuePolicy> //
   class basic_result_storage;
-  template <class R, class EC, class NoValuePolicy>  //
+  template <class R, class EC, class NoValuePolicy> //
   class basic_result_storage
   {
     static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
     static_assert(trait::type_can_be_used_in_basic_result<EC>, "The type S cannot be used in a basic_result");
     static_assert(std::is_void<EC>::value || std::is_default_constructible<EC>::value, "The type S must be void or default constructible");
-
     friend struct policy::base;
-    template <class T, class U, class V>  //
+    template <class T, class U, class V> //
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V>
-    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;  // NOLINT
+    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept; // NOLINT
     template <class T, class U, class V>
-    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
+    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept; // NOLINT
     template <bool value_throws, bool error_throws> struct basic_result_storage_swap;
-
     struct disable_in_place_value_type
     {
     };
     struct disable_in_place_error_type
     {
     };
-
   protected:
     using _value_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_value_type, R>;
     using _error_type = std::conditional_t<std::is_same<R, EC>::value, disable_in_place_error_type, EC>;
-
     using _state_type = value_storage_select_impl<_value_type>;
-
-
-
-
     _state_type _state;
-
     devoid<_error_type> _error;
-
   public:
     // Used by iostream support to access state
     _state_type &_iostreams_state() { return _state; }
     const _state_type &_iostreams_state() const { return _state; }
-
     // Hack to work around MSVC bug in /permissive-
     _state_type &_msvc_nonpermissive_state() { return _state; }
     devoid<_error_type> &_msvc_nonpermissive_error() { return _error; }
-
   protected:
     basic_result_storage() = default;
-    basic_result_storage(const basic_result_storage &) = default;             // NOLINT
-    basic_result_storage(basic_result_storage &&) = default;                  // NOLINT
-    basic_result_storage &operator=(const basic_result_storage &) = default;  // NOLINT
-    basic_result_storage &operator=(basic_result_storage &&) = default;       // NOLINT
+    basic_result_storage(const basic_result_storage &) = default; // NOLINT
+    basic_result_storage(basic_result_storage &&) = default; // NOLINT
+    basic_result_storage &operator=(const basic_result_storage &) = default; // NOLINT
+    basic_result_storage &operator=(basic_result_storage &&) = default; // NOLINT
     ~basic_result_storage() = default;
-
     template <class... Args>
     constexpr explicit basic_result_storage(in_place_type_t<_value_type> _,
                                             Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type, Args...>)
@@ -3484,7 +2649,6 @@ namespace detail
         , _error(_error_type{})
     {
     }
-
     struct make_error_code_compatible_conversion_tag
     {
     };
@@ -3500,7 +2664,6 @@ namespace detail
         , _error(make_error_code(static_cast<U &&>(o._error)))
     {
     }
-
     struct make_exception_ptr_compatible_conversion_tag
     {
     };
@@ -3517,7 +2680,6 @@ namespace detail
     {
     }
   };
-
 // Neither value nor error type can throw during swap
 #ifdef __cpp_exceptions
   template <> struct basic_result_storage_swap<false, false>
@@ -3634,13 +2796,10 @@ namespace detail
     }
   };
 #endif
-
-}  // namespace detail
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace convert
 {
 #if defined(__cpp_concepts)
@@ -3653,9 +2812,7 @@ namespace convert
   {
     template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
     template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
-  }  // namespace detail
-
-
+  } // namespace detail
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -3694,10 +2851,9 @@ namespace convert
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<U>().has_value()), OUTCOME_TEXPR(std::declval<U>().value()), OUTCOME_TEXPR(std::declval<U>().error()))
     inline U match_value_or_error(U &&);
-
     template <class U> static constexpr bool ValueOrNone = !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
     template <class U> static constexpr bool ValueOrError = !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
-  }  // namespace detail
+  } // namespace detail
   /* The `ValueOrNone` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
@@ -3708,7 +2864,6 @@ namespace convert
   */
   template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
 #endif
-
   namespace detail
   {
     template <class T, class X> struct make_type
@@ -3723,8 +2878,7 @@ namespace convert
       template <class U> static constexpr T error(U && /*unused*/) { return T{in_place_type<typename T::error_type>}; }
       static constexpr T error() { return T{in_place_type<typename T::error_type>}; }
     };
-  }  // namespace detail
-
+  } // namespace detail
   /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition  value_or_error. Potential doc page: NOT FOUND
 */
@@ -3733,16 +2887,14 @@ type definition  value_or_error. Potential doc page: NOT FOUND
     static constexpr bool enable_result_inputs = false;
     static constexpr bool enable_outcome_inputs = false;
     OUTCOME_TEMPLATE(class X)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                                                                                    //
-                                    &&ValueOrError<U>                                                                                                                                                                          //
-                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
+    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value //
+                                    &&ValueOrError<U> //
+                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>) //
                                     &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
     constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) : detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v)); }
   };
-}  // namespace convert
-
+} // namespace convert
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Finaliser for a very simple result type
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -3767,7 +2919,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_RESULT_FINAL_HPP
 #define OUTCOME_BASIC_RESULT_FINAL_HPP
 /* Error observers for a very simple basic_result type
@@ -3793,14 +2944,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_RESULT_ERROR_OBSERVERS_HPP
 #define OUTCOME_BASIC_RESULT_ERROR_OBSERVERS_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace detail
 {
   template <class Base, class EC, class NoValuePolicy> class basic_result_error_observers : public Base
@@ -3808,7 +2954,6 @@ namespace detail
   public:
     using error_type = EC;
     using Base::Base;
-
     constexpr error_type &assume_error() & noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &>(*this));
@@ -3829,7 +2974,6 @@ namespace detail
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &&>(*this));
       return static_cast<const error_type &&>(this->_error);
     }
-
     constexpr error_type &error() &
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &>(*this));
@@ -3858,9 +3002,8 @@ namespace detail
     constexpr void assume_error() const noexcept { NoValuePolicy::narrow_error_check(*this); }
     constexpr void error() const { NoValuePolicy::wide_error_check(*this); }
   };
-}  // namespace detail
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Value observers for a very simple basic_result type
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
@@ -3885,14 +3028,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_RESULT_VALUE_OBSERVERS_HPP
 #define OUTCOME_RESULT_VALUE_OBSERVERS_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace detail
 {
   template <class Base, class R, class NoValuePolicy> class basic_result_value_observers : public Base
@@ -3900,97 +3038,83 @@ namespace detail
   public:
     using value_type = R;
     using Base::Base;
-
     constexpr value_type &assume_value() & noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &>(*this));
-      return this->_state._value;  // NOLINT
+      return this->_state._value; // NOLINT
     }
     constexpr const value_type &assume_value() const &noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &>(*this));
-      return this->_state._value;  // NOLINT
+      return this->_state._value; // NOLINT
     }
     constexpr value_type &&assume_value() && noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<basic_result_value_observers &&>(*this));
-      return static_cast<value_type &&>(this->_state._value);  // NOLINT
+      return static_cast<value_type &&>(this->_state._value); // NOLINT
     }
     constexpr const value_type &&assume_value() const &&noexcept
     {
       NoValuePolicy::narrow_value_check(static_cast<const basic_result_value_observers &&>(*this));
-      return static_cast<const value_type &&>(this->_state._value);  // NOLINT
+      return static_cast<const value_type &&>(this->_state._value); // NOLINT
     }
-
     constexpr value_type &value() &
     {
       NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &>(*this));
-      return this->_state._value;  // NOLINT
+      return this->_state._value; // NOLINT
     }
     constexpr const value_type &value() const &
     {
       NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &>(*this));
-      return this->_state._value;  // NOLINT
+      return this->_state._value; // NOLINT
     }
     constexpr value_type &&value() &&
     {
       NoValuePolicy::wide_value_check(static_cast<basic_result_value_observers &&>(*this));
-      return static_cast<value_type &&>(this->_state._value);  // NOLINT
+      return static_cast<value_type &&>(this->_state._value); // NOLINT
     }
     constexpr const value_type &&value() const &&
     {
       NoValuePolicy::wide_value_check(static_cast<const basic_result_value_observers &&>(*this));
-      return static_cast<const value_type &&>(this->_state._value);  // NOLINT
+      return static_cast<const value_type &&>(this->_state._value); // NOLINT
     }
   };
   template <class Base, class NoValuePolicy> class basic_result_value_observers<Base, void, NoValuePolicy> : public Base
   {
   public:
     using Base::Base;
-
     constexpr void assume_value() const noexcept { NoValuePolicy::narrow_value_check(*this); }
     constexpr void value() const { NoValuePolicy::wide_value_check(*this); }
   };
-}  // namespace detail
-
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace detail
 {
   template <class R, class EC, class NoValuePolicy> using select_basic_result_impl = basic_result_error_observers<basic_result_value_observers<basic_result_storage<R, EC, NoValuePolicy>, R, NoValuePolicy>, EC, NoValuePolicy>;
-
   template <class R, class S, class NoValuePolicy>
   class basic_result_final
-
-
-
   : public select_basic_result_impl<R, S, NoValuePolicy>
-
   {
     using base = select_basic_result_impl<R, S, NoValuePolicy>;
-
   public:
     using base::base;
-
     constexpr explicit operator bool() const noexcept { return this->_state._status.have_value(); }
     constexpr bool has_value() const noexcept { return this->_state._status.have_value(); }
     constexpr bool has_error() const noexcept { return this->_state._status.have_error(); }
     constexpr bool has_exception() const noexcept { return this->_state._status.have_exception(); }
     constexpr bool has_lost_consistency() const noexcept { return this->_state._status.have_lost_consistency(); }
     constexpr bool has_failure() const noexcept { return this->_state._status.have_error() || this->_state._status.have_exception(); }
-
     OUTCOME_TEMPLATE(class T, class U, class V)
-    OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()),  //
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()), //
                       OUTCOME_TEXPR(std::declval<detail::devoid<S>>() == std::declval<detail::devoid<U>>()))
-    constexpr bool operator==(const basic_result_final<T, U, V> &o) const noexcept(  //
+    constexpr bool operator==(const basic_result_final<T, U, V> &o) const noexcept( //
     noexcept(std::declval<detail::devoid<R>>() == std::declval<detail::devoid<T>>()) && noexcept(std::declval<detail::devoid<S>>() == std::declval<detail::devoid<U>>()))
     {
       if(this->_state._status.have_value() && o._state._status.have_value())
       {
-        return this->_state._value == o._state._value;  // NOLINT
+        return this->_state._value == o._state._value; // NOLINT
       }
       if(this->_state._status.have_error() && o._state._status.have_error())
       {
@@ -4000,7 +3124,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<R>() == std::declval<T>()))
-    constexpr bool operator==(const success_type<T> &o) const noexcept(  //
+    constexpr bool operator==(const success_type<T> &o) const noexcept( //
     noexcept(std::declval<R>() == std::declval<T>()))
     {
       if(this->_state._status.have_value())
@@ -4016,7 +3140,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() == std::declval<T>()))
-    constexpr bool operator==(const failure_type<T, void> &o) const noexcept(  //
+    constexpr bool operator==(const failure_type<T, void> &o) const noexcept( //
     noexcept(std::declval<S>() == std::declval<T>()))
     {
       if(this->_state._status.have_error())
@@ -4026,9 +3150,9 @@ namespace detail
       return false;
     }
     OUTCOME_TEMPLATE(class T, class U, class V)
-    OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() != std::declval<detail::devoid<T>>()),  //
+    OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<R>>() != std::declval<detail::devoid<T>>()), //
                       OUTCOME_TEXPR(std::declval<detail::devoid<S>>() != std::declval<detail::devoid<U>>()))
-    constexpr bool operator!=(const basic_result_final<T, U, V> &o) const noexcept(  //
+    constexpr bool operator!=(const basic_result_final<T, U, V> &o) const noexcept( //
     noexcept(std::declval<detail::devoid<R>>() != std::declval<detail::devoid<T>>()) && noexcept(std::declval<detail::devoid<S>>() != std::declval<detail::devoid<U>>()))
     {
       if(this->_state._status.have_value() && o._state._status.have_value())
@@ -4043,7 +3167,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<R>() != std::declval<T>()))
-    constexpr bool operator!=(const success_type<T> &o) const noexcept(  //
+    constexpr bool operator!=(const success_type<T> &o) const noexcept( //
     noexcept(std::declval<R>() != std::declval<T>()))
     {
       if(this->_state._status.have_value())
@@ -4059,7 +3183,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class T)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<S>() != std::declval<T>()))
-    constexpr bool operator!=(const failure_type<T, void> &o) const noexcept(  //
+    constexpr bool operator!=(const failure_type<T, void> &o) const noexcept( //
     noexcept(std::declval<S>() != std::declval<T>()))
     {
       if(this->_state._status.have_error())
@@ -4073,10 +3197,8 @@ namespace detail
   template <class T, class U, class V, class W> constexpr inline bool operator==(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b == a; }
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const success_type<W> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
   template <class T, class U, class V, class W> constexpr inline bool operator!=(const failure_type<W, void> &a, const basic_result_final<T, U, V> &b) noexcept(noexcept(b == a)) { return b != a; }
-}  // namespace detail
-
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Policies for result and outcome
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
@@ -4101,7 +3223,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_POLICY_ALL_NARROW_HPP
 #define OUTCOME_POLICY_ALL_NARROW_HPP
 /* Policies for result and outcome
@@ -4127,14 +3248,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_POLICY_BASE_HPP
 #define OUTCOME_POLICY_BASE_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace policy
 {
   namespace detail
@@ -4152,18 +3268,14 @@ SIGNATURE NOT RECOGNISED
     template <class Impl> static constexpr bool _has_error(Impl &&self) noexcept { return self._state._status.have_error(); }
     template <class Impl> static constexpr bool _has_exception(Impl &&self) noexcept { return self._state._status.have_exception(); }
     template <class Impl> static constexpr bool _has_error_is_errno(Impl &&self) noexcept { return self._state._status.have_error_is_errno(); }
-
     template <class Impl> static constexpr void _set_has_value(Impl &&self, bool v) noexcept { self._state._status.set_have_value(v); }
     template <class Impl> static constexpr void _set_has_error(Impl &&self, bool v) noexcept { self._state._status.set_have_error(v); }
     template <class Impl> static constexpr void _set_has_exception(Impl &&self, bool v) noexcept { self._state._status.set_have_exception(v); }
     template <class Impl> static constexpr void _set_has_error_is_errno(Impl &&self, bool v) noexcept { self._state._status.set_have_error_is_errno(v); }
-
     template <class Impl> static constexpr auto &&_value(Impl &&self) noexcept { return static_cast<Impl &&>(self)._state._value; }
     template <class Impl> static constexpr auto &&_error(Impl &&self) noexcept { return static_cast<Impl &&>(self)._error; }
-
   public:
     template <class R, class S, class P, class NoValuePolicy, class Impl> static inline constexpr auto &&_exception(Impl &&self) noexcept;
-
     template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
     {
       if(!_has_value(self))
@@ -4186,13 +3298,10 @@ SIGNATURE NOT RECOGNISED
       }
     }
   };
-}  // namespace policy
-
+} // namespace policy
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace policy
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4204,10 +3313,8 @@ type definition  all_narrow. Potential doc page: `all_narrow`
     template <class Impl> static constexpr void wide_error_check(Impl &&self) { base::narrow_error_check(static_cast<Impl &&>(self)); }
     template <class Impl> static constexpr void wide_exception_check(Impl &&self) { base::narrow_exception_check(static_cast<Impl &&>(self)); }
   };
-}  // namespace policy
-
+} // namespace policy
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Policies for result and outcome
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
@@ -4232,16 +3339,10 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_POLICY_TERMINATE_HPP
 #define OUTCOME_POLICY_TERMINATE_HPP
-
-
-
 #include <cstdlib>
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace policy
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4271,126 +3372,110 @@ type definition  terminate. Potential doc page: `terminate`
       }
     }
   };
-}  // namespace policy
-
+} // namespace policy
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"  // Standardese markup confuses clang
+#pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
 #endif
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-template <class R, class S, class NoValuePolicy>  //
+template <class R, class S, class NoValuePolicy> //
 class basic_result;
-
 namespace detail
 {
   // These are reused by basic_outcome to save load on the compiler
   template <class value_type, class error_type> struct result_predicates
   {
     // Predicate for the implicit constructors to be available. Weakened to allow result<int, C enum>.
-    static constexpr bool implicit_constructors_enabled =  //
+    static constexpr bool implicit_constructors_enabled = //
     !(trait::is_error_type<std::decay_t<value_type>>::value &&
-      trait::is_error_type<std::decay_t<error_type>>::value)  // both value and error types are not whitelisted error types
+      trait::is_error_type<std::decay_t<error_type>>::value) // both value and error types are not whitelisted error types
     && ((!detail::is_implicitly_constructible<value_type, error_type> &&
-         !detail::is_implicitly_constructible<error_type, value_type>)       // if value and error types cannot be constructed into one another
-        || (trait::is_error_type<std::decay_t<error_type>>::value            // if error type is a whitelisted error type
-            && !detail::is_implicitly_constructible<error_type, value_type>  // AND which cannot be constructed from the value type
-            && std::is_integral<value_type>::value));                        // AND the value type is some integral type
-
+         !detail::is_implicitly_constructible<error_type, value_type>) // if value and error types cannot be constructed into one another
+        || (trait::is_error_type<std::decay_t<error_type>>::value // if error type is a whitelisted error type
+            && !detail::is_implicitly_constructible<error_type, value_type> // AND which cannot be constructed from the value type
+            && std::is_integral<value_type>::value)); // AND the value type is some integral type
     // Predicate for the value converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
-    static constexpr bool enable_value_converting_constructor =                                                      //
-    implicit_constructors_enabled                                                                                    //
-    && !is_in_place_type_t<std::decay_t<T>>::value                                                                   // not in place construction
-    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value                                                // not an enum valid for my error type
-    && ((detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>)  // is unambiguously for value type
-        || (std::is_same<value_type, std::decay_t<T>>::value                                                         // OR is my value type exactly
-            && detail::is_implicitly_constructible<value_type, T>) );  // and my value type is constructible from this ref form of T
-
-
+    static constexpr bool enable_value_converting_constructor = //
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
+    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value // not an enum valid for my error type
+    && ((detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T>) // is unambiguously for value type
+        || (std::is_same<value_type, std::decay_t<T>>::value // OR is my value type exactly
+            && detail::is_implicitly_constructible<value_type, T>) ); // and my value type is constructible from this ref form of T
     // Predicate for the error converting constructor to be available. Weakened to allow result<int, C enum>.
     template <class T>
-    static constexpr bool enable_error_converting_constructor =                                                      //
-    implicit_constructors_enabled                                                                                    //
-    && !is_in_place_type_t<std::decay_t<T>>::value                                                                   // not in place construction
-    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value                                                // not an enum valid for my error type
-    && ((!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>)  // is unambiguously for error type
-        || (std::is_same<error_type, std::decay_t<T>>::value                                                         // OR is my error type exactly
-            && detail::is_implicitly_constructible<error_type, T>) );  // and my error type is constructible from this ref form of T
-
+    static constexpr bool enable_error_converting_constructor = //
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
+    && !trait::is_error_type_enum<error_type, std::decay_t<T>>::value // not an enum valid for my error type
+    && ((!detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>) // is unambiguously for error type
+        || (std::is_same<error_type, std::decay_t<T>>::value // OR is my error type exactly
+            && detail::is_implicitly_constructible<error_type, T>) ); // and my error type is constructible from this ref form of T
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
-    static constexpr bool enable_error_condition_converting_constructor =         //
-    !is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value                       // not in place construction
-    && trait::is_error_type_enum<error_type, std::decay_t<ErrorCondEnum>>::value  // is an error condition enum
-    /*&& !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>*/;  // not
+    static constexpr bool enable_error_condition_converting_constructor = //
+    !is_in_place_type_t<std::decay_t<ErrorCondEnum>>::value // not in place construction
+    && trait::is_error_type_enum<error_type, std::decay_t<ErrorCondEnum>>::value // is an error condition enum
+    /*&& !detail::is_implicitly_constructible<value_type, ErrorCondEnum> && !detail::is_implicitly_constructible<error_type, ErrorCondEnum>*/; // not
                                                                                                                                                 // constructible
                                                                                                                                                 // via any other
                                                                                                                                                 // means
-
     // Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_compatible_conversion =  //
+    static constexpr bool enable_compatible_conversion = //
     (std::is_void<T>::value ||
-     detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // if our value types are constructible
+     detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>) // if our value types are constructible
     &&(std::is_void<U>::value ||
-       detail::is_explicitly_constructible<error_type, typename basic_result<T, U, V>::error_type>)  // if our error types are constructible
+       detail::is_explicitly_constructible<error_type, typename basic_result<T, U, V>::error_type>) // if our error types are constructible
     ;
-
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_make_error_code_compatible_conversion =  //
-    trait::is_error_code_available<std::decay_t<error_type>>::value       // if error type has an error code
-    && !enable_compatible_conversion<T, U, V>                             // and the normal compatible conversion is not available
+    static constexpr bool enable_make_error_code_compatible_conversion = //
+    trait::is_error_code_available<std::decay_t<error_type>>::value // if error type has an error code
+    && !enable_compatible_conversion<T, U, V> // and the normal compatible conversion is not available
     && (std::is_void<T>::value ||
-        detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)  // and if our value types are constructible
+        detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>) // and if our value types are constructible
     &&detail::is_explicitly_constructible<error_type,
-                                          typename trait::is_error_code_available<U>::type>;  // and our error type is constructible from a make_error_code()
-
+                                          typename trait::is_error_code_available<U>::type>; // and our error type is constructible from a make_error_code()
     // Predicate for the converting constructor from a make_exception_ptr() of the input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_make_exception_ptr_compatible_conversion =  //
-    trait::is_exception_ptr_available<std::decay_t<error_type>>::value       // if error type has an exception ptr
-    && !enable_compatible_conversion<T, U, V>                                // and the normal compatible conversion is not available
+    static constexpr bool enable_make_exception_ptr_compatible_conversion = //
+    trait::is_exception_ptr_available<std::decay_t<error_type>>::value // if error type has an exception ptr
+    && !enable_compatible_conversion<T, U, V> // and the normal compatible conversion is not available
     && (std::is_void<T>::value ||
-        detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>)         // and if our value types are constructible
-    &&detail::is_explicitly_constructible<error_type, typename trait::is_exception_ptr_available<U>::type>;  // and our error type is constructible from a
+        detail::is_explicitly_constructible<value_type, typename basic_result<T, U, V>::value_type>) // and if our value types are constructible
+    &&detail::is_explicitly_constructible<error_type, typename trait::is_exception_ptr_available<U>::type>; // and our error type is constructible from a
                                                                                                              // make_exception_ptr()
-
     // Predicate for the implicit converting inplace constructor from a compatible input to be available.
     struct disable_inplace_value_error_constructor;
     template <class... Args>
-    using choose_inplace_value_error_constructor = std::conditional_t<                                       //
-    detail::is_constructible<value_type, Args...> && detail::is_constructible<error_type, Args...>,  //
-    disable_inplace_value_error_constructor,                                                                 //
-    std::conditional_t<                                                                                      //
-    detail::is_constructible<value_type, Args...>,                                                       //
-    value_type,                                                                                              //
-    std::conditional_t<                                                                                      //
-    detail::is_constructible<error_type, Args...>,                                                       //
-    error_type,                                                                                              //
+    using choose_inplace_value_error_constructor = std::conditional_t< //
+    detail::is_constructible<value_type, Args...> && detail::is_constructible<error_type, Args...>, //
+    disable_inplace_value_error_constructor, //
+    std::conditional_t< //
+    detail::is_constructible<value_type, Args...>, //
+    value_type, //
+    std::conditional_t< //
+    detail::is_constructible<error_type, Args...>, //
+    error_type, //
     disable_inplace_value_error_constructor>>>;
     template <class... Args>
     static constexpr bool enable_inplace_value_error_constructor =
-    implicit_constructors_enabled  //
+    implicit_constructors_enabled //
     && !std::is_same<choose_inplace_value_error_constructor<Args...>, disable_inplace_value_error_constructor>::value;
   };
-
   template <class T, class U> constexpr inline const U &extract_value_from_success(const success_type<U> &v) { return v.value(); }
   template <class T, class U> constexpr inline U &&extract_value_from_success(success_type<U> &&v) { return static_cast<success_type<U> &&>(v).value(); }
   template <class T> constexpr inline T extract_value_from_success(const success_type<void> & /*unused*/) { return T{}; }
-
   template <class T, class U, class V> constexpr inline const U &extract_error_from_failure(const failure_type<U, V> &v) { return v.error(); }
   template <class T, class U, class V> constexpr inline U &&extract_error_from_failure(failure_type<U, V> &&v)
   {
     return static_cast<failure_type<U, V> &&>(v).error();
   }
   template <class T, class V> constexpr inline T extract_error_from_failure(const failure_type<void, V> & /*unused*/) { return T{}; }
-
   template <class T> struct is_basic_result
   {
     static constexpr bool value = false;
@@ -4399,8 +3484,7 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-}  // namespace detail
-
+} // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type alias template <class T> is_basic_result. Potential doc page: `is_basic_result<T>`
 */
@@ -4409,7 +3493,6 @@ template <class T> using is_basic_result = detail::is_basic_result<std::decay_t<
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_basic_result_v = detail::is_basic_result<std::decay_t<T>>::value;
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -4434,7 +3517,6 @@ SIGNATURE NOT RECOGNISED
   constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
   {
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -4450,20 +3532,17 @@ SIGNATURE NOT RECOGNISED
   {
     r->_state._status.spare_storage_value = v;
   }
-}  // namespace hooks
-
+} // namespace hooks
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class R, class S, class NoValuePolicy> basic_result. Potential doc page: `basic_result<T, E, NoValuePolicy>`
 */
-template <class R, class S, class NoValuePolicy>  //
+template <class R, class S, class NoValuePolicy> //
 class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, NoValuePolicy>
 {
   static_assert(trait::type_can_be_used_in_basic_result<R>, "The type R cannot be used in a basic_result");
   static_assert(trait::type_can_be_used_in_basic_result<S>, "The type S cannot be used in a basic_result");
   static_assert(std::is_void<S>::value || std::is_default_constructible<S>::value, "The type S must be void or default constructible");
-
   using base = detail::basic_result_final<R, S, NoValuePolicy>;
-
   struct implicit_constructors_disabled_tag
   {
   };
@@ -4500,92 +3579,76 @@ class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, N
   struct explicit_make_exception_ptr_compatible_move_conversion_tag
   {
   };
-
 public:
   using value_type = R;
   using error_type = S;
-
   using value_type_if_enabled = typename base::_value_type;
   using error_type_if_enabled = typename base::_error_type;
-
   template <class T, class U = S, class V = NoValuePolicy> using rebind = basic_result<T, U, V>;
-
 protected:
   // Requirement predicates for result.
   struct predicate
   {
     using base = detail::result_predicates<value_type, error_type>;
-
     // Predicate for any constructors to be available at all
     static constexpr bool constructors_enabled = !std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value;
-
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
-
     // Predicate for the value converting constructor to be available.
     template <class T>
-    static constexpr bool enable_value_converting_constructor =  //
-    constructors_enabled                                         //
-    && !std::is_same<std::decay_t<T>, basic_result>::value       // not my type
+    static constexpr bool enable_value_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_result>::value // not my type
     && base::template enable_value_converting_constructor<T>;
-
     // Predicate for the error converting constructor to be available.
     template <class T>
-    static constexpr bool enable_error_converting_constructor =  //
-    constructors_enabled                                         //
-    && !std::is_same<std::decay_t<T>, basic_result>::value       // not my type
+    static constexpr bool enable_error_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_result>::value // not my type
     && base::template enable_error_converting_constructor<T>;
-
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
-    static constexpr bool enable_error_condition_converting_constructor =  //
-    constructors_enabled                                                   //
-    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_result>::value     // not my type
+    static constexpr bool enable_error_condition_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_result>::value // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
-
     // Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_compatible_conversion =          //
-    constructors_enabled                                          //
-    && !std::is_same<basic_result<T, U, V>, basic_result>::value  // not my type
+    static constexpr bool enable_compatible_conversion = //
+    constructors_enabled //
+    && !std::is_same<basic_result<T, U, V>, basic_result>::value // not my type
     && base::template enable_compatible_conversion<T, U, V>;
-
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_make_error_code_compatible_conversion =  //
-    constructors_enabled                                                  //
-    && !std::is_same<basic_result<T, U, V>, basic_result>::value          // not my type
+    static constexpr bool enable_make_error_code_compatible_conversion = //
+    constructors_enabled //
+    && !std::is_same<basic_result<T, U, V>, basic_result>::value // not my type
     && base::template enable_make_error_code_compatible_conversion<T, U, V>;
-
     // Predicate for the converting constructor from a make_exception_ptr() of the input to be available.
     template <class T, class U, class V>
-    static constexpr bool enable_make_exception_ptr_compatible_conversion =  //
-    constructors_enabled                                                     //
-    && !std::is_same<basic_result<T, U, V>, basic_result>::value             // not my type
+    static constexpr bool enable_make_exception_ptr_compatible_conversion = //
+    constructors_enabled //
+    && !std::is_same<basic_result<T, U, V>, basic_result>::value // not my type
     && base::template enable_make_exception_ptr_compatible_conversion<T, U, V>;
-
     // Predicate for the inplace construction of value to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_value_constructor =  //
-    constructors_enabled                                      //
-    && (std::is_void<value_type>::value                       //
+    static constexpr bool enable_inplace_value_constructor = //
+    constructors_enabled //
+    && (std::is_void<value_type>::value //
         || detail::is_constructible<value_type, Args...>);
-
     // Predicate for the inplace construction of error to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_error_constructor =  //
-    constructors_enabled                                      //
-    && (std::is_void<error_type>::value                       //
+    static constexpr bool enable_inplace_error_constructor = //
+    constructors_enabled //
+    && (std::is_void<error_type>::value //
         || detail::is_constructible<error_type, Args...>);
-
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_value_error_constructor =  //
-    constructors_enabled                                            //
+    static constexpr bool enable_inplace_value_error_constructor = //
+    constructors_enabled //
     &&base::template enable_inplace_value_error_constructor<Args...>;
     template <class... Args> using choose_inplace_value_error_constructor = typename base::template choose_inplace_value_error_constructor<Args...>;
   };
-
 public:
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -4594,7 +3657,7 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  basic_result(basic_result && /*unused*/) = default;  // NOLINT
+  basic_result(basic_result && /*unused*/) = default; // NOLINT
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -4602,36 +3665,33 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  basic_result &operator=(basic_result && /*unused*/) = default;  // NOLINT
+  basic_result &operator=(basic_result && /*unused*/) = default; // NOLINT
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   basic_result &operator=(const basic_result & /*unused*/) = default;
   ~basic_result() = default;
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class Arg, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!predicate::constructors_enabled && (sizeof...(Args) >= 0)))
-  basic_result(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_result<T, T> is NOT SUPPORTED, see docs!
-
+  basic_result(Arg && /*unused*/, Args &&... /*unused*/) = delete; // NOLINT basic_result<T, T> is NOT SUPPORTED, see docs!
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled //
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T>) )))
   basic_result(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) =
-  delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
-
+  delete; // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr basic_result(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(
-  detail::is_nothrow_constructible<value_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<typename base::value_type>, static_cast<T &&>(t)}
   {
     using namespace hooks;
@@ -4643,7 +3703,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr basic_result(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<typename base::error_type>, static_cast<T &&>(t)}
   {
     using namespace hooks;
@@ -4653,24 +3713,23 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class ErrorCondEnum)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
   constexpr basic_result(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(
-  noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
+  noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t))))) // NOLINT
       : base{in_place_type<typename base::error_type>, make_error_code(t)}
   {
     using namespace hooks;
     hook_result_construction(this, static_cast<ErrorCondEnum &&>(t));
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>), //
                     OUTCOME_TEXPR(convert::value_or_error<basic_result, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit basic_result(T &&o,
-                                  explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+                                  explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag()) // NOLINT
       : basic_result{convert::value_or_error<basic_result, std::decay_t<T>>{}(static_cast<T &&>(o))}
   {
   }
@@ -4758,7 +3817,6 @@ SIGNATURE NOT RECOGNISED
     using namespace hooks;
     hook_result_move_construction(this, static_cast<basic_result<T, U, V> &&>(o));
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -4821,11 +3879,10 @@ SIGNATURE NOT RECOGNISED
     using namespace hooks;
     // hook_result_in_place_construction(in_place_type<typename predicate::template choose_inplace_value_error_constructor<A1, A2, Args...>>, this);
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  constexpr basic_result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)  // NOLINT
+  constexpr basic_result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value) // NOLINT
       : base{in_place_type<value_type_if_enabled>}
   {
     using namespace hooks;
@@ -4836,7 +3893,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<T, void, void>))
-  constexpr basic_result(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
+  constexpr basic_result(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(o)}
   {
     using namespace hooks;
@@ -4847,7 +3904,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void>))
-  constexpr basic_result(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
+  constexpr basic_result(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(static_cast<success_type<T> &&>(o))}
   {
     using namespace hooks;
@@ -4859,7 +3916,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr basic_result(const failure_type<T> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o)}
   {
     using namespace hooks;
@@ -4871,7 +3928,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_compatible_conversion<void, T, void>))
   constexpr basic_result(failure_type<T> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
   {
     using namespace hooks;
@@ -4884,7 +3941,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<void, T, void>))
   constexpr basic_result(const failure_type<T> &o,
                          explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
-                         explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+                         explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_error_code(detail::extract_error_from_failure<error_type>(o))}
   {
     using namespace hooks;
@@ -4897,7 +3954,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_error_code_compatible_conversion<void, T, void>))
   constexpr basic_result(failure_type<T> &&o,
                          explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
-                         explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+                         explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_error_code(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
   {
     using namespace hooks;
@@ -4910,7 +3967,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<void, T, void>))
   constexpr basic_result(const failure_type<T> &o,
                          explicit_make_exception_ptr_compatible_copy_conversion_tag /*unused*/ =
-                         explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>())))  // NOLINT
+                         explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_exception_ptr(detail::extract_error_from_failure<error_type>(o))}
   {
     using namespace hooks;
@@ -4923,24 +3980,22 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_make_exception_ptr_compatible_conversion<void, T, void>))
   constexpr basic_result(failure_type<T> &&o,
                          explicit_make_exception_ptr_compatible_move_conversion_tag /*unused*/ =
-                         explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>())))  // NOLINT
+                         explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_exception_ptr(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
   {
     using namespace hooks;
     hook_result_move_construction(this, static_cast<failure_type<T> &&>(o));
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  constexpr void swap(basic_result &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value)  //
+  constexpr void swap(basic_result &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value) //
                                                 && (std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value))
   {
     constexpr bool value_throws = !std::is_void<value_type>::value && !detail::is_nothrow_swappable<value_type>::value;
     constexpr bool error_throws = !std::is_void<error_type>::value && !detail::is_nothrow_swappable<error_type>::value;
     detail::basic_result_storage_swap<value_throws, error_throws>(*this, o);
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -4949,12 +4004,10 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   auto as_failure() && { return failure(static_cast<basic_result &&>(*this).assume_error()); }
-
 #ifdef __APPLE__
   failure_type<error_type> _xcode_workaround_as_failure() &&;
 #endif
 };
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -4962,7 +4015,6 @@ template <class R, class S, class P> inline void swap(basic_result<R, S, P> &a, 
 {
   a.swap(b);
 }
-
 #if !defined(NDEBUG)
 // Check is trivial in all ways except default constructibility
 // static_assert(std::is_trivial<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not trivial!");
@@ -4979,13 +4031,10 @@ static_assert(std::is_trivially_move_assignable<basic_result<int, long, policy::
 // Also check is standard layout
 static_assert(std::is_standard_layout<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not a standard layout type!");
 #endif
-
 OUTCOME_V2_NAMESPACE_END
-
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-
 #endif
 /* Exception observers for outcome type
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
@@ -5010,14 +4059,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_HPP
 #define OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace detail
 {
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_exception_observers : public Base
@@ -5025,18 +4069,15 @@ namespace detail
   public:
     using exception_type = P;
     using Base::Base;
-
     constexpr inline exception_type &assume_exception() & noexcept;
     constexpr inline const exception_type &assume_exception() const &noexcept;
     constexpr inline exception_type &&assume_exception() && noexcept;
     constexpr inline const exception_type &&assume_exception() const &&noexcept;
-
     constexpr inline exception_type &exception() &;
     constexpr inline const exception_type &exception() const &;
     constexpr inline exception_type &&exception() &&;
     constexpr inline const exception_type &&exception() const &&;
   };
-
   // Exception observers not present
   template <class Base, class R, class S, class NoValuePolicy> class basic_outcome_exception_observers<Base, R, S, void, NoValuePolicy> : public Base
   {
@@ -5045,11 +4086,8 @@ namespace detail
     constexpr void assume_exception() const noexcept { NoValuePolicy::narrow_exception_check(this); }
     constexpr void exception() const { NoValuePolicy::wide_exception_check(this); }
   };
-
-}  // namespace detail
-
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Failure observers for outcome type
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (7 commits)
@@ -5074,14 +4112,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
 #define OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace detail
 {
   namespace adl
@@ -5096,23 +4129,20 @@ namespace detail
       // ADL discovered
       return basic_outcome_failure_exception_from_error(ec);
     }
-  }                                        // namespace adl
-#if defined(_MSC_VER) && _MSC_VER <= 1923  // VS2019
+  } // namespace adl
+#if defined(_MSC_VER) && _MSC_VER <= 1923 // VS2019
   // VS2017 and VS2019 with /permissive- chokes on the correct form due to over eager early instantiation.
   template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) { static_assert(sizeof(S) == 0, "No specialisation for these error and exception types available!"); }
 #else
-  template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete;  // NOLINT No specialisation for these error and exception types available!
+  template <class S, class P> inline void _delayed_lookup_basic_outcome_failure_exception_from_error(...) = delete; // NOLINT No specialisation for these error and exception types available!
 #endif
-
   template <class exception_type> inline exception_type current_exception_or_fatal(std::exception_ptr e) { std::rethrow_exception(e); }
   template <> inline std::exception_ptr current_exception_or_fatal<std::exception_ptr>(std::exception_ptr e) { return e; }
-
   template <class Base, class R, class S, class P, class NoValuePolicy> class basic_outcome_failure_observers : public Base
   {
   public:
     using exception_type = P;
     using Base::Base;
-
     exception_type failure() const noexcept
     {
 #ifdef __cpp_exceptions
@@ -5139,124 +4169,107 @@ namespace detail
 #endif
     }
   };
-
-}  // namespace detail
-
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"  // Standardese markup confuses clang
+#pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
 #endif
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-template <class R, class S, class P, class NoValuePolicy>  //
+template <class R, class S, class P, class NoValuePolicy> //
 class basic_outcome;
-
 namespace detail
 {
   // May be reused by basic_outcome subclasses to save load on the compiler
   template <class value_type, class error_type, class exception_type> struct outcome_predicates
   {
     using result = result_predicates<value_type, error_type>;
-
     // Predicate for the implicit constructors to be available
-    static constexpr bool implicit_constructors_enabled =                //
-    result::implicit_constructors_enabled                                //
-    && !detail::is_implicitly_constructible<value_type, exception_type>  //
-    && !detail::is_implicitly_constructible<error_type, exception_type>  //
-    && !detail::is_implicitly_constructible<exception_type, value_type>  //
+    static constexpr bool implicit_constructors_enabled = //
+    result::implicit_constructors_enabled //
+    && !detail::is_implicitly_constructible<value_type, exception_type> //
+    && !detail::is_implicitly_constructible<error_type, exception_type> //
+    && !detail::is_implicitly_constructible<exception_type, value_type> //
     && !detail::is_implicitly_constructible<exception_type, error_type>;
-
     // Predicate for the value converting constructor to be available.
     template <class T>
-    static constexpr bool enable_value_converting_constructor =  //
-    implicit_constructors_enabled                                //
-    &&result::template enable_value_converting_constructor<T>    //
-    && !detail::is_implicitly_constructible<exception_type, T>;  // deliberately less tolerant of ambiguity than result's edition
-
+    static constexpr bool enable_value_converting_constructor = //
+    implicit_constructors_enabled //
+    &&result::template enable_value_converting_constructor<T> //
+    && !detail::is_implicitly_constructible<exception_type, T>; // deliberately less tolerant of ambiguity than result's edition
     // Predicate for the error converting constructor to be available.
     template <class T>
-    static constexpr bool enable_error_converting_constructor =  //
-    implicit_constructors_enabled                                //
-    &&result::template enable_error_converting_constructor<T>    //
-    && !detail::is_implicitly_constructible<exception_type, T>;  // deliberately less tolerant of ambiguity than result's edition
-
+    static constexpr bool enable_error_converting_constructor = //
+    implicit_constructors_enabled //
+    &&result::template enable_error_converting_constructor<T> //
+    && !detail::is_implicitly_constructible<exception_type, T>; // deliberately less tolerant of ambiguity than result's edition
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
-    static constexpr bool enable_error_condition_converting_constructor = result::template enable_error_condition_converting_constructor<ErrorCondEnum>  //
+    static constexpr bool enable_error_condition_converting_constructor = result::template enable_error_condition_converting_constructor<ErrorCondEnum> //
                                                                           && !detail::is_implicitly_constructible<exception_type, ErrorCondEnum>;
-
     // Predicate for the exception converting constructor to be available.
     template <class T>
-    static constexpr bool enable_exception_converting_constructor =  //
-    implicit_constructors_enabled                                    //
-    && !is_in_place_type_t<std::decay_t<T>>::value                   // not in place construction
+    static constexpr bool enable_exception_converting_constructor = //
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
     && !detail::is_implicitly_constructible<value_type, T> && !detail::is_implicitly_constructible<error_type, T> &&
     detail::is_implicitly_constructible<exception_type, T>;
-
     // Predicate for the error + exception converting constructor to be available.
     template <class T, class U>
-    static constexpr bool enable_error_exception_converting_constructor =                                         //
-    implicit_constructors_enabled                                                                                 //
-    && !is_in_place_type_t<std::decay_t<T>>::value                                                                // not in place construction
-    && !detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T>  //
+    static constexpr bool enable_error_exception_converting_constructor = //
+    implicit_constructors_enabled //
+    && !is_in_place_type_t<std::decay_t<T>>::value // not in place construction
+    && !detail::is_implicitly_constructible<value_type, T> && detail::is_implicitly_constructible<error_type, T> //
     && !detail::is_implicitly_constructible<value_type, U> && detail::is_implicitly_constructible<exception_type, U>;
-
     // Predicate for the converting copy constructor from a compatible outcome to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_compatible_conversion =  //
+    static constexpr bool enable_compatible_conversion = //
     (std::is_void<T>::value ||
-     detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)  // if our value types are constructible
+     detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>) // if our value types are constructible
     &&(std::is_void<U>::value ||
-       detail::is_explicitly_constructible<error_type, typename basic_outcome<T, U, V, W>::error_type>)  // if our error types are constructible
+       detail::is_explicitly_constructible<error_type, typename basic_outcome<T, U, V, W>::error_type>) // if our error types are constructible
     &&(std::is_void<V>::value ||
-       detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>)  // if our exception types are constructible
+       detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>) // if our exception types are constructible
     ;
-
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_make_error_code_compatible_conversion =  //
-    trait::is_error_code_available<std::decay_t<error_type>>::value       // if error type has an error code
-    && !enable_compatible_conversion<T, U, V, W>                          // and the normal compatible conversion is not available
+    static constexpr bool enable_make_error_code_compatible_conversion = //
+    trait::is_error_code_available<std::decay_t<error_type>>::value // if error type has an error code
+    && !enable_compatible_conversion<T, U, V, W> // and the normal compatible conversion is not available
     && (std::is_void<T>::value ||
-        detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>)  // and if our value types are constructible
+        detail::is_explicitly_constructible<value_type, typename basic_outcome<T, U, V, W>::value_type>) // and if our value types are constructible
     &&detail::is_explicitly_constructible<error_type,
-                                          typename trait::is_error_code_available<U>::type>  // and our error type is constructible from a make_error_code()
+                                          typename trait::is_error_code_available<U>::type> // and our error type is constructible from a make_error_code()
     && (std::is_void<V>::value ||
-        detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>);  // and our exception types are constructible
-
+        detail::is_explicitly_constructible<exception_type, typename basic_outcome<T, U, V, W>::exception_type>); // and our exception types are constructible
     // Predicate for the implicit converting inplace constructor from a compatible input to be available.
     struct disable_inplace_value_error_exception_constructor;
     template <class... Args>
-    using choose_inplace_value_error_exception_constructor = std::conditional_t<  //
+    using choose_inplace_value_error_exception_constructor = std::conditional_t< //
     ((static_cast<int>(detail::is_constructible<value_type, Args...>) + static_cast<int>(detail::is_constructible<error_type, Args...>) +
-      static_cast<int>(detail::is_constructible<exception_type, Args...>)) > 1),  //
-    disable_inplace_value_error_exception_constructor,                                //
-    std::conditional_t<                                                               //
-    detail::is_constructible<value_type, Args...>,                                //
-    value_type,                                                                       //
-    std::conditional_t<                                                               //
-    detail::is_constructible<error_type, Args...>,                                //
-    error_type,                                                                       //
-    std::conditional_t<                                                               //
-    detail::is_constructible<exception_type, Args...>,                            //
-    exception_type,                                                                   //
+      static_cast<int>(detail::is_constructible<exception_type, Args...>)) > 1), //
+    disable_inplace_value_error_exception_constructor, //
+    std::conditional_t< //
+    detail::is_constructible<value_type, Args...>, //
+    value_type, //
+    std::conditional_t< //
+    detail::is_constructible<error_type, Args...>, //
+    error_type, //
+    std::conditional_t< //
+    detail::is_constructible<exception_type, Args...>, //
+    exception_type, //
     disable_inplace_value_error_exception_constructor>>>>;
     template <class... Args>
-    static constexpr bool enable_inplace_value_error_exception_constructor =  //
+    static constexpr bool enable_inplace_value_error_exception_constructor = //
     implicit_constructors_enabled &&
     !std::is_same<choose_inplace_value_error_exception_constructor<Args...>, disable_inplace_value_error_exception_constructor>::value;
   };
-
   // Select whether to use basic_outcome_failure_observers or not
   template <class Base, class R, class S, class P, class NoValuePolicy>
-  using select_basic_outcome_failure_observers =  //
+  using select_basic_outcome_failure_observers = //
   std::conditional_t<trait::is_error_code_available<S>::value && trait::is_exception_ptr_available<P>::value,
                      basic_outcome_failure_observers<Base, R, S, P, NoValuePolicy>, Base>;
-
   template <class T, class U, class V> constexpr inline const V &extract_exception_from_failure(const failure_type<U, V> &v) { return v.exception(); }
   template <class T, class U, class V> constexpr inline V &&extract_exception_from_failure(failure_type<U, V> &&v)
   {
@@ -5267,7 +4280,6 @@ namespace detail
   {
     return static_cast<failure_type<U, void> &&>(v).error();
   }
-
   template <class T> struct is_basic_outcome
   {
     static constexpr bool value = false;
@@ -5276,8 +4288,7 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-}  // namespace detail
-
+} // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type alias template <class T> is_basic_outcome. Potential doc page: `is_basic_outcome<T>`
 */
@@ -5286,7 +4297,6 @@ template <class T> using is_basic_outcome = detail::is_basic_outcome<std::decay_
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_basic_outcome_v = detail::is_basic_outcome<std::decay_t<T>>::value;
-
 namespace hooks
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5308,38 +4318,29 @@ SIGNATURE NOT RECOGNISED
   constexpr inline void hook_outcome_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
   {
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   template <class R, class S, class P, class NoValuePolicy, class U>
   constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept;
-}  // namespace hooks
-
+} // namespace hooks
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class R, class S, class P, class NoValuePolicy> basic_outcome. Potential doc page: `basic_outcome<T, EC, EP, NoValuePolicy>`
 */
-template <class R, class S, class P, class NoValuePolicy>  //
+template <class R, class S, class P, class NoValuePolicy> //
 class OUTCOME_NODISCARD basic_outcome
-
-
-
-
-
     : public detail::select_basic_outcome_failure_observers<
       detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>
-
 {
   static_assert(trait::type_can_be_used_in_basic_result<P>, "The exception_type cannot be used");
   static_assert(std::is_void<P>::value || std::is_default_constructible<P>::value, "exception_type must be void or default constructible");
   using base = detail::select_basic_outcome_failure_observers<
   detail::basic_outcome_exception_observers<detail::basic_result_final<R, S, NoValuePolicy>, R, S, P, NoValuePolicy>, R, S, P, NoValuePolicy>;
   friend struct policy::base;
-  template <class T, class U, class V, class W>  //
+  template <class T, class U, class V, class W> //
   friend class basic_outcome;
   template <class T, class U, class V, class W, class X>
-  friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept;  // NOLINT
-
+  friend constexpr inline void hooks::override_outcome_exception(basic_outcome<T, U, V, W> *o, X &&v) noexcept; // NOLINT
   struct implicit_constructors_disabled_tag
   {
   };
@@ -5379,7 +4380,6 @@ class OUTCOME_NODISCARD basic_outcome
   struct exception_failure_tag
   {
   };
-
   struct disable_in_place_value_type
   {
   };
@@ -5389,111 +4389,94 @@ class OUTCOME_NODISCARD basic_outcome
   struct disable_in_place_exception_type
   {
   };
-
 public:
   using value_type = R;
   using error_type = S;
   using exception_type = P;
-
   template <class T, class U = S, class V = P, class W = NoValuePolicy> using rebind = basic_outcome<T, U, V, W>;
-
 protected:
   // Requirement predicates for outcome.
   struct predicate
   {
     using base = detail::outcome_predicates<value_type, error_type, exception_type>;
-
     // Predicate for any constructors to be available at all
     static constexpr bool constructors_enabled =
-    (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value))  //
+    (!std::is_same<std::decay_t<value_type>, std::decay_t<error_type>>::value || (std::is_void<value_type>::value && std::is_void<error_type>::value)) //
     && (!std::is_same<std::decay_t<value_type>, std::decay_t<exception_type>>::value ||
-        (std::is_void<value_type>::value && std::is_void<exception_type>::value))  //
+        (std::is_void<value_type>::value && std::is_void<exception_type>::value)) //
     && (!std::is_same<std::decay_t<error_type>, std::decay_t<exception_type>>::value ||
-        (std::is_void<error_type>::value && std::is_void<exception_type>::value))  //
+        (std::is_void<error_type>::value && std::is_void<exception_type>::value)) //
     ;
-
     // Predicate for implicit constructors to be available at all
     static constexpr bool implicit_constructors_enabled = constructors_enabled && base::implicit_constructors_enabled;
-
     // Predicate for the value converting constructor to be available.
     template <class T>
-    static constexpr bool enable_value_converting_constructor =  //
-    constructors_enabled                                         //
-    && !std::is_same<std::decay_t<T>, basic_outcome>::value      // not my type
+    static constexpr bool enable_value_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_value_converting_constructor<T>;
-
     // Predicate for the error converting constructor to be available.
     template <class T>
-    static constexpr bool enable_error_converting_constructor =  //
-    constructors_enabled                                         //
-    && !std::is_same<std::decay_t<T>, basic_outcome>::value      // not my type
+    static constexpr bool enable_error_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_error_converting_constructor<T>;
-
     // Predicate for the error condition converting constructor to be available.
     template <class ErrorCondEnum>
-    static constexpr bool enable_error_condition_converting_constructor =  //
-    constructors_enabled                                                   //
-    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_outcome>::value    // not my type
+    static constexpr bool enable_error_condition_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<ErrorCondEnum>, basic_outcome>::value // not my type
     && base::template enable_error_condition_converting_constructor<ErrorCondEnum>;
-
     // Predicate for the exception converting constructor to be available.
     template <class T>
-    static constexpr bool enable_exception_converting_constructor =  //
-    constructors_enabled                                             //
-    && !std::is_same<std::decay_t<T>, basic_outcome>::value          // not my type
+    static constexpr bool enable_exception_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_exception_converting_constructor<T>;
-
     // Predicate for the error + exception converting constructor to be available.
     template <class T, class U>
-    static constexpr bool enable_error_exception_converting_constructor =  //
-    constructors_enabled                                                   //
-    && !std::is_same<std::decay_t<T>, basic_outcome>::value                // not my type
+    static constexpr bool enable_error_exception_converting_constructor = //
+    constructors_enabled //
+    && !std::is_same<std::decay_t<T>, basic_outcome>::value // not my type
     && base::template enable_error_exception_converting_constructor<T, U>;
-
     // Predicate for the converting constructor from a compatible input to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_compatible_conversion =               //
-    constructors_enabled                                               //
-    && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value  // not my type
+    static constexpr bool enable_compatible_conversion = //
+    constructors_enabled //
+    && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value // not my type
     && base::template enable_compatible_conversion<T, U, V, W>;
-
     // Predicate for the converting constructor from a make_error_code() of the input to be available.
     template <class T, class U, class V, class W>
-    static constexpr bool enable_make_error_code_compatible_conversion =  //
-    constructors_enabled                                                  //
-    && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value     // not my type
+    static constexpr bool enable_make_error_code_compatible_conversion = //
+    constructors_enabled //
+    && !std::is_same<basic_outcome<T, U, V, W>, basic_outcome>::value // not my type
     && base::template enable_make_error_code_compatible_conversion<T, U, V, W>;
-
     // Predicate for the inplace construction of value to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_value_constructor =  //
-    constructors_enabled                                      //
-    && (std::is_void<value_type>::value                       //
+    static constexpr bool enable_inplace_value_constructor = //
+    constructors_enabled //
+    && (std::is_void<value_type>::value //
         || detail::is_constructible<value_type, Args...>);
-
     // Predicate for the inplace construction of error to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_error_constructor =  //
-    constructors_enabled                                      //
-    && (std::is_void<error_type>::value                       //
+    static constexpr bool enable_inplace_error_constructor = //
+    constructors_enabled //
+    && (std::is_void<error_type>::value //
         || detail::is_constructible<error_type, Args...>);
-
     // Predicate for the inplace construction of exception to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_exception_constructor =  //
-    constructors_enabled                                          //
-    && (std::is_void<exception_type>::value                       //
+    static constexpr bool enable_inplace_exception_constructor = //
+    constructors_enabled //
+    && (std::is_void<exception_type>::value //
         || detail::is_constructible<exception_type, Args...>);
-
     // Predicate for the implicit converting inplace constructor to be available.
     template <class... Args>
-    static constexpr bool enable_inplace_value_error_exception_constructor =  //
-    constructors_enabled                                                      //
+    static constexpr bool enable_inplace_value_error_exception_constructor = //
+    constructors_enabled //
     &&base::template enable_inplace_value_error_exception_constructor<Args...>;
     template <class... Args>
     using choose_inplace_value_error_exception_constructor = typename base::template choose_inplace_value_error_exception_constructor<Args...>;
   };
-
 public:
   using value_type_if_enabled =
   std::conditional_t<std::is_same<value_type, error_type>::value || std::is_same<value_type, exception_type>::value, disable_in_place_value_type, value_type>;
@@ -5501,35 +4484,31 @@ public:
   std::conditional_t<std::is_same<error_type, value_type>::value || std::is_same<error_type, exception_type>::value, disable_in_place_error_type, error_type>;
   using exception_type_if_enabled = std::conditional_t<std::is_same<exception_type, value_type>::value || std::is_same<exception_type, error_type>::value,
                                                        disable_in_place_exception_type, exception_type>;
-
 protected:
   detail::devoid<exception_type> _ptr;
-
 public:
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class Arg, class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED((!predicate::constructors_enabled && sizeof...(Args) >= 0)))
-  basic_outcome(Arg && /*unused*/, Args &&... /*unused*/) = delete;  // NOLINT basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
-
+  basic_outcome(Arg && /*unused*/, Args &&... /*unused*/) = delete; // NOLINT basic_outcome<> with any of the same type is NOT SUPPORTED, see docs!
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED((predicate::constructors_enabled && !predicate::implicit_constructors_enabled //
                                    && (detail::is_implicitly_constructible<value_type, T> || detail::is_implicitly_constructible<error_type, T> ||
                                        detail::is_implicitly_constructible<exception_type, T>) )))
   basic_outcome(T && /*unused*/, implicit_constructors_disabled_tag /*unused*/ = implicit_constructors_disabled_tag()) =
-  delete;  // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
-
+  delete; // NOLINT Implicit constructors disabled, use explicit in_place_type<T>, success() or failure(). see docs!
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_value_converting_constructor<T>))
   constexpr basic_outcome(T &&t, value_converting_constructor_tag /*unused*/ = value_converting_constructor_tag()) noexcept(
-  detail::is_nothrow_constructible<value_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<typename base::_value_type>, static_cast<T &&>(t)}
       , _ptr()
   {
@@ -5542,7 +4521,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_converting_constructor<T>))
   constexpr basic_outcome(T &&t, error_converting_constructor_tag /*unused*/ = error_converting_constructor_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<typename base::_error_type>, static_cast<T &&>(t)}
       , _ptr()
   {
@@ -5553,10 +4532,10 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class ErrorCondEnum)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))),  //
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(error_type(make_error_code(ErrorCondEnum()))), //
                     OUTCOME_TPRED(predicate::template enable_error_condition_converting_constructor<ErrorCondEnum>))
   constexpr basic_outcome(ErrorCondEnum &&t, error_condition_converting_constructor_tag /*unused*/ = error_condition_converting_constructor_tag()) noexcept(
-  noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t)))))  // NOLINT
+  noexcept(error_type(make_error_code(static_cast<ErrorCondEnum &&>(t))))) // NOLINT
       : base{in_place_type<typename base::_error_type>, make_error_code(t)}
   {
     using namespace hooks;
@@ -5568,7 +4547,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_exception_converting_constructor<T>))
   constexpr basic_outcome(T &&t, exception_converting_constructor_tag /*unused*/ = exception_converting_constructor_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<exception_type, T>) // NOLINT
       : base()
       , _ptr(static_cast<T &&>(t))
   {
@@ -5582,7 +4561,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_error_exception_converting_constructor<T, U>))
   constexpr basic_outcome(T &&a, U &&b, error_exception_converting_constructor_tag /*unused*/ = error_exception_converting_constructor_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>) // NOLINT
       : base{in_place_type<typename base::_error_type>, static_cast<T &&>(a)}
       , _ptr(static_cast<U &&>(b))
   {
@@ -5590,16 +4569,15 @@ SIGNATURE NOT RECOGNISED
     this->_state._status.set_have_exception(true);
     hook_outcome_construction(this, static_cast<T &&>(a), static_cast<U &&>(b));
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),    //
-                    OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !is_basic_outcome_v<T>),  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>), //
+                    OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !is_basic_outcome_v<T>), //
                     OUTCOME_TEXPR(convert::value_or_error<basic_outcome, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit basic_outcome(T &&o,
-                                   explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
+                                   explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag()) // NOLINT
       : basic_outcome{convert::value_or_error<basic_outcome, std::decay_t<T>>{}(static_cast<T &&>(o))}
   {
   }
@@ -5699,8 +4677,6 @@ SIGNATURE NOT RECOGNISED
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<basic_result<T, U, V> &&>(o));
   }
-
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -5793,11 +4769,10 @@ SIGNATURE NOT RECOGNISED
                       static_cast<A2 &&>(a2), static_cast<Args &&>(args)...)
   {
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  constexpr basic_outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value)  // NOLINT
+  constexpr basic_outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value) // NOLINT
       : base{in_place_type<typename base::_value_type>}
   {
     using namespace hooks;
@@ -5808,7 +4783,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void, void>))
-  constexpr basic_outcome(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
+  constexpr basic_outcome(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(o)}
   {
     using namespace hooks;
@@ -5819,20 +4794,19 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<T, void, void, void>))
-  constexpr basic_outcome(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>)  // NOLINT
+  constexpr basic_outcome(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(static_cast<success_type<T> &&>(o))}
   {
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<success_type<T> &&>(o));
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(const failure_type<T> &o,
-                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(detail::is_nothrow_constructible<error_type, T>)  // NOLINT
+                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr()
   {
@@ -5845,7 +4819,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
   constexpr basic_outcome(const failure_type<T> &o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<exception_type, T>) // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -5860,7 +4834,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_make_error_code_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(const failure_type<T> &o,
                           explicit_make_error_code_compatible_copy_conversion_tag /*unused*/ =
-                          explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+                          explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>()))) // NOLINT
       : base{in_place_type<typename base::_error_type>, make_error_code(detail::extract_error_from_failure<error_type>(o))}
       , _ptr()
   {
@@ -5873,7 +4847,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<U>::value && predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr basic_outcome(const failure_type<T, U> &o, explicit_compatible_copy_conversion_tag /*unused*/ = explicit_compatible_copy_conversion_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>) // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -5888,14 +4862,13 @@ SIGNATURE NOT RECOGNISED
     using namespace hooks;
     hook_outcome_copy_construction(this, o);
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(failure_type<T> &&o,
-                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(detail::is_nothrow_constructible<error_type, T>)  // NOLINT
+                          error_failure_tag /*unused*/ = error_failure_tag()) noexcept(detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
       , _ptr()
   {
@@ -5908,7 +4881,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
   constexpr basic_outcome(failure_type<T> &&o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
+  detail::is_nothrow_constructible<exception_type, T>) // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
@@ -5923,7 +4896,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_make_error_code_compatible_conversion<void, T, void, void>))
   constexpr basic_outcome(failure_type<T> &&o,
                           explicit_make_error_code_compatible_move_conversion_tag /*unused*/ =
-                          explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>())))  // NOLINT
+                          explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>()))) // NOLINT
       : base{in_place_type<typename base::_error_type>, make_error_code(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
       , _ptr()
   {
@@ -5936,7 +4909,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TEMPLATE(class T, class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<U>::value && predicate::template enable_compatible_conversion<void, T, U, void>))
   constexpr basic_outcome(failure_type<T, U> &&o, explicit_compatible_move_conversion_tag /*unused*/ = explicit_compatible_move_conversion_tag()) noexcept(
-  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>)  // NOLINT
+  detail::is_nothrow_constructible<error_type, T> &&detail::is_nothrow_constructible<exception_type, U>) // NOLINT
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T, U> &&>(o))}
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T, U> &&>(o)))
   {
@@ -5951,7 +4924,6 @@ SIGNATURE NOT RECOGNISED
     using namespace hooks;
     hook_outcome_move_construction(this, static_cast<failure_type<T, U> &&>(o));
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -5961,19 +4933,19 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()),  //
-                    OUTCOME_TEXPR(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()),  //
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()), //
+                    OUTCOME_TEXPR(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()), //
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
-  constexpr bool operator==(const basic_outcome<T, U, V, W> &o) const noexcept(                 //
-  noexcept(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>())     //
-  && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>())  //
+  constexpr bool operator==(const basic_outcome<T, U, V, W> &o) const noexcept( //
+  noexcept(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()) //
+  && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
   && noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
-      return this->_state._value == o._state._value;  // NOLINT
+      return this->_state._value == o._state._value; // NOLINT
     }
-    if(this->_state._status.have_error() && o._state._status.have_error()  //
+    if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error == o._error && this->_ptr == o._ptr;
@@ -5992,12 +4964,12 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() == std::declval<T>()),  //
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() == std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() == std::declval<U>()))
-  constexpr bool operator==(const failure_type<T, U> &o) const noexcept(  //
+  constexpr bool operator==(const failure_type<T, U> &o) const noexcept( //
   noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
-    if(this->_state._status.have_error() && o._state._status.have_error()  //
+    if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error == o.error() && this->_ptr == o.exception();
@@ -6016,19 +4988,19 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T, class U, class V, class W)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()),  //
-                    OUTCOME_TEXPR(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()),  //
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()), //
+                    OUTCOME_TEXPR(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()), //
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
-  constexpr bool operator!=(const basic_outcome<T, U, V, W> &o) const noexcept(                 //
-  noexcept(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>())     //
-  && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>())  //
+  constexpr bool operator!=(const basic_outcome<T, U, V, W> &o) const noexcept( //
+  noexcept(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()) //
+  && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
   && noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
-      return this->_state._value != o._state._value;  // NOLINT
+      return this->_state._value != o._state._value; // NOLINT
     }
-    if(this->_state._status.have_error() && o._state._status.have_error()  //
+    if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error != o._error || this->_ptr != o._ptr;
@@ -6047,12 +5019,12 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() != std::declval<T>()),  //
+  OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() != std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() != std::declval<U>()))
-  constexpr bool operator!=(const failure_type<T, U> &o) const noexcept(  //
+  constexpr bool operator!=(const failure_type<T, U> &o) const noexcept( //
   noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
-    if(this->_state._status.have_error() && o._state._status.have_error()  //
+    if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
     {
       return this->_error != o.error() || this->_ptr != o.exception();
@@ -6067,12 +5039,11 @@ SIGNATURE NOT RECOGNISED
     }
     return true;
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  constexpr void swap(basic_outcome &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value)     //
-                                                 && (std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value)  //
+  constexpr void swap(basic_outcome &o) noexcept((std::is_void<value_type>::value || detail::is_nothrow_swappable<value_type>::value) //
+                                                 && (std::is_void<error_type>::value || detail::is_nothrow_swappable<error_type>::value) //
                                                  && (std::is_void<exception_type>::value || detail::is_nothrow_swappable<exception_type>::value))
   {
 #ifdef __cpp_exceptions
@@ -6081,7 +5052,7 @@ SIGNATURE NOT RECOGNISED
     constexpr bool exception_throws = !std::is_void<exception_type>::value && !detail::is_nothrow_swappable<exception_type>::value;
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4127) // conditional expression is constant
 #endif
     if(!exception_throws && !value_throws && !error_throws)
     {
@@ -6119,7 +5090,6 @@ SIGNATURE NOT RECOGNISED
             b._state._status.set_have_lost_consistency(true);
             // throw away second exception
           }
-
           // Prevent has_value() == has_error() or has_value() == has_exception()
           auto check = [](basic_outcome *t) {
             if(t->has_value() && (t->has_error() || t->has_exception()))
@@ -6151,7 +5121,6 @@ SIGNATURE NOT RECOGNISED
     swap(this->_ptr, o._ptr);
 #endif
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -6167,7 +5136,6 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, this->assume_error());
   }
-
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -6183,20 +5151,18 @@ SIGNATURE NOT RECOGNISED
     }
     return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
   }
-
 #ifdef __APPLE__
   failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
 #endif
 };
-
 #if __cplusplus <= 202000
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-OUTCOME_TEMPLATE(class T, class U, class V,  //
+OUTCOME_TEMPLATE(class T, class U, class V, //
                  class R, class S, class P, class N)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>()))
-constexpr inline bool operator==(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept(  //
+constexpr inline bool operator==(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept( //
 noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>()))
 {
   return b == a;
@@ -6204,10 +5170,10 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-OUTCOME_TEMPLATE(class T, class U, class V,  //
+OUTCOME_TEMPLATE(class T, class U, class V, //
                  class R, class S, class P, class N)
 OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>()))
-constexpr inline bool operator!=(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept(  //
+constexpr inline bool operator!=(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept( //
 noexcept(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>()))
 {
   return b != a;
@@ -6220,7 +5186,6 @@ template <class R, class S, class P, class N> inline void swap(basic_outcome<R, 
 {
   a.swap(b);
 }
-
 namespace hooks
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -6229,13 +5194,11 @@ SIGNATURE NOT RECOGNISED
   template <class R, class S, class P, class NoValuePolicy, class U>
   constexpr inline void override_outcome_exception(basic_outcome<R, S, P, NoValuePolicy> *o, U &&v) noexcept
   {
-    o->_ptr = static_cast<U &&>(v);  // NOLINT
+    o->_ptr = static_cast<U &&>(v); // NOLINT
     o->_state._status.set_have_exception(true);
   }
-}  // namespace hooks
-
+} // namespace hooks
 OUTCOME_V2_NAMESPACE_END
-
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -6262,16 +5225,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_IMPL_HPP
 #define OUTCOME_BASIC_OUTCOME_EXCEPTION_OBSERVERS_IMPL_HPP
-
-
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace policy
 {
   template <class R, class S, class P, class NoValuePolicy, class Impl> inline constexpr auto &&base::_exception(Impl &&self) noexcept
@@ -6281,14 +5237,13 @@ namespace policy
     using Outcome = OUTCOME_V2_NAMESPACE::detail::rebind_type<basic_outcome<R, S, P, NoValuePolicy>, decltype(self)>;
 #if defined(_MSC_VER) && _MSC_VER < 1920
     // VS2017 tries a copy construction in the correct implementation despite that Outcome is always a rvalue or lvalue ref! :(
-    basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self);  // NOLINT
+    basic_outcome<R, S, P, NoValuePolicy> &_self = (basic_outcome<R, S, P, NoValuePolicy> &) (self); // NOLINT
 #else
-    Outcome _self = static_cast<Outcome>(self);  // NOLINT
+    Outcome _self = static_cast<Outcome>(self); // NOLINT
 #endif
     return static_cast<Outcome>(_self)._ptr;
   }
-}  // namespace policy
-
+} // namespace policy
 namespace detail
 {
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::assume_exception() & noexcept
@@ -6311,7 +5266,6 @@ namespace detail
     NoValuePolicy::narrow_exception_check(std::move(*this));
     return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
-
   template <class Base, class R, class S, class P, class NoValuePolicy> inline constexpr typename basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception_type &basic_outcome_exception_observers<Base, R, S, P, NoValuePolicy>::exception() &
   {
     NoValuePolicy::wide_exception_check(*this);
@@ -6332,10 +5286,8 @@ namespace detail
     NoValuePolicy::wide_exception_check(std::move(*this));
     return NoValuePolicy::template _exception<R, S, P, NoValuePolicy>(std::move(*this));
   }
-}  // namespace detail
-
+} // namespace detail
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 #if !defined(NDEBUG)
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -6357,7 +5309,6 @@ static_assert(std::is_trivially_move_assignable<basic_outcome<int, long, double,
 // static_assert(std::is_standard_layout<basic_outcome<int, long, double, policy::all_narrow>>::value, "outcome<int> is not a standard layout type!");
 OUTCOME_V2_NAMESPACE_END
 #endif
-
 #endif
 /* Traits for Outcome
 (C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
@@ -6382,16 +5333,10 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_TRAIT_STD_EXCEPTION_HPP
 #define OUTCOME_TRAIT_STD_EXCEPTION_HPP
-
-
-
 #include <exception>
-
 OUTCOME_V2_NAMESPACE_BEGIN
-
 namespace policy
 {
   namespace detail
@@ -6399,35 +5344,31 @@ namespace policy
     /* Pass through `make_exception_ptr` function for `std::exception_ptr`.
     */
     inline std::exception_ptr make_exception_ptr(std::exception_ptr v) { return v; }
-
     // Try ADL, if not use fall backs above
     template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return make_exception_ptr(std::forward<T>(v)); }
-  }  // namespace detail
-
+  } // namespace detail
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   template <class T> constexpr inline decltype(auto) exception_ptr(T &&v) { return detail::exception_ptr(std::forward<T>(v)); }
-
   namespace detail
   {
     template <bool has_error_payload> struct _rethrow_exception
     {
-      template <class Exception> explicit _rethrow_exception(Exception && /*unused*/)  // NOLINT
+      template <class Exception> explicit _rethrow_exception(Exception && /*unused*/) // NOLINT
       {
       }
     };
     template <> struct _rethrow_exception<true>
     {
-      template <class Exception> explicit _rethrow_exception(Exception &&excpt)  // NOLINT
+      template <class Exception> explicit _rethrow_exception(Exception &&excpt) // NOLINT
       {
         // ADL
         rethrow_exception(policy::exception_ptr(std::forward<Exception>(excpt)));
       }
     };
-  }  // namespace detail
-}  // namespace policy
-
+  } // namespace detail
+} // namespace policy
 namespace trait
 {
   namespace detail
@@ -6438,18 +5379,14 @@ namespace trait
       static constexpr bool value = true;
       using type = std::exception_ptr;
     };
-  }  // namespace detail
-
+  } // namespace detail
   // std::exception_ptr is an error type
   template <> struct is_error_type<std::exception_ptr>
   {
     static constexpr bool value = true;
   };
-
-}  // namespace trait
-
+} // namespace trait
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* A very simple result type
 (C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
@@ -6474,7 +5411,6 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 /* Policies for result and outcome
@@ -6500,36 +5436,21 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
 #define OUTCOME_POLICY_FAIL_TO_COMPILE_OBSERVERS_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
-#define OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE                                                                                                                                                                                                                                                                                "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."
-
-
-
-
-
-
-
+#define OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE "Attempt to wide observe value, error or " "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom " "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> " "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."
 namespace policy
 {
   struct fail_to_compile_observers : base
   {
-    template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
-    template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
-    template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or "                                                                                                                                                                                                                                                                                     "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom "                                                                                                                                                                                                                           "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> "                                                                                                                                                                                                        "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use "                                                                                                                                                                                                                    "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide "                                                                                                                                                                                                                                "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    template <class Impl> static constexpr void wide_value_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or " "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom " "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> " "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    template <class Impl> static constexpr void wide_error_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or " "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom " "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> " "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
+    template <class Impl> static constexpr void wide_exception_check(Impl && /* unused */) { static_assert(!std::is_same<Impl, Impl>::value, "Attempt to wide observe value, error or " "exception for a basic_result/basic_outcome given an EC or EP type which is not void, and for whom " "trait::is_error_code_available<EC>, trait::is_exception_ptr_available<EC>, and trait::is_exception_ptr_available<EP> " "are all false. Please specify a NoValuePolicy to tell basic_result/basic_outcome what to do, or else use " "a more specific convenience type alias such as unchecked<T, E> to indicate you want the wide " "observers to be narrow, or checked<T, E> to indicate you always want an exception throw etc."); }
   };
-}  // namespace policy
-
+} // namespace policy
 #undef OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE
-
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -6554,7 +5475,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_HPP
 #define SYSTEM_ERROR2_HPP
 /* Proposed SG14 status_code
@@ -6580,7 +5500,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_ERROR_HPP
 #define SYSTEM_ERROR2_ERROR_HPP
 /* Proposed SG14 status_code
@@ -6606,7 +5525,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_ERRORED_STATUS_CODE_HPP
 #define SYSTEM_ERROR2_ERRORED_STATUS_CODE_HPP
 /* Proposed SG14 status_code
@@ -6632,7 +5550,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_HPP
 #define SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_HPP
 /* Proposed SG14 status_code
@@ -6658,7 +5575,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_GENERIC_CODE_HPP
 #define SYSTEM_ERROR2_GENERIC_CODE_HPP
 /* Proposed SG14 status_code
@@ -6684,7 +5600,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_STATUS_ERROR_HPP
 #define SYSTEM_ERROR2_STATUS_ERROR_HPP
 /* Proposed SG14 status_code
@@ -6710,7 +5625,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_STATUS_CODE_HPP
 #define SYSTEM_ERROR2_STATUS_CODE_HPP
 /* Proposed SG14 status_code
@@ -6736,7 +5650,6 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 #define SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 /* Proposed SG14 status_code
@@ -6762,29 +5675,22 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_CONFIG_HPP
 #define SYSTEM_ERROR2_CONFIG_HPP
-
 // < 0.1 each
 #include <cassert>
-#include <cstddef>  // for size_t
-#include <cstdlib>  // for free
-
+#include <cstddef> // for size_t
+#include <cstdlib> // for free
 // 0.22
 #include <type_traits>
-
 // 0.29
 #include <atomic>
-
 // 0.28 (0.15 of which is exception_ptr)
-#include <exception>  // for std::exception
+#include <exception> // for std::exception
 // <new> includes <exception>, <exception> includes <new>
 #include <new>
-
 // 0.01
 #include <initializer_list>
-
 #ifndef SYSTEM_ERROR2_CONSTEXPR14
 #if 0 || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
 //! Defined to be `constexpr` when on C++ 14 or better compilers. Usually automatic, can be overriden.
@@ -6793,7 +5699,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_CONSTEXPR14
 #endif
 #endif
-
 #ifndef SYSTEM_ERROR2_NORETURN
 #if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NORETURN [[noreturn]]
@@ -6820,7 +5725,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 #undef SYSTEM_ERROR2_NORETURN
 #define SYSTEM_ERROR2_NORETURN
 #endif
-
 #ifndef SYSTEM_ERROR2_NODISCARD
 #if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NODISCARD [[nodiscard]]
@@ -6835,21 +5739,12 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this
-#define SYSTEM_ERROR2_NODISCARD                                                                                                                                                                                                                                                                                                  __declspec("SAL_name"                                                                                                                                                                                                                                                                                                                     "("                                                                                                                                                                                                                                                                                                                            "\"_Must_inspect_result_\""                                                                                                                                                                                                                                                                                                    ","                                                                                                                                                                                                                                                                                                                            "\"\""                                                                                                                                                                                                                                                                                                                         ","                                                                                                                                                                                                                                                                                                                            "\"2\""                                                                                                                                                                                                                                                                                                                        ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
-
-
-
-
-
-
-
-
+#define SYSTEM_ERROR2_NODISCARD __declspec("SAL_name" "(" "\"_Must_inspect_result_\"" "," "\"\"" "," "\"2\"" ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_NODISCARD
 #define SYSTEM_ERROR2_NODISCARD
 #endif
-
 #ifndef SYSTEM_ERROR2_TRIVIAL_ABI
 #if 0 || (__clang_major__ >= 7 && !defined(__APPLE__))
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
@@ -6858,21 +5753,16 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_TRIVIAL_ABI
 #endif
 #endif
-
 #ifndef SYSTEM_ERROR2_NAMESPACE
 //! The system_error2 namespace name.
 #define SYSTEM_ERROR2_NAMESPACE system_error2
 //! Begins the system_error2 namespace.
-#define SYSTEM_ERROR2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                            namespace system_error2                                                                                                                                                                                                                                                                                                        {
-
-
+#define SYSTEM_ERROR2_NAMESPACE_BEGIN namespace system_error2 {
 //! Ends the system_error2 namespace.
 #define SYSTEM_ERROR2_NAMESPACE_END }
 #endif
-
 //! Namespace for the library
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 //! Namespace for user specialised traits
 namespace traits
 {
@@ -6886,15 +5776,14 @@ namespace traits
   {
     static constexpr bool value = std::is_trivially_copyable<T>::value;
   };
-}  // namespace traits
-
+} // namespace traits
 namespace detail
 {
 #if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
   inline constexpr size_t cstrlen(const char *str)
   {
     const char *end = nullptr;
-    for(end = str; *end != 0; ++end)  // NOLINT
+    for(end = str; *end != 0; ++end) // NOLINT
       ;
     return end - str;
   }
@@ -6908,7 +5797,6 @@ namespace detail
     return cstrlen_(str, 0);
   }
 #endif
-
   /* A partially compliant implementation of C++20's std::bit_cast function contributed
   by Jesse Towner. TODO FIXME Replace with C++ 20 bit_cast when available.
 
@@ -6919,41 +5807,34 @@ namespace detail
   input types, which some compilers accept. For array inputs, we fall back to
   non-constexpr memmove.
   */
-
   template <class T> using is_integral_or_enum = std::integral_constant<bool, std::is_integral<T>::value || std::is_enum<T>::value>;
-
   template <class To, class From> using is_static_castable = std::integral_constant<bool, is_integral_or_enum<To>::value && is_integral_or_enum<From>::value>;
-
   template <class To, class From> using is_union_castable = std::integral_constant<bool, !is_static_castable<To, From>::value && !std::is_array<To>::value && !std::is_array<From>::value>;
-
   template <class To, class From> using is_bit_castable = std::integral_constant<bool, sizeof(To) == sizeof(From) && traits::is_move_bitcopying<To>::value && traits::is_move_bitcopying<From>::value>;
-
   template <class To, class From> union bit_cast_union {
     From source;
     To target;
   };
-
   template <class To, class From,
-            typename std::enable_if<                 //
-            is_bit_castable<To, From>::value         //
-            && is_static_castable<To, From>::value   //
-            && !is_union_castable<To, From>::value,  //
-            bool>::type = true>                      //
+            typename std::enable_if< //
+            is_bit_castable<To, From>::value //
+            && is_static_castable<To, From>::value //
+            && !is_union_castable<To, From>::value, //
+            bool>::type = true> //
   constexpr To bit_cast(const From &from) noexcept
   {
     return static_cast<To>(from);
   }
-
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
   template <class To, class From,
-            typename std::enable_if<                 //
-            is_bit_castable<To, From>::value         //
-            && !is_static_castable<To, From>::value  //
-            && is_union_castable<To, From>::value,   //
-            bool>::type = true>                      //
+            typename std::enable_if< //
+            is_bit_castable<To, From>::value //
+            && !is_static_castable<To, From>::value //
+            && is_union_castable<To, From>::value, //
+            bool>::type = true> //
   constexpr To bit_cast(const From &from) noexcept
   {
     return bit_cast_union<To, From>{from}.target;
@@ -6961,29 +5842,25 @@ namespace detail
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
-
   template <class To, class From,
-            typename std::enable_if<                 //
-            is_bit_castable<To, From>::value         //
-            && !is_static_castable<To, From>::value  //
-            && !is_union_castable<To, From>::value,  //
-            bool>::type = true>                      //
+            typename std::enable_if< //
+            is_bit_castable<To, From>::value //
+            && !is_static_castable<To, From>::value //
+            && !is_union_castable<To, From>::value, //
+            bool>::type = true> //
   To bit_cast(const From &from) noexcept
   {
     bit_cast_union<To, From> ret;
     memmove(&ret.source, &from, sizeof(ret.source));
     return ret.target;
   }
-
   /* erasure_cast performs a bit_cast with additional rules to handle types
   of differing sizes. For integral & enum types, it may perform a narrowing
   or widing conversion with static_cast if necessary, before doing the final
   conversion with bit_cast. When casting to or from non-integral, non-enum
   types it may insert the value into another object with extra padding bytes
   to satisfy bit_cast's preconditions that both types have the same size. */
-
   template <class To, class From> using is_erasure_castable = std::integral_constant<bool, traits::is_move_bitcopying<To>::value && traits::is_move_bitcopying<From>::value>;
-
   template <class T, bool = std::is_enum<T>::value> struct identity_or_underlying_type
   {
     using type = T;
@@ -6992,10 +5869,8 @@ namespace detail
   {
     using type = typename std::underlying_type<T>::type;
   };
-
   template <class OfSize, class OfSign>
   using erasure_integer_type = typename std::conditional<std::is_signed<typename identity_or_underlying_type<OfSign>::type>::value, typename std::make_signed<typename identity_or_underlying_type<OfSize>::type>::type, typename std::make_unsigned<typename identity_or_underlying_type<OfSize>::type>::type>::type;
-
   template <class ErasedType, std::size_t N> struct padded_erasure_object
   {
     static_assert(traits::is_move_bitcopying<ErasedType>::value, "ErasedType must be TriviallyCopyable or MoveBitcopying");
@@ -7008,34 +5883,27 @@ namespace detail
     {
     }
   };
-
   template <class To, class From, typename std::enable_if<is_erasure_castable<To, From>::value && (sizeof(To) == sizeof(From)), bool>::type = true> constexpr To erasure_cast(const From &from) noexcept { return bit_cast<To>(from); }
-
   template <class To, class From, typename std::enable_if<is_erasure_castable<To, From>::value && is_static_castable<To, From>::value && (sizeof(To) < sizeof(From)), bool>::type = true> constexpr To erasure_cast(const From &from) noexcept { return static_cast<To>(bit_cast<erasure_integer_type<From, To>>(from)); }
-
   template <class To, class From, typename std::enable_if<is_erasure_castable<To, From>::value && is_static_castable<To, From>::value && (sizeof(To) > sizeof(From)), bool>::type = true> constexpr To erasure_cast(const From &from) noexcept { return bit_cast<To>(static_cast<erasure_integer_type<To, From>>(from)); }
-
   template <class To, class From, typename std::enable_if<is_erasure_castable<To, From>::value && !is_static_castable<To, From>::value && (sizeof(To) < sizeof(From)), bool>::type = true> constexpr To erasure_cast(const From &from) noexcept
   {
     return bit_cast<padded_erasure_object<To, sizeof(From) - sizeof(To)>>(from).value;
   }
-
   template <class To, class From, typename std::enable_if<is_erasure_castable<To, From>::value && !is_static_castable<To, From>::value && (sizeof(To) > sizeof(From)), bool>::type = true> constexpr To erasure_cast(const From &from) noexcept
   {
     return bit_cast<To>(padded_erasure_object<From, sizeof(To) - sizeof(From)>{from});
   }
-}  // namespace detail
+} // namespace detail
 SYSTEM_ERROR2_NAMESPACE_END
-
 #ifndef SYSTEM_ERROR2_FATAL
 #ifdef SYSTEM_ERROR2_NOT_POSIX
 #error If SYSTEM_ERROR2_NOT_POSIX is defined, you must define your own SYSTEM_ERROR2_FATAL implementation!
 #endif
-#include <cstdlib>  // for abort
+#include <cstdlib> // for abort
 #ifdef __APPLE__
-#include <unistd.h>  // for write
+#include <unistd.h> // for write
 #endif
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 namespace detail
 {
@@ -7051,7 +5919,7 @@ namespace detail
 #pragma comment(linker, "/alternatename:?write@avoid_stdio_include@detail@system_error2@@YAHHPBXI@Z=_write")
 #endif
 #endif
-  }  // namespace avoid_stdio_include
+  } // namespace avoid_stdio_include
   inline void do_fatal_exit(const char *msg)
   {
     using namespace avoid_stdio_include;
@@ -7059,17 +5927,14 @@ namespace detail
     write(2 /*stderr*/, "\n", 1);
     abort();
   }
-}  // namespace detail
+} // namespace detail
 SYSTEM_ERROR2_NAMESPACE_END
 //! Prints msg to stderr, and calls `std::terminate()`. Can be overriden via predefinition.
 #define SYSTEM_ERROR2_FATAL(msg) ::SYSTEM_ERROR2_NAMESPACE::detail::do_fatal_exit(msg)
 #endif
-
 #endif
-#include <cstring>  // for strchr
-
+#include <cstring> // for strchr
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 /*! The main workhorse of the system_error2 library, can be typed (`status_code<DomainType>`), erased-immutable (`status_code<void>`) or erased-mutable (`status_code<erased<T>>`).
 
 Be careful of placing these into containers! Equality and inequality operators are
@@ -7082,7 +5947,6 @@ template <class DomainType> class status_code;
 class _generic_code_domain;
 //! The generic code is a status code with the generic code domain, which is that of `errc` (POSIX).
 using generic_code = status_code<_generic_code_domain>;
-
 namespace detail
 {
   template <class StatusCode> class indirecting_domain;
@@ -7093,7 +5957,7 @@ namespace detail
   };
   template <class To, class From> struct type_erasure_is_safe
   {
-    static constexpr bool value = traits::is_move_bitcopying<From>::value  //
+    static constexpr bool value = traits::is_move_bitcopying<From>::value //
                                   && (sizeof(status_code_sizer<From>) <= sizeof(status_code_sizer<To>));
   };
   /* We are severely limited by needing to retain C++ 11 compatibility when doing
@@ -7117,8 +5981,8 @@ namespace detail
   constexpr inline unsigned long long parse_uuid2(const char *s)
   {
     return ((parse_hex_byte(s[0]) << 0) | (parse_hex_byte(s[1]) << 4) | (parse_hex_byte(s[2]) << 8) | (parse_hex_byte(s[3]) << 12) | (parse_hex_byte(s[4]) << 16) | (parse_hex_byte(s[5]) << 20) | (parse_hex_byte(s[6]) << 24) | (parse_hex_byte(s[7]) << 28) | (parse_hex_byte(s[9]) << 32) | (parse_hex_byte(s[10]) << 36) |
-            (parse_hex_byte(s[11]) << 40) | (parse_hex_byte(s[12]) << 44) | (parse_hex_byte(s[14]) << 48) | (parse_hex_byte(s[15]) << 52) | (parse_hex_byte(s[16]) << 56) | (parse_hex_byte(s[17]) << 60))  //
-           ^                                                                                                                                                                                                //
+            (parse_hex_byte(s[11]) << 40) | (parse_hex_byte(s[12]) << 44) | (parse_hex_byte(s[14]) << 48) | (parse_hex_byte(s[15]) << 52) | (parse_hex_byte(s[16]) << 56) | (parse_hex_byte(s[17]) << 60)) //
+           ^ //
            ((parse_hex_byte(s[19]) << 0) | (parse_hex_byte(s[20]) << 4) | (parse_hex_byte(s[21]) << 8) | (parse_hex_byte(s[22]) << 12) | (parse_hex_byte(s[24]) << 16) | (parse_hex_byte(s[25]) << 20) | (parse_hex_byte(s[26]) << 24) | (parse_hex_byte(s[27]) << 28) | (parse_hex_byte(s[28]) << 32) |
             (parse_hex_byte(s[29]) << 36) | (parse_hex_byte(s[30]) << 40) | (parse_hex_byte(s[31]) << 44) | (parse_hex_byte(s[32]) << 48) | (parse_hex_byte(s[33]) << 52) | (parse_hex_byte(s[34]) << 56) | (parse_hex_byte(s[35]) << 60));
   }
@@ -7129,15 +5993,13 @@ namespace detail
 #endif
   static constexpr unsigned long long test_uuid_parse = parse_uuid_from_array("430f1201-94fc-06c7-430f-120194fc06c7");
   //static constexpr unsigned long long test_uuid_parse2 = parse_uuid_from_array("x30f1201-94fc-06c7-430f-120194fc06c7");
-}  // namespace detail
-
+} // namespace detail
 /*! Abstract base class for a coding domain of a status code.
  */
 class status_code_domain
 {
   template <class DomainType> friend class status_code;
   template <class StatusCode> friend class indirecting_domain;
-
 public:
   //! Type of the unique id for this domain.
   using unique_id_type = unsigned long long;
@@ -7165,7 +6027,6 @@ public:
     using iterator = const char *;
     //! The const iterator type
     using const_iterator = const char *;
-
   protected:
     //! The operation occurring
     enum class _thunk_op
@@ -7182,25 +6043,22 @@ public:
     {
       (void) dest;
       (void) src;
-      assert(dest->_thunk == _checking_string_thunk);                   // NOLINT
-      assert(src == nullptr || src->_thunk == _checking_string_thunk);  // NOLINT
+      assert(dest->_thunk == _checking_string_thunk); // NOLINT
+      assert(src == nullptr || src->_thunk == _checking_string_thunk); // NOLINT
       // do nothing
     }
-
   protected:
 #endif
     //! Pointers to beginning and end of character range
     pointer _begin{}, _end{};
     //! Three `void*` of state
-    void *_state[3]{};  // at least the size of a shared_ptr
+    void *_state[3]{}; // at least the size of a shared_ptr
     //! Handler for when operations occur
     const _thunk_spec _thunk{nullptr};
-
     constexpr explicit string_ref(_thunk_spec thunk) noexcept
         : _thunk(thunk)
     {
     }
-
   public:
     //! Construct from a C string literal
     SYSTEM_ERROR2_CONSTEXPR14 explicit string_ref(const char *str, size_type len = static_cast<size_type>(-1), void *state0 = nullptr, void *state1 = nullptr, void *state2 = nullptr,
@@ -7212,7 +6070,7 @@ public:
                                                   ) noexcept
         : _begin(str)
         , _end((len == static_cast<size_type>(-1)) ? (str + detail::cstrlen(str)) : (str + len))
-        ,  // NOLINT
+        , // NOLINT
         _state{state0, state1, state2}
         , _thunk(thunk)
     {
@@ -7251,7 +6109,7 @@ public:
         this->~string_ref();
         try
         {
-          new(this) string_ref(o);  // may throw
+          new(this) string_ref(o); // may throw
         }
         catch(...)
         {
@@ -7284,7 +6142,6 @@ public:
       }
       _begin = _end = nullptr;
     }
-
     //! Returns whether the reference is empty or not
     SYSTEM_ERROR2_NODISCARD bool empty() const noexcept { return _begin == _end; }
     //! Returns the size of the string
@@ -7306,7 +6163,6 @@ public:
     //! Returns the end of the string
     const_iterator cend() const noexcept { return _end; }
   };
-
   /*! A reference counted, threadsafe reference to a message string.
    */
   class atomic_refcounted_string_ref : public string_ref
@@ -7315,16 +6171,15 @@ public:
     {
       mutable std::atomic<unsigned> count{1};
     };
-    _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); }                  // NOLINT
-    const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); }  // NOLINT
-
+    _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
+    const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
     static void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
     {
-      auto dest = static_cast<atomic_refcounted_string_ref *>(_dest);      // NOLINT
-      auto src = static_cast<const atomic_refcounted_string_ref *>(_src);  // NOLINT
+      auto dest = static_cast<atomic_refcounted_string_ref *>(_dest); // NOLINT
+      auto src = static_cast<const atomic_refcounted_string_ref *>(_src); // NOLINT
       (void) src;
-      assert(dest->_thunk == _refcounted_string_thunk);                   // NOLINT
-      assert(src == nullptr || src->_thunk == _refcounted_string_thunk);  // NOLINT
+      assert(dest->_thunk == _refcounted_string_thunk); // NOLINT
+      assert(src == nullptr || src->_thunk == _refcounted_string_thunk); // NOLINT
       switch(op)
       {
       case _thunk_op::copy:
@@ -7333,14 +6188,14 @@ public:
         {
           auto count = dest->_msg()->count.fetch_add(1, std::memory_order_relaxed);
           (void) count;
-          assert(count != 0);  // NOLINT
+          assert(count != 0); // NOLINT
         }
         return;
       }
       case _thunk_op::move:
       {
-        assert(src);                                                  // NOLINT
-        auto msrc = const_cast<atomic_refcounted_string_ref *>(src);  // NOLINT
+        assert(src); // NOLINT
+        auto msrc = const_cast<atomic_refcounted_string_ref *>(src); // NOLINT
         msrc->_begin = msrc->_end = nullptr;
         msrc->_state[0] = msrc->_state[1] = msrc->_state[2] = nullptr;
         return;
@@ -7353,14 +6208,13 @@ public:
           if(count == 1)
           {
             std::atomic_thread_fence(std::memory_order_acquire);
-            free((void *) dest->_begin);  // NOLINT
-            delete dest->_msg();          // NOLINT
+            free((void *) dest->_begin); // NOLINT
+            delete dest->_msg(); // NOLINT
           }
         }
       }
       }
     }
-
   public:
     //! Construct from a C string literal allocated using `malloc()`.
     explicit atomic_refcounted_string_ref(const char *str, size_type len = static_cast<size_type>(-1), void *state1 = nullptr, void *state2 = nullptr) noexcept
@@ -7368,18 +6222,16 @@ public:
     {
       if(_msg() == nullptr)
       {
-        free((void *) this->_begin);  // NOLINT
-        _msg() = nullptr;             // disabled
+        free((void *) this->_begin); // NOLINT
+        _msg() = nullptr; // disabled
         this->_begin = "failed to get message from system";
         this->_end = strchr(this->_begin, 0);
         return;
       }
     }
   };
-
 private:
   unique_id_type _id;
-
 protected:
   /*! Use [https://www.random.org/cgi-bin/randbyte?nbytes=8&format=h](https://www.random.org/cgi-bin/randbyte?nbytes=8&format=h) to get a random 64 bit id.
 
@@ -7415,7 +6267,6 @@ protected:
   status_code_domain &operator=(status_code_domain &&) = default;
   //! No public destruction at type erased level
   ~status_code_domain() = default;
-
 public:
   //! True if the unique ids match.
   constexpr bool operator==(const status_code_domain &o) const noexcept { return _id == o._id; }
@@ -7423,12 +6274,10 @@ public:
   constexpr bool operator!=(const status_code_domain &o) const noexcept { return _id != o._id; }
   //! True if this unique is lower than the other's unique id.
   constexpr bool operator<(const status_code_domain &o) const noexcept { return _id < o._id; }
-
   //! Returns the unique id used to identify identical category instances.
   constexpr unique_id_type id() const noexcept { return _id; }
   //! Name of this category.
   virtual string_ref name() const noexcept = 0;
-
 protected:
   //! True if code means failure.
   virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
@@ -7446,29 +6295,24 @@ protected:
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
 #endif
   // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
-  virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); }  // NOLINT
+  virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); } // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
-  virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept  // NOLINT
+  virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept // NOLINT
   {
     (void) code;
     (void) bytes;
   }
 };
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 #if (__cplusplus >= 201700 || _HAS_CXX17) && !defined(SYSTEM_ERROR2_DISABLE_STD_IN_PLACE)
 // 0.26
-#include <utility>  // for in_place
-
+#include <utility> // for in_place
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 using in_place_t = std::in_place_t;
 using std::in_place;
 SYSTEM_ERROR2_NAMESPACE_END
-
 #else
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 //! Aliases `std::in_place_t` if on C++ 17 or later, else defined locally.
 struct in_place_t
@@ -7479,9 +6323,7 @@ struct in_place_t
 constexpr in_place_t in_place{};
 SYSTEM_ERROR2_NAMESPACE_END
 #endif
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 //! Namespace for user injected mixins
 namespace mixins
 {
@@ -7489,18 +6331,60 @@ namespace mixins
   {
     using Base::Base;
   };
-}  // namespace mixins
-
+} // namespace mixins
 /*! A tag for an erased value type for `status_code<D>`.
 Available only if `ErasedType` satisfies `traits::is_move_bitcopying<ErasedType>::value`.
 */
-template <class ErasedType,  //
+template <class ErasedType, //
           typename std::enable_if<traits::is_move_bitcopying<ErasedType>::value, bool>::type = true>
 struct erased
 {
   using value_type = ErasedType;
 };
+/*! Specialise this template to quickly wrap a third party enumeration into a
+custom status code domain.
 
+Use like this:
+
+```c++
+SYSTEM_ERROR2_NAMESPACE_BEGIN
+template <> struct quick_status_code_from_enum<AnotherCode> : quick_status_code_from_enum_defaults<AnotherCode>
+{
+  // Text name of the enum
+  static constexpr const auto domain_name = "Another Code";
+  // Unique UUID for the enum. PLEASE use https://www.random.org/cgi-bin/randbyte?nbytes=16&format=h
+  static constexpr const auto domain_uuid = "{be201f65-3962-dd0e-1266-a72e63776a42}";
+  // Map of each enum value to its text string, and list of semantically equivalent errc's
+  static const std::initializer_list<mapping> &value_mappings()
+  {
+    static const std::initializer_list<mapping<AnotherCode>> v = {
+    // Format is: { enum value, "string representation", { list of errc mappings ... } }
+    {AnotherCode::success1, "Success 1", {errc::success}},        //
+    {AnotherCode::goaway, "Go away", {errc::permission_denied}},  //
+    {AnotherCode::success2, "Success 2", {errc::success}},        //
+    {AnotherCode::error2, "Error 2", {}},                         //
+    };
+    return v;
+  }
+  // Completely optional definition of mixin for the status code synthesised from `Enum`. It can be omitted.
+  template <class Base> struct mixin : Base
+  {
+    using Base::Base;
+    constexpr int custom_method() const { return 42; }
+  };
+};
+SYSTEM_ERROR2_NAMESPACE_END
+```
+
+Note that if the `errc` mapping contains `errc::success`, then
+the enumeration value is considered to be a successful value.
+Otherwise it is considered to be a failure value.
+
+The first value in the `errc` mapping is the one chosen as the
+`generic_code` conversion. Other values are used during equivalence
+comparisons.
+*/
+template <class Enum> struct quick_status_code_from_enum;
 namespace detail
 {
   template <class T> struct is_status_code
@@ -7519,7 +6403,6 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-
   // From http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4436.pdf
   namespace impl
   {
@@ -7540,19 +6423,16 @@ namespace detail
     {
       using type = T<Ts...>;
     };
-  }  // namespace impl
+  } // namespace impl
   template <template <class...> class T, class... Ts> using test_apply = impl::test_apply<T, impl::types<Ts...>>;
-
   template <class T, class... Args> using get_make_status_code_result = decltype(make_status_code(std::declval<T>(), std::declval<Args>()...));
   template <class... Args> using safe_get_make_status_code_result = test_apply<get_make_status_code_result, Args...>;
-}  // namespace detail
-
+} // namespace detail
 //! Trait returning true if the type is a status code.
 template <class T> struct is_status_code
 {
   static constexpr bool value = detail::is_status_code<typename std::decay<T>::type>::value || detail::is_erased_status_code<typename std::decay<T>::type>::value;
 };
-
 /*! A type erased lightweight status code reflecting empty, success, or failure.
 Differs from `status_code<erased<>>` by being always available irrespective of
 the domain's value type, but cannot be copied, moved, nor destructed. Thus one
@@ -7561,7 +6441,6 @@ always passes this around by const lvalue reference.
 template <> class SYSTEM_ERROR2_TRIVIAL_ABI status_code<void>
 {
   template <class T> friend class status_code;
-
 public:
   //! The type of the domain.
   using domain_type = void;
@@ -7569,10 +6448,8 @@ public:
   using value_type = void;
   //! The type of a reference to a message string.
   using string_ref = typename status_code_domain::string_ref;
-
 protected:
   const status_code_domain *_domain{nullptr};
-
 protected:
   //! No default construction at type erased level
   status_code() = default;
@@ -7586,19 +6463,16 @@ protected:
   status_code &operator=(status_code &&) = default;
   //! No public destruction at type erased level
   ~status_code() = default;
-
   //! Used to construct a non-empty type erased status code
   constexpr explicit status_code(const status_code_domain *v) noexcept
       : _domain(v)
   {
   }
-
 public:
   //! Return the status code domain.
   constexpr const status_code_domain &domain() const noexcept { return *_domain; }
   //! True if the status code is empty.
   SYSTEM_ERROR2_NODISCARD constexpr bool empty() const noexcept { return _domain == nullptr; }
-
   //! Return a reference to a string textually representing a code.
   string_ref message() const noexcept { return (_domain != nullptr) ? _domain->_do_message(*this) : string_ref("(empty)"); }
   //! True if code means success.
@@ -7619,7 +6493,7 @@ public:
     // If we are both empty, we are equivalent
     if(!_domain && !o._domain)
     {
-      return true;  // NOLINT
+      return true; // NOLINT
     }
     // Otherwise not equivalent
     return false;
@@ -7634,11 +6508,10 @@ public:
   SYSTEM_ERROR2_NORETURN void throw_exception() const
   {
     _domain->_do_throw_exception(*this);
-    abort();  // suppress buggy GCC warning
+    abort(); // suppress buggy GCC warning
   }
 #endif
 };
-
 namespace detail
 {
   template <class DomainType> struct get_domain_value_type
@@ -7654,7 +6527,6 @@ namespace detail
   template <class DomainType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code_storage : public status_code<void>
   {
     using _base = status_code<void>;
-
   public:
     //! The type of the domain.
     using domain_type = typename get_domain_value_type<DomainType>::domain_type;
@@ -7662,18 +6534,15 @@ namespace detail
     using value_type = typename get_domain_value_type<DomainType>::value_type;
     //! The type of a reference to a message string.
     using string_ref = typename domain_type::string_ref;
-
 #ifndef NDEBUG
     static_assert(std::is_move_constructible<value_type>::value || std::is_copy_constructible<value_type>::value, "DomainType::value_type is neither move nor copy constructible!");
     static_assert(!std::is_default_constructible<value_type>::value || std::is_nothrow_default_constructible<value_type>::value, "DomainType::value_type is not nothrow default constructible!");
     static_assert(!std::is_move_constructible<value_type>::value || std::is_nothrow_move_constructible<value_type>::value, "DomainType::value_type is not nothrow move constructible!");
     static_assert(std::is_nothrow_destructible<value_type>::value, "DomainType::value_type is not nothrow destructible!");
 #endif
-
     // Replace the type erased implementations with type aware implementations for better codegen
     //! Return the status code domain.
     constexpr const domain_type &domain() const noexcept { return *static_cast<const domain_type *>(this->_domain); }
-
     //! Reset the code to empty.
     SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept
     {
@@ -7681,7 +6550,6 @@ namespace detail
       this->_domain = nullptr;
       new(&this->_value) value_type();
     }
-
 #if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
     //! Return a reference to the `value_type`.
     constexpr value_type &value() & noexcept { return this->_value; }
@@ -7692,7 +6560,6 @@ namespace detail
     constexpr const value_type &value() const &noexcept { return this->_value; }
     //! Return a reference to the `value_type`.
     constexpr const value_type &&value() const &&noexcept { return this->_value; }
-
   protected:
     status_code_storage() = default;
     status_code_storage(const status_code_storage &) = default;
@@ -7710,7 +6577,6 @@ namespace detail
       return *this;
     }
     ~status_code_storage() = default;
-
     value_type _value{};
     struct _value_type_constructor
     {
@@ -7722,8 +6588,7 @@ namespace detail
     {
     }
   };
-}  // namespace detail
-
+} // namespace detail
 /*! A lightweight, typed, status code reflecting empty, success, or failure.
 This is the main workhorse of the system_error2 library. Its characteristics reflect the value type
 set by its domain type, so if that value type is move-only or trivial, so is this.
@@ -7739,7 +6604,6 @@ template <class DomainType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code : public
 {
   template <class T> friend class status_code;
   using _base = mixins::mixin<detail::status_code_storage<DomainType>, DomainType>;
-
 public:
   //! The type of the domain.
   using domain_type = DomainType;
@@ -7747,38 +6611,42 @@ public:
   using value_type = typename domain_type::value_type;
   //! The type of a reference to a message string.
   using string_ref = typename domain_type::string_ref;
-
 protected:
   using _base::_base;
-
 public:
   //! Default construction to empty
   status_code() = default;
   //! Copy constructor
   status_code(const status_code &) = default;
   //! Move constructor
-  status_code(status_code &&) = default;  // NOLINT
+  status_code(status_code &&) = default; // NOLINT
   //! Copy assignment
   status_code &operator=(const status_code &) = default;
   //! Move assignment
-  status_code &operator=(status_code &&) = default;  // NOLINT
+  status_code &operator=(status_code &&) = default; // NOLINT
   ~status_code() = default;
-
   //! Return a copy of the code.
   SYSTEM_ERROR2_CONSTEXPR14 status_code clone() const { return *this; }
-
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class T, class... Args,                                                                            //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<T>::type, status_code>::value            // not copy/move of self
-                                    && !std::is_same<typename std::decay<T>::type, in_place_t>::value          // not in_place_t
-                                    && is_status_code<MakeStatusCodeResult>::value                             // ADL makes a status code
-                                    && std::is_constructible<status_code, MakeStatusCodeResult>::value,        // ADLed status code is compatible
-
+  template <class T, class... Args, //
+            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+            typename std::enable_if<!std::is_same<typename std::decay<T>::type, status_code>::value // not copy/move of self
+                                    && !std::is_same<typename std::decay<T>::type, in_place_t>::value // not in_place_t
+                                    && is_status_code<MakeStatusCodeResult>::value // ADL makes a status code
+                                    && std::is_constructible<status_code, MakeStatusCodeResult>::value, // ADLed status code is compatible
                                     bool>::type = true>
-  constexpr status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
+  constexpr status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...))) // NOLINT
       : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  {
+  }
+  //! Implicit construction from any `quick_status_code_from_enum<Enum>` enumerated type.
+  template <class Enum, //
+            class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type, // Enumeration has been activated
+            typename std::enable_if<std::is_constructible<status_code, QuickStatusCodeType>::value, // Its status code is compatible
+                                    bool>::type = true>
+  constexpr status_code(Enum &&v) noexcept(std::is_nothrow_constructible<status_code, QuickStatusCodeType>::value) // NOLINT
+      : status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
   }
   //! Explicit in-place construction. Disables if `domain_type::get()` is not a valid expression.
@@ -7807,7 +6675,7 @@ public:
   `value_type` is trivially copyable or move bitcopying, and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
   Does not check if domains are equal.
   */
-  template <class ErasedType,  //
+  template <class ErasedType, //
             typename std::enable_if<detail::type_erasure_is_safe<ErasedType, value_type>::value, bool>::type = true>
   constexpr explicit status_code(const status_code<erased<ErasedType>> &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : status_code(detail::erasure_cast<value_type>(v.value()))
@@ -7816,20 +6684,16 @@ public:
     assert(v.domain() == this->domain());
 #endif
   }
-
   //! Return a reference to a string textually representing a code.
   string_ref message() const noexcept { return this->_domain ? string_ref(this->domain()._do_message(*this)) : string_ref("(empty)"); }
 };
-
 namespace traits
 {
   template <class DomainType> struct is_move_bitcopying<status_code<DomainType>>
   {
     static constexpr bool value = is_move_bitcopying<typename DomainType::value_type>::value;
   };
-}  // namespace traits
-
-
+} // namespace traits
 /*! Type erased, move-only status_code, unlike `status_code<void>` which cannot be moved nor destroyed. Available
 only if `erased<>` is available, which is when the domain's type is trivially
 copyable or is move relocatable, and if the size of the domain's typed error code is less than or equal to
@@ -7843,7 +6707,6 @@ template <class ErasedType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code<erased<E
 {
   template <class T> friend class status_code;
   using _base = mixins::mixin<detail::status_code_storage<erased<ErasedType>>, erased<ErasedType>>;
-
 public:
   //! The type of the domain (void, as it is erased).
   using domain_type = void;
@@ -7851,18 +6714,17 @@ public:
   using value_type = ErasedType;
   //! The type of a reference to a message string.
   using string_ref = typename _base::string_ref;
-
 public:
   //! Default construction to empty
   status_code() = default;
   //! Copy constructor
   status_code(const status_code &) = delete;
   //! Move constructor
-  status_code(status_code &&) = default;  // NOLINT
+  status_code(status_code &&) = default; // NOLINT
   //! Copy assignment
   status_code &operator=(const status_code &) = delete;
   //! Move assignment
-  status_code &operator=(status_code &&) = default;  // NOLINT
+  status_code &operator=(status_code &&) = default; // NOLINT
   ~status_code()
   {
     if(nullptr != this->_domain)
@@ -7870,7 +6732,6 @@ public:
       this->_domain->_do_erased_destroy(*this, sizeof(*this));
     }
   }
-
   //! Return a copy of the erased code by asking the domain to perform the erased copy.
   status_code clone() const
   {
@@ -7882,65 +6743,66 @@ public:
     this->_domain->_do_erased_copy(x, *this, sizeof(*this));
     return x;
   }
-
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
-  template <class DomainType,                                                                              //
-            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value         //
-                                    && std::is_trivially_copyable<typename DomainType::value_type>::value  //
+  template <class DomainType, //
+            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value //
+                                    && std::is_trivially_copyable<typename DomainType::value_type>::value //
                                     && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
-  constexpr status_code(const status_code<DomainType> &v) noexcept  // NOLINT
+  constexpr status_code(const status_code<DomainType> &v) noexcept // NOLINT
       : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
   {
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
-  template <class DomainType,  //
+  template <class DomainType, //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value, bool>::type = true>
-  SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept  // NOLINT
+  SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept // NOLINT
       : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
   {
     v._domain = nullptr;
   }
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class T, class... Args,                                                                            //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<T>::type, status_code>::value            // not copy/move of self
-                                    && !std::is_same<typename std::decay<T>::type, value_type>::value          // not copy/move of value type
-                                    && is_status_code<MakeStatusCodeResult>::value                             // ADL makes a status code
-                                    && std::is_constructible<status_code, MakeStatusCodeResult>::value,        // ADLed status code is compatible
+  template <class T, class... Args, //
+            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+            typename std::enable_if<!std::is_same<typename std::decay<T>::type, status_code>::value // not copy/move of self
+                                    && !std::is_same<typename std::decay<T>::type, value_type>::value // not copy/move of value type
+                                    && is_status_code<MakeStatusCodeResult>::value // ADL makes a status code
+                                    && std::is_constructible<status_code, MakeStatusCodeResult>::value, // ADLed status code is compatible
                                     bool>::type = true>
-  constexpr status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
+  constexpr status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...))) // NOLINT
       : status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
   }
-
+  //! Implicit construction from any `quick_status_code_from_enum<Enum>` enumerated type.
+  template <class Enum, //
+            class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type, // Enumeration has been activated
+            typename std::enable_if<std::is_constructible<status_code, QuickStatusCodeType>::value, // Its status code is compatible
+                                    bool>::type = true>
+  constexpr status_code(Enum &&v) noexcept(std::is_nothrow_constructible<status_code, QuickStatusCodeType>::value) // NOLINT
+      : status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
+  {
+  }
   /**** By rights ought to be removed in any formal standard ****/
   //! Reset the code to empty.
   SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept { *this = status_code(); }
   //! Return the erased `value_type` by value.
   constexpr value_type value() const noexcept { return this->_value; }
 };
-
 namespace traits
 {
   template <class ErasedType> struct is_move_bitcopying<status_code<erased<ErasedType>>>
   {
     static constexpr bool value = true;
   };
-}  // namespace traits
-
+} // namespace traits
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
-#include <exception>  // for std::exception
-
+#include <exception> // for std::exception
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 /*! Exception type representing a thrown status_code
 */
 template <class DomainType> class status_error;
-
 /*! The erased type edition of status_error.
 */
 template <> class status_error<void> : public std::exception
@@ -7958,37 +6820,31 @@ protected:
   status_error &operator=(status_error &&) = default;
   //! Destructor. Not publicly available.
   ~status_error() override = default;
-
 public:
   //! The type of the status domain
   using domain_type = void;
   //! The type of the status code
   using status_code_type = status_code<void>;
 };
-
 /*! Exception type representing a thrown status_code
 */
 template <class DomainType> class status_error : public status_error<void>
 {
   status_code<DomainType> _code;
   typename DomainType::string_ref _msgref;
-
 public:
   //! The type of the status domain
   using domain_type = DomainType;
   //! The type of the status code
   using status_code_type = status_code<DomainType>;
-
   //! Constructs an instance
   explicit status_error(status_code<DomainType> code)
       : _code(static_cast<status_code<DomainType> &&>(code))
       , _msgref(_code.message())
   {
   }
-
   //! Return an explanatory string
-  virtual const char *what() const noexcept override { return _msgref.c_str(); }  // NOLINT
-
+  virtual const char *what() const noexcept override { return _msgref.c_str(); } // NOLINT
   //! Returns a reference to the code
   const status_code_type &code() const & { return _code; }
   //! Returns a reference to the code
@@ -7998,20 +6854,15 @@ public:
   //! Returns a reference to the code
   status_code_type &&code() && { return _code; }
 };
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
-#include <cerrno>  // for error constants
-
+#include <cerrno> // for error constants
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 //! The generic error coding (POSIX)
 enum class errc : int
 {
   success = 0,
   unknown = -1,
-
   address_family_not_supported = EAFNOSUPPORT,
   address_in_use = EADDRINUSE,
   address_not_available = EADDRNOTAVAIL,
@@ -8090,7 +6941,6 @@ enum class errc : int
   value_too_large = EOVERFLOW,
   wrong_protocol_type = EPROTOTYPE
 };
-
 namespace detail
 {
   SYSTEM_ERROR2_CONSTEXPR14 inline const char *generic_code_message(errc code) noexcept
@@ -8261,8 +7111,7 @@ namespace detail
       return "unknown";
     }
   }
-}  // namespace detail
-
+} // namespace detail
 /*! The implementation of the domain for generic status codes, those mapped by `errc` (POSIX).
  */
 class _generic_code_domain : public status_code_domain
@@ -8270,12 +7119,10 @@ class _generic_code_domain : public status_code_domain
   template <class> friend class status_code;
   template <class StatusCode> friend class detail::indirecting_domain;
   using _base = status_code_domain;
-
 public:
   //! The value type of the generic code, which is an `errc` as per POSIX.
   using value_type = errc;
   using string_ref = _base::string_ref;
-
 public:
   //! Default constructor
   constexpr explicit _generic_code_domain(typename _base::unique_id_type id = 0x746d6354f4f733e9) noexcept : _base(id) {}
@@ -8284,44 +7131,42 @@ public:
   _generic_code_domain &operator=(const _generic_code_domain &) = default;
   _generic_code_domain &operator=(_generic_code_domain &&) = default;
   ~_generic_code_domain() = default;
-
   //! Constexpr singleton getter. Returns the constexpr generic_code_domain variable.
   static inline constexpr const _generic_code_domain &get();
-
-  virtual _base::string_ref name() const noexcept override { return string_ref("generic domain"); }  // NOLINT
+  virtual _base::string_ref name() const noexcept override { return string_ref("generic domain"); } // NOLINT
 protected:
-  virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
-    assert(code.domain() == *this);                                           // NOLINT
-    return static_cast<const generic_code &>(code).value() != errc::success;  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    return static_cast<const generic_code &>(code).value() != errc::success; // NOLINT
   }
-  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
+  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override // NOLINT
   {
-    assert(code1.domain() == *this);                            // NOLINT
-    const auto &c1 = static_cast<const generic_code &>(code1);  // NOLINT
+    assert(code1.domain() == *this); // NOLINT
+    const auto &c1 = static_cast<const generic_code &>(code1); // NOLINT
     if(code2.domain() == *this)
     {
-      const auto &c2 = static_cast<const generic_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const generic_code &>(code2); // NOLINT
       return c1.value() == c2.value();
     }
     return false;
   }
-  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override // NOLINT
   {
-    assert(code.domain() == *this);                  // NOLINT
-    return static_cast<const generic_code &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    return static_cast<const generic_code &>(code); // NOLINT
   }
-  virtual _base::string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual _base::string_ref _do_message(const status_code<void> &code) const noexcept override // NOLINT
   {
-    assert(code.domain() == *this);                           // NOLINT
-    const auto &c = static_cast<const generic_code &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    const auto &c = static_cast<const generic_code &>(code); // NOLINT
     return string_ref(detail::generic_code_message(c.value()));
   }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
-    assert(code.domain() == *this);                           // NOLINT
-    const auto &c = static_cast<const generic_code &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    const auto &c = static_cast<const generic_code &>(code); // NOLINT
     throw status_error<_generic_code_domain>(c);
   }
 #endif
@@ -8339,11 +7184,7 @@ SYSTEM_ERROR2_CONSTEXPR14 inline generic_code make_status_code(errc c) noexcept
 {
   return generic_code(in_place, c);
 }
-
-
 /*************************************************************************************************************/
-
-
 template <class T> inline bool status_code<void>::equivalent(const status_code<T> &o) const noexcept
 {
   if(_domain && o._domain)
@@ -8381,96 +7222,53 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const sta
   return !a.equivalent(b);
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
 inline bool operator==(const status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
 inline bool operator==(const T &a, const status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
 //! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
 inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
 inline bool operator!=(const T &a, const status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
 }
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
-/*! Specialise this template to quickly wrap a third party enumeration into a
-custom status code domain. C++ 14 or later is required.
-
-Use like this:
-
-```c++
-SYSTEM_ERROR2_NAMESPACE_BEGIN
-template <> struct quick_status_code_from_enum<AnotherCode> : quick_status_code_from_enum_defaults<AnotherCode>
-{
-  // Text name of the enum
-  static constexpr const auto domain_name = "Another Code";
-  // Unique UUID for the enum. PLEASE use https://www.random.org/cgi-bin/randbyte?nbytes=16&format=h
-  static constexpr const auto domain_uuid = "{be201f65-3962-dd0e-1266-a72e63776a42}";
-  // Map of each enum value to its text string, and list of semantically equivalent errc's
-  static const std::initializer_list<mapping> &value_mappings()
-  {
-    static const std::initializer_list<mapping<AnotherCode>> v = {
-    // Format is: { enum value, "string representation", { list of errc mappings ... } }
-    {AnotherCode::success1, "Success 1", {errc::success}},        //
-    {AnotherCode::goaway, "Go away", {errc::permission_denied}},  //
-    {AnotherCode::success2, "Success 2", {errc::success}},        //
-    {AnotherCode::error2, "Error 2", {}},                         //
-    };
-    return v;
-  }
-  // Completely optional definition of mixin for the status code synthesised from `Enum`. It can be omitted.
-  template <class Base> struct mixin : Base
-  {
-    using Base::Base;
-    constexpr int custom_method() const { return 42; }
-  };
-};
-SYSTEM_ERROR2_NAMESPACE_END
-```
-
-Note that if the `errc` mapping contains `errc::success`, then
-the enumeration value is considered to be a successful value.
-Otherwise it is considered to be a failure value.
-
-The first value in the `errc` mapping is the one chosen as the
-`generic_code` conversion. Other values are used during equivalence
-comparisons.
-*/
-template <class Enum> struct quick_status_code_from_enum;
+template <class Enum> class _quick_status_code_from_enum_domain;
+//! A status code wrapping `Enum` generated from `quick_status_code_from_enum`.
+template <class Enum> using quick_status_code_from_domain_enum_code = status_code<_quick_status_code_from_enum_domain<Enum>>;
 //! Defaults for an implementation of `quick_status_code_from_enum<Enum>`
 template <class Enum> struct quick_status_code_from_enum_defaults
 {
+  //! The type of the resulting code
+  using code_type = quick_status_code_from_domain_enum_code<Enum>;
   //! Used within `quick_status_code_from_enum` to define a mapping of enumeration value with its status code
   struct mapping
   {
     //! The enumeration type
     using enumeration_type = Enum;
-
     //! The value being mapped
     const Enum value;
     //! A string representation for this enumeration value
@@ -8484,10 +7282,6 @@ template <class Enum> struct quick_status_code_from_enum_defaults
     using Base::Base;
   };
 };
-template <class Enum> class _quick_status_code_from_enum_domain;
-//! A status code wrapping `Enum` generated from `quick_status_code_from_enum`.
-template <class Enum> using quick_status_code_from_domain_enum_code = status_code<_quick_status_code_from_enum_domain<Enum>>;
-
 /*! The implementation of the domain for status codes wrapping `Enum` generated from `quick_status_code_from_enum`.
  */
 template <class Enum> class _quick_status_code_from_enum_domain : public status_code_domain
@@ -8496,12 +7290,10 @@ template <class Enum> class _quick_status_code_from_enum_domain : public status_
   template <class StatusCode> friend class detail::indirecting_domain;
   using _base = status_code_domain;
   using _src = quick_status_code_from_enum<Enum>;
-
 public:
   //! The value type of the quick status code from enum
   using value_type = Enum;
   using _base::string_ref;
-
   constexpr _quick_status_code_from_enum_domain()
       : status_code_domain(_src::domain_uuid, _uuid_size<detail::cstrlen(_src::domain_uuid)>())
   {
@@ -8511,7 +7303,6 @@ public:
   _quick_status_code_from_enum_domain &operator=(const _quick_status_code_from_enum_domain &) = default;
   _quick_status_code_from_enum_domain &operator=(_quick_status_code_from_enum_domain &&) = default;
   ~_quick_status_code_from_enum_domain() = default;
-
 #if __cplusplus < 201402 && !defined(_MSC_VER)
   static inline const _quick_status_code_from_enum_domain &get()
   {
@@ -8521,9 +7312,7 @@ public:
 #else
   static inline constexpr const _quick_status_code_from_enum_domain &get();
 #endif
-
   virtual string_ref name() const noexcept override { return string_ref(_src::domain_name); }
-
 protected:
   // Not sure if a hash table is worth it here, most enumerations won't be long enough to be worth it
   // Also, until C++ 20's consteval, the hash table would get emitted into the binary, bloating it
@@ -8538,10 +7327,9 @@ protected:
     }
     return nullptr;
   }
-
   virtual bool _do_failure(const status_code<void> &code) const noexcept override
   {
-    assert(code.domain() == *this);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
     // If `errc::success` is in the generic code mapping, it is not a failure
     const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code).value());
     assert(mapping != nullptr);
@@ -8559,16 +7347,16 @@ protected:
   }
   virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override
   {
-    assert(code1.domain() == *this);                                                                   // NOLINT
-    const auto &c1 = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code1);  // NOLINT
+    assert(code1.domain() == *this); // NOLINT
+    const auto &c1 = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code1); // NOLINT
     if(code2.domain() == *this)
     {
-      const auto &c2 = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code2); // NOLINT
       return c1.value() == c2.value();
     }
     if(code2.domain() == generic_code_domain)
     {
-      const auto &c2 = static_cast<const generic_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const generic_code &>(code2); // NOLINT
       const auto *mapping = _find_mapping(c1.value());
       assert(mapping != nullptr);
       if(mapping != nullptr)
@@ -8586,7 +7374,7 @@ protected:
   }
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept override
   {
-    assert(code.domain() == *this);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
     const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code).value());
     assert(mapping != nullptr);
     if(mapping != nullptr)
@@ -8600,7 +7388,7 @@ protected:
   }
   virtual string_ref _do_message(const status_code<void> &code) const noexcept override
   {
-    assert(code.domain() == *this);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
     const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code).value());
     assert(mapping != nullptr);
     if(mapping != nullptr)
@@ -8612,20 +7400,12 @@ protected:
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override
   {
-    assert(code.domain() == *this);                                                                  // NOLINT
-    const auto &c = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    const auto &c = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code); // NOLINT
     throw status_error<_quick_status_code_from_enum_domain>(c);
   }
 #endif
 };
-
-namespace detail
-{
-  struct quick_status_code_from_enum_tag
-  {
-  };
-}  // namespace detail
-
 #if __cplusplus >= 201402 || defined(_MSC_VER)
 template <class Enum> constexpr _quick_status_code_from_enum_domain<Enum> quick_status_code_from_enum_domain = {};
 template <class Enum> inline constexpr const _quick_status_code_from_enum_domain<Enum> &_quick_status_code_from_enum_domain<Enum>::get()
@@ -8633,24 +7413,14 @@ template <class Enum> inline constexpr const _quick_status_code_from_enum_domain
   return quick_status_code_from_enum_domain<Enum>;
 }
 #endif
-
-//! Declare an implicit conversion from `Enum` into `quick_status_code_from_domain_enum_code<Enum>`.
-template <class Enum, typename = decltype(quick_status_code_from_enum<Enum>::domain_name)>  //
-constexpr inline quick_status_code_from_domain_enum_code<Enum> make_status_code(Enum c, detail::quick_status_code_from_enum_tag = {}) noexcept
-{
-  return quick_status_code_from_domain_enum_code<Enum>(c);
-}
-
 namespace mixins
 {
   template <class Base, class Enum> struct mixin<Base, _quick_status_code_from_enum_domain<Enum>> : public quick_status_code_from_enum<Enum>::template mixin<Base>
   {
     using quick_status_code_from_enum<Enum>::template mixin<Base>::mixin;
   };
-}  // namespace mixins
-
+} // namespace mixins
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 /* Pointer to a SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -8675,35 +7445,27 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_STATUS_CODE_PTR_HPP
 #define SYSTEM_ERROR2_STATUS_CODE_PTR_HPP
-
-
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 namespace detail
 {
   template <class StatusCode> class indirecting_domain : public status_code_domain
   {
     template <class DomainType> friend class status_code;
     using _base = status_code_domain;
-
   public:
     using value_type = StatusCode *;
     using _base::string_ref;
-
     constexpr indirecting_domain() noexcept
         : _base(0xc44f7bdeb2cc50e9 ^ typename StatusCode::domain_type().id() /* unique-ish based on domain's unique id */)
     {
     }
     indirecting_domain(const indirecting_domain &) = default;
-    indirecting_domain(indirecting_domain &&) = default;  // NOLINT
+    indirecting_domain(indirecting_domain &&) = default; // NOLINT
     indirecting_domain &operator=(const indirecting_domain &) = default;
-    indirecting_domain &operator=(indirecting_domain &&) = default;  // NOLINT
+    indirecting_domain &operator=(indirecting_domain &&) = default; // NOLINT
     ~indirecting_domain() = default;
-
 #if __cplusplus < 201402 && !defined(_MSC_VER)
     static inline const indirecting_domain &get()
     {
@@ -8713,76 +7475,73 @@ namespace detail
 #else
     static inline constexpr const indirecting_domain &get();
 #endif
-
-    virtual string_ref name() const noexcept override { return typename StatusCode::domain_type().name(); }  // NOLINT
+    virtual string_ref name() const noexcept override { return typename StatusCode::domain_type().name(); } // NOLINT
   protected:
     using _mycode = status_code<indirecting_domain>;
-    virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
+    virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
     {
       assert(code.domain() == *this);
-      const auto &c = static_cast<const _mycode &>(code);  // NOLINT
+      const auto &c = static_cast<const _mycode &>(code); // NOLINT
       return typename StatusCode::domain_type()._do_failure(*c.value());
     }
-    virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
+    virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override // NOLINT
     {
       assert(code1.domain() == *this);
-      const auto &c1 = static_cast<const _mycode &>(code1);  // NOLINT
+      const auto &c1 = static_cast<const _mycode &>(code1); // NOLINT
       return typename StatusCode::domain_type()._do_equivalent(*c1.value(), code2);
     }
-    virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
+    virtual generic_code _generic_code(const status_code<void> &code) const noexcept override // NOLINT
     {
       assert(code.domain() == *this);
-      const auto &c = static_cast<const _mycode &>(code);  // NOLINT
+      const auto &c = static_cast<const _mycode &>(code); // NOLINT
       return typename StatusCode::domain_type()._generic_code(*c.value());
     }
-    virtual string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
+    virtual string_ref _do_message(const status_code<void> &code) const noexcept override // NOLINT
     {
       assert(code.domain() == *this);
-      const auto &c = static_cast<const _mycode &>(code);  // NOLINT
+      const auto &c = static_cast<const _mycode &>(code); // NOLINT
       return typename StatusCode::domain_type()._do_message(*c.value());
     }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-    SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
+    SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
     {
       assert(code.domain() == *this);
-      const auto &c = static_cast<const _mycode &>(code);  // NOLINT
+      const auto &c = static_cast<const _mycode &>(code); // NOLINT
       typename StatusCode::domain_type()._do_throw_exception(*c.value());
     }
 #endif
-    virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t /*unused*/) const override  // NOLINT
+    virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t /*unused*/) const override // NOLINT
     {
       // Note that dst will not have its domain set
       assert(src.domain() == *this);
-      auto &d = static_cast<_mycode &>(dst);               // NOLINT
-      const auto &_s = static_cast<const _mycode &>(src);  // NOLINT
+      auto &d = static_cast<_mycode &>(dst); // NOLINT
+      const auto &_s = static_cast<const _mycode &>(src); // NOLINT
       const StatusCode &s = *_s.value();
       new(&d) _mycode(in_place, new StatusCode(s));
     }
-    virtual void _do_erased_destroy(status_code<void> &code, size_t /*unused*/) const noexcept override  // NOLINT
+    virtual void _do_erased_destroy(status_code<void> &code, size_t /*unused*/) const noexcept override // NOLINT
     {
       assert(code.domain() == *this);
-      auto &c = static_cast<_mycode &>(code);  // NOLINT
-      delete c.value();                        // NOLINT
+      auto &c = static_cast<_mycode &>(code); // NOLINT
+      delete c.value(); // NOLINT
     }
   };
 #if __cplusplus >= 201402 || defined(_MSC_VER)
   template <class StatusCode> constexpr indirecting_domain<StatusCode> _indirecting_domain{};
   template <class StatusCode> inline constexpr const indirecting_domain<StatusCode> &indirecting_domain<StatusCode>::get() { return _indirecting_domain<StatusCode>; }
 #endif
-}  // namespace detail
-
+} // namespace detail
 /*! Make an erased status code which indirects to a dynamically allocated status code.
 This is useful for shoehorning a rich status code with large value type into a small
 erased status code like `system_code`, with which the status code generated by this
 function is compatible. Note that this function can throw due to `bad_alloc`.
 */
-template <class T, typename std::enable_if<is_status_code<T>::value, bool>::type = true>  //
+template <class T, typename std::enable_if<is_status_code<T>::value, bool>::type = true> //
 inline status_code<erased<typename std::add_pointer<typename std::decay<T>::type>::type>> make_status_code_ptr(T &&v)
 {
   using status_code_type = typename std::decay<T>::type;
   return status_code<detail::indirecting_domain<status_code_type>>(in_place, new status_code_type(static_cast<T &&>(v)));
 }
-
 /*! If a status code refers to a `status_code_ptr` which indirects to a status
 code of type `StatusCode`, return a pointer to that `StatusCode`. Otherwise return null.
 */
@@ -8813,7 +7572,6 @@ template <class StatusCode, class U, typename std::enable_if<is_status_code<Stat
   value = v->value();
   return ret;
 }
-
 /*! If a status code refers to a `status_code_ptr`, return the id of the erased
 status code's domain. Otherwise return a meaningless number.
 */
@@ -8821,12 +7579,9 @@ template <class U> inline typename status_code_domain::unique_id_type get_id(con
 {
   return 0xc44f7bdeb2cc50e9 ^ v.domain().id();
 }
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 /*! A `status_code` which is always a failure. The closest equivalent to
 `std::error_code`, except it cannot be modified, and is templated.
 
@@ -8841,7 +7596,6 @@ template <class DomainType> class errored_status_code : public status_code<Domai
   using _base = status_code<DomainType>;
   using _base::clear;
   using _base::success;
-
   void _check()
   {
     if(_base::success())
@@ -8849,25 +7603,22 @@ template <class DomainType> class errored_status_code : public status_code<Domai
       std::terminate();
     }
   }
-
 public:
   //! The type of the erased error code.
   using typename _base::value_type;
   //! The type of a reference to a message string.
   using typename _base::string_ref;
-
   //! Default constructor.
   errored_status_code() = default;
   //! Copy constructor.
   errored_status_code(const errored_status_code &) = default;
   //! Move constructor.
-  errored_status_code(errored_status_code &&) = default;  // NOLINT
+  errored_status_code(errored_status_code &&) = default; // NOLINT
   //! Copy assignment.
   errored_status_code &operator=(const errored_status_code &) = default;
   //! Move assignment.
-  errored_status_code &operator=(errored_status_code &&) = default;  // NOLINT
+  errored_status_code &operator=(errored_status_code &&) = default; // NOLINT
   ~errored_status_code() = default;
-
   //! Explicitly construct from any similarly erased status code
   explicit errored_status_code(const _base &o) noexcept(std::is_nothrow_copy_constructible<_base>::value)
       : _base(o)
@@ -8880,18 +7631,27 @@ public:
   {
     _check();
   }
-
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class T, class... Args,                                                                              //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,    // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value      // not copy/move of self
-                                    && !std::is_same<typename std::decay<T>::type, in_place_t>::value            // not in_place_t
-                                    && is_status_code<MakeStatusCodeResult>::value                               // ADL makes a status code
-                                    && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value,  // ADLed status code is compatible
+  template <class T, class... Args, //
+            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+            typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value // not copy/move of self
+                                    && !std::is_same<typename std::decay<T>::type, in_place_t>::value // not in_place_t
+                                    && is_status_code<MakeStatusCodeResult>::value // ADL makes a status code
+                                    && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value, // ADLed status code is compatible
                                     bool>::type = true>
-  errored_status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
-  : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  errored_status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...))) // NOLINT
+      : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  {
+    _check();
+  }
+  //! Implicit construction from any `quick_status_code_from_enum<Enum>` enumerated type.
+  template <class Enum, //
+            class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type, // Enumeration has been activated
+            typename std::enable_if<std::is_constructible<errored_status_code, QuickStatusCodeType>::value, // Its status code is compatible
+                                    bool>::type = true>
+  constexpr errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value) // NOLINT
+      : errored_status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
     _check();
   }
@@ -8925,32 +7685,28 @@ public:
   `value_type` is trivially destructible and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
   Does not check if domains are equal.
   */
-  template <class ErasedType,  //
+  template <class ErasedType, //
             typename std::enable_if<detail::type_erasure_is_safe<ErasedType, value_type>::value, bool>::type = true>
   explicit errored_status_code(const status_code<erased<ErasedType>> &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-      : errored_status_code(detail::erasure_cast<value_type>(v.value()))  // NOLINT
+      : errored_status_code(detail::erasure_cast<value_type>(v.value())) // NOLINT
   {
-    assert(v.domain() == this->domain());  // NOLINT
+    assert(v.domain() == this->domain()); // NOLINT
     _check();
   }
-
   //! Return a const reference to the `value_type`.
   constexpr const value_type &value() const &noexcept { return this->_value; }
 };
-
 namespace traits
 {
   template <class DomainType> struct is_move_bitcopying<errored_status_code<DomainType>>
   {
     static constexpr bool value = is_move_bitcopying<typename DomainType::value_type>::value;
   };
-}  // namespace traits
-
+} // namespace traits
 template <class ErasedType> class errored_status_code<erased<ErasedType>> : public status_code<erased<ErasedType>>
 {
   using _base = status_code<erased<ErasedType>>;
   using _base::success;
-
   void _check()
   {
     if(_base::success())
@@ -8958,23 +7714,20 @@ template <class ErasedType> class errored_status_code<erased<ErasedType>> : publ
       std::terminate();
     }
   }
-
 public:
   using value_type = typename _base::value_type;
   using string_ref = typename _base::string_ref;
-
   //! Default construction to empty
   errored_status_code() = default;
   //! Copy constructor
   errored_status_code(const errored_status_code &) = default;
   //! Move constructor
-  errored_status_code(errored_status_code &&) = default;  // NOLINT
+  errored_status_code(errored_status_code &&) = default; // NOLINT
                                                           //! Copy assignment
   errored_status_code &operator=(const errored_status_code &) = default;
   //! Move assignment
-  errored_status_code &operator=(errored_status_code &&) = default;  // NOLINT
+  errored_status_code &operator=(errored_status_code &&) = default; // NOLINT
   ~errored_status_code() = default;
-
   //! Explicitly construct from any similarly erased status code
   explicit errored_status_code(const _base &o) noexcept(std::is_nothrow_copy_constructible<_base>::value)
       : _base(o)
@@ -8987,52 +7740,60 @@ public:
   {
     _check();
   }
-
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
-  template <class DomainType,                                                                              //
-            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value         //
-                                    && std::is_trivially_copyable<typename DomainType::value_type>::value  //
+  template <class DomainType, //
+            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value //
+                                    && std::is_trivially_copyable<typename DomainType::value_type>::value //
                                     && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
-  errored_status_code(const status_code<DomainType> &v) noexcept : _base(v)  // NOLINT
+  errored_status_code(const status_code<DomainType> &v) noexcept
+      : _base(v) // NOLINT
   {
     _check();
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
-  template <class DomainType,  //
+  template <class DomainType, //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
-  errored_status_code(status_code<DomainType> &&v) noexcept : _base(static_cast<status_code<DomainType> &&>(v))  // NOLINT
+  errored_status_code(status_code<DomainType> &&v) noexcept
+      : _base(static_cast<status_code<DomainType> &&>(v)) // NOLINT
   {
     _check();
   }
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class T, class... Args,                                                                              //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,    // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value      // not copy/move of self
-                                    && !std::is_same<typename std::decay<T>::type, value_type>::value            // not copy/move of value type
-                                    && is_status_code<MakeStatusCodeResult>::value                               // ADL makes a status code
-                                    && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value,  // ADLed status code is compatible
+  template <class T, class... Args, //
+            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+            typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value // not copy/move of self
+                                    && !std::is_same<typename std::decay<T>::type, value_type>::value // not copy/move of value type
+                                    && is_status_code<MakeStatusCodeResult>::value // ADL makes a status code
+                                    && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value, // ADLed status code is compatible
                                     bool>::type = true>
-  errored_status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
-  : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  errored_status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...))) // NOLINT
+      : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  {
+    _check();
+  }
+  //! Implicit construction from any `quick_status_code_from_enum<Enum>` enumerated type.
+  template <class Enum, //
+            class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type, // Enumeration has been activated
+            typename std::enable_if<std::is_constructible<errored_status_code, QuickStatusCodeType>::value, // Its status code is compatible
+                                    bool>::type = true>
+  constexpr errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value) // NOLINT
+      : errored_status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
     _check();
   }
   //! Return the erased `value_type` by value.
   constexpr value_type value() const noexcept { return this->_value; }
 };
-
 namespace traits
 {
   template <class ErasedType> struct is_move_bitcopying<errored_status_code<erased<ErasedType>>>
   {
     static constexpr bool value = true;
   };
-}  // namespace traits
-
-
+} // namespace traits
 //! True if the status code's are semantically equal via `equivalent()`.
 template <class DomainType1, class DomainType2> inline bool operator==(const errored_status_code<DomainType1> &a, const errored_status_code<DomainType2> &b) noexcept
 {
@@ -9064,43 +7825,37 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const err
   return !static_cast<const status_code<DomainType1> &>(a).equivalent(b);
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator==(const errored_status_code<DomainType1> &a, const T &b)
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool operator==(const errored_status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator==(const T &a, const errored_status_code<DomainType1> &b)
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool operator==(const T &a, const errored_status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
 //! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator!=(const errored_status_code<DomainType1> &a, const T &b)
+template <class DomainType1, class T, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool operator!=(const errored_status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator!=(const T &a, const errored_status_code<DomainType1> &b)
+template <class T, class DomainType1, //
+          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
+          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
+inline bool operator!=(const T &a, const errored_status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
 }
-
-
 namespace detail
 {
   template <class T> struct is_errored_status_code
@@ -9119,17 +7874,13 @@ namespace detail
   {
     static constexpr bool value = true;
   };
-}  // namespace detail
-
+} // namespace detail
 //! Trait returning true if the type is an errored status code.
 template <class T> struct is_errored_status_code
 {
   static constexpr bool value = detail::is_errored_status_code<typename std::decay<T>::type>::value || detail::is_erased_errored_status_code<typename std::decay<T>::type>::value;
 };
-
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -9154,10 +7905,8 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_SYSTEM_CODE_HPP
 #define SYSTEM_ERROR2_SYSTEM_CODE_HPP
-
 #ifndef SYSTEM_ERROR2_NOT_POSIX
 /* Proposed SG14 status_code
 (C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -9182,37 +7931,27 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_POSIX_CODE_HPP
 #define SYSTEM_ERROR2_POSIX_CODE_HPP
-
 #ifdef SYSTEM_ERROR2_NOT_POSIX
 #error <posix_code.hpp> is not includable when SYSTEM_ERROR2_NOT_POSIX is defined!
 #endif
-
-
-
-#include <cstring>  // for strchr and strerror_r
-
+#include <cstring> // for strchr and strerror_r
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 class _posix_code_domain;
 //! A POSIX error code, those returned by `errno`.
 using posix_code = status_code<_posix_code_domain>;
 //! A specialisation of `status_error` for the POSIX error code domain.
 using posix_error = status_error<_posix_code_domain>;
-
 namespace mixins
 {
   template <class Base> struct mixin<Base, _posix_code_domain> : public Base
   {
     using Base::Base;
-
     //! Returns a `posix_code` for the current value of `errno`.
     static posix_code current() noexcept;
   };
-}  // namespace mixins
-
+} // namespace mixins
 /*! The implementation of the domain for POSIX error codes, those returned by `errno`.
  */
 class _posix_code_domain : public status_code_domain
@@ -9220,37 +7959,34 @@ class _posix_code_domain : public status_code_domain
   template <class DomainType> friend class status_code;
   template <class StatusCode> friend class detail::indirecting_domain;
   using _base = status_code_domain;
-
   static _base::string_ref _make_string_ref(int c) noexcept
   {
     char buffer[1024] = "";
 #ifdef _WIN32
     strerror_s(buffer, sizeof(buffer), c);
-#elif defined(__gnu_linux__) && !defined(__ANDROID__)  // handle glibc's weird strerror_r()
-    char *s = strerror_r(c, buffer, sizeof(buffer));  // NOLINT
+#elif defined(__gnu_linux__) && !defined(__ANDROID__) // handle glibc's weird strerror_r()
+    char *s = strerror_r(c, buffer, sizeof(buffer)); // NOLINT
     if(s != nullptr)
     {
-      strncpy(buffer, s, sizeof(buffer));  // NOLINT
+      strncpy(buffer, s, sizeof(buffer)); // NOLINT
       buffer[1023] = 0;
     }
 #else
     strerror_r(c, buffer, sizeof(buffer));
 #endif
-    size_t length = strlen(buffer);                     // NOLINT
-    auto *p = static_cast<char *>(malloc(length + 1));  // NOLINT
+    size_t length = strlen(buffer); // NOLINT
+    auto *p = static_cast<char *>(malloc(length + 1)); // NOLINT
     if(p == nullptr)
     {
       return _base::string_ref("failed to get message from system");
     }
-    memcpy(p, buffer, length + 1);  // NOLINT
+    memcpy(p, buffer, length + 1); // NOLINT
     return _base::atomic_refcounted_string_ref(p, length);
   }
-
 public:
   //! The value type of the POSIX code, which is an `int`
   using value_type = int;
   using _base::string_ref;
-
   //! Default constructor
   constexpr explicit _posix_code_domain(typename _base::unique_id_type id = 0xa59a56fe5f310933) noexcept
       : _base(id)
@@ -9261,29 +7997,27 @@ public:
   _posix_code_domain &operator=(const _posix_code_domain &) = default;
   _posix_code_domain &operator=(_posix_code_domain &&) = default;
   ~_posix_code_domain() = default;
-
   //! Constexpr singleton getter. Returns constexpr posix_code_domain variable.
   static inline constexpr const _posix_code_domain &get();
-
-  virtual string_ref name() const noexcept override { return string_ref("posix domain"); }  // NOLINT
+  virtual string_ref name() const noexcept override { return string_ref("posix domain"); } // NOLINT
 protected:
-  virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
-    assert(code.domain() == *this);                             // NOLINT
-    return static_cast<const posix_code &>(code).value() != 0;  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    return static_cast<const posix_code &>(code).value() != 0; // NOLINT
   }
-  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
+  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override // NOLINT
   {
-    assert(code1.domain() == *this);                          // NOLINT
-    const auto &c1 = static_cast<const posix_code &>(code1);  // NOLINT
+    assert(code1.domain() == *this); // NOLINT
+    const auto &c1 = static_cast<const posix_code &>(code1); // NOLINT
     if(code2.domain() == *this)
     {
-      const auto &c2 = static_cast<const posix_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const posix_code &>(code2); // NOLINT
       return c1.value() == c2.value();
     }
     if(code2.domain() == generic_code_domain)
     {
-      const auto &c2 = static_cast<const generic_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const generic_code &>(code2); // NOLINT
       if(static_cast<int>(c2.value()) == c1.value())
       {
         return true;
@@ -9291,23 +8025,23 @@ protected:
     }
     return false;
   }
-  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override // NOLINT
   {
-    assert(code.domain() == *this);                         // NOLINT
-    const auto &c = static_cast<const posix_code &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    const auto &c = static_cast<const posix_code &>(code); // NOLINT
     return generic_code(static_cast<errc>(c.value()));
   }
-  virtual string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual string_ref _do_message(const status_code<void> &code) const noexcept override // NOLINT
   {
-    assert(code.domain() == *this);                         // NOLINT
-    const auto &c = static_cast<const posix_code &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    const auto &c = static_cast<const posix_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
-    assert(code.domain() == *this);                         // NOLINT
-    const auto &c = static_cast<const posix_code &>(code);  // NOLINT
+    assert(code.domain() == *this); // NOLINT
+    const auto &c = static_cast<const posix_code &>(code); // NOLINT
     throw status_error<_posix_code_domain>(c);
   }
 #endif
@@ -9318,19 +8052,14 @@ inline constexpr const _posix_code_domain &_posix_code_domain::get()
 {
   return posix_code_domain;
 }
-
 namespace mixins
 {
   template <class Base> inline posix_code mixin<Base, _posix_code_domain>::current() noexcept { return posix_code(errno); }
-}  // namespace mixins
-
+} // namespace mixins
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 #else
-
 #endif
-
 #if defined(_WIN32) || 0
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
@@ -9355,10 +8084,8 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_NT_CODE_HPP
 #define SYSTEM_ERROR2_NT_CODE_HPP
-
 #if !defined(_WIN32) && !0
 #error This file should only be included on Windows
 #endif
@@ -9385,18 +8112,12 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file Licence.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef SYSTEM_ERROR2_WIN32_CODE_HPP
 #define SYSTEM_ERROR2_WIN32_CODE_HPP
-
 #if !defined(_WIN32) && !0
 #error This file should only be included on Windows
 #endif
-
-
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 //! \exclude
 namespace win32
 {
@@ -9418,26 +8139,22 @@ namespace win32
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=__imp__FormatMessageW@28")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
 #endif
-}  // namespace win32
-
+} // namespace win32
 class _win32_code_domain;
 class _com_code_domain;
 //! (Windows only) A Win32 error code, those returned by `GetLastError()`.
 using win32_code = status_code<_win32_code_domain>;
 //! (Windows only) A specialisation of `status_error` for the Win32 error code domain.
 using win32_error = status_error<_win32_code_domain>;
-
 namespace mixins
 {
   template <class Base> struct mixin<Base, _win32_code_domain> : public Base
   {
     using Base::Base;
-
     //! Returns a `win32_code` for the current value of `GetLastError()`.
     static inline win32_code current() noexcept;
   };
-}  // namespace mixins
-
+} // namespace mixins
 /*! (Windows only) The implementation of the domain for Win32 error codes, those returned by `GetLastError()`.
  */
 class _win32_code_domain : public status_code_domain
@@ -9543,7 +8260,7 @@ case 0x2751: return EHOSTUNREACH;
     }
     for(;;)
     {
-      auto *p = static_cast<char *>(malloc(allocation));  // NOLINT
+      auto *p = static_cast<char *>(malloc(allocation)); // NOLINT
       if(p == nullptr)
       {
         return _base::string_ref("failed to get message from system");
@@ -9556,10 +8273,10 @@ case 0x2751: return EHOSTUNREACH;
         {
           --end;
         }
-        *end = 0;  // NOLINT
+        *end = 0; // NOLINT
         return _base::atomic_refcounted_string_ref(p, end - p);
       }
-      free(p);  // NOLINT
+      free(p); // NOLINT
       if(win32::GetLastError() == 0x7a /*ERROR_INSUFFICIENT_BUFFER*/)
       {
         allocation += allocation >> 2;
@@ -9568,12 +8285,10 @@ case 0x2751: return EHOSTUNREACH;
       return _base::string_ref("failed to get message from system");
     }
   }
-
 public:
   //! The value type of the win32 code, which is a `win32::DWORD`
   using value_type = win32::DWORD;
   using _base::string_ref;
-
 public:
   //! Default constructor
   constexpr explicit _win32_code_domain(typename _base::unique_id_type id = 0x8cd18ee72d680f1b) noexcept
@@ -9585,29 +8300,27 @@ public:
   _win32_code_domain &operator=(const _win32_code_domain &) = default;
   _win32_code_domain &operator=(_win32_code_domain &&) = default;
   ~_win32_code_domain() = default;
-
   //! Constexpr singleton getter. Returns the constexpr win32_code_domain variable.
   static inline constexpr const _win32_code_domain &get();
-
-  virtual string_ref name() const noexcept override { return string_ref("win32 domain"); }  // NOLINT
+  virtual string_ref name() const noexcept override { return string_ref("win32 domain"); } // NOLINT
 protected:
-  virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
     assert(code.domain() == *this);
-    return static_cast<const win32_code &>(code).value() != 0;  // NOLINT
+    return static_cast<const win32_code &>(code).value() != 0; // NOLINT
   }
-  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
+  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override // NOLINT
   {
     assert(code1.domain() == *this);
-    const auto &c1 = static_cast<const win32_code &>(code1);  // NOLINT
+    const auto &c1 = static_cast<const win32_code &>(code1); // NOLINT
     if(code2.domain() == *this)
     {
-      const auto &c2 = static_cast<const win32_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const win32_code &>(code2); // NOLINT
       return c1.value() == c2.value();
     }
     if(code2.domain() == generic_code_domain)
     {
-      const auto &c2 = static_cast<const generic_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const generic_code &>(code2); // NOLINT
       if(static_cast<int>(c2.value()) == _win32_code_to_errno(c1.value()))
       {
         return true;
@@ -9615,23 +8328,23 @@ protected:
     }
     return false;
   }
-  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override // NOLINT
   {
     assert(code.domain() == *this);
-    const auto &c = static_cast<const win32_code &>(code);  // NOLINT
+    const auto &c = static_cast<const win32_code &>(code); // NOLINT
     return generic_code(static_cast<errc>(_win32_code_to_errno(c.value())));
   }
-  virtual string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual string_ref _do_message(const status_code<void> &code) const noexcept override // NOLINT
   {
     assert(code.domain() == *this);
-    const auto &c = static_cast<const win32_code &>(code);  // NOLINT
+    const auto &c = static_cast<const win32_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
-    const auto &c = static_cast<const win32_code &>(code);  // NOLINT
+    const auto &c = static_cast<const win32_code &>(code); // NOLINT
     throw status_error<_win32_code_domain>(c);
   }
 #endif
@@ -9642,17 +8355,13 @@ inline constexpr const _win32_code_domain &_win32_code_domain::get()
 {
   return win32_code_domain;
 }
-
 namespace mixins
 {
   template <class Base> inline win32_code mixin<Base, _win32_code_domain>::current() noexcept { return win32_code(win32::GetLastError()); }
-}  // namespace mixins
-
+} // namespace mixins
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 //! \exclude
 namespace win32
 {
@@ -9668,14 +8377,12 @@ namespace win32
 #else
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=__imp__GetModuleHandleW@4")
 #endif
-}  // namespace win32
-
+} // namespace win32
 class _nt_code_domain;
 //! (Windows only) A NT error code, those returned by NT kernel functions.
 using nt_code = status_code<_nt_code_domain>;
 //! (Windows only) A specialisation of `status_error` for the NT error code domain.
 using nt_error = status_error<_nt_code_domain>;
-
 /*! (Windows only) The implementation of the domain for NT error codes, those returned by NT kernel functions.
  */
 class _nt_code_domain : public status_code_domain
@@ -9688,7 +8395,7 @@ class _nt_code_domain : public status_code_domain
   {
     if(c >= 0)
     {
-      return 0;  // success
+      return 0; // success
     }
     switch(static_cast<unsigned>(c))
     {
@@ -9793,11 +8500,11 @@ case 0xc000a203: return EACCES;
     }
     return -1;
   }
-  static win32::DWORD _nt_code_to_win32_code(win32::NTSTATUS c)  // NOLINT
+  static win32::DWORD _nt_code_to_win32_code(win32::NTSTATUS c) // NOLINT
   {
     if(c >= 0)
     {
-      return 0;  // success
+      return 0; // success
     }
     switch(static_cast<unsigned>(c))
     {
@@ -10836,7 +9543,7 @@ case 0xc000cf1b: return 0x18e;
     }
     for(;;)
     {
-      auto *p = static_cast<char *>(malloc(allocation));  // NOLINT
+      auto *p = static_cast<char *>(malloc(allocation)); // NOLINT
       if(p == nullptr)
       {
         return _base::string_ref("failed to get message from system");
@@ -10849,10 +9556,10 @@ case 0xc000cf1b: return 0x18e;
         {
           --end;
         }
-        *end = 0;  // NOLINT
+        *end = 0; // NOLINT
         return _base::atomic_refcounted_string_ref(p, end - p);
       }
-      free(p);  // NOLINT
+      free(p); // NOLINT
       if(win32::GetLastError() == 0x7a /*ERROR_INSUFFICIENT_BUFFER*/)
       {
         allocation += allocation >> 2;
@@ -10861,12 +9568,10 @@ case 0xc000cf1b: return 0x18e;
       return _base::string_ref("failed to get message from system");
     }
   }
-
 public:
   //! The value type of the NT code, which is a `win32::NTSTATUS`
   using value_type = win32::NTSTATUS;
   using _base::string_ref;
-
 public:
   //! Default constructor
   constexpr explicit _nt_code_domain(typename _base::unique_id_type id = 0x93f3b4487e4af25b) noexcept
@@ -10878,29 +9583,27 @@ public:
   _nt_code_domain &operator=(const _nt_code_domain &) = default;
   _nt_code_domain &operator=(_nt_code_domain &&) = default;
   ~_nt_code_domain() = default;
-
   //! Constexpr singleton getter. Returns the constexpr nt_code_domain variable.
   static inline constexpr const _nt_code_domain &get();
-
-  virtual string_ref name() const noexcept override { return string_ref("NT domain"); }  // NOLINT
+  virtual string_ref name() const noexcept override { return string_ref("NT domain"); } // NOLINT
 protected:
-  virtual bool _do_failure(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
     assert(code.domain() == *this);
-    return static_cast<const nt_code &>(code).value() < 0;  // NOLINT
+    return static_cast<const nt_code &>(code).value() < 0; // NOLINT
   }
-  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override  // NOLINT
+  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override // NOLINT
   {
     assert(code1.domain() == *this);
-    const auto &c1 = static_cast<const nt_code &>(code1);  // NOLINT
+    const auto &c1 = static_cast<const nt_code &>(code1); // NOLINT
     if(code2.domain() == *this)
     {
-      const auto &c2 = static_cast<const nt_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const nt_code &>(code2); // NOLINT
       return c1.value() == c2.value();
     }
     if(code2.domain() == generic_code_domain)
     {
-      const auto &c2 = static_cast<const generic_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const generic_code &>(code2); // NOLINT
       if(static_cast<int>(c2.value()) == _nt_code_to_errno(c1.value()))
       {
         return true;
@@ -10908,7 +9611,7 @@ protected:
     }
     if(code2.domain() == win32_code_domain)
     {
-      const auto &c2 = static_cast<const win32_code &>(code2);  // NOLINT
+      const auto &c2 = static_cast<const win32_code &>(code2); // NOLINT
       if(c2.value() == _nt_code_to_win32_code(c1.value()))
       {
         return true;
@@ -10916,23 +9619,23 @@ protected:
     }
     return false;
   }
-  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual generic_code _generic_code(const status_code<void> &code) const noexcept override // NOLINT
   {
     assert(code.domain() == *this);
-    const auto &c = static_cast<const nt_code &>(code);  // NOLINT
+    const auto &c = static_cast<const nt_code &>(code); // NOLINT
     return generic_code(static_cast<errc>(_nt_code_to_errno(c.value())));
   }
-  virtual string_ref _do_message(const status_code<void> &code) const noexcept override  // NOLINT
+  virtual string_ref _do_message(const status_code<void> &code) const noexcept override // NOLINT
   {
     assert(code.domain() == *this);
-    const auto &c = static_cast<const nt_code &>(code);  // NOLINT
+    const auto &c = static_cast<const nt_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override  // NOLINT
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
-    const auto &c = static_cast<const nt_code &>(code);  // NOLINT
+    const auto &c = static_cast<const nt_code &>(code); // NOLINT
     throw status_error<_nt_code_domain>(c);
   }
 #endif
@@ -10943,13 +9646,10 @@ inline constexpr const _nt_code_domain &_nt_code_domain::get()
 {
   return nt_code_domain;
 }
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 // NOT "com_code.hpp"
 #endif
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 /*! An erased-mutable status code suitably large for all the system codes
 which can be returned on this system.
@@ -10966,17 +9666,13 @@ You are guaranteed that `system_code` can be transported by the compiler
 in exactly two CPU registers.
 */
 using system_code = status_code<erased<intptr_t>>;
-
 #ifndef NDEBUG
 static_assert(sizeof(system_code) == 2 * sizeof(void *), "system_code is not exactly two pointers in size!");
 static_assert(traits::is_move_bitcopying<system_code>::value, "system_code is not move bitcopying!");
 #endif
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
-
 /*! An erased `system_code` which is always a failure. The closest equivalent to
 `std::error_code`, except it cannot be null and cannot be modified.
 
@@ -10995,18 +9691,14 @@ As with `system_code`, it remains guaranteed to be two CPU registers in size,
 and move bitcopying.
 */
 using error = errored_status_code<erased<system_code::value_type>>;
-
 #ifndef NDEBUG
 static_assert(sizeof(error) == 2 * sizeof(void *), "error is not exactly two pointers in size!");
 static_assert(traits::is_move_bitcopying<error>::value, "error is not move bitcopying!");
 #endif
-
 SYSTEM_ERROR2_NAMESPACE_END
-
 #endif
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace trait
 {
   namespace detail
@@ -11023,23 +9715,8 @@ namespace trait
       static constexpr bool value = true;
       using type = SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>;
     };
-  }    // namespace detail
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}  // namespace trait
-
+  } // namespace detail
+} // namespace trait
 namespace detail
 {
   // Customise _set_error_is_errno
@@ -11057,15 +9734,12 @@ namespace detail
   {
     state._status.set_have_error_is_errno(true);
   }
-
-}  // namespace detail
-
+} // namespace detail
 namespace experimental
 {
   using namespace SYSTEM_ERROR2_NAMESPACE;
   using OUTCOME_V2_NAMESPACE::failure;
   using OUTCOME_V2_NAMESPACE::success;
-
   namespace policy
   {
     using namespace OUTCOME_V2_NAMESPACE::policy;
@@ -11099,30 +9773,24 @@ namespace experimental
       status_code_throw() = default;
       using status_code_throw<T, status_code<DomainType>, void>::status_code_throw;
     };
-
     template <class T, class EC>
-    using default_status_result_policy = std::conditional_t<                            //
-    std::is_void<EC>::value,                                                            //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                            //
-    std::conditional_t<is_status_code<EC>::value || is_errored_status_code<EC>::value,  //
-                       status_code_throw<T, EC, void>,                                  //
-                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers          //
+    using default_status_result_policy = std::conditional_t< //
+    std::is_void<EC>::value, //
+    OUTCOME_V2_NAMESPACE::policy::terminate, //
+    std::conditional_t<is_status_code<EC>::value || is_errored_status_code<EC>::value, //
+                       status_code_throw<T, EC, void>, //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers //
                        >>;
-  }  // namespace policy
-
+  } // namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
+  template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>> //
   using status_result = basic_result<R, S, NoValuePolicy>;
-
-}  // namespace experimental
-
+} // namespace experimental
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 // Boost.Outcome #include "boost/exception_ptr.hpp"
-
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 template <class DomainType> inline std::exception_ptr basic_outcome_failure_exception_from_error(const status_code<DomainType> &sc)
 {
@@ -11140,29 +9808,25 @@ template <class DomainType> inline std::exception_ptr basic_outcome_failure_exce
   return {};
 }
 SYSTEM_ERROR2_NAMESPACE_END
-
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-
 namespace experimental
 {
   namespace policy
   {
     template <class T, class EC, class E>
-    using default_status_outcome_policy = std::conditional_t<                                                                                                                              //
-    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                                     //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                               //
-    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value),  //
-                       status_code_throw<T, EC, E>,                                                                                                                                        //
-                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                                             //
+    using default_status_outcome_policy = std::conditional_t< //
+    std::is_void<EC>::value && std::is_void<E>::value, //
+    OUTCOME_V2_NAMESPACE::policy::terminate, //
+    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value), //
+                       status_code_throw<T, EC, E>, //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers //
                        >>;
-  }  // namespace policy
-
+  } // namespace policy
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
+  template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>> //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
-
   namespace policy
   {
     template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : base
@@ -11174,7 +9838,7 @@ SIGNATURE NOT RECOGNISED
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self))); // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
@@ -11194,12 +9858,9 @@ SIGNATURE NOT RECOGNISED
       status_code_throw() = default;
       using status_code_throw<T, status_code<DomainType>, E>::status_code_throw;
     };
-  }  // namespace policy
-
-}  // namespace experimental
-
+  } // namespace policy
+} // namespace experimental
 OUTCOME_V2_NAMESPACE_END
-
 #endif
 /* Try operation macros
 (C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
@@ -11224,14 +9885,9 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-
 #ifndef OUTCOME_TRY_HPP
 #define OUTCOME_TRY_HPP
-
-
-
 OUTCOME_V2_NAMESPACE_BEGIN
-
 namespace detail
 {
   struct has_value_overload
@@ -11252,11 +9908,11 @@ namespace detail
   struct value_overload
   {
   };
-#ifdef __APPLE__
-  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
-#else
+//#ifdef __APPLE__
+//  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+//#else
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
-#endif
+//#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
@@ -11276,8 +9932,7 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
   constexpr inline bool has_value(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_value(...) { return false; }
-}  // namespace detail
-
+} // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11287,7 +9942,6 @@ constexpr inline bool try_operation_has_value(T &&v, detail::has_value_overload 
 {
   return v.has_value();
 }
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11315,7 +9969,6 @@ constexpr inline decltype(auto) try_operation_return_as(T &&v, detail::error_ove
 {
   return failure(static_cast<T &&>(v).error());
 }
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11334,19 +9987,14 @@ constexpr inline decltype(auto) try_operation_extract_value(T &&v, detail::value
 {
   return static_cast<T &&>(v).value();
 }
-
 OUTCOME_V2_NAMESPACE_END
-
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
-
-
 #define OUTCOME_TRY_GLUE2(x, y) x##y
 #define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
 #define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(_outcome_try_unique_name_temporary, __COUNTER__)
-
 #define OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
 #define OUTCOME_TRY_EXPAND_ARGS(args) OUTCOME_TRY_RETURN_ARG_COUNT args
 #define OUTCOME_TRY_COUNT_ARGS_MAX8(...) OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
@@ -11354,9 +10002,7 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_OVERLOAD_MACRO1(name, count) OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
 #define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
 #define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
-#define OUTCOME_TRY_CALL_OVERLOAD(name, ...)                                                                                                                     OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
-
-
+#define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY
 #if defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY(expr) (__builtin_expect(!!(expr), true))
@@ -11364,42 +10010,15 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_LIKELY(expr) (expr)
 #endif
 #endif
-
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
-#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                                auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                    ;                                                                                                                                                            else                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-
-
-
-
-
-#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                              OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                             auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-
-
-#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                                auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                 return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-
-
-
-#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                              OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                             auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-
-
-
-#define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...)                                                                                                             auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                    ;                                                                                                                                                            else                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-
-
-
-
-
-#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...)                                                                                                           OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__);                                                                                                          auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-
-
-#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...)                                                                                                             auto &&unique = (__VA_ARGS__);                                                                                                                                 if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                                 co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-
-
-
-#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...)                                                                                                           OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__);                                                                                                          auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-
-
-
+#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11408,7 +10027,6 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYV_FAILURE_LIKELY(...) OUTCOME_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11417,36 +10035,16 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRYV_FAILURE_LIKELY(...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
-
 #if defined(__GNUC__) || defined(__clang__)
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...)                                                                                                                                        ({                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                       ;                                                                                                                                                            else                                                                                                                                                             return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                       })
-
-
-
-
-
-
-
-
-
+#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res))) ; else return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res)); })
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYX(...)                                                                                                                                     ({                                                                                                                                                               auto &&res = (__VA_ARGS__);                                                                                                                                    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                       ;                                                                                                                                                            else                                                                                                                                                             co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                 OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                       })
-
-
-
-
-
-
-
-
+#define OUTCOME_CO_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res))) ; else co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res)); })
 #endif
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11455,7 +10053,6 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -11464,8 +10061,6 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_CO_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
-
-
 #define OUTCOME_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA(a, b, c, d, e, f, g)
 #define OUTCOME_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_TRYA(a, b, c, d, e, f)
@@ -11474,12 +10069,10 @@ SIGNATURE NOT RECOGNISED
 #define OUTCOME_TRY_INVOKE_TRY3(a, b, c) OUTCOME_TRYA(a, b, c)
 #define OUTCOME_TRY_INVOKE_TRY2(a, b) OUTCOME_TRYA(a, b)
 #define OUTCOME_TRY_INVOKE_TRY1(a) OUTCOME_TRYV(a)
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
-
 #define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g, h)
 #define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g)
 #define OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_TRYA_FAILURE_LIKELY(a, b, c, d, e, f)
@@ -11492,7 +10085,6 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
-
 #define OUTCOME_CO_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_CO_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME_CO_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_CO_TRYA(a, b, c, d, e, f, g)
 #define OUTCOME_CO_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_CO_TRYA(a, b, c, d, e, f)
@@ -11505,12 +10097,10 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_INVOKE_TRY, __VA_ARGS__)
-
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY_INVOKE_TRY, __VA_ARGS__)
-
 #define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g, h)
 #define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g)
 #define OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f)
@@ -11523,9 +10113,7 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
-
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic pop
 #endif
-
 #endif
