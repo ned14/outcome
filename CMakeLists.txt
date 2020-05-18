@@ -81,7 +81,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
                             ${ARGN}
                             -I ../quickcpplib/include
                             --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-                            --passthru-comments --line-directive # --debug
+                            --passthru-comments --line-directive --compress # --debug
                             -U QUICKCPPLIB_ENABLE_VALGRIND
                             -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
                             -U STANDARDESE_IS_IN_THE_HOUSE
