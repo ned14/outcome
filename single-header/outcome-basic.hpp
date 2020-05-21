@@ -958,9 +958,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF cdb9621da2645d6ef8315698b1c615334bf1da33
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-18 15:00:52 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE cdb9621d
+#define OUTCOME_PREVIOUS_COMMIT_REF f1458cb91fb5d35006f08432fb2ec1009a67253f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-18 19:08:40 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f1458cb9
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
