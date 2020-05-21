@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-05-18T19:20:49 UTC">
+<meta name="revised" content="2020-05-21T15:24:22 UTC">
 <title>`status_result` and `status_outcome` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2641,9 +2641,9 @@ and <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><cod
 with a defaulted <code>NoValuePolicy</code> which selects on the basis of <code>status_code&lt;DomainType&gt;</code>
 instead.</p>
 
-<div class="notices note" ><p>If the <code>E</code> type is not some <code>status_code&lt;&gt;</code>, the default policy selector
+<div class="notices note" ><p><p>If the <code>E</code> type is not some <code>status_code&lt;&gt;</code>, the default policy selector
 will complain.</p>
-</div>
+</p></div>
 
 
 <p>The specifications are:</p>
@@ -2670,10 +2670,10 @@ is trivially copyable or move relocating. This means that you can return a
 <code>generic_code</code> from a function returning a <code>system_code</code> or <code>error</code>, and it&rsquo;ll
 work exactly as you&rsquo;d expect (implicit conversion).</p>
 
-<div class="notices note" ><p>As <code>status_code&lt;erased&lt;T&gt;&gt;</code> is move-only, so is any <code>status_result</code> or <code>status_outcome</code>.
+<div class="notices note" ><p><p>As <code>status_code&lt;erased&lt;T&gt;&gt;</code> is move-only, so is any <code>status_result</code> or <code>status_outcome</code>.
 For some reason this surprises a lot of people, and they tend to react by not using the erased
 form because it seems &ldquo;difficult&rdquo;.</p>
-</div>
+</p></div>
 
 
 <p>It is actually, in fact, a wise discipline to follow to make all functions return
@@ -2711,7 +2711,7 @@ compiler warnings about unnecessary use of <code>std::move()</code>.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/10/2019
+        <i class='fa fa-calendar'></i> Last update on 18/12/2019
     </div>
     
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-05-18T19:20:49 UTC">
+<meta name="revised" content="2020-05-21T15:24:21 UTC">
 <title>Phase 2 construction :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2701,8 +2701,8 @@ which puts the object into a legally destructible state. We then
 proceed to implement phase 2 of construction, filling in the various
 parts as we go, reporting via <code>result</code> any failures.</p>
 
-<div class="notices note" ><p>Remember that <code>operator new</code> has a non-throwing form, <code>new(std::nothrow)</code>.</p>
-</div>
+<div class="notices note" ><p><p>Remember that <code>operator new</code> has a non-throwing form, <code>new(std::nothrow)</code>.</p>
+</p></div>
 
 
 <p>For the final return, in theory we could just <code>return ret</code> and
@@ -2734,7 +2734,7 @@ irrespective of compiler, C++ version, or any other factor.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/10/2019
+        <i class='fa fa-calendar'></i> Last update on 18/12/2019
     </div>
     
 
