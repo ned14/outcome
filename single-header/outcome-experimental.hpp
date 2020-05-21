@@ -983,9 +983,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF a7a5b4f306a853489f729bf9e7a4d0202154fb60
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-18 15:02:19 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a7a5b4f3
+#define OUTCOME_PREVIOUS_COMMIT_REF aa92abe442dd2cd75be8fe1272d1d98f53fe6fe7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-18 19:09:06 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE aa92abe4
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -7130,8 +7130,7 @@ public:
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   template <class DomainType, //
-            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value //
-                                    && std::is_trivially_copyable<typename DomainType::value_type>::value //
+            typename std::enable_if<std::is_trivially_copyable<typename DomainType::value_type>::value //
                                     && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
   constexpr status_code(const status_code<DomainType> &v) noexcept // NOLINT
@@ -8127,12 +8126,21 @@ public:
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   template <class DomainType, //
-            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value //
-                                    && std::is_trivially_copyable<typename DomainType::value_type>::value //
+            typename std::enable_if<std::is_trivially_copyable<typename DomainType::value_type>::value //
                                     && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
   errored_status_code(const status_code<DomainType> &v) noexcept
       : _base(v) // NOLINT
+  {
+    _check();
+  }
+  //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
+  template <class DomainType, //
+            typename std::enable_if<std::is_trivially_copyable<typename DomainType::value_type>::value //
+                                    && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
+                                    bool>::type = true>
+  errored_status_code(const errored_status_code<DomainType> &v) noexcept
+      : _base(static_cast<const status_code<DomainType> &>(v)) // NOLINT
   {
     _check();
   }
@@ -8141,6 +8149,15 @@ public:
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
   errored_status_code(status_code<DomainType> &&v) noexcept
+      : _base(static_cast<status_code<DomainType> &&>(v)) // NOLINT
+  {
+    _check();
+  }
+  //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
+  template <class DomainType, //
+            typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
+                                    bool>::type = true>
+  errored_status_code(errored_status_code<DomainType> &&v) noexcept
       : _base(static_cast<status_code<DomainType> &&>(v)) // NOLINT
   {
     _check();
