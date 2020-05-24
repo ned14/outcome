@@ -120,15 +120,15 @@ namespace detail
     // Predicate for the implicit converting inplace constructor from a compatible input to be available.
     struct disable_inplace_value_error_constructor;
     template <class... Args>
-    using choose_inplace_value_error_constructor = std::conditional_t<                                       //
+    using choose_inplace_value_error_constructor = std::conditional_t<                               //
     detail::is_constructible<value_type, Args...> && detail::is_constructible<error_type, Args...>,  //
-    disable_inplace_value_error_constructor,                                                                 //
-    std::conditional_t<                                                                                      //
-    detail::is_constructible<value_type, Args...>,                                                       //
-    value_type,                                                                                              //
-    std::conditional_t<                                                                                      //
-    detail::is_constructible<error_type, Args...>,                                                       //
-    error_type,                                                                                              //
+    disable_inplace_value_error_constructor,                                                         //
+    std::conditional_t<                                                                              //
+    detail::is_constructible<value_type, Args...>,                                                   //
+    value_type,                                                                                      //
+    std::conditional_t<                                                                              //
+    detail::is_constructible<error_type, Args...>,                                                   //
+    error_type,                                                                                      //
     disable_inplace_value_error_constructor>>>;
     template <class... Args>
     static constexpr bool enable_inplace_value_error_constructor =
@@ -165,6 +165,43 @@ template <class T> using is_basic_result = detail::is_basic_result<std::decay_t<
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_basic_result_v = detail::is_basic_result<std::decay_t<T>>::value;
+
+namespace concepts
+{
+#if defined(__cpp_concepts)
+  /* The `basic_result` concept.
+  \requires That `U` matches a `basic_result`.
+  */
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL basic_result =
+  OUTCOME_V2_NAMESPACE::is_basic_result<U>::value ||
+  (requires(U v) { OUTCOME_V2_NAMESPACE::basic_result<typename U::value_type, typename U::error_type, typename U::no_value_policy_type>(v); } &&    //
+   detail::convertible<U, OUTCOME_V2_NAMESPACE::basic_result<typename U::value_type, typename U::error_type, typename U::no_value_policy_type>> &&  //
+   detail::base_of<OUTCOME_V2_NAMESPACE::basic_result<typename U::value_type, typename U::error_type, typename U::no_value_policy_type>, U>);
+#else
+  namespace detail
+  {
+    inline no_match match_basic_result(...);
+    template <class R, class S, class NVP, class T,                                                                      //
+              typename = typename T::value_type,                                                                         //
+              typename = typename T::error_type,                                                                         //
+              typename = typename T::no_value_policy_type,                                                               //
+              typename std::enable_if_t<std::is_convertible<T, OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP>>::value &&  //
+                                        std::is_base_of<OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP>, T>::value,
+                                        bool> = true>
+    inline OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP> match_basic_result(OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP> &&, T &&);
+
+    template <class U>
+    static constexpr bool basic_result = OUTCOME_V2_NAMESPACE::is_basic_result<U>::value ||
+                                         !std::is_same<no_match, decltype(match_basic_result(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>(),
+                                                                                             std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+  }  // namespace detail
+  /* The `basic_result` concept.
+  \requires That `U` matches a `basic_result`.
+  */
+  template <class U> static constexpr bool basic_result = detail::basic_result<U>;
+#endif
+}  // namespace concepts
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -260,6 +297,7 @@ class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, N
 public:
   using value_type = R;
   using error_type = S;
+  using no_value_policy_type = NoValuePolicy;
 
   using value_type_if_enabled = typename base::_value_type;
   using error_type_if_enabled = typename base::_error_type;
@@ -423,7 +461,7 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !concepts::basic_result<T>),  //
                     OUTCOME_TEXPR(convert::value_or_error<basic_result, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit basic_result(T &&o,
                                   explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT

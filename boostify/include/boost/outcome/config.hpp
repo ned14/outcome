@@ -111,6 +111,10 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
+#ifndef BOOST_OUTCOME_ENABLE_LEGACY_SUPPORT_FOR
+#define BOOST_OUTCOME_ENABLE_LEGACY_SUPPORT_FOR 210  // the v2.1 Outcome release
+#endif
+
 namespace boost
 {
 #define BOOST_OUTCOME_V2
