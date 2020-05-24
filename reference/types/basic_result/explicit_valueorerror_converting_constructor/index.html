@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-05-21T15:33:32 UTC">
+<meta name="revised" content="2020-05-24T11:51:34 UTC">
 <title>`explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -720,6 +720,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/enable_legacy_support_for/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/enable_legacy_support_for/">
+            <code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/nodiscard/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/nodiscard/">
@@ -819,17 +826,31 @@
       <a href="/outcome/reference/concepts/">Concepts</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/concepts/valueorerror/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_outcome/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueorerror/">
-            <code>ValueOrError&lt;T, E&gt;</code>
+          <a href="/outcome/reference/concepts/basic_outcome/">
+            <code>basic_outcome&lt;T&gt;</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/concepts/valueornone/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_result/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueornone/">
-            <code>ValueOrNone&lt;T&gt;</code>
+          <a href="/outcome/reference/concepts/basic_result/">
+            <code>basic_result&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_error/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_error/">
+            <code>value_or_error&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_none/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_none/">
+            <code>value_or_none&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2727,7 +2748,7 @@
     
     
     
-    <p>Explicit converting constructor from <a href="/outcome/reference/concepts/valueorerror/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
+    <p>Explicit converting constructor from <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
  concept matching types. Delegates to the <code>basic_result</code> move constructor.</p>
 
 <p><em>Requires</em>: <code>convert::</code><a href="/outcome/reference/converters/value_or_error/" class="api-reference"><code>value_or_error&lt;T, U&gt;</code></a>
@@ -2758,7 +2779,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 12/10/2019
+        <i class='fa fa-calendar'></i> Last update on 09/01/2020
     </div>
     
 

@@ -5,28 +5,50 @@
     <link>https://ned14.github.io/outcome/reference/concepts/</link>
     <description>Recent content in Concepts on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 11 Oct 2019 17:03:05 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 19:27:58 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/concepts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>`ValueOrError&lt;T, E&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/concepts/valueorerror/</link>
+      <title>`basic_outcome&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/basic_outcome/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/reference/concepts/valueorerror/</guid>
+      <guid>https://ned14.github.io/outcome/reference/concepts/basic_outcome/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types which have value_type, error_type and no_value_policy_type member typedefs; that the type is convertible to basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt;; that basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt; is a base of the type.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches any type which provides the same typedefs as a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , has that basic_result as a base class, and is implicitly convertible to basic_result.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/basic_result/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types which have value_type, error_type and no_value_policy_type member typedefs; that the type is convertible to basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt;; that basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt; is a base of the type.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches any type which provides the same typedefs as a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , has that basic_result as a base class, and is implicitly convertible to basic_result.</description>
+    </item>
+    
+    <item>
+      <title>`value_or_error&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/value_or_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/value_or_error/</guid>
       <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, a public .value() observer function, and a public .error() observer function.
 If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
 This concept matches expected-like types such as  P0323 std::expected&amp;lt;T, E&amp;gt; , one of which is basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; .</description>
     </item>
     
     <item>
-      <title>`ValueOrNone&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/concepts/valueornone/</link>
+      <title>`value_or_none&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/value_or_none/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/reference/concepts/valueornone/</guid>
+      <guid>https://ned14.github.io/outcome/reference/concepts/value_or_none/</guid>
       <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, and a public .value() observer function.
 If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
 This concept matches optional-like types such as  std::optional&amp;lt;T&amp;gt; . Note it also matches  P0323 std::expected&amp;lt;T, E&amp;gt; , which also has an optional-like interface.</description>

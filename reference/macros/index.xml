@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/macros/</link>
     <description>Recent content in Macros on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 11 Oct 2019 17:03:05 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 19:27:58 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/macros/index.xml" rel="self" type="application/rss+xml" />
     
@@ -118,6 +118,18 @@ Hints are given to the compiler that the expression will be unsuccessful.</descr
 Some embedded Linux toolchains do not define &amp;lt;execinfo.h&amp;gt;, thus disabling C++ exceptions on those toolchains produces a failure to find this file. Avoid that problem by defining this macro to disable stack backtrace support entirely.
 Overridable: Define before inclusion.
 Default: Defined if __ANDROID__ is defined, else undefined.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_ENABLE_LEGACY_SUPPORT_FOR`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/enable_legacy_support_for/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/enable_legacy_support_for/</guid>
+      <description>As Outcome has evolved, some features and especially naming were retired in newer versions. Define this macro to enable backwards compatibility aliasing from old features and naming to new features and naming.
+Overridable: Define before inclusion.
+Default: The current version of Outcome, expressed in hundreds e.g. Outcome v2.10 is 210.
 Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
     </item>
     

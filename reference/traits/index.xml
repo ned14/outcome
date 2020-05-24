@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/traits/</link>
     <description>Recent content in Traits on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 11 Oct 2019 17:03:05 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 19:27:58 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/traits/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,7 +16,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/traits/is_basic_outcome/</guid>
-      <description>An integral constant type true for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; types.
+      <description>An integral constant type true for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; types. This does not match anything not exactly a basic_outcome. If you want to match types like basic_outcome but not equal to it, consider basic_outcome&amp;lt;T&amp;gt; ..
 Overridable: Not overridable.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;
@@ -29,7 +29,7 @@ Variable alias: is_basic_outcome_v&amp;lt;T&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/traits/is_basic_result/</guid>
-      <description>An integral constant type true for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; types.
+      <description>An integral constant type true for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; types. This does not match anything not exactly a basic_result. If you want to match types like basic_result but not equal to it, consider basic_result&amp;lt;T&amp;gt; or value_or_error&amp;lt;T&amp;gt; .
 Overridable: Not overridable.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/basic_result.hpp&amp;gt;

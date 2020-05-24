@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-05-21T15:33:31 UTC">
+<meta name="revised" content="2020-05-24T11:51:33 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -719,6 +719,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/enable_legacy_support_for/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/enable_legacy_support_for/">
+            <code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/nodiscard/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/nodiscard/">
@@ -818,17 +825,31 @@
       <a href="/outcome/reference/concepts/">Concepts</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/concepts/valueorerror/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_outcome/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueorerror/">
-            <code>ValueOrError&lt;T, E&gt;</code>
+          <a href="/outcome/reference/concepts/basic_outcome/">
+            <code>basic_outcome&lt;T&gt;</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/concepts/valueornone/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_result/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueornone/">
-            <code>ValueOrNone&lt;T&gt;</code>
+          <a href="/outcome/reference/concepts/basic_result/">
+            <code>basic_result&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_error/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_error/">
+            <code>value_or_error&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_none/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_none/">
+            <code>value_or_none&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2629,15 +2650,46 @@
 
 <h2 id="v2-1-4-boost-1-74-release-https-github-com-ned14-outcome-releases-tag-v2-1-4">v2.1.4 ??? (Boost 1.74) <a href="https://github.com/ned14/outcome/releases/tag/v2.1.4">[release]</a></h2>
 
-<div class="notices note" ><p><p>The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
+<div class="notices note" ><p>The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
 becoming the default. You can use the future v2.2 branch now using
 <a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a>.
 This branch has a number of major changes to Outcome v2.1, see the front page
 for details.</p>
-</p></div>
+</div>
 
 
 <h3 id="enhancements">Enhancements:</h3>
+
+<dl>
+<dt>BREAKING CHANGE <code>void</code> results and outcomes no longer default construct types during explicit construction</dt>
+<dd>Previously if you explicitly constructed a <code>result&lt;T&gt;</code> from a non-errored
+<code>result&lt;void&gt;</code>, it default constructed <code>T</code>. This was found to cause unhelpful
+surprise, so it has been disabled.</dd>
+<dt>New macro <code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code></dt>
+<dd>The macro <a href="/outcome/reference/macros/enable_legacy_support_for/" class="api-reference"><code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code></a>
+ can be used to
+enable aliasing of older naming and features to newer naming and features when
+using a newer version of Outcome.</dd>
+<dt>Concepts now have snake case style naming instead of camel case style</dt>
+<dd>When Outcome was first implemented, it was thought that C++ 20 concepts were
+going to have camel case style. This was changed before the C++ 20 release, and
+Outcome&rsquo;s concepts have been renamed similarly. This won&rsquo;t break any code in
+Outcome v2.1, as compatibility aliases are provided. However code compiled
+against Outcome v2.2 will need to be upgraded, unless <code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code>
+is set to <code>210</code> or lower.</dd>
+<dt>Concepts now live in <code>OUTCOME_V2_NAMESPACE::concepts</code> namespace</dt>
+<dd>Previously concepts lived in the <code>convert</code> namespace, now they live in their
+own namespace.</dd>
+<dt>New concepts <a href="/outcome/reference/concepts/basic_result/" class="api-reference"><code>basic_result&lt;T&gt;</code></a>
+ and <a href="/outcome/reference/concepts/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T&gt;</code></a>
+ added</dt>
+<dd>End users were finding an unhelpful gap in between <a href="/outcome/reference/traits/is_basic_result/" class="api-reference"><code>is_basic_result&lt;T&gt;</code></a>
+
+and <a href="/outcome/reference/concepts/value_or_error/" class="api-reference"><code>value_or_error&lt;T&gt;</code></a>
+ where they wanted a concept that matched
+types which were <code>basic_result</code>, but not exactly one of those. Concepts filling
+that gap were added.</dd>
+</dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
@@ -2991,7 +3043,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 14/05/2020
+        <i class='fa fa-calendar'></i> Last update on 24/05/2020
     </div>
     
 

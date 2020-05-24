@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-05-21T15:33:31 UTC">
+<meta name="revised" content="2020-05-24T11:51:33 UTC">
 <title>Worked example: Custom domain :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -389,90 +389,6 @@
       <a href="/outcome/tutorial/advanced/interop/">Interoperation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/problem/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/problem/">
-            Incommensurate E types
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/value-or-error/">
-            ValueOrError Concept
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/httplib/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/httplib/">
-            The HTTP library
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/tidylib/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/tidylib/">
-            The HTMLTidy library
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/filelib/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/filelib/">
-            The File I/O library
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/app/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/app/">
-            The Application
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
-            Mapping the HTTP library into the Application <code>1/2</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
-            Mapping the HTTP library into the Application <code>2/2</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-filelib/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/app-map-filelib/">
-            Mapping the File I/O library into the Application
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-tidylib/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/app-map-tidylib/">
-            Mapping the HTMLTidy library into the Application
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/app-go/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/app-go/">
-            In use
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/advanced/interop/conclusion/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/advanced/interop/conclusion/">
-            Conclusion
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
         </ul>
@@ -721,6 +637,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/enable_legacy_support_for/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/enable_legacy_support_for/">
+            <code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/nodiscard/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/nodiscard/">
@@ -820,17 +743,31 @@
       <a href="/outcome/reference/concepts/">Concepts</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/concepts/valueorerror/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_outcome/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueorerror/">
-            <code>ValueOrError&lt;T, E&gt;</code>
+          <a href="/outcome/reference/concepts/basic_outcome/">
+            <code>basic_outcome&lt;T&gt;</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/concepts/valueornone/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_result/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueornone/">
-            <code>ValueOrNone&lt;T&gt;</code>
+          <a href="/outcome/reference/concepts/basic_result/">
+            <code>basic_result&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_error/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_error/">
+            <code>value_or_error&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_none/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_none/">
+            <code>value_or_none&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2697,7 +2634,7 @@ manage the lifetime of any pointer.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 12/10/2019
+        <i class='fa fa-calendar'></i> Last update on 09/01/2020
     </div>
     
 

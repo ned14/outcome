@@ -2515,7 +2515,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1181 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1183 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2636,6 +2636,18 @@ Hints are given to the compiler that the expression will be unsuccessful.</descr
 Some embedded Linux toolchains do not define &amp;lt;execinfo.h&amp;gt;, thus disabling C++ exceptions on those toolchains produces a failure to find this file. Avoid that problem by defining this macro to disable stack backtrace support entirely.
 Overridable: Define before inclusion.
 Default: Defined if __ANDROID__ is defined, else undefined.
+Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_ENABLE_LEGACY_SUPPORT_FOR`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/enable_legacy_support_for/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/enable_legacy_support_for/</guid>
+      <description>As Outcome has evolved, some features and especially naming were retired in newer versions. Define this macro to enable backwards compatibility aliasing from old features and naming to new features and naming.
+Overridable: Define before inclusion.
+Default: The current version of Outcome, expressed in hundreds e.g. Outcome v2.10 is 210.
 Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
     </item>
     
@@ -2793,28 +2805,6 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
     </item>
     
     <item>
-      <title>`ValueOrError&lt;T, E&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/concepts/valueorerror/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/concepts/valueorerror/</guid>
-      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, a public .value() observer function, and a public .error() observer function.
-If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
-This concept matches expected-like types such as  P0323 std::expected&amp;lt;T, E&amp;gt; , one of which is basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; .</description>
-    </item>
-    
-    <item>
-      <title>`ValueOrNone&lt;T&gt;`</title>
-      <link>https://ned14.github.io/outcome/reference/concepts/valueornone/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/concepts/valueornone/</guid>
-      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, and a public .value() observer function.
-If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
-This concept matches optional-like types such as  std::optional&amp;lt;T&amp;gt; . Note it also matches  P0323 std::expected&amp;lt;T, E&amp;gt; , which also has an optional-like interface.</description>
-    </item>
-    
-    <item>
       <title>`all_narrow`</title>
       <link>https://ned14.github.io/outcome/reference/policies/all_narrow/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2898,6 +2888,28 @@ No member functions are added in addition to std::logic_error. Typical .what() s
  &amp;quot;no value&amp;quot; &amp;quot;no error&amp;quot;  Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/bad_access.hpp&amp;gt;</description>
+    </item>
+    
+    <item>
+      <title>`basic_outcome&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/basic_outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/basic_outcome/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types which have value_type, error_type and no_value_policy_type member typedefs; that the type is convertible to basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt;; that basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt; is a base of the type.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches any type which provides the same typedefs as a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , has that basic_result as a base class, and is implicitly convertible to basic_result.</description>
+    </item>
+    
+    <item>
+      <title>`basic_result&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/basic_result/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/basic_result/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types which have value_type, error_type and no_value_policy_type member typedefs; that the type is convertible to basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt;; that basic_result&amp;lt;value_type, error_type, no_value_policy_type&amp;gt; is a base of the type.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches any type which provides the same typedefs as a basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , has that basic_result as a base class, and is implicitly convertible to basic_result.</description>
     </item>
     
     <item>
@@ -3135,7 +3147,7 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/traits/is_basic_outcome/</guid>
-      <description>An integral constant type true for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; types.
+      <description>An integral constant type true for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; types. This does not match anything not exactly a basic_outcome. If you want to match types like basic_outcome but not equal to it, consider basic_outcome&amp;lt;T&amp;gt; ..
 Overridable: Not overridable.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;
@@ -3148,7 +3160,7 @@ Variable alias: is_basic_outcome_v&amp;lt;T&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/traits/is_basic_result/</guid>
-      <description>An integral constant type true for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; types.
+      <description>An integral constant type true for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; types. This does not match anything not exactly a basic_result. If you want to match types like basic_result but not equal to it, consider basic_result&amp;lt;T&amp;gt; or value_or_error&amp;lt;T&amp;gt; .
 Overridable: Not overridable.
 Namespace: OUTCOME_V2_NAMESPACE
 Header: &amp;lt;outcome/basic_result.hpp&amp;gt;
@@ -3480,6 +3492,28 @@ Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
       <guid>https://ned14.github.io/outcome/reference/converters/value_or_error/</guid>
       <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types. It must have the following form:
 // `T` will be the destination basic_result or basic_outcome. // `U` will be the decayed form of the `ValueOrError&amp;lt;T, E&amp;gt;` concept matching input type. template &amp;lt;classT&amp;gt; struct value_or_error&amp;lt;T, U&amp;gt; { // False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`  static constexpr bool enable_result_inputs = false; // False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`  static constexpr bool enable_outcome_inputs = false; // `X` will be the raw input form of `U`.</description>
+    </item>
+    
+    <item>
+      <title>`value_or_error&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/value_or_error/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/value_or_error/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, a public .value() observer function, and a public .error() observer function.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches expected-like types such as  P0323 std::expected&amp;lt;T, E&amp;gt; , one of which is basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; .</description>
+    </item>
+    
+    <item>
+      <title>`value_or_none&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/concepts/value_or_none/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/concepts/value_or_none/</guid>
+      <description>If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types with a public .has_value() observer which returns bool, and a public .value() observer function.
+If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
+This concept matches optional-like types such as  std::optional&amp;lt;T&amp;gt; . Note it also matches  P0323 std::expected&amp;lt;T, E&amp;gt; , which also has an optional-like interface.</description>
     </item>
     
     <item>

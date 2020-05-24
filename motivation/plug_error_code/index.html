@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-05-21T15:33:30 UTC">
+<meta name="revised" content="2020-05-24T11:51:32 UTC">
 <title>Plugging a library into std::error_code` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -720,6 +720,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/enable_legacy_support_for/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/enable_legacy_support_for/">
+            <code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/nodiscard/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/nodiscard/">
@@ -819,17 +826,31 @@
       <a href="/outcome/reference/concepts/">Concepts</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/concepts/valueorerror/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_outcome/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueorerror/">
-            <code>ValueOrError&lt;T, E&gt;</code>
+          <a href="/outcome/reference/concepts/basic_outcome/">
+            <code>basic_outcome&lt;T&gt;</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/concepts/valueornone/" class="dd-item">
+      <li data-nav-id="/outcome/reference/concepts/basic_result/" class="dd-item">
         <div>
-          <a href="/outcome/reference/concepts/valueornone/">
-            <code>ValueOrNone&lt;T&gt;</code>
+          <a href="/outcome/reference/concepts/basic_result/">
+            <code>basic_result&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_error/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_error/">
+            <code>value_or_error&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/concepts/value_or_none/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/concepts/value_or_none/">
+            <code>value_or_none&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2771,7 +2792,7 @@ code domain for equivalence to the standard error conditions, AND without being
 recompiled.</li>
 </ol>
 
-<div class="notices note" ><p><p>This documentation recommends that when you define your custom <code>enum</code> for representing
+<div class="notices note" ><p>This documentation recommends that when you define your custom <code>enum</code> for representing
 <code>error_code</code>s, you should always make sure that value 0 never represents an actual error:
 it should either represent a success or should not be provided at all. If you only
 intend to use your <code>enum</code> inside <code>result&lt;&gt;</code> or <code>outcome&lt;&gt;</code> you can just start your
@@ -2780,7 +2801,7 @@ functions, you should probably define value 0 as success, so that you are able t
 inform about function&rsquo;s success by returning <code>MyEnum::Success</code>. This is because <code>error_code</code>&rsquo;s
 contextual conversion to <code>bool</code> (which some people use to check if there was an error or not)
 only checks for the numeric value of the error code (without looking at error domain (category)).</p>
-</p></div>
+</div>
 
 
 <p>[1]: The only documentation I&rsquo;m aware of is the quite old guide by Chris Kohlhoff, founder of ASIO and the Networking TS:</p>
@@ -2814,7 +2835,7 @@ only checks for the numeric value of the error code (without looking at error do
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 12/10/2019
+        <i class='fa fa-calendar'></i> Last update on 09/01/2020
     </div>
     
 
