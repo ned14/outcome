@@ -120,16 +120,16 @@ namespace detail
     using choose_inplace_value_error_exception_constructor = std::conditional_t<  //
     ((static_cast<int>(detail::is_constructible<value_type, Args...>) + static_cast<int>(detail::is_constructible<error_type, Args...>) +
       static_cast<int>(detail::is_constructible<exception_type, Args...>)) > 1),  //
-    disable_inplace_value_error_exception_constructor,                                //
-    std::conditional_t<                                                               //
+    disable_inplace_value_error_exception_constructor,                            //
+    std::conditional_t<                                                           //
     detail::is_constructible<value_type, Args...>,                                //
-    value_type,                                                                       //
-    std::conditional_t<                                                               //
+    value_type,                                                                   //
+    std::conditional_t<                                                           //
     detail::is_constructible<error_type, Args...>,                                //
-    error_type,                                                                       //
-    std::conditional_t<                                                               //
+    error_type,                                                                   //
+    std::conditional_t<                                                           //
     detail::is_constructible<exception_type, Args...>,                            //
-    exception_type,                                                                   //
+    exception_type,                                                               //
     disable_inplace_value_error_exception_constructor>>>>;
     template <class... Args>
     static constexpr bool enable_inplace_value_error_exception_constructor =  //
@@ -172,6 +172,49 @@ template <class T> using is_basic_outcome = detail::is_basic_outcome<std::decay_
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_basic_outcome_v = detail::is_basic_outcome<std::decay_t<T>>::value;
+
+namespace concepts
+{
+#if defined(__cpp_concepts)
+  /* The `basic_outcome` concept.
+  \requires That `U` matches a `basic_outcome`.
+  */
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL basic_outcome =
+  OUTCOME_V2_NAMESPACE::is_basic_outcome<U>::value ||
+  (requires(U v) {
+    OUTCOME_V2_NAMESPACE::basic_outcome<typename U::value_type, typename U::error_type, typename U::exception_type, typename U::no_value_policy_type>(v);
+  } &&  //
+   detail::convertible<
+   U, OUTCOME_V2_NAMESPACE::basic_outcome<typename U::value_type, typename U::error_type, typename U::exception_type, typename U::no_value_policy_type>> &&  //
+   detail::base_of<
+   OUTCOME_V2_NAMESPACE::basic_outcome<typename U::value_type, typename U::error_type, typename U::exception_type, typename U::no_value_policy_type>, U>);
+#else
+  namespace detail
+  {
+    inline no_match match_basic_outcome(...);
+    template <class R, class S, class P, class NVP, class T,                                                                 //
+              typename = typename T::value_type,                                                                             //
+              typename = typename T::error_type,                                                                             //
+              typename = typename T::exception_type,                                                                         //
+              typename = typename T::no_value_policy_type,                                                                   //
+              typename std::enable_if_t<std::is_convertible<T, OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP>>::value &&  //
+                                        std::is_base_of<OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP>, T>::value,
+                                        bool> = true>
+    inline OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP> match_basic_outcome(OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP> &&, T &&);
+
+    template <class U>
+    static constexpr bool basic_outcome =
+    OUTCOME_V2_NAMESPACE::is_basic_outcome<U>::value ||
+    !std::is_same<no_match, decltype(match_basic_outcome(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>(),
+                                                         std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+  }  // namespace detail
+  /* The `basic_outcome` concept.
+  \requires That `U` matches a `basic_outcome`.
+  */
+  template <class U> static constexpr bool basic_outcome = detail::basic_outcome<U>;
+#endif
+}  // namespace concepts
 
 namespace hooks
 {
@@ -280,6 +323,7 @@ public:
   using value_type = R;
   using error_type = S;
   using exception_type = P;
+  using no_value_policy_type = NoValuePolicy;
 
   template <class T, class U = S, class V = P, class W = NoValuePolicy> using rebind = basic_outcome<T, U, V, W>;
 
@@ -481,8 +525,8 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>),    //
-                    OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !is_basic_outcome_v<T>),  //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !concepts::basic_result<T>),    //
+                    OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !concepts::basic_outcome<T>),  //
                     OUTCOME_TEXPR(convert::value_or_error<basic_outcome, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit basic_outcome(T &&o,
                                    explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag())  // NOLINT
@@ -592,8 +636,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _,
-                                   Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
+  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -618,8 +661,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _,
-                                   Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
+  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -730,8 +772,8 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
-  constexpr basic_outcome(const failure_type<T> &o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
+  constexpr basic_outcome(const failure_type<T> &o,
+                          exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -793,8 +835,8 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
-  constexpr basic_outcome(failure_type<T> &&o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
+  constexpr basic_outcome(failure_type<T> &&o,
+                          exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(detail::is_nothrow_constructible<exception_type, T>)  // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {

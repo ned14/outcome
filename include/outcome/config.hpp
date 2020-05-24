@@ -90,6 +90,9 @@ SIGNATURE NOT RECOGNISED
 
 #include "quickcpplib/import.h"
 
+#ifndef OUTCOME_ENABLE_LEGACY_SUPPORT_FOR
+#define OUTCOME_ENABLE_LEGACY_SUPPORT_FOR 210  // the v2.1 Outcome release
+#endif
 
 #if defined(OUTCOME_UNSTABLE_VERSION)
 #include "detail/revision.hpp"

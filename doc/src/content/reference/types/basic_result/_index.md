@@ -45,6 +45,7 @@ The second major design difference is that union storage is NOT used, as it is a
 
 - `value_type` is `T`.
 - `error_type` is `E`.
+- `no_value_policy_type` is `NoValuePolicy`.
 - `value_type_if_enabled` is `T` if construction from `T` is available, else it is a usefully named unusable internal type.
 - `error_type_if_enabled` is `E` if construction from `E` is available, else it is a usefully named unusable internal type.
 - `rebind<A, B = E, C = NoValuePolicy>` is `basic_result<A, B, C>`.

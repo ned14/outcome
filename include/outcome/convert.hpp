@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
-namespace convert
+namespace concepts
 {
 #if defined(__cpp_concepts)
 #if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 9
@@ -41,13 +41,15 @@ namespace convert
   {
     template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
     template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL convertible = std::is_convertible<T, U>::value;
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL base_of = std::is_base_of<T, U>::value;
   }  // namespace detail
 
 
-  /* The `ValueOrNone` concept.
+  /* The `value_or_none` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_none = requires(U a)
   {
     {
       a.has_value()
@@ -55,11 +57,11 @@ namespace convert
     ->detail::same_as<bool>;
     {a.value()};
   };
-  /* The `ValueOrError` concept.
+  /* The `value_or_error` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_error = requires(U a)
   {
     {
       a.has_value()
@@ -68,6 +70,7 @@ namespace convert
     {a.value()};
     {a.error()};
   };
+
 #else
   namespace detail
   {
@@ -83,18 +86,35 @@ namespace convert
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<U>().has_value()), OUTCOME_TEXPR(std::declval<U>().value()), OUTCOME_TEXPR(std::declval<U>().error()))
     inline U match_value_or_error(U &&);
 
-    template <class U> static constexpr bool ValueOrNone = !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
-    template <class U> static constexpr bool ValueOrError = !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U>
+    static constexpr bool value_or_none =
+    !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U>
+    static constexpr bool value_or_error =
+    !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
   }  // namespace detail
-  /* The `ValueOrNone` concept.
+  /* The `value_or_none` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
-  /* The `ValueOrError` concept.
+  template <class U> static constexpr bool value_or_none = detail::value_or_none<U>;
+  /* The `value_or_error` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
+  template <class U> static constexpr bool value_or_error = detail::value_or_error<U>;
+#endif
+}  // namespace concepts
+
+namespace convert
+{
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+#if defined(__cpp_concepts)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = concepts::value_or_none<U>;
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = concepts::value_or_error<U>;
+#else
+  template <class U> static constexpr bool ValueOrNone = concepts::value_or_none<U>;
+  template <class U> static constexpr bool ValueOrError = concepts::value_or_error<U>;
+#endif
 #endif
 
   namespace detail
@@ -121,11 +141,18 @@ type definition  value_or_error. Potential doc page: NOT FOUND
     static constexpr bool enable_result_inputs = false;
     static constexpr bool enable_outcome_inputs = false;
     OUTCOME_TEMPLATE(class X)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                                                                                    //
-                                    &&ValueOrError<U>                                                                                                                                                                          //
-                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
-                                    &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
-    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) : detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v)); }
+    OUTCOME_TREQUIRES(
+    OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value  //
+                  &&concepts::value_or_error<U>            //
+                  && (std::is_void<typename std::decay_t<X>::value_type>::value ||
+                      OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
+                  &&(std::is_void<typename std::decay_t<X>::error_type>::value ||
+                     OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
+    constexpr T operator()(X &&v)
+    {
+      return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) :
+                             detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v));
+    }
   };
 }  // namespace convert
 
