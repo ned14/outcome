@@ -959,6 +959,9 @@ Distributed under the Boost Software License, Version 1.0.
 //! Expands into a static const char string array used to mark BindLib compatible namespaces
 #define QUICKCPPLIB_BIND_DECLARE(decl, desc) static const char *quickcpplib_out[] = {#decl, desc};
 #endif
+#ifndef OUTCOME_ENABLE_LEGACY_SUPPORT_FOR
+#define OUTCOME_ENABLE_LEGACY_SUPPORT_FOR 220 // the v2.2 Outcome release
+#endif
 #if defined(OUTCOME_UNSTABLE_VERSION)
 /* UPDATED BY SCRIPT
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (225 commits)
@@ -3182,7 +3185,7 @@ namespace detail
 OUTCOME_V2_NAMESPACE_END
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
-namespace convert
+namespace concepts
 {
 #if defined(__cpp_concepts)
 #if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 9
@@ -3194,11 +3197,13 @@ namespace convert
   {
     template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
     template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL convertible = std::is_convertible<T, U>::value;
+    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL base_of = std::is_base_of<T, U>::value;
   } // namespace detail
-  /* The `ValueOrNone` concept.
+  /* The `value_or_none` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_none = requires(U a)
   {
     {
       a.has_value()
@@ -3206,11 +3211,11 @@ namespace convert
     ->detail::same_as<bool>;
     {a.value()};
   };
-  /* The `ValueOrError` concept.
+  /* The `value_or_error` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = requires(U a)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_error = requires(U a)
   {
     {
       a.has_value()
@@ -3233,18 +3238,34 @@ namespace convert
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<U>().has_value()), OUTCOME_TEXPR(std::declval<U>().value()), OUTCOME_TEXPR(std::declval<U>().error()))
     inline U match_value_or_error(U &&);
-    template <class U> static constexpr bool ValueOrNone = !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
-    template <class U> static constexpr bool ValueOrError = !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U>
+    static constexpr bool value_or_none =
+    !std::is_same<no_match, decltype(match_value_or_none(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+    template <class U>
+    static constexpr bool value_or_error =
+    !std::is_same<no_match, decltype(match_value_or_error(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
   } // namespace detail
-  /* The `ValueOrNone` concept.
+  /* The `value_or_none` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> static constexpr bool ValueOrNone = detail::ValueOrNone<U>;
-  /* The `ValueOrError` concept.
+  template <class U> static constexpr bool value_or_none = detail::value_or_none<U>;
+  /* The `value_or_error` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> static constexpr bool ValueOrError = detail::ValueOrError<U>;
+  template <class U> static constexpr bool value_or_error = detail::value_or_error<U>;
+#endif
+} // namespace concepts
+namespace convert
+{
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+#if defined(__cpp_concepts)
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = concepts::value_or_none<U>;
+  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = concepts::value_or_error<U>;
+#else
+  template <class U> static constexpr bool ValueOrNone = concepts::value_or_none<U>;
+  template <class U> static constexpr bool ValueOrError = concepts::value_or_error<U>;
+#endif
 #endif
   namespace detail
   {
@@ -3269,11 +3290,18 @@ type definition  value_or_error. Potential doc page: NOT FOUND
     static constexpr bool enable_result_inputs = false;
     static constexpr bool enable_outcome_inputs = false;
     OUTCOME_TEMPLATE(class X)
-    OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value //
-                                    &&ValueOrError<U> //
-                                    && (std::is_void<typename std::decay_t<X>::value_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>) //
-                                    &&(std::is_void<typename std::decay_t<X>::error_type>::value || OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
-    constexpr T operator()(X &&v) { return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) : detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v)); }
+    OUTCOME_TREQUIRES(
+    OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value //
+                  &&concepts::value_or_error<U> //
+                  && (std::is_void<typename std::decay_t<X>::value_type>::value ||
+                      OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>) //
+                  &&(std::is_void<typename std::decay_t<X>::error_type>::value ||
+                     OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::error_type, typename std::decay_t<X>::error_type>) ))
+    constexpr T operator()(X &&v)
+    {
+      return v.has_value() ? detail::make_type<T, typename T::value_type>::value(static_cast<X &&>(v)) :
+                             detail::make_type<T, typename U::error_type>::error(static_cast<X &&>(v));
+    }
   };
 } // namespace convert
 OUTCOME_V2_NAMESPACE_END
@@ -3875,6 +3903,41 @@ template <class T> using is_basic_result = detail::is_basic_result<std::decay_t<
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_basic_result_v = detail::is_basic_result<std::decay_t<T>>::value;
+namespace concepts
+{
+#if defined(__cpp_concepts)
+  /* The `basic_result` concept.
+  \requires That `U` matches a `basic_result`.
+  */
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL basic_result =
+  OUTCOME_V2_NAMESPACE::is_basic_result<U>::value ||
+  (requires(U v) { OUTCOME_V2_NAMESPACE::basic_result<typename U::value_type, typename U::error_type, typename U::no_value_policy_type>(v); } && //
+   detail::convertible<U, OUTCOME_V2_NAMESPACE::basic_result<typename U::value_type, typename U::error_type, typename U::no_value_policy_type>> && //
+   detail::base_of<OUTCOME_V2_NAMESPACE::basic_result<typename U::value_type, typename U::error_type, typename U::no_value_policy_type>, U>);
+#else
+  namespace detail
+  {
+    inline no_match match_basic_result(...);
+    template <class R, class S, class NVP, class T, //
+              typename = typename T::value_type, //
+              typename = typename T::error_type, //
+              typename = typename T::no_value_policy_type, //
+              typename std::enable_if_t<std::is_convertible<T, OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP>>::value && //
+                                        std::is_base_of<OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP>, T>::value,
+                                        bool> = true>
+    inline OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP> match_basic_result(OUTCOME_V2_NAMESPACE::basic_result<R, S, NVP> &&, T &&);
+    template <class U>
+    static constexpr bool basic_result = OUTCOME_V2_NAMESPACE::is_basic_result<U>::value ||
+                                         !std::is_same<no_match, decltype(match_basic_result(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>(),
+                                                                                             std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+  } // namespace detail
+  /* The `basic_result` concept.
+  \requires That `U` matches a `basic_result`.
+  */
+  template <class U> static constexpr bool basic_result = detail::basic_result<U>;
+#endif
+} // namespace concepts
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -3963,6 +4026,7 @@ class OUTCOME_NODISCARD basic_result : public detail::basic_result_final<R, S, N
 public:
   using value_type = R;
   using error_type = S;
+  using no_value_policy_type = NoValuePolicy;
   using value_type_if_enabled = typename base::_value_type;
   using error_type_if_enabled = typename base::_error_type;
   template <class T, class U = S, class V = NoValuePolicy> using rebind = basic_result<T, U, V>;
@@ -4107,7 +4171,7 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>), //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_result, std::decay_t<T>>::enable_result_inputs || !concepts::basic_result<T>), //
                     OUTCOME_TEXPR(convert::value_or_error<basic_result, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit basic_result(T &&o,
                                   explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag()) // NOLINT
@@ -4680,6 +4744,47 @@ template <class T> using is_basic_outcome = detail::is_basic_outcome<std::decay_
 SIGNATURE NOT RECOGNISED
 */
 template <class T> static constexpr bool is_basic_outcome_v = detail::is_basic_outcome<std::decay_t<T>>::value;
+namespace concepts
+{
+#if defined(__cpp_concepts)
+  /* The `basic_outcome` concept.
+  \requires That `U` matches a `basic_outcome`.
+  */
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL basic_outcome =
+  OUTCOME_V2_NAMESPACE::is_basic_outcome<U>::value ||
+  (requires(U v) {
+    OUTCOME_V2_NAMESPACE::basic_outcome<typename U::value_type, typename U::error_type, typename U::exception_type, typename U::no_value_policy_type>(v);
+  } && //
+   detail::convertible<
+   U, OUTCOME_V2_NAMESPACE::basic_outcome<typename U::value_type, typename U::error_type, typename U::exception_type, typename U::no_value_policy_type>> && //
+   detail::base_of<
+   OUTCOME_V2_NAMESPACE::basic_outcome<typename U::value_type, typename U::error_type, typename U::exception_type, typename U::no_value_policy_type>, U>);
+#else
+  namespace detail
+  {
+    inline no_match match_basic_outcome(...);
+    template <class R, class S, class P, class NVP, class T, //
+              typename = typename T::value_type, //
+              typename = typename T::error_type, //
+              typename = typename T::exception_type, //
+              typename = typename T::no_value_policy_type, //
+              typename std::enable_if_t<std::is_convertible<T, OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP>>::value && //
+                                        std::is_base_of<OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP>, T>::value,
+                                        bool> = true>
+    inline OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP> match_basic_outcome(OUTCOME_V2_NAMESPACE::basic_outcome<R, S, P, NVP> &&, T &&);
+    template <class U>
+    static constexpr bool basic_outcome =
+    OUTCOME_V2_NAMESPACE::is_basic_outcome<U>::value ||
+    !std::is_same<no_match, decltype(match_basic_outcome(std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>(),
+                                                         std::declval<OUTCOME_V2_NAMESPACE::detail::devoid<U>>()))>::value;
+  } // namespace detail
+  /* The `basic_outcome` concept.
+  \requires That `U` matches a `basic_outcome`.
+  */
+  template <class U> static constexpr bool basic_outcome = detail::basic_outcome<U>;
+#endif
+} // namespace concepts
 namespace hooks
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4776,6 +4881,7 @@ public:
   using value_type = R;
   using error_type = S;
   using exception_type = P;
+  using no_value_policy_type = NoValuePolicy;
   template <class T, class U = S, class V = P, class W = NoValuePolicy> using rebind = basic_outcome<T, U, V, W>;
 protected:
   // Requirement predicates for outcome.
@@ -4956,8 +5062,8 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !is_basic_result_v<T>), //
-                    OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !is_basic_outcome_v<T>), //
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_result_inputs || !concepts::basic_result<T>), //
+                    OUTCOME_TPRED(convert::value_or_error<basic_outcome, std::decay_t<T>>::enable_outcome_inputs || !concepts::basic_outcome<T>), //
                     OUTCOME_TEXPR(convert::value_or_error<basic_outcome, std::decay_t<T>>{}(std::declval<T>())))
   constexpr explicit basic_outcome(T &&o,
                                    explicit_valueorerror_converting_constructor_tag /*unused*/ = explicit_valueorerror_converting_constructor_tag()) // NOLINT
@@ -5065,8 +5171,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_value_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _,
-                                   Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
+  constexpr explicit basic_outcome(in_place_type_t<value_type_if_enabled> _, Args &&... args) noexcept(detail::is_nothrow_constructible<value_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -5091,8 +5196,7 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class... Args)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(predicate::template enable_inplace_error_constructor<Args...>))
-  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _,
-                                   Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
+  constexpr explicit basic_outcome(in_place_type_t<error_type_if_enabled> _, Args &&... args) noexcept(detail::is_nothrow_constructible<error_type, Args...>)
       : base{_, static_cast<Args &&>(args)...}
       , _ptr()
   {
@@ -5201,8 +5305,8 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
-  constexpr basic_outcome(const failure_type<T> &o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>) // NOLINT
+  constexpr basic_outcome(const failure_type<T> &o,
+                          exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(detail::is_nothrow_constructible<exception_type, T>) // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
@@ -5263,8 +5367,8 @@ SIGNATURE NOT RECOGNISED
 */
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_void<T>::value && predicate::template enable_compatible_conversion<void, void, T, void>))
-  constexpr basic_outcome(failure_type<T> &&o, exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(
-  detail::is_nothrow_constructible<exception_type, T>) // NOLINT
+  constexpr basic_outcome(failure_type<T> &&o,
+                          exception_failure_tag /*unused*/ = exception_failure_tag()) noexcept(detail::is_nothrow_constructible<exception_type, T>) // NOLINT
       : base()
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
@@ -7641,12 +7745,12 @@ SYSTEM_ERROR2_NAMESPACE_END
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 template <class Enum> class _quick_status_code_from_enum_domain;
 //! A status code wrapping `Enum` generated from `quick_status_code_from_enum`.
-template <class Enum> using quick_status_code_from_domain_enum_code = status_code<_quick_status_code_from_enum_domain<Enum>>;
+template <class Enum> using quick_status_code_from_enum_code = status_code<_quick_status_code_from_enum_domain<Enum>>;
 //! Defaults for an implementation of `quick_status_code_from_enum<Enum>`
 template <class Enum> struct quick_status_code_from_enum_defaults
 {
   //! The type of the resulting code
-  using code_type = quick_status_code_from_domain_enum_code<Enum>;
+  using code_type = quick_status_code_from_enum_code<Enum>;
   //! Used within `quick_status_code_from_enum` to define a mapping of enumeration value with its status code
   struct mapping
   {
@@ -7714,7 +7818,7 @@ protected:
   {
     assert(code.domain() == *this); // NOLINT
     // If `errc::success` is in the generic code mapping, it is not a failure
-    const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code).value());
+    const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_enum_code<value_type> &>(code).value());
     assert(mapping != nullptr);
     if(mapping != nullptr)
     {
@@ -7731,10 +7835,10 @@ protected:
   virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override
   {
     assert(code1.domain() == *this); // NOLINT
-    const auto &c1 = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code1); // NOLINT
+    const auto &c1 = static_cast<const quick_status_code_from_enum_code<value_type> &>(code1); // NOLINT
     if(code2.domain() == *this)
     {
-      const auto &c2 = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code2); // NOLINT
+      const auto &c2 = static_cast<const quick_status_code_from_enum_code<value_type> &>(code2); // NOLINT
       return c1.value() == c2.value();
     }
     if(code2.domain() == generic_code_domain)
@@ -7758,7 +7862,7 @@ protected:
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept override
   {
     assert(code.domain() == *this); // NOLINT
-    const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code).value());
+    const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_enum_code<value_type> &>(code).value());
     assert(mapping != nullptr);
     if(mapping != nullptr)
     {
@@ -7772,7 +7876,7 @@ protected:
   virtual string_ref _do_message(const status_code<void> &code) const noexcept override
   {
     assert(code.domain() == *this); // NOLINT
-    const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code).value());
+    const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_enum_code<value_type> &>(code).value());
     assert(mapping != nullptr);
     if(mapping != nullptr)
     {
@@ -7784,7 +7888,7 @@ protected:
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override
   {
     assert(code.domain() == *this); // NOLINT
-    const auto &c = static_cast<const quick_status_code_from_domain_enum_code<value_type> &>(code); // NOLINT
+    const auto &c = static_cast<const quick_status_code_from_enum_code<value_type> &>(code); // NOLINT
     throw status_error<_quick_status_code_from_enum_domain>(c);
   }
 #endif
@@ -8033,7 +8137,7 @@ public:
             class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type, // Enumeration has been activated
             typename std::enable_if<std::is_constructible<errored_status_code, QuickStatusCodeType>::value, // Its status code is compatible
                                     bool>::type = true>
-  constexpr errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value) // NOLINT
+  errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value) // NOLINT
       : errored_status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
     _check();
@@ -8180,7 +8284,7 @@ public:
             class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type, // Enumeration has been activated
             typename std::enable_if<std::is_constructible<errored_status_code, QuickStatusCodeType>::value, // Its status code is compatible
                                     bool>::type = true>
-  constexpr errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value) // NOLINT
+  errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value) // NOLINT
       : errored_status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
     _check();

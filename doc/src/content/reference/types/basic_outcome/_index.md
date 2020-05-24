@@ -60,6 +60,7 @@ an exception perhaps carrying a custom payload.
 - `value_type` is `T`.
 - `error_type` is `EC`.
 - `exception_type` is `EP`.
+- `no_value_policy_type` is `NoValuePolicy`.
 - `value_type_if_enabled` is `T` if construction from `T` is available, else it is a usefully named unusable internal type.
 - `error_type_if_enabled` is `EC` if construction from `EC` is available, else it is a usefully named unusable internal type.
 - `exception_type_if_enabled` is `EP` if construction from `EP` is available, else it is a usefully named unusable internal type.

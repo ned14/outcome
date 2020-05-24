@@ -16,6 +16,34 @@ for details.
 
 ### Enhancements:
 
+BREAKING CHANGE `void` results and outcomes no longer default construct types during explicit construction
+: Previously if you explicitly constructed a `result<T>` from a non-errored
+`result<void>`, it default constructed `T`. This was found to cause unhelpful
+surprise, so it has been disabled.
+
+New macro `OUTCOME_ENABLE_LEGACY_SUPPORT_FOR`
+: The macro {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} can be used to
+enable aliasing of older naming and features to newer naming and features when
+using a newer version of Outcome.
+
+Concepts now have snake case style naming instead of camel case style
+: When Outcome was first implemented, it was thought that C++ 20 concepts were
+going to have camel case style. This was changed before the C++ 20 release, and
+Outcome's concepts have been renamed similarly. This won't break any code in
+Outcome v2.1, as compatibility aliases are provided. However code compiled
+against Outcome v2.2 will need to be upgraded, unless `OUTCOME_ENABLE_LEGACY_SUPPORT_FOR`
+is set to `210` or lower.
+
+Concepts now live in `OUTCOME_V2_NAMESPACE::concepts` namespace
+: Previously concepts lived in the `convert` namespace, now they live in their
+own namespace.
+
+New concepts {{% api "basic_result<T>" %}} and {{% api "basic_outcome<T>" %}} added
+: End users were finding an unhelpful gap in between {{% api "is_basic_result<T>" %}}
+and {{% api "value_or_error<T>" %}} where they wanted a concept that matched
+types which were `basic_result`, but not exactly one of those. Concepts filling
+that gap were added.
+
 ### Bug fixes:
 
 [#224](https://github.com/ned14/outcome/issues/224)
