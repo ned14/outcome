@@ -22,6 +22,6 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 3878468d68540cb5b4f4b4dc1849dcd991d618e1
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-21 15:20:58 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3878468d
+#define OUTCOME_PREVIOUS_COMMIT_REF 67c0d27afcb14624bf26c32147bcf1f98f600497
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-25 09:26:57 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 67c0d27a
