@@ -40,7 +40,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0065 / outcome, "OUTCOME_TRY does not pres
         return std::current_exception();
       }
     };
-    OUTCOME_TRY(ans, (f()));
+    OUTCOME_TRY(auto &&ans, (f()));
     return ans;
   };
   outcome<int> o = g();

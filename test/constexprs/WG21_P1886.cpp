@@ -42,7 +42,7 @@ static QUICKCPPLIB_NOINLINE status_result<int> src1() noexcept
 extern QUICKCPPLIB_NOINLINE status_result<int> test1() noexcept
 {
   obj x;
-  OUTCOME_TRY(v, src1());
+  OUTCOME_TRY(auto &&v, src1());
   foo = 0;
   return success(v);
 }

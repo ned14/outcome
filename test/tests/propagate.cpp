@@ -59,7 +59,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / propagate, "Tests that the outcom
   {
     auto t0 = [&](int a) { return result<long>(a); };
     auto t1 = [&](int a) -> result<std::string> {
-      OUTCOME_TRY(f, (t0(a)));
+      OUTCOME_TRY(auto &&f, (t0(a)));
       return std::to_string(f);
     };
     BOOST_CHECK(t1(5).value() == "5");
@@ -67,7 +67,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / propagate, "Tests that the outcom
   {
     auto t0 = [&](int a) { return result<long>(a); };
     auto t1 = [&](int a) -> outcome<std::string> {
-      OUTCOME_TRY(f, (t0(a)));
+      OUTCOME_TRY(auto &&f, (t0(a)));
       return std::to_string(f);
     };
     BOOST_CHECK(t1(5).value() == "5");

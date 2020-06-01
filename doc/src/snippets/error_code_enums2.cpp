@@ -128,7 +128,7 @@ result<udt> boo()
 }
 result<udt> foo()
 {
-  OUTCOME_TRY(v, (boo()));
+  OUTCOME_TRY(auto &&v, (boo()));
   return udt{5};  // emplace construct udt with 5
 }
 //! [usage3]
