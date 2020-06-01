@@ -57,6 +57,11 @@ world code. It is expected that the build time impact of union storage won't be 
 union storage for trivially copyable types is much easier than for non-TC types.
 
 3. The compile time requirement for `E` types to have a default constructor is removed.
+
+4. `OUTCOME_TRY(var, expr)` no longer always declares `var` as `auto &&var`, but simply uses it
+as is. This allows `TRY` to initialise or assign. You can use the macro `OUTCOME21_TRY` if you
+want the pre-Outcome v2.2 behaviour. You may find the regular expression `_TRY\((.*?),(.*?)\);` =>
+`_TRY(auto &&\1,\2);` of use to you when upgrading code.
 {{% /notice %}}
 
 ## Sample usage
