@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-01T11:29:12 UTC">
+<meta name="revised" content="2020-06-01T11:38:06 UTC">
 <title>Inspecting result&lt;T, EC&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2685,23 +2685,23 @@
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">print_half</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">text</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">r</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>     <span class="c1">// #1
+  <span class="k">if</span> <span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">r</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>         <span class="c1">// #1
 </span><span class="c1"></span>  <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>    <span class="c1">// #2
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>        <span class="c1">// #2
 </span><span class="c1"></span>  <span class="p">}</span>
   <span class="k">else</span>
   <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">error</span><span class="p">()</span> <span class="o">==</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="n">TooLong</span><span class="p">)</span>     <span class="c1">// #3
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">error</span><span class="p">()</span> <span class="o">==</span> <span class="n">ConversionErrc</span><span class="o">::</span><span class="n">TooLong</span><span class="p">)</span>         <span class="c1">// #3
 </span><span class="c1"></span>    <span class="p">{</span>
-      <span class="n">OUTCOME_TRY</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>  <span class="c1">// #4
+      <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">i</span><span class="p">,</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>  <span class="c1">// #4
 </span><span class="c1"></span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">.</span><span class="n">half</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">else</span>
     <span class="p">{</span>
-      <span class="k">return</span> <span class="n">r</span><span class="p">.</span><span class="n">as_failure</span><span class="p">();</span>                      <span class="c1">// #5
+      <span class="k">return</span> <span class="n">r</span><span class="p">.</span><span class="n">as_failure</span><span class="p">();</span>                          <span class="c1">// #5
 </span><span class="c1"></span>    <span class="p">}</span>
   <span class="p">}</span>
-  <span class="k">return</span> <span class="n">outcome</span><span class="o">::</span><span class="n">success</span><span class="p">();</span>                      <span class="c1">// #6
+  <span class="k">return</span> <span class="n">outcome</span><span class="o">::</span><span class="n">success</span><span class="p">();</span>                          <span class="c1">// #6
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/using_result.cpp#L142" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
@@ -2759,7 +2759,7 @@ all <code>result</code> and <code>outcome</code> types into a successful return,
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 15/11/2019
     </div>
     
 
