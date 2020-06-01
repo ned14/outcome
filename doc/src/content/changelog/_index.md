@@ -44,6 +44,11 @@ and {{% api "value_or_error<T>" %}} where they wanted a concept that matched
 types which were `basic_result`, but not exactly one of those. Concepts filling
 that gap were added.
 
+Operation `TRY` works differently from Outcome v2.2 onwards
+: This is a severely code breaking change which change the syntax of how one uses
+`OUTCOME_TRY()`. A regular expression suitable for upgrading code can be found in
+the list of changes between Outcome v2.1 and v2.2.
+
 ### Bug fixes:
 
 [#224](https://github.com/ned14/outcome/issues/224)

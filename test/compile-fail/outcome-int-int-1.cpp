@@ -29,5 +29,6 @@ int main()
   using namespace OUTCOME_V2_NAMESPACE;
   // Must not be possible to initialise an outcome with same R, S and P types
   outcome<int, int, int> m(5);
+  (void) m;
   return 0;
 }
