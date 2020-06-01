@@ -57,19 +57,21 @@ namespace experimental
   namespace policy
   {
     template <class T, class EC, class E>
-    using default_status_outcome_policy = std::conditional_t<                                                                                                                              //
-    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                                     //
-    OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                               //
-    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value),  //
-                       status_code_throw<T, EC, E>,                                                                                                                                        //
-                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                                             //
+    using default_status_outcome_policy = std::conditional_t<  //
+    std::is_void<EC>::value && std::is_void<E>::value,         //
+    OUTCOME_V2_NAMESPACE::policy::terminate,                   //
+    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) &&
+                       (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value),  //
+                       status_code_throw<T, EC, E>,                                                                    //
+                       OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                         //
                        >>;
   }  // namespace policy
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
+  template <class R, class S = errored_status_code<erased<typename system_code::value_type>>, class P = std::exception_ptr,
+            class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
   namespace policy
@@ -83,7 +85,8 @@ SIGNATURE NOT RECOGNISED
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(
+            base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
@@ -98,7 +101,8 @@ SIGNATURE NOT RECOGNISED
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
       template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
     };
-    template <class T, class DomainType, class E> struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
+    template <class T, class DomainType, class E>
+    struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
     {
       status_code_throw() = default;
       using status_code_throw<T, status_code<DomainType>, E>::status_code_throw;

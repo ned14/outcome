@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF a1ffd01c68cb176dd12dd469824a38846e535b40
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-25 14:12:05 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a1ffd01c
+#define OUTCOME_PREVIOUS_COMMIT_REF 4f6d05f8267b00201970b9638dc775bf16d22d94
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-06-01 11:30:38 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 4f6d05f8
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5877,7 +5877,7 @@ namespace trait
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* A very simple result type
-(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Apr 2018
 
 
@@ -10221,11 +10221,11 @@ namespace trait
       using type = SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>;
     };
   } // namespace detail
-  template<class DomainType> struct is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
+  template <class DomainType> struct is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>
   {
     static constexpr bool value = SYSTEM_ERROR2_NAMESPACE::traits::is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::status_code<DomainType>>::value;
   };
-  template<class DomainType> struct is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
+  template <class DomainType> struct is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>
   {
     static constexpr bool value = SYSTEM_ERROR2_NAMESPACE::traits::is_move_bitcopying<SYSTEM_ERROR2_NAMESPACE::errored_status_code<DomainType>>::value;
   };
@@ -10298,7 +10298,8 @@ namespace experimental
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = system_code, class NoValuePolicy = policy::default_status_result_policy<R, S>> //
+  template <class R, class S = errored_status_code<erased<typename system_code::value_type>>,
+            class NoValuePolicy = policy::default_status_result_policy<R, S>> //
   using status_result = basic_result<R, S, NoValuePolicy>;
 } // namespace experimental
 OUTCOME_V2_NAMESPACE_END
@@ -10330,7 +10331,8 @@ namespace experimental
     using default_status_outcome_policy = std::conditional_t< //
     std::is_void<EC>::value && std::is_void<E>::value, //
     OUTCOME_V2_NAMESPACE::policy::terminate, //
-    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value), //
+    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) &&
+                       (std::is_void<E>::value || OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value), //
                        status_code_throw<T, EC, E>, //
                        OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers //
                        >>;
@@ -10338,7 +10340,8 @@ namespace experimental
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>> //
+  template <class R, class S = errored_status_code<erased<typename system_code::value_type>>, class P = std::exception_ptr,
+            class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>> //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
   namespace policy
   {
@@ -10351,7 +10354,8 @@ SIGNATURE NOT RECOGNISED
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self))); // NOLINT
+            OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(
+            base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self))); // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
@@ -10366,7 +10370,8 @@ SIGNATURE NOT RECOGNISED
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
       template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
     };
-    template <class T, class DomainType, class E> struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
+    template <class T, class DomainType, class E>
+    struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
     {
       status_code_throw() = default;
       using status_code_throw<T, status_code<DomainType>, E>::status_code_throw;
