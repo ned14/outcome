@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF aa92abe442dd2cd75be8fe1272d1d98f53fe6fe7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-18 19:09:06 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE aa92abe4
+#define OUTCOME_PREVIOUS_COMMIT_REF a1ffd01c68cb176dd12dd469824a38846e535b40
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-05-25 14:12:05 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a1ffd01c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -10525,13 +10525,13 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
 #define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); auto &&v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -10626,6 +10626,70 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_CO_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_CO_TRYA(v, ...) OUTCOME_CO_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_CO_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+#define OUTCOME21_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME21_TRYA(a, b, c, d, e, f, g, h)
+#define OUTCOME21_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME21_TRYA(a, b, c, d, e, f, g)
+#define OUTCOME21_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME21_TRYA(a, b, c, d, e, f)
+#define OUTCOME21_TRY_INVOKE_TRY5(a, b, c, d, e) OUTCOME21_TRYA(a, b, c, d, e)
+#define OUTCOME21_TRY_INVOKE_TRY4(a, b, c, d) OUTCOME21_TRYA(a, b, c, d)
+#define OUTCOME21_TRY_INVOKE_TRY3(a, b, c) OUTCOME21_TRYA(a, b, c)
+#define OUTCOME21_TRY_INVOKE_TRY2(a, b) OUTCOME21_TRYA(a, b)
+#define OUTCOME21_TRY_INVOKE_TRY1(a) OUTCOME_TRYV(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME21_TRY_INVOKE_TRY, __VA_ARGS__)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME21_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g, h)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME21_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME21_TRYA_FAILURE_LIKELY(a, b, c, d, e, f)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY5(a, b, c, d, e) OUTCOME21_TRYA_FAILURE_LIKELY(a, b, c, d, e)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY4(a, b, c, d) OUTCOME21_TRYA_FAILURE_LIKELY(a, b, c, d)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY3(a, b, c) OUTCOME21_TRYA_FAILURE_LIKELY(a, b, c)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY2(a, b) OUTCOME21_TRYA_FAILURE_LIKELY(a, b)
+#define OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY1(a) OUTCOME_TRYV_FAILURE_LIKELY(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME21_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
+#define OUTCOME21_CO_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME21_CO_TRYA(a, b, c, d, e, f, g, h)
+#define OUTCOME21_CO_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME21_CO_TRYA(a, b, c, d, e, f, g)
+#define OUTCOME21_CO_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME21_CO_TRYA(a, b, c, d, e, f)
+#define OUTCOME21_CO_TRY_INVOKE_TRY5(a, b, c, d, e) OUTCOME21_CO_TRYA(a, b, c, d, e)
+#define OUTCOME21_CO_TRY_INVOKE_TRY4(a, b, c, d) OUTCOME21_CO_TRYA(a, b, c, d)
+#define OUTCOME21_CO_TRY_INVOKE_TRY3(a, b, c) OUTCOME21_CO_TRYA(a, b, c)
+#define OUTCOME21_CO_TRY_INVOKE_TRY2(a, b) OUTCOME21_CO_TRYA(a, b)
+#define OUTCOME21_CO_TRY_INVOKE_TRY1(a) OUTCOME_CO_TRYV(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_CO_TRY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME21_CO_TRY_INVOKE_TRY, __VA_ARGS__)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g, h)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f, g)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e, f)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY5(a, b, c, d, e) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b, c, d, e)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY4(a, b, c, d) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b, c, d)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY3(a, b, c) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b, c)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY2(a, b) OUTCOME21_CO_TRYA_FAILURE_LIKELY(a, b)
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY1(a) OUTCOME_CO_TRYV_FAILURE_LIKELY(a)
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME21_CO_TRY_FAILURE_LIKELY(...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME21_CO_TRY_FAILURE_LIKELY_INVOKE_TRY, __VA_ARGS__)
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic pop
 #endif
