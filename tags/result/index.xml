@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/result/</link>
     <description>Recent content in Result on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 05 Feb 2020 11:39:21 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 19 Nov 2019 11:56:48 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/result/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,7 +13,7 @@
     <item>
       <title>result&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/result/</link>
-      <pubDate>Wed, 05 Feb 2020 11:39:21 +0000</pubDate>
+      <pubDate>Tue, 19 Nov 2019 11:56:48 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/</guid>
       <description>We will define a function that converts a std::string to an int. This function can fail for a number of reasons; if it does we want to communicate the failure reason.

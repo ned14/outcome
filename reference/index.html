@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-02T08:26:08 UTC">
+<meta name="revised" content="2020-06-02T08:36:04 UTC">
 <title>API reference :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2674,7 +2674,7 @@
 	<a href="/outcome/reference/macros/template/" >Constrained template macros</a><li>
 	<a href="/outcome/reference/macros/version/" >Version macros</a><li>
 	<a href="/outcome/reference/macros/co_try/" ><code>OUTCOME_CO_TRY(var, expr)</code></a>
-<p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+<p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/co_tryv/" ><code>OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)</code></a>
 <p>Evaluate from within a coroutine an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/co_tryv_failure_likely/" ><code>OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)</code></a>
@@ -2684,7 +2684,7 @@
 	<a href="/outcome/reference/macros/co_tryx_failure_likely/" ><code>OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)</code></a>
 <p>Evaluate from within a coroutine an expression which results in an understood type, emitting the <code>T</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/co_try_failure_likely/" ><code>OUTCOME_CO_TRY_FAILURE_LIKELY(var, expr)</code></a>
-<p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+<p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/disable_execinfo/" ><code>OUTCOME_DISABLE_EXECINFO</code></a>
 <p>If defined, disables the use of the <code>&lt;execinfo.h&gt;</code> header (or the win32 emulation).</p><li>
 	<a href="/outcome/reference/macros/enable_legacy_support_for/" ><code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code></a>
@@ -2700,7 +2700,7 @@
 	<a href="/outcome/reference/macros/throw_exception/" ><code>OUTCOME_THROW_EXCEPTION(expr)</code></a>
 <p>How to throw a C++ exception, or equivalent thereof.</p><li>
 	<a href="/outcome/reference/macros/try/" ><code>OUTCOME_TRY(var, expr)</code></a>
-<p>Evaluate an expression which results in an understood type, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+<p>Evaluate an expression which results in an understood type, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/tryv/" ><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></a>
 <p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/tryv_failure_likely/" ><code>OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)</code></a>
@@ -2710,7 +2710,7 @@
 	<a href="/outcome/reference/macros/tryx_failure_likely/" ><code>OUTCOME_TRYX_FAILURE_LIKELY(expr)</code></a>
 <p>Evaluate an expression which results in an understood type, emitting the <code>T</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/try_failure_likely/" ><code>OUTCOME_TRY_FAILURE_LIKELY(var, expr)</code></a>
-<p>Evaluate an expression which results in an understood type, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+<p>Evaluate an expression which results in an understood type, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/in_place_type/" ><code>OUTCOME_USE_STD_IN_PLACE_TYPE</code></a>
 <p>How to implement <code>in_place_type_t&lt;T&gt;</code> and <code>in_place_type&lt;T&gt;</code>.</p><li>
 	<a href="/outcome/reference/macros/is_nothrow_swappable/" ><code>OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE</code></a>
@@ -2864,7 +2864,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 05/02/2020
+        <i class='fa fa-calendar'></i> Last update on 19/11/2019
     </div>
     
 
