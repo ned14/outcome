@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-01T13:45:24 UTC">
+<meta name="revised" content="2020-06-02T08:26:18 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2709,7 +2709,7 @@ union storage for trivially copyable types is much easier than for non-TC types.
 
 <li><p><code>OUTCOME_TRY(var, expr)</code> no longer always declares <code>var</code> as <code>auto &amp;&amp;var</code>, but simply uses it
 as is. This allows <code>TRY</code> to initialise or assign. You can use the macro <code>OUTCOME21_TRY</code> if you
-want the pre-Outcome v2.2 behaviour. You may find the regular expression <code>_TRY\((.*?),(.*?)\);</code> =&gt;
+want the pre-Outcome v2.2 behaviour. You may find the regular expression <code>_TRY\(([^(]*?),(.*?)\);</code> =&gt;
 <code>_TRY(auto &amp;&amp;\1,\2);</code> of use to you when upgrading code.</p></li>
 </ol>
 </div>
@@ -2785,7 +2785,7 @@ is available in scope.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 01/06/2020
+        <i class='fa fa-calendar'></i> Last update on 02/06/2020
     </div>
     
 

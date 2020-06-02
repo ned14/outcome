@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/outcome/</link>
     <description>Recent content in Outcome on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 03 Feb 2020 18:35:18 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 05 Feb 2020 11:39:21 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -22,7 +22,7 @@
     <item>
       <title>outcome&lt;&gt;</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/outcome/</link>
-      <pubDate>Mon, 03 Feb 2020 18:35:18 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 11:39:21 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/outcome/</guid>
       <description>Type outcome&amp;lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&amp;lt;T, EC, EP&amp;gt;&amp;gt; represents either a successfully computed value of type T, or one or two reasons for failure. Failure can be represented by EC, or EP, or both, although usually it will either be an EC or an EP. Similarly to result, EC defaults to std::error_code/boost::system::error_code, and EP defaults to std::exception_ptr/boost::exception_ptr.
