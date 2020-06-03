@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-02T08:36:06 UTC">
+<meta name="revised" content="2020-06-03T12:57:41 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2703,6 +2703,9 @@ the list of changes between Outcome v2.1 and v2.2.</dd>
 with the fixes to LLVM clang that fix <code>noexcept(std::is_constructible&lt;T, void&gt;)</code>
 failing to compile which I originally submitted years ago. So give up waiting on
 Apple to fix their clang, add a workaround to Outcome.</dd>
+<dt>Use of <code>void</code> in <code>T</code> or <code>E</code> caused <code>noexcept(false)</code></dt>
+<dd>Direct traits examination of <code>void</code> was causing nothrow detection to return false,
+fixed.</dd>
 </dl>
 
 <hr />
@@ -3047,7 +3050,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 01/06/2020
+        <i class='fa fa-calendar'></i> Last update on 03/06/2020
     </div>
     
 
