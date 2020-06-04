@@ -37,7 +37,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
   static_assert(std::is_constructible<outcome<long>, int>::value, "Sanity check that monad can be constructed from a value_type");
   static_assert(!std::is_constructible<outcome<outcome<long>>, int>::value,
                 "Sanity check that outer monad can be constructed from an inner monad's value_type");
-#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 7  // GCC 6 barfs on this
+#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 9  // GCCs before 9 barf on this
   static_assert(!std::is_constructible<outcome<outcome<outcome<long>>>, int>::value,
                 "Sanity check that outer monad can be constructed from an inner inner monad's value_type");
   static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<long>>>>, int>::value,
@@ -46,7 +46,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
 
   static_assert(std::is_constructible<outcome<int>, outcome<long>>::value, "Sanity check that compatible monads can be constructed from one another");
   static_assert(std::is_constructible<outcome<outcome<int>>, outcome<long>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
-#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 7  // GCC 6 barfs on this
+#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 9  // GCCs before 9 barf on this
   static_assert(!std::is_constructible<outcome<outcome<outcome<int>>>, outcome<long>>::value,
                 "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
   static_assert(!std::is_constructible<outcome<outcome<outcome<outcome<int>>>>, outcome<long>>::value,
@@ -57,7 +57,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome, "Tests that the outcome works as i
 
   static_assert(std::is_constructible<outcome<int>, outcome<void>>::value, "Sanity check that all monads can be constructed from a void monad");
   static_assert(std::is_constructible<outcome<outcome<int>>, outcome<void>>::value, "Sanity check that outer monad can be constructed from a compatible monad");
-#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 7  // GCC 6 barfs on this
+#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 9 // GCCs before 9 barf on this
   static_assert(std::is_constructible<outcome<outcome<outcome<int>>>, outcome<void>>::value,
                 "Sanity check that outer monad can be constructed from a compatible monad up to two nestings deep");
 #endif
