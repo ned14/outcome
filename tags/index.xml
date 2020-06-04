@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/</link>
     <description>Recent content in Tags on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 30 Nov 2019 16:49:38 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 05 Feb 2020 21:24:28 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -49,7 +49,7 @@
     <item>
       <title>Best Practice</title>
       <link>https://ned14.github.io/outcome/tags/best-practice/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/best-practice/</guid>
       <description></description>
@@ -67,7 +67,7 @@
     <item>
       <title>Constructors</title>
       <link>https://ned14.github.io/outcome/tags/constructors/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/constructors/</guid>
       <description></description>
@@ -76,7 +76,7 @@
     <item>
       <title>Conventions</title>
       <link>https://ned14.github.io/outcome/tags/conventions/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/conventions/</guid>
       <description></description>
@@ -139,7 +139,7 @@
     <item>
       <title>Has_error_code</title>
       <link>https://ned14.github.io/outcome/tags/has_error_code/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/has_error_code/</guid>
       <description></description>
@@ -148,7 +148,7 @@
     <item>
       <title>Hooks</title>
       <link>https://ned14.github.io/outcome/tags/hooks/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/hooks/</guid>
       <description></description>
@@ -157,7 +157,7 @@
     <item>
       <title>Idioms</title>
       <link>https://ned14.github.io/outcome/tags/idioms/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/idioms/</guid>
       <description></description>
@@ -175,7 +175,7 @@
     <item>
       <title>Make_error_code</title>
       <link>https://ned14.github.io/outcome/tags/make_error_code/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/make_error_code/</guid>
       <description></description>
@@ -184,7 +184,7 @@
     <item>
       <title>Namespace</title>
       <link>https://ned14.github.io/outcome/tags/namespace/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/namespace/</guid>
       <description></description>
@@ -211,7 +211,7 @@
     <item>
       <title>Outcome</title>
       <link>https://ned14.github.io/outcome/tags/outcome/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/outcome/</guid>
       <description></description>
@@ -220,7 +220,7 @@
     <item>
       <title>Payload</title>
       <link>https://ned14.github.io/outcome/tags/payload/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/payload/</guid>
       <description></description>
@@ -238,7 +238,7 @@
     <item>
       <title>Policies</title>
       <link>https://ned14.github.io/outcome/tags/policies/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/policies/</guid>
       <description></description>
@@ -247,7 +247,7 @@
     <item>
       <title>Result</title>
       <link>https://ned14.github.io/outcome/tags/result/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/result/</guid>
       <description></description>
@@ -256,7 +256,7 @@
     <item>
       <title>Try</title>
       <link>https://ned14.github.io/outcome/tags/try/</link>
-      <pubDate>Sat, 30 Nov 2019 16:49:38 +0000</pubDate>
+      <pubDate>Wed, 05 Feb 2020 21:24:28 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tags/try/</guid>
       <description></description>

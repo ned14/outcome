@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-03T12:57:50 UTC">
+<meta name="revised" content="2020-06-04T09:26:25 UTC">
 <title>`OUTCOME_TRY(var, expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2693,7 +2693,7 @@
     
     
     
-    <p>Evaluate an expression which results in a type matching the following customisation points, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <a href="/outcome/reference/functions/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(X)</code></a>
+    <p>Evaluate an expression which results in a type matching the following customisation points, assigning <code>T</code> to a variable called <code>var</code> if successful, immediately returning <a href="/outcome/reference/functions/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(X)</code></a>
  from the calling function if unsuccessful:</p>
 
 <ul>
@@ -2715,11 +2715,9 @@
 <p><em>Definition</em>: See <a href="/outcome/reference/macros/tryv/" class="api-reference"><code>OUTCOME_TRYV(expr)</code></a>
  for most of the mechanics.</p>
 
-<p>If successful, <code>var</code> is initialised or assigned to the expression result&rsquo;s <code>.assume_value()</code> if available, else to its <code>.value()</code>. This binds a reference possibly to the <code>T</code> stored inside the bound result of the expression, but possibly also to a temporary emitted from the value observer function.</p>
+<p>If successful, an <code>auto &amp;&amp;var</code> is initialised to the expression result&rsquo;s <code>.assume_value()</code> if available, else to its <code>.value()</code>. This binds a reference possibly to the <code>T</code> stored inside the bound result of the expression, but possibly also to a temporary emitted from the value observer function.</p>
 
 <p><em>Header</em>: <code>&lt;outcome/try.hpp&gt;</code></p>
-
-<p><em>Legacy</em>: Before Outcome v2.2, <code>var</code> was always declared as an automatic rvalue ref. You can use the backwards compatibility macro <code>OUTCOME21_TRY()</code> if wish to retain the old behaviour.</p>
 
 
     
@@ -2742,7 +2740,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 01/06/2020
+        <i class='fa fa-calendar'></i> Last update on 05/02/2020
     </div>
     
 
