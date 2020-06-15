@@ -987,9 +987,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 07076384f668e0c34b7938ad0442cd2c16210c51
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-06-02 08:23:45 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 07076384
+#define OUTCOME_PREVIOUS_COMMIT_REF 10001ed51969ff5bc868d293b61f764ff3b7060e
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-06-03 12:54:37 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 10001ed5
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3615,13 +3615,13 @@ OUTCOME_V2_NAMESPACE_END
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace detail
 {
-  template <class R, class S, class NoValuePolicy> class basic_result_final;
+  template <class R, class EC, class NoValuePolicy> class basic_result_storage;
 } // namespace detail
 namespace hooks
 {
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_storage<R, S, NoValuePolicy> *r) noexcept;
   template <class R, class S, class NoValuePolicy>
-  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+  constexpr inline void set_spare_storage(detail::basic_result_storage<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 } // namespace hooks
 namespace policy
 {
@@ -3629,8 +3629,6 @@ namespace policy
 } // namespace policy
 namespace detail
 {
-  template <class R, class EC, class NoValuePolicy> //
-  class basic_result_storage;
   template <class R, class EC, class NoValuePolicy> //
   class basic_result_storage
   {
@@ -3641,9 +3639,9 @@ namespace detail
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V>
-    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept; // NOLINT
+    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_storage<T, U, V> *r) noexcept; // NOLINT
     template <class T, class U, class V>
-    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept; // NOLINT
+    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_storage<T, U, V> *r, uint16_t v) noexcept; // NOLINT
     struct disable_in_place_value_type
     {
     };
@@ -4524,7 +4522,7 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_storage<R, S, NoValuePolicy> *r) noexcept
   {
     return r->_state._status.spare_storage_value;
   }
@@ -4532,7 +4530,7 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   template <class R, class S, class NoValuePolicy>
-  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept
+  constexpr inline void set_spare_storage(detail::basic_result_storage<R, S, NoValuePolicy> *r, uint16_t v) noexcept
   {
     r->_state._status.spare_storage_value = v;
   }

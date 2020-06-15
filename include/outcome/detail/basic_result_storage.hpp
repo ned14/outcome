@@ -33,14 +33,14 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-  template <class R, class S, class NoValuePolicy> class basic_result_final;
+  template <class R, class EC, class NoValuePolicy> class basic_result_storage;
 }  // namespace detail
 
 namespace hooks
 {
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept;
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_storage<R, S, NoValuePolicy> *r) noexcept;
   template <class R, class S, class NoValuePolicy>
-  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
+  constexpr inline void set_spare_storage(detail::basic_result_storage<R, S, NoValuePolicy> *r, uint16_t v) noexcept;
 }  // namespace hooks
 
 namespace policy
@@ -50,8 +50,6 @@ namespace policy
 
 namespace detail
 {
-  template <class R, class EC, class NoValuePolicy>  //
-  class basic_result_storage;
   template <class R, class EC, class NoValuePolicy>  //
   class basic_result_storage
   {
@@ -63,9 +61,9 @@ namespace detail
     friend class basic_result_storage;
     template <class T, class U, class V> friend class basic_result_final;
     template <class T, class U, class V>
-    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_final<T, U, V> *r) noexcept;  // NOLINT
+    friend constexpr inline uint16_t hooks::spare_storage(const detail::basic_result_storage<T, U, V> *r) noexcept;  // NOLINT
     template <class T, class U, class V>
-    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_final<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
+    friend constexpr inline void hooks::set_spare_storage(detail::basic_result_storage<T, U, V> *r, uint16_t v) noexcept;  // NOLINT
 
     struct disable_in_place_value_type
     {

@@ -231,7 +231,7 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_final<R, S, NoValuePolicy> *r) noexcept
+  template <class R, class S, class NoValuePolicy> constexpr inline uint16_t spare_storage(const detail::basic_result_storage<R, S, NoValuePolicy> *r) noexcept
   {
     return r->_state._status.spare_storage_value;
   }
@@ -239,7 +239,7 @@ SIGNATURE NOT RECOGNISED
 SIGNATURE NOT RECOGNISED
 */
   template <class R, class S, class NoValuePolicy>
-  constexpr inline void set_spare_storage(detail::basic_result_final<R, S, NoValuePolicy> *r, uint16_t v) noexcept
+  constexpr inline void set_spare_storage(detail::basic_result_storage<R, S, NoValuePolicy> *r, uint16_t v) noexcept
   {
     r->_state._status.spare_storage_value = v;
   }

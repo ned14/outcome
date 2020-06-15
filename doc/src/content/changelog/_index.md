@@ -61,6 +61,11 @@ Use of `void` in `T` or `E` caused `noexcept(false)`
 : Direct traits examination of `void` was causing nothrow detection to return false,
 fixed.
 
+Spare storage could not be used from within no-value policy classes
+: Due to an obvious brain fart when writing the code at the time, the spare storage
+APIs had the wrong prototype which prevented them working from within policy classes.
+Sorry.
+
 ---
 ## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
 
