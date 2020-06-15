@@ -37,10 +37,16 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/types.h>
 
 #include "../../../include/outcome.hpp"
+
+#if __has_include(<filesystem>) && (__cplusplus >= 201700 || _HAS_CXX17)
+#include <filesystem>
+namespace filesystem = std::filesystem;
+#else
 #include <experimental/filesystem>
+namespace filesystem = std::experimental::filesystem;
+#endif
 
 namespace outcome = OUTCOME_V2_NAMESPACE;
-namespace filesystem = std::experimental::filesystem;
 
 //! [file_handle]
 class file_handle
