@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-15T18:44:37 UTC">
+<meta name="revised" content="2020-06-19T14:45:49 UTC">
 <title>Error :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2660,7 +2660,7 @@
         <h2 class="post-title"><a href="/outcome/tutorial/essential/outcome/inspecting/">Inspecting outcome&lt;T, EC, EP&gt;</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Continuing with the previous example, in Layer3 we have function z which again reports failures via exceptions. It will call function h from Layer2_old which returns outcome&lt;int&gt; (which may store a double or an std::error_code or an std::exception_ptr). The goal is to unpack it to either the successful return value int or to throw an appropriate exception: if we are storing an std::exception_ptr just rethrow it. If we are storing an std::error_code throw it as std::system_error, which is designed to store std::error_code&rsquo;s: <a class="read-more" href="/outcome/tutorial/essential/outcome/inspecting/">&raquo;</a></p>
+        <p>Continuing with the previous example, in Layer3 we have function z which again reports failures via exceptions. It will call function h from Layer2_old which returns outcome&lt;int&gt; (which may store an int or a std::error_code or a std::exception_ptr). The goal is to unpack it to either the successful return value int or to throw an appropriate exception: if we are storing an std::exception_ptr, just rethrow it. If we are storing a std::error_code throw it as std::system_error, which is designed to store std::error_code&rsquo;s: <a class="read-more" href="/outcome/tutorial/essential/outcome/inspecting/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2741,7 +2741,7 @@ outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this c
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 11/02/2020
+        <i class='fa fa-calendar'></i> Last update on 17/02/2020
     </div>
     
 
