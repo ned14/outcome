@@ -5426,8 +5426,8 @@ SIGNATURE NOT RECOGNISED
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   constexpr bool operator==(const basic_outcome<T, U, V, W> &o) const noexcept( //
   noexcept(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()) //
-  && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
-  && noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
+  &&noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
+  &&noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
@@ -5455,7 +5455,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() == std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() == std::declval<U>()))
   constexpr bool operator==(const failure_type<T, U> &o) const noexcept( //
-  noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
+  noexcept(std::declval<error_type>() == std::declval<T>()) &&noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
     if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
@@ -5481,8 +5481,8 @@ SIGNATURE NOT RECOGNISED
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   constexpr bool operator!=(const basic_outcome<T, U, V, W> &o) const noexcept( //
   noexcept(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()) //
-  && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
-  && noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
+  &&noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
+  &&noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
@@ -5510,7 +5510,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() != std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() != std::declval<U>()))
   constexpr bool operator!=(const failure_type<T, U> &o) const noexcept( //
-  noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
+  noexcept(std::declval<error_type>() == std::declval<T>()) &&noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
     if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
@@ -5644,13 +5644,13 @@ SIGNATURE NOT RECOGNISED
   failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
 #endif
 };
-#if __cplusplus <= 202000
+// These two must be SFINAE, as Concepts-based causes build failure due to constexpr recursion
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-OUTCOME_TEMPLATE(class T, class U, class V, //
-                 class R, class S, class P, class N)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>()))
+template <class T, class U, class V, //
+          class R, class S, class P, class N, //
+          typename = decltype(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>())>
 constexpr inline bool operator==(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept( //
 noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>()))
 {
@@ -5659,15 +5659,14 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-OUTCOME_TEMPLATE(class T, class U, class V, //
-                 class R, class S, class P, class N)
-OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>()))
+template <class T, class U, class V, //
+          class R, class S, class P, class N, //
+          typename = decltype(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>())>
 constexpr inline bool operator!=(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept( //
 noexcept(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>()))
 {
   return b != a;
 }
-#endif
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
