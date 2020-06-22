@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-06-21T15:42:50 UTC">
+<meta name="revised" content="2020-06-22T09:18:51 UTC">
 <title>outcome&lt;&gt; :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2727,7 +2727,7 @@ and be able to rethrow it in <code>Layer3</code>.</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">auto</span> <span class="n">old</span><span class="o">::</span><span class="n">h</span><span class="p">()</span> <span class="k">noexcept</span> <span class="o">-&gt;</span> <span class="n">outcome</span><span class="o">::</span><span class="n">outcome</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span>
 <span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">g</span><span class="p">()));</span>             <span class="c1">// #1
+  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">g</span><span class="p">()));</span>             <span class="c1">// #1
 </span><span class="c1"></span>    
   <span class="k">try</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="n">f</span><span class="p">();</span>
@@ -2772,7 +2772,7 @@ and be able to rethrow it in <code>Layer3</code>.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 18/12/2019
+        <i class='fa fa-calendar'></i> Last update on 19/02/2020
     </div>
     
 
