@@ -10,7 +10,7 @@ weight = 80
 The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
 becoming the default. You can use the future v2.2 branch now using
 [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation).
-This branch has a number of major changes to Outcome v2.1, see the front page
+This branch has a number of major breaking changes to Outcome v2.1, see the front page
 for details.
 {{% /notice %}}
 
