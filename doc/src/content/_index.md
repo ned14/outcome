@@ -38,7 +38,7 @@ guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based
 Ben Craig's work on [P1886 *Error speed benchmarking*](https://wg21.link/P1886) has led to
 a [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation) branch intended
 to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing. This branch has a number
-of major changes to Outcome v2:
+of major and breaking changes to Outcome v2:
 
 1. A new trait `is_move_bitcopying<T>` is added, which opts types into a library-based emulation of
 [P1029 *move = bitcopies*](https://wg21.link/P1029). [Experimental `std::error`](https://wg21.link/P1028) is opted in by default.
