@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-07-03T14:15:39 UTC">
+<meta name="revised" content="2020-07-07T14:22:40 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2707,6 +2707,10 @@ Apple to fix their clang, add a workaround to Outcome.</dd>
 <dd>Due to an obvious brain fart when writing the code at the time, the spare storage
 APIs had the wrong prototype which prevented them working from within policy classes.
 Sorry.</dd>
+<dt>Boost.Outcome should now compile with <code>BOOST_NO_EXCEPTIONS</code> defined</dt>
+<dd>Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
+should now compile with C++ exceptions globally disabled. You won&rsquo;t be able to use
+<code>boost::exception_ptr</code> as it can&rsquo;t be included if C++ exceptions are globally disabled.</dd>
 </dl>
 
 <hr />
@@ -3051,7 +3055,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/07/2020
+        <i class='fa fa-calendar'></i> Last update on 07/07/2020
     </div>
     
 
