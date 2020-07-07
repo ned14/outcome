@@ -27,8 +27,17 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "config.hpp"
 
-#include "boost/exception_ptr.hpp"
 #include "boost/system/system_error.hpp"
+#include "boost/version.hpp"
+
+#if BOOST_VERSION < 107400 || !defined(BOOST_NO_EXCEPTIONS)
+#include "boost/exception_ptr.hpp"
+#else
+namespace boost
+{
+  class exception_ptr;
+}
+#endif
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -43,6 +52,7 @@ namespace policy
      */
     inline boost::system::error_code make_error_code(boost::system::error_code v) { return v; }
 
+#if BOOST_VERSION < 107400
     /* Pass through `make_exception_ptr` function for `boost::exception_ptr`.
     The reason this needs to be here, declared before the rest of Outcome,
     is that there is no boost::make_exception_ptr as Boost still uses the old
@@ -53,6 +63,7 @@ namespace policy
     Boost doing that itself at some point. This hack should keep working after.
     */
     inline boost::exception_ptr make_exception_ptr(boost::exception_ptr v) { return v; }
+#endif
   }  // namespace detail
 }  // namespace policy
 OUTCOME_V2_NAMESPACE_END

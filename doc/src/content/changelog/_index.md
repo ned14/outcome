@@ -10,7 +10,7 @@ weight = 80
 The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
 becoming the default. You can use the future v2.2 branch now using
 [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation).
-This branch has a number of major changes to Outcome v2.1, see the front page
+This branch has a number of major breaking changes to Outcome v2.1, see the front page
 for details.
 {{% /notice %}}
 
@@ -61,6 +61,11 @@ Spare storage could not be used from within no-value policy classes
 : Due to an obvious brain fart when writing the code at the time, the spare storage
 APIs had the wrong prototype which prevented them working from within policy classes.
 Sorry.
+
+Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
+: Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
+should now compile with C++ exceptions globally disabled. You won't be able to use
+`boost::exception_ptr` as it can't be included if C++ exceptions are globally disabled.
 
 ---
 ## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
