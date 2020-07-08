@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-07-08T12:37:46 UTC">
+<meta name="revised" content="2020-07-08T16:43:42 UTC">
 <title>In use :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2699,7 +2699,7 @@
 </span><span class="c1"></span>    <span class="c1">// that into a httplib_error exception type which is stored as an exception ptr. The
 </span><span class="c1"></span>    <span class="c1">// TRY operation below will return that exception ptr to be rethrown in the caller.
 </span><span class="c1"></span>    <span class="c1">// Otherwise the fetched data is returned in a std::string data.
-</span><span class="c1"></span>    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="p">(</span><span class="n">httplib</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="s">&#34;http://www.nedproductions.biz/&#34;</span><span class="p">)));</span>
+</span><span class="c1"></span>    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="p">(</span><span class="n">httplib</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="s">&#34;http://www.nedproductions.biz/&#34;</span><span class="p">)));</span>
     <span class="n">string_view</span> <span class="nf">data_view</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
 
     <span class="c1">// HTML tidy the fetched data. If the C library fails due to an error corresponding to
@@ -2709,11 +2709,11 @@
 </span><span class="c1"></span>    <span class="c1">// TRY operation below will return that exception ptr to be rethrown in the caller.
 </span><span class="c1"></span>    <span class="c1">// Otherwise the tidied data is returned into holdmem, with the string view updated to
 </span><span class="c1"></span>    <span class="c1">// point at the tidied data.
-</span><span class="c1"></span>    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">holdmem</span><span class="p">,</span> <span class="n">ext</span><span class="p">(</span><span class="n">tidy_html</span><span class="p">(</span><span class="n">data_view</span><span class="p">)));</span>
+</span><span class="c1"></span>    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">holdmem</span><span class="p">,</span> <span class="n">ext</span><span class="p">(</span><span class="n">tidy_html</span><span class="p">(</span><span class="n">data_view</span><span class="p">)));</span>
 
     <span class="c1">// Write the tidied data to some file. If the write fails, synthesise a filesystem_error
 </span><span class="c1"></span>    <span class="c1">// exception ptr exactly as if one called filelib::write_file(data_view).value().
-</span><span class="c1"></span>    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">written</span><span class="p">,</span> <span class="n">ext</span><span class="p">(</span><span class="n">filelib</span><span class="o">::</span><span class="n">write_file</span><span class="p">(</span><span class="n">data_view</span><span class="p">)));</span>
+</span><span class="c1"></span>    <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">written</span><span class="p">,</span> <span class="n">ext</span><span class="p">(</span><span class="n">filelib</span><span class="o">::</span><span class="n">write_file</span><span class="p">(</span><span class="n">data_view</span><span class="p">)));</span>
     <span class="k">return</span> <span class="nf">success</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>  <span class="c1">// namespace app
@@ -2764,7 +2764,7 @@ achieved solely by <code>app</code> based customisation points, and via <code>co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 28/01/2020
+        <i class='fa fa-calendar'></i> Last update on 25/02/2020
     </div>
     
 
