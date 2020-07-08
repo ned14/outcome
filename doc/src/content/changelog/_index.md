@@ -66,6 +66,11 @@ Spare storage could not be used from within no-value policy classes
 APIs had the wrong prototype which prevented them working from within policy classes.
 Sorry.
 
+Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
+: Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
+should now compile with C++ exceptions globally disabled. You won't be able to use
+`boost::exception_ptr` as it can't be included if C++ exceptions are globally disabled.
+
 ---
 ## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)
 
