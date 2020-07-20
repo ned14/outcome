@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 96c87340794c8c3606e10d7addc2ced5153518a7
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-06-04 09:23:02 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 96c87340
+#define OUTCOME_PREVIOUS_COMMIT_REF e2c3cc65ebc514ca1dba3fa32954e9c6566e4079
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-07-08 16:40:08 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e2c3cc65
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5040,8 +5040,8 @@ SIGNATURE NOT RECOGNISED
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   constexpr bool operator==(const basic_outcome<T, U, V, W> &o) const noexcept( //
   noexcept(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()) //
-  &&noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
-  &&noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
+  && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
+  && noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
@@ -5069,7 +5069,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() == std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() == std::declval<U>()))
   constexpr bool operator==(const failure_type<T, U> &o) const noexcept( //
-  noexcept(std::declval<error_type>() == std::declval<T>()) &&noexcept(std::declval<exception_type>() == std::declval<U>()))
+  noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
     if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
@@ -5095,8 +5095,8 @@ SIGNATURE NOT RECOGNISED
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   constexpr bool operator!=(const basic_outcome<T, U, V, W> &o) const noexcept( //
   noexcept(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()) //
-  &&noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
-  &&noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
+  && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
+  && noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
@@ -5124,7 +5124,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() != std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() != std::declval<U>()))
   constexpr bool operator!=(const failure_type<T, U> &o) const noexcept( //
-  noexcept(std::declval<error_type>() == std::declval<T>()) &&noexcept(std::declval<exception_type>() == std::declval<U>()))
+  noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
     if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
@@ -5257,13 +5257,12 @@ SIGNATURE NOT RECOGNISED
   failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
 #endif
 };
-// These two must be SFINAE, as Concepts-based causes build failure due to constexpr recursion
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class T, class U, class V, //
-          class R, class S, class P, class N, //
-          typename = decltype(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>())>
+OUTCOME_TEMPLATE(class T, class U, class V, //
+                 class R, class S, class P, class N)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>()))
 constexpr inline bool operator==(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept( //
 noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<T, U, V>>()))
 {
@@ -5272,9 +5271,9 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class T, class U, class V, //
-          class R, class S, class P, class N, //
-          typename = decltype(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>())>
+OUTCOME_TEMPLATE(class T, class U, class V, //
+                 class R, class S, class P, class N)
+OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>()))
 constexpr inline bool operator!=(const basic_result<T, U, V> &a, const basic_outcome<R, S, P, N> &b) noexcept( //
 noexcept(std::declval<basic_outcome<R, S, P, N>>() != std::declval<basic_result<T, U, V>>()))
 {
@@ -5654,7 +5653,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_HPP
 #define SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -7225,7 +7224,10 @@ public:
   using string_ref = _base::string_ref;
 public:
   //! Default constructor
-  constexpr explicit _generic_code_domain(typename _base::unique_id_type id = 0x746d6354f4f733e9) noexcept : _base(id) {}
+  constexpr explicit _generic_code_domain(typename _base::unique_id_type id = 0x746d6354f4f733e9) noexcept
+      : _base(id)
+  {
+  }
   _generic_code_domain(const _generic_code_domain &) = default;
   _generic_code_domain(_generic_code_domain &&) = default;
   _generic_code_domain &operator=(const _generic_code_domain &) = default;
@@ -7352,6 +7354,38 @@ template <class T, class DomainType1, //
 inline bool operator!=(const T &a, const status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator==(const status_code<DomainType1> &a, const T &b)
+{
+  return a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator==(const T &a, const status_code<DomainType1> &b)
+{
+  return b.equivalent(QuickStatusCodeType(a));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator!=(const status_code<DomainType1> &a, const T &b)
+{
+  return !a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator!=(const T &a, const status_code<DomainType1> &b)
+{
+  return !b.equivalent(QuickStatusCodeType(a));
 }
 SYSTEM_ERROR2_NAMESPACE_END
 #endif
@@ -7973,6 +8007,38 @@ template <class T, class DomainType1, //
 inline bool operator!=(const T &a, const errored_status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator==(const errored_status_code<DomainType1> &a, const T &b)
+{
+  return a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator==(const T &a, const errored_status_code<DomainType1> &b)
+{
+  return b.equivalent(QuickStatusCodeType(a));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator!=(const errored_status_code<DomainType1> &a, const T &b)
+{
+  return !a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1, //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
+          >
+inline bool operator!=(const T &a, const errored_status_code<DomainType1> &b)
+{
+  return !b.equivalent(QuickStatusCodeType(a));
 }
 namespace detail
 {
@@ -10026,11 +10092,11 @@ namespace detail
   struct value_overload
   {
   };
-//#ifdef __APPLE__
-//  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
-//#else
+  //#ifdef __APPLE__
+  //  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+  //#else
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
-//#endif
+  //#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
@@ -10154,14 +10220,15 @@ SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRYV_FAILURE_LIKELY(...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
 #if defined(__GNUC__) || defined(__clang__)
+#define OUTCOME_TRYX2(unique, retstmt, ...) ({ auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique)); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res))) ; else return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res)); })
+#define OUTCOME_TRYX(...) OUTCOME_TRYX2(OUTCOME_TRY_UNIQUE_NAME, return, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYX(...) ({ auto &&res = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res))) ; else co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res)); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res)); })
+#define OUTCOME_CO_TRYX(...) OUTCOME_TRYX2(OUTCOME_TRY_UNIQUE_NAME, co_return, __VA_ARGS__)
 #endif
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
