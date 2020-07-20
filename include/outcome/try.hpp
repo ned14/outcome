@@ -49,11 +49,11 @@ namespace detail
   struct value_overload
   {
   };
-//#ifdef __APPLE__
-//  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
-//#else
+  //#ifdef __APPLE__
+  //  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+  //#else
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
-//#endif
+  //#endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
   constexpr inline bool has_as_failure(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_as_failure(...) { return false; }
@@ -217,31 +217,25 @@ SIGNATURE NOT RECOGNISED
 
 #if defined(__GNUC__) || defined(__clang__)
 
-/*! AWAITING HUGO JSON CONVERSION TOOL
-SIGNATURE NOT RECOGNISED
-*/
-#define OUTCOME_TRYX(...)                                                                                                                                      \
+#define OUTCOME_TRYX2(unique, retstmt, ...)                                                                                                                    \
   ({                                                                                                                                                           \
-    auto &&res = (__VA_ARGS__);                                                                                                                                \
-    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                 \
+    auto &&unique = (__VA_ARGS__);                                                                                                                             \
+    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)))                                                                              \
       ;                                                                                                                                                        \
     else                                                                                                                                                       \
-      return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                                \
-    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                     \
+      retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique));                                                         \
+    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique));                                                               \
   })
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYX(...)                                                                                                                                   \
-  ({                                                                                                                                                           \
-    auto &&res = (__VA_ARGS__);                                                                                                                                \
-    if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(res)))                                                                                 \
-      ;                                                                                                                                                        \
-    else                                                                                                                                                       \
-      co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(res) &&>(res));                                                             \
-    OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(res) &&>(res));                                                                     \
-  })
+#define OUTCOME_TRYX(...) OUTCOME_TRYX2(OUTCOME_TRY_UNIQUE_NAME, return, __VA_ARGS__)
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+#define OUTCOME_CO_TRYX(...) OUTCOME_TRYX2(OUTCOME_TRY_UNIQUE_NAME, co_return, __VA_ARGS__)
 #endif
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
