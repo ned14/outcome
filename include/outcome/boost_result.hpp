@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "boost/system/system_error.hpp"
 #include "boost/version.hpp"
 
-#if BOOST_VERSION < 107400 || !defined(BOOST_NO_EXCEPTIONS)
+#if BOOST_VERSION < 107500 || !defined(BOOST_NO_EXCEPTIONS)
 #include "boost/exception_ptr.hpp"
 #else
 namespace boost
@@ -52,7 +52,7 @@ namespace policy
      */
     inline boost::system::error_code make_error_code(boost::system::error_code v) { return v; }
 
-#if BOOST_VERSION < 107400
+#if BOOST_VERSION < 107500
     /* Pass through `make_exception_ptr` function for `boost::exception_ptr`.
     The reason this needs to be here, declared before the rest of Outcome,
     is that there is no boost::make_exception_ptr as Boost still uses the old
