@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF e2c3cc65ebc514ca1dba3fa32954e9c6566e4079
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-07-08 16:40:08 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e2c3cc65
+#define OUTCOME_PREVIOUS_COMMIT_REF 1e90094ca283be2fc456f1cae4ab3eeaa65c67ec
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-07-22 16:53:49 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1e90094c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5232,6 +5232,9 @@ SIGNATURE NOT RECOGNISED
   failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;
 #endif
 };
+// C++ 20 operator== rewriting should take care of this for us, indeed
+// if we don't disable it, we cause Concept recursion to infinity!
+#if __cplusplus < 202000
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -5243,6 +5246,7 @@ noexcept(std::declval<basic_outcome<R, S, P, N>>() == std::declval<basic_result<
 {
   return b == a;
 }
+#endif
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
