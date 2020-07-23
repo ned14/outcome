@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-07-23T18:50:42 UTC">
+<meta name="revised" content="2020-07-23T19:00:30 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2703,6 +2703,9 @@ the list of changes between Outcome v2.1 and v2.2.</dd>
 with the fixes to LLVM clang that fix <code>noexcept(std::is_constructible&lt;T, void&gt;)</code>
 failing to compile which I originally submitted years ago. So give up waiting on
 Apple to fix their clang, add a workaround to Outcome.</dd>
+<dt>Use of <code>void</code> in <code>T</code> or <code>E</code> caused <code>noexcept(false)</code></dt>
+<dd>Direct traits examination of <code>void</code> was causing nothrow detection to return false,
+fixed.</dd>
 <dt>Spare storage could not be used from within no-value policy classes</dt>
 <dd>Due to an obvious brain fart when writing the code at the time, the spare storage
 APIs had the wrong prototype which prevented them working from within policy classes.
