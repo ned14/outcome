@@ -1,5 +1,5 @@
 /* Unit testing for outcomes
-(C) 2013-2019 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2013-2020 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #define _CRT_SECURE_NO_WARNINGS
+#define OUTCOME_ENABLE_LEGACY_SUPPORT_FOR 210  // legacy ADL hooks support
 
 #include "../../include/outcome/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"

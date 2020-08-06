@@ -1,5 +1,5 @@
 /* Policies for result and outcome
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits) and Andrzej Krzemieński <akrzemi1@gmail.com> (1 commit)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (6 commits) and Andrzej Krzemieński <akrzemi1@gmail.com> (1 commit)
 File Created: Oct 2017
 
 
@@ -29,6 +29,53 @@ Distributed under the Boost Software License, Version 1.0.
 
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+namespace hooks
+{
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U> constexpr inline void hook_result_construction(T * /*unused*/, U && /*unused*/) noexcept {}
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U> constexpr inline void hook_result_copy_construction(T * /*unused*/, U && /*unused*/) noexcept {}
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U> constexpr inline void hook_result_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U, class... Args>
+  constexpr inline void hook_result_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
+  {
+  }
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class... U> constexpr inline void hook_outcome_construction(T * /*unused*/, U &&... /*unused*/) noexcept {}
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U> constexpr inline void hook_outcome_copy_construction(T * /*unused*/, U && /*unused*/) noexcept {}
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U> constexpr inline void hook_outcome_move_construction(T * /*unused*/, U && /*unused*/) noexcept {}
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  template <class T, class U, class... Args>
+  constexpr inline void hook_outcome_in_place_construction(T * /*unused*/, in_place_type_t<U> /*unused*/, Args &&... /*unused*/) noexcept
+  {
+  }
+}  // namespace hooks
+#endif
+
 namespace policy
 {
   namespace detail
@@ -40,6 +87,7 @@ SIGNATURE NOT RECOGNISED
 */
   struct base
   {
+    template <class... Args> static constexpr void _silence_unused(Args &&... /*unused*/) noexcept {}
   protected:
     template <class Impl> static constexpr void _make_ub(Impl &&self) noexcept { return detail::make_ub(static_cast<Impl &&>(self)); }
     template <class Impl> static constexpr bool _has_value(Impl &&self) noexcept { return self._state._status.have_value(); }
@@ -57,6 +105,92 @@ SIGNATURE NOT RECOGNISED
 
   public:
     template <class R, class S, class P, class NoValuePolicy, class Impl> static inline constexpr auto &&_exception(Impl &&self) noexcept;
+
+    template <class T, class U> static constexpr inline void on_result_construction(T *inst, U &&v) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_result_construction(inst, static_cast<U &&>(v));
+#else
+      (void) inst;
+      (void) v;
+#endif
+    }
+    template <class T, class U> static constexpr inline void on_result_copy_construction(T *inst, U &&v) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_result_copy_construction(inst, static_cast<U &&>(v));
+#else
+      (void) inst;
+      (void) v;
+#endif
+    }
+    template <class T, class U> static constexpr inline void on_result_move_construction(T *inst, U &&v) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_result_move_construction(inst, static_cast<U &&>(v));
+#else
+      (void) inst;
+      (void) v;
+#endif
+    }
+    template <class T, class U, class... Args>
+    static constexpr inline void on_result_in_place_construction(T *inst, in_place_type_t<U> _, Args &&... args) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_result_in_place_construction(inst, _, static_cast<Args &&>(args)...);
+#else
+      (void) inst;
+      (void) _;
+      _silence_unused(static_cast<Args &&>(args)...);
+#endif
+    }
+
+    template <class T, class... U> static constexpr inline void on_outcome_construction(T *inst, U &&... args) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_outcome_construction(inst, static_cast<U &&>(args)...);
+#else
+      (void) inst;
+      _silence_unused(static_cast<U &&>(args)...);
+#endif
+    }
+    template <class T, class U> static constexpr inline void on_outcome_copy_construction(T *inst, U &&v) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_outcome_copy_construction(inst, static_cast<U &&>(v));
+#else
+      (void) inst;
+      (void) v;
+#endif
+    }
+    template <class T, class U> static constexpr inline void on_outcome_move_construction(T *inst, U &&v) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_outcome_move_construction(inst, static_cast<U &&>(v));
+#else
+      (void) inst;
+      (void) v;
+#endif
+    }
+    template <class T, class U, class... Args>
+    static constexpr inline void on_outcome_in_place_construction(T *inst, in_place_type_t<U> _, Args &&... args) noexcept
+    {
+#if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
+      using namespace hooks;
+      hook_outcome_in_place_construction(inst, _, static_cast<Args &&>(args)...);
+#else
+      (void) inst;
+      (void) _;
+      _silence_unused(static_cast<Args &&>(args)...);
+#endif
+    }
 
     template <class Impl> static constexpr void narrow_value_check(Impl &&self) noexcept
     {
