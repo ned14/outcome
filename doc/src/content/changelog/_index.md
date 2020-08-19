@@ -4,15 +4,37 @@ weight = 80
 +++
 
 ---
-## v2.1.4 ??? (Boost 1.74) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.4)
+## v2.1.5 ??? (Boost 1.75) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.5)
 
 {{% notice note %}}
-The v2.1 branch is expected to be retired end of 2020, with the v2.2 branch
-becoming the default. You can use the future v2.2 branch now using
+The v2.1 branch is expected to be retired end of 2020 with the Boost 1.75 release, with the v2.2 branch
+becoming the default for Boost 1.76 onwards. You can use the future v2.2 branch now using
 [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation).
 This branch has a number of major breaking changes to Outcome v2.1, see the front page
 for details.
 {{% /notice %}}
+
+### Enhancements:
+
+[The ADL discovered event hooks]({{% relref "/tutorial/advanced/hooks" %}}) have been replaced with policy-specified event hooks instead
+: This is due to brittleness (where hooks would quietly
+self-disable if somebody changed something), compiler bugs (a difference in compiler settings causes
+the wrong hooks, or some but not all hooks, to get discovered), and end user difficulty in using
+them at all. The policy-specified event hooks can be told to default to ADL discovered hooks for
+backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to `210` or lower to
+enable emulation.
+
+    **TODO: Update docs to match new API.**
+
+### Bug fixes:
+
+Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
+: Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
+should now compile with C++ exceptions globally disabled. You won't be able to use
+`boost::exception_ptr` as it can't be included if C++ exceptions are globally disabled.
+
+---
+## v2.1.4 14th August 2020 (Boost 1.74) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.4)
 
 ### Enhancements:
 
@@ -65,11 +87,6 @@ Spare storage could not be used from within no-value policy classes
 : Due to an obvious brain fart when writing the code at the time, the spare storage
 APIs had the wrong prototype which prevented them working from within policy classes.
 Sorry.
-
-Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
-: Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
-should now compile with C++ exceptions globally disabled. You won't be able to use
-`boost::exception_ptr` as it can't be included if C++ exceptions are globally disabled.
 
 ---
 ## v2.1.3 29th April 2020 (Boost 1.73) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.3)

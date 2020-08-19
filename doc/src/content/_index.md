@@ -37,8 +37,8 @@ guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based
 {{% notice note %}}
 Ben Craig's work on [P1886 *Error speed benchmarking*](https://wg21.link/P1886) has led to
 a [`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation) branch intended
-to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing. This branch has a number
-of major and breaking changes to Outcome v2:
+to be merged end of 2020 as Outcome v2.2.0, after twelve months of testing, into Boost 1.76 onwards.
+This branch has a number of major and breaking changes to Outcome v2:
 
 1. A new trait `is_move_bitcopying<T>` is added, which opts types into a library-based emulation of
 [P1029 *move = bitcopies*](https://wg21.link/P1029). [Experimental `std::error`](https://wg21.link/P1028) is opted in by default.
@@ -62,6 +62,14 @@ union storage for trivially copyable types is much easier than for non-TC types.
 as is. This allows `TRY` to initialise or assign. You can use the macro `OUTCOME21_TRY` if you
 want the pre-Outcome v2.2 behaviour. You may find the regular expression `_TRY\(([^(]*?),(.*?)\);` =>
 `_TRY(auto &&\1,\2);` of use to you when upgrading code.
+
+5. [The ADL discovered event hooks]({{% relref "/tutorial/advanced/hooks" %}}) have been replaced
+with policy-specified event hooks instead. This is due to brittleness (where hooks would quietly
+self-disable if somebody changed something), compiler bugs (a difference in compiler settings causes
+the wrong hooks, or some but not all hooks, to get discovered), and end user difficulty in using
+them at all. The policy-specified event hooks can be told to default to ADL discovered hooks for
+backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to `210` or lower to
+enable emulation.
 {{% /notice %}}
 
 ## Sample usage
