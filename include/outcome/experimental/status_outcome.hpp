@@ -90,7 +90,7 @@ SIGNATURE NOT RECOGNISED
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION("wide value check failed");
+            OUTCOME_THROW_EXCEPTION(bad_outcome_access("wide value check failed"));
 #endif
           }
         }
