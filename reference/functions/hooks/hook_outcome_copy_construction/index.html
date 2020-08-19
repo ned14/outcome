@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-08-19T00:17:57 UTC">
+<meta name="revised" content="2020-08-19T11:19:05 UTC">
 <title>`void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1056,6 +1056,83 @@
         <div>
           <a href="/outcome/reference/policies/base/narrow_exception_check/">
             <code>static void narrow_exception_check(Impl &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_construction/">
+            <code>static void on_outcome_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_construction2/">
+            <code>static void on_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_copy_construction/">
+            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_copy_construction2/">
+            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_in_place_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_in_place_construction/">
+            <code>static void on_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_move_construction/">
+            <code>static void on_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_move_construction2/">
+            <code>static void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_construction/">
+            <code>static void on_result_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_copy_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_copy_construction/">
+            <code>static void on_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_in_place_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_in_place_construction/">
+            <code>static void on_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_move_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_move_construction/">
+            <code>static void on_result_move_construction(T *, U &amp;&amp;) noexcept</code>
           </a>
         </div>
     </li>
@@ -2703,7 +2780,12 @@
     
     
     
-    <p>One of the constructor hooks for <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a>
+    <p>Removed in Outcome v2.2.0, unless <a href="/outcome/reference/macros/enable_legacy_support_for/" class="api-reference"><code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code></a>
+ is set to less than <code>220</code> to
+enable emulation. Use <a href="/outcome/reference/policies/base/on_outcome_copy_construction/" class="api-reference"><code>on_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code></a>
+ instead in new code.</p>
+
+<p>One of the constructor hooks for <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a>
 , generally invoked by the converting copy constructors of <code>basic_outcome</code> (NOT the standard copy constructor). See each constructor&rsquo;s documentation to see which specific hook it invokes.</p>
 
 <p><em>Overridable</em>: By Argument Dependent Lookup.</p>
@@ -2735,7 +2817,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 19/08/2020
     </div>
     
 

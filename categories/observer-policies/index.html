@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-08-19T00:17:53 UTC">
+<meta name="revised" content="2020-08-19T11:19:00 UTC">
 <title>Observer Policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1055,6 +1055,83 @@
         <div>
           <a href="/outcome/reference/policies/base/narrow_exception_check/">
             <code>static void narrow_exception_check(Impl &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_construction/">
+            <code>static void on_outcome_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_construction2/">
+            <code>static void on_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_copy_construction/">
+            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_copy_construction2/">
+            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_in_place_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_in_place_construction/">
+            <code>static void on_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_move_construction/">
+            <code>static void on_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_move_construction2/">
+            <code>static void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_construction/">
+            <code>static void on_result_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_copy_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_copy_construction/">
+            <code>static void on_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_in_place_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_in_place_construction/">
+            <code>static void on_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_move_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_move_construction/">
+            <code>static void on_result_move_construction(T *, U &amp;&amp;) noexcept</code>
           </a>
         </div>
     </li>
@@ -2648,7 +2725,9 @@
 <div class="extra-pagination inner">
 <nav class="pagination" role="navigation">
 	
-	<span class="page-number">Page 1 of 1</span>
+	<span class="page-number">Page 1 of 2</span>
+	
+	    <a class="older-posts" href="/outcome/categories/observer-policies/page/2/">Next Pages &rarr;</a>
 	
 </nav>
 
@@ -2715,12 +2794,147 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
     </footer>
 </article>
 
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_construction/">`static void on_outcome_construction(T *, U &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the implicit constructors of basic_outcome. See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_construction/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_construction2/">`static void on_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the implicit constructors of basic_outcome which consume two arguments. See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_construction2/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_copy_construction/">`static void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor). See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_copy_construction/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_copy_construction2/">`static void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor) which consume two arguments. See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_copy_construction2/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_in_place_construction/">`static void on_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the in-place constructors of basic_outcome. See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_in_place_construction/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_move_construction/">`static void on_outcome_move_construction(T *, U &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor). See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_move_construction/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
+   <article class="post reference">
+    <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/reference/policies/base/on_outcome_move_construction2/">`static void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept`</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>One of the constructor hooks for basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor) which consume two arguments. See each constructor&rsquo;s documentation to see which specific hook it invokes.
+Requires: Always available.
+Guarantees: Never throws an exception. <a class="read-more" href="/outcome/reference/policies/base/on_outcome_move_construction2/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+        
+
+    </footer>
+</article>
+
 
 <div style="margin-bottom:2rem"></div>
 
 <nav class="pagination" role="navigation">
 	
-	<span class="page-number">Page 1 of 1</span>
+	<span class="page-number">Page 1 of 2</span>
+	
+	    <a class="older-posts" href="/outcome/categories/observer-policies/page/2/">Next Pages &rarr;</a>
 	
 </nav>
 
@@ -2746,7 +2960,7 @@ Guarantees: Never throws an exception. <a class="read-more" href="/outcome/refer
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 19/08/2020
     </div>
     
 

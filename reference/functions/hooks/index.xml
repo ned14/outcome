@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/functions/hooks/</link>
     <description>Recent content in Hooks on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 03 Feb 2020 18:23:49 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 18 Dec 2019 09:34:06 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/functions/hooks/index.xml" rel="self" type="application/rss+xml" />
     
@@ -29,7 +29,8 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_construction(T *, U &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -42,11 +43,11 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_construction2/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_outcome which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_construction(T *, U &amp;amp;&amp;amp;, V &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_outcome which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
-Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
+Namespace: OUTCOME_V2_NAMESPACE::hooks</description>
     </item>
     
     <item>
@@ -55,11 +56,11 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_copy_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
-Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
+Namespace: OUTCOME_V2_NAMESPACE::hooks</description>
     </item>
     
     <item>
@@ -68,11 +69,9 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_copy_construction2/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
-Overridable: By Argument Dependent Lookup.
-Requires: Nothing.
-Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_copy_construction(T *, U &amp;amp;&amp;amp;, V &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_outcome (NOT the standard copy constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+Overridable: By Argument Dependent Lookup.</description>
     </item>
     
     <item>
@@ -81,7 +80,8 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_in_place_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the in-place constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the in-place constructors of basic_outcome. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -94,11 +94,11 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_move_construction/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_move_construction(T *, U &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
-Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
+Namespace: OUTCOME_V2_NAMESPACE::hooks</description>
     </item>
     
     <item>
@@ -107,11 +107,9 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_outcome_move_construction2/</guid>
-      <description>One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
-Overridable: By Argument Dependent Lookup.
-Requires: Nothing.
-Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_outcome_move_construction(T *, U &amp;amp;&amp;amp;, V &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_outcome (NOT the standard move constructor) which consume two arguments. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+Overridable: By Argument Dependent Lookup.</description>
     </item>
     
     <item>
@@ -120,7 +118,8 @@ Header: &amp;lt;outcome/basic_outcome.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_result_construction(T *, U &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the implicit constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -133,11 +132,12 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_copy_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_result (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the converting copy constructors of basic_result (NOT the standard copy constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
+Header: &amp;lt;outcome/basic_result.</description>
     </item>
     
     <item>
@@ -146,7 +146,8 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_in_place_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the in-place constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept instead in new code.
+One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the in-place constructors of basic_result. See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
@@ -159,11 +160,12 @@ Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/hooks/hook_result_move_construction/</guid>
-      <description>One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_result (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
+      <description>Removed in Outcome v2.2.0, unless OUTCOME_ENABLE_LEGACY_SUPPORT_FOR is set to less than 220 to enable emulation. Use on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept instead in new code.
+One of the constructor hooks for basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; , generally invoked by the converting move constructors of basic_result (NOT the standard move constructor). See each constructor&amp;rsquo;s documentation to see which specific hook it invokes.
 Overridable: By Argument Dependent Lookup.
 Requires: Nothing.
 Namespace: OUTCOME_V2_NAMESPACE::hooks
-Header: &amp;lt;outcome/basic_result.hpp&amp;gt;</description>
+Header: &amp;lt;outcome/basic_result.</description>
     </item>
     
     <item>

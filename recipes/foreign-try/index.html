@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-08-19T00:17:52 UTC">
+<meta name="revised" content="2020-08-19T11:19:00 UTC">
 <title>Extending `OUTCOME_TRY` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1056,6 +1056,83 @@
         <div>
           <a href="/outcome/reference/policies/base/narrow_exception_check/">
             <code>static void narrow_exception_check(Impl &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_construction/">
+            <code>static void on_outcome_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_construction2/">
+            <code>static void on_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_copy_construction/">
+            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_copy_construction2/">
+            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_in_place_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_in_place_construction/">
+            <code>static void on_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_move_construction/">
+            <code>static void on_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_outcome_move_construction2/">
+            <code>static void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_construction/">
+            <code>static void on_result_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_copy_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_copy_construction/">
+            <code>static void on_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_in_place_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_in_place_construction/">
+            <code>static void on_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/policies/base/on_result_move_construction/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/policies/base/on_result_move_construction/">
+            <code>static void on_result_move_construction(T *, U &amp;&amp;) noexcept</code>
           </a>
         </div>
     </li>
@@ -2747,7 +2824,7 @@ to transparently call old code, like this:</p>
 
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">new_code</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>  <span class="c1">// new code
 </span><span class="c1"></span><span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">x</span><span class="p">,</span> <span class="n">old_code</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
+  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">old_code</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
   <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/foreign_try.cpp#L82" class="code-snippet-url" target="_blank">View this code on Github</a></div>
@@ -2831,7 +2908,7 @@ new_code(0) returns failure argument out of domain
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 18/12/2019
     </div>
     
 
