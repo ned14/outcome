@@ -68,7 +68,7 @@ with policy-specified event hooks instead. This is due to brittleness (where hoo
 self-disable if somebody changed something), compiler bugs (a difference in compiler settings causes
 the wrong hooks, or some but not all hooks, to get discovered), and end user difficulty in using
 them at all. The policy-specified event hooks can be told to default to ADL discovered hooks for
-backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to `210` or lower to
+backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to less than `220` to
 enable emulation.
 {{% /notice %}}
 

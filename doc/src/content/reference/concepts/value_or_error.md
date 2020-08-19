@@ -15,4 +15,4 @@ If you want a concept matching specifically {{% api "basic_result<T, E, NoValueP
 
 *Header*: `<outcome/convert.hpp>`
 
-*Legacy*: This was named `convert::ValueOrError<T>` in Outcome v2.1 and earlier. Define {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to `210` or lower to enable.
+*Legacy*: This was named `convert::ValueOrError<T>` in Outcome v2.1 and earlier. Define {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to less than `220` to enable.

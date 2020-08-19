@@ -5,6 +5,11 @@ weight = 50
 tags = ["hooks"]
 +++
 
+{{% notice warning %}}
+Outcome v2.2 has replaced the ADL discovered hooks with a policy-determined implementation instead.
+This section of the tutorial is awaiting upgrade.
+{{% /notice %}}
+
 Outcome provides multiple methods for user code to intercept various events which occur.
 The deepest method is simply to inherit from `basic_result` or `basic_outcome`, and override member functions,
 for which you will need to study the source code as that form of customisation is out of scope for this tutorial.

@@ -1,7 +1,10 @@
 +++
 title = "`void hook_result_copy_construction(T *, U &&) noexcept`"
-description = "ADL discovered free function hook invoked by the converting copy constructors of `basic_result`."
+description = "(Until v2.2.0) ADL discovered free function hook invoked by the converting copy constructors of `basic_result`."
 +++
+
+Removed in Outcome v2.2.0, unless {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} is set to less than `220` to
+enable emulation. Use {{% api "on_result_copy_construction(T *, U &&) noexcept" %}} instead in new code.
 
 One of the constructor hooks for {{% api "basic_result<T, E, NoValuePolicy>" %}}, generally invoked by the converting copy constructors of `basic_result` (NOT the standard copy constructor). See each constructor's documentation to see which specific hook it invokes.
 
