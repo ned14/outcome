@@ -571,9 +571,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF e6515d51df28804ee8638cbd778d089b53ee1030
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-04-22 08:26:40 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e6515d51
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 947358055683a529cafd8934054dab7773313b3f
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-08-05 22:15:21 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 94735805
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -987,9 +987,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 1e90094ca283be2fc456f1cae4ab3eeaa65c67ec
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-07-22 16:53:49 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1e90094c
+#define OUTCOME_PREVIOUS_COMMIT_REF ba09aa59704ced4f616305d732de4ae0388d8a44
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-08-19 11:15:46 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ba09aa59
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1292,6 +1292,7 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
+#include <atomic>
 #include <stdlib.h> // for abort
 #include <string.h>
 // To avoid including windows.h, this source has been macro expanded and win32 function shimmed for C++ only
@@ -1341,6 +1342,7 @@ namespace
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
   typedef int(__stdcall *SymInitialize_t)(_In_ void *hProcess, _In_opt_ const wchar_t *UserSearchPath, _In_ int fInvadeProcess);
   typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
+  static std::atomic<unsigned> dbghelp_init_lock;
 #if defined(__cplusplus) && !defined(__clang__)
   static void *dbghelp;
 #else
@@ -1354,8 +1356,13 @@ static HMODULE dbghelp;
     using win32::GetProcAddress;
     using win32::LoadLibraryA;
 #endif
+    while(dbghelp_init_lock.exchange(1, std::memory_order_acq_rel))
+      ;
     if(dbghelp)
+    {
+      dbghelp_init_lock.store(0, std::memory_order_release);
       return;
+    }
     dbghelp = LoadLibraryA("DBGHELP.DLL");
     if(dbghelp)
     {
@@ -1368,6 +1375,7 @@ static HMODULE dbghelp;
       if(!SymGetLineFromAddr64)
         abort();
     }
+    dbghelp_init_lock.store(0, std::memory_order_release);
   }
 #ifdef __cplusplus
 }
@@ -1679,7 +1687,7 @@ namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* Tells C++ coroutines about Outcome's result
-(C) 2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+(C) 2019-2020 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Oct 2019
 
 
@@ -1706,6 +1714,20 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <cassert>
 #if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines) || (defined(__clang__) && __cpp_coroutines)
+#ifndef OUTCOME_HAVE_NOOP_COROUTINE
+#if defined(__has_builtin)
+#if __has_builtin(__builtin_coro_noop)
+#define OUTCOME_HAVE_NOOP_COROUTINE 1
+#endif
+#endif
+#endif
+#ifndef OUTCOME_HAVE_NOOP_COROUTINE
+#if _MSC_VER >= 1928
+#define OUTCOME_HAVE_NOOP_COROUTINE 1
+#else
+#define OUTCOME_HAVE_NOOP_COROUTINE 0
+#endif
+#endif
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1715,6 +1737,9 @@ namespace awaitables
   template <class... Args> using coroutine_traits = std::coroutine_traits<Args...>;
   using std::suspend_always;
   using std::suspend_never;
+#if OUTCOME_HAVE_NOOP_COROUTINE
+  using std::noop_coroutine;
+#endif
 } // namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_FOUND_COROUTINE_HEADER 1
@@ -1727,6 +1752,9 @@ namespace awaitables
   template <class... Args> using coroutine_traits = std::experimental::coroutine_traits<Args...>;
   using std::experimental::suspend_always;
   using std::experimental::suspend_never;
+#if OUTCOME_HAVE_NOOP_COROUTINE
+  using std::experimental::noop_coroutine;
+#endif
 } // namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_FOUND_COROUTINE_HEADER 1
@@ -1755,7 +1783,7 @@ namespace awaitables
     OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
     inline bool try_set_error(T &&e, U *result)
     {
-      new(result) U(static_cast<T&&>(e));
+      new(result) U(static_cast<T &&>(e));
       return true;
     }
     template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
@@ -1779,13 +1807,14 @@ namespace awaitables
     {
       using container_type = typename Awaitable::container_type;
       using result_set_type = std::conditional_t<use_atomic, std::atomic<bool>, fake_atomic<bool>>;
-      union {
+      union
+      {
         OUTCOME_V2_NAMESPACE::detail::empty_type _default{};
         container_type result;
       };
       result_set_type result_set{false};
       coroutine_handle<> continuation;
-      outcome_promise_type() {}
+      outcome_promise_type() noexcept {}
       outcome_promise_type(const outcome_promise_type &) = delete;
       outcome_promise_type(outcome_promise_type &&) = delete;
       outcome_promise_type &operator=(const outcome_promise_type &) = delete;
@@ -1794,18 +1823,21 @@ namespace awaitables
       {
         if(result_set.load(std::memory_order_acquire))
         {
-          result.~container_type();
+          result.~container_type(); // could throw
         }
       }
-      auto get_return_object() { return Awaitable{*this}; }
+      auto get_return_object()
+      {
+        return Awaitable{*this}; // could throw bad_alloc
+      }
       void return_value(container_type &&value)
       {
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
-          result.~container_type();
+          result.~container_type(); // could throw
         }
-        new(&result) container_type(static_cast<container_type &&>(value));
+        new(&result) container_type(static_cast<container_type &&>(value)); // could throw
         result_set.store(true, std::memory_order_release);
       }
       void return_value(const container_type &value)
@@ -1813,9 +1845,9 @@ namespace awaitables
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
-          result.~container_type();
+          result.~container_type(); // could throw
         }
-        new(&result) container_type(value);
+        new(&result) container_type(value); // could throw
         result_set.store(true, std::memory_order_release);
       }
       void unhandled_exception()
@@ -1831,7 +1863,7 @@ namespace awaitables
         // Try to set error code first
         if(!detail::error_is_set(ec) || !detail::try_set_error(static_cast<decltype(ec) &&>(ec), &result))
         {
-          detail::set_or_rethrow(e, &result);
+          detail::set_or_rethrow(e, &result); // could throw
         }
 #else
         std::terminate();
@@ -1844,16 +1876,22 @@ namespace awaitables
         {
           bool await_ready() noexcept { return !suspend_initial; }
           void await_resume() noexcept {}
-          void await_suspend(coroutine_handle<> /*unused*/) {}
+          void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
         };
         return awaiter{};
       }
-      auto final_suspend()
+      auto final_suspend() noexcept
       {
         struct awaiter
         {
           bool await_ready() noexcept { return false; }
           void await_resume() noexcept {}
+#if OUTCOME_HAVE_NOOP_COROUTINE
+          coroutine_handle<> await_suspend(coroutine_handle<outcome_promise_type> self) noexcept
+          {
+            return self.promise().continuation ? self.promise().continuation : noop_coroutine();
+          }
+#else
           void await_suspend(coroutine_handle<outcome_promise_type> self)
           {
             if(self.promise().continuation)
@@ -1861,6 +1899,7 @@ namespace awaitables
               return self.promise().continuation.resume();
             }
           }
+#endif
         };
         return awaiter{};
       }
@@ -1877,8 +1916,11 @@ namespace awaitables
       outcome_promise_type &operator=(const outcome_promise_type &) = delete;
       outcome_promise_type &operator=(outcome_promise_type &&) = delete;
       ~outcome_promise_type() = default;
-      auto get_return_object() { return Awaitable{*this}; }
-      void return_void()
+      auto get_return_object()
+      {
+        return Awaitable{*this}; // could throw bad_alloc
+      }
+      void return_void() noexcept
       {
         assert(!result_set.load(std::memory_order_acquire));
         result_set.store(true, std::memory_order_release);
@@ -1886,7 +1928,7 @@ namespace awaitables
       void unhandled_exception()
       {
         assert(!result_set.load(std::memory_order_acquire));
-        std::rethrow_exception(std::current_exception());
+        std::rethrow_exception(std::current_exception()); // throws
       }
       auto initial_suspend() noexcept
       {
@@ -1894,16 +1936,22 @@ namespace awaitables
         {
           bool await_ready() noexcept { return !suspend_initial; }
           void await_resume() noexcept {}
-          void await_suspend(coroutine_handle<> /*unused*/) {}
+          void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
         };
         return awaiter{};
       }
-      auto final_suspend()
+      auto final_suspend() noexcept
       {
         struct awaiter
         {
           bool await_ready() noexcept { return false; }
           void await_resume() noexcept {}
+#if OUTCOME_HAVE_NOOP_COROUTINE
+          coroutine_handle<> await_suspend(coroutine_handle<outcome_promise_type> self) noexcept
+          {
+            return self.promise().continuation ? self.promise().continuation : noop_coroutine();
+          }
+#else
           void await_suspend(coroutine_handle<outcome_promise_type> self)
           {
             if(self.promise().continuation)
@@ -1911,12 +1959,20 @@ namespace awaitables
               return self.promise().continuation.resume();
             }
           }
+#endif
         };
         return awaiter{};
       }
     };
-    template <class Awaitable, bool suspend_initial, bool use_atomic> constexpr inline auto move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, false> &p) { return static_cast<typename Awaitable::container_type &&>(p.result); }
-    template <class Awaitable, bool suspend_initial, bool use_atomic> constexpr inline void move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, true> & /*unused*/) {}
+    template <class Awaitable, bool suspend_initial, bool use_atomic>
+    constexpr inline auto move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, false> &p)
+    {
+      return static_cast<typename Awaitable::container_type &&>(p.result);
+    }
+    template <class Awaitable, bool suspend_initial, bool use_atomic>
+    constexpr inline void move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, true> & /*unused*/)
+    {
+    }
     template <class Cont, bool suspend_initial, bool use_atomic> struct OUTCOME_NODISCARD awaitable
     {
       using container_type = Cont;
@@ -1937,7 +1993,7 @@ namespace awaitables
           _h.destroy();
         }
       }
-      explicit awaitable(promise_type &p)
+      explicit awaitable(promise_type &p) // could throw
           : _h(coroutine_handle<promise_type>::from_promise(p))
       {
       }
@@ -1951,11 +2007,19 @@ namespace awaitables
         }
         return detail::move_result_from_promise_if_not_void(_h.promise());
       }
+#if OUTCOME_HAVE_NOOP_COROUTINE
+      coroutine_handle<> await_suspend(coroutine_handle<> cont) noexcept
+      {
+        _h.promise().continuation = cont;
+        return _h;
+      }
+#else
       void await_suspend(coroutine_handle<> cont)
       {
         _h.promise().continuation = cont;
         _h.resume();
       }
+#endif
     };
 #endif
   } // namespace detail

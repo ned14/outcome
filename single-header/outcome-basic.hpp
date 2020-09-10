@@ -545,9 +545,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF e6515d51df28804ee8638cbd778d089b53ee1030
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-04-22 08:26:40 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e6515d51
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 947358055683a529cafd8934054dab7773313b3f
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-08-05 22:15:21 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 94735805
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 1e90094ca283be2fc456f1cae4ab3eeaa65c67ec
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-07-22 16:53:49 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1e90094c
+#define OUTCOME_PREVIOUS_COMMIT_REF ba09aa59704ced4f616305d732de4ae0388d8a44
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-08-19 11:15:46 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ba09aa59
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1266,6 +1266,7 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
+#include <atomic>
 #include <stdlib.h> // for abort
 #include <string.h>
 // To avoid including windows.h, this source has been macro expanded and win32 function shimmed for C++ only
@@ -1315,6 +1316,7 @@ namespace
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
   typedef int(__stdcall *SymInitialize_t)(_In_ void *hProcess, _In_opt_ const wchar_t *UserSearchPath, _In_ int fInvadeProcess);
   typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
+  static std::atomic<unsigned> dbghelp_init_lock;
 #if defined(__cplusplus) && !defined(__clang__)
   static void *dbghelp;
 #else
@@ -1328,8 +1330,13 @@ static HMODULE dbghelp;
     using win32::GetProcAddress;
     using win32::LoadLibraryA;
 #endif
+    while(dbghelp_init_lock.exchange(1, std::memory_order_acq_rel))
+      ;
     if(dbghelp)
+    {
+      dbghelp_init_lock.store(0, std::memory_order_release);
       return;
+    }
     dbghelp = LoadLibraryA("DBGHELP.DLL");
     if(dbghelp)
     {
@@ -1342,6 +1349,7 @@ static HMODULE dbghelp;
       if(!SymGetLineFromAddr64)
         abort();
     }
+    dbghelp_init_lock.store(0, std::memory_order_release);
   }
 #ifdef __cplusplus
 }

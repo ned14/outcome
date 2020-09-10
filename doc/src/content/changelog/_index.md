@@ -33,6 +33,13 @@ Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
 should now compile with C++ exceptions globally disabled. You won't be able to use
 `boost::exception_ptr` as it can't be included if C++ exceptions are globally disabled.
 
+[#236](https://github.com/ned14/outcome/issues/236)
+: In the Coroutine support the `final_suspend()` was not `noexcept`, despite being required
+to be so in the C++ 20 standard. This has been fixed, but only if your compiler implements
+`noop_coroutine`. Additionally, if `noop_coroutine` is available, we use the much more
+efficient coroutine handle returning variant of `await_suspend()` which should significantly
+improve codegen and context switching performance.
+
 ---
 ## v2.1.4 14th August 2020 (Boost 1.74) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.4)
 
