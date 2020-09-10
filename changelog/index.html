@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-08-19T11:18:51 UTC">
+<meta name="revised" content="2020-09-10T11:03:52 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2757,6 +2757,12 @@ enable emulation.</p>
 <dd>Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
 should now compile with C++ exceptions globally disabled. You won&rsquo;t be able to use
 <code>boost::exception_ptr</code> as it can&rsquo;t be included if C++ exceptions are globally disabled.</dd>
+<dt><a href="https://github.com/ned14/outcome/issues/236">#236</a></dt>
+<dd>In the Coroutine support the <code>final_suspend()</code> was not <code>noexcept</code>, despite being required
+to be so in the C++ 20 standard. This has been fixed, but only if your compiler implements
+<code>noop_coroutine</code>. Additionally, if <code>noop_coroutine</code> is available, we use the much more
+efficient coroutine handle returning variant of <code>await_suspend()</code> which should significantly
+improve codegen and context switching performance.</dd>
 </dl>
 
 <hr />
@@ -3156,7 +3162,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/08/2020
+        <i class='fa fa-calendar'></i> Last update on 10/09/2020
     </div>
     
 
