@@ -13,4 +13,4 @@ This concept matches optional-like types such as {{% api "std::optional<T>" %}}.
 
 *Header*: `<outcome/convert.hpp>`
 
-*Legacy*: This was named `convert::ValueOrNone<T>` in Outcome v2.1 and earlier. Define {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to `210` or lower to enable.
+*Legacy*: This was named `convert::ValueOrNone<T>` in Outcome v2.1 and earlier. Define {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to less than `220` to enable.

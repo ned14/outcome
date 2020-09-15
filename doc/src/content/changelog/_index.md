@@ -21,7 +21,7 @@ for details.
 self-disable if somebody changed something), compiler bugs (a difference in compiler settings causes
 the wrong hooks, or some but not all hooks, to get discovered), and end user difficulty in using
 them at all. The policy-specified event hooks can be told to default to ADL discovered hooks for
-backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to `210` or lower to
+backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to less than `220` to
 enable emulation.
 
     **TODO: Update docs to match new API.**
@@ -32,6 +32,13 @@ Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
 : Thanks to Emil, maintainer of Boost.Exception, making a change for me, Boost.Outcome
 should now compile with C++ exceptions globally disabled. You won't be able to use
 `boost::exception_ptr` as it can't be included if C++ exceptions are globally disabled.
+
+[#236](https://github.com/ned14/outcome/issues/236)
+: In the Coroutine support the `final_suspend()` was not `noexcept`, despite being required
+to be so in the C++ 20 standard. This has been fixed, but only if your compiler implements
+`noop_coroutine`. Additionally, if `noop_coroutine` is available, we use the much more
+efficient coroutine handle returning variant of `await_suspend()` which should significantly
+improve codegen and context switching performance.
 
 ---
 ## v2.1.4 14th August 2020 (Boost 1.74) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.4)
@@ -54,7 +61,7 @@ going to have camel case style. This was changed before the C++ 20 release, and
 Outcome's concepts have been renamed similarly. This won't break any code in
 Outcome v2.1, as compatibility aliases are provided. However code compiled
 against Outcome v2.2 will need to be upgraded, unless `OUTCOME_ENABLE_LEGACY_SUPPORT_FOR`
-is set to `210` or lower.
+is set to less than `220`.
 
 Concepts now live in `OUTCOME_V2_NAMESPACE::concepts` namespace
 : Previously concepts lived in the `convert` namespace, now they live in their
