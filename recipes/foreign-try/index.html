@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-09-11T10:55:32 UTC">
+<meta name="revised" content="2020-09-15T16:40:22 UTC">
 <title>Extending `OUTCOME_TRY` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2824,7 +2824,7 @@ to transparently call old code, like this:</p>
 
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">new_code</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>  <span class="c1">// new code
 </span><span class="c1"></span><span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">old_code</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
+  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">x</span><span class="p">,</span> <span class="n">old_code</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
   <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/foreign_try.cpp#L82" class="code-snippet-url" target="_blank">View this code on Github</a></div>
