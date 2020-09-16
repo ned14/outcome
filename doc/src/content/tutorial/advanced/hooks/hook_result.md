@@ -4,6 +4,10 @@ description = ""
 weight = 30
 +++
 
+{{% notice note %}}
+In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+{{% /notice %}}
+
 We now tell Outcome that for every instance of our localised `result<T>`, that
 on failure construction only, we want custom code to be run which increments the current
 slot in TLS storage and writes the current stack backtrace into it.

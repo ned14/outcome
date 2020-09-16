@@ -4,6 +4,10 @@ description = ""
 weight = 50
 +++
 
+{{% notice note %}}
+In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+{{% /notice %}}
+
 The final step is to add ADL discovered event hooks for the very specific case of
 when our localised `outcome` is copy or move constructed from our localised `result`.
 
