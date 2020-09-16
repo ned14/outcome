@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 19 Aug 2020 12:15:40 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 16 Sep 2020 11:58:04 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -179,9 +179,9 @@ classfile_handle { int _fd{-1}; // file descriptor  struct stat _stat { 0 }; // 
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</guid>
-      <description>In a previous section, we used the failure_info type to create the ADL bridge into the namespace where the ADL discovered outcome_throw_as_system_error_with_payload() function was to be found.
-Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace. This ensures that this namespace will be searched by the compiler when discovering the event hooks.
-namespace error_code_extended { // Use the error_code type as the ADL bridge for the hooks by creating a type here  // It can be any type that your localised result uses, including the value type but  // by localising the error code type here you prevent nasty surprises later when the  // value type you use doesn&amp;#39;t trigger the ADL bridge.</description>
+      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+ In a previous section, we used the failure_info type to create the ADL bridge into the namespace where the ADL discovered outcome_throw_as_system_error_with_payload() function was to be found.
+Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace. This ensures that this namespace will be searched by the compiler when discovering the event hooks.</description>
     </item>
     
     <item>
@@ -258,6 +258,15 @@ public: // This is the value type for `file_io_error`. We add line number and so
     </item>
     
     <item>
+      <title>Upgrade guide v2.1 =&gt; v2.2</title>
+      <link>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</guid>
+      <description>After a year of listening to user feedback since entering Boost, Outcome v2.2 has a number of breaking source changes from Outcome v2.1 which were published start of 2020 in the better_optimisation branch. The full year of 2020 (three Boost releases) was given to announcing those upcoming changes, and testing the v2.2 branch in production. The tutorial remains based on v2.1, as that remains the stable branch. However in early 2021 the tutorial shall be ported to v2.</description>
+    </item>
+    
+    <item>
       <title>Upgrading the Filesystem TS</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -323,7 +332,8 @@ int readInt(const char * filename, int&amp;amp; val) { FILE* fd; int r = openFil
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_result/</guid>
-      <description>We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
+      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+ We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
 namespace error_code_extended { // Specialise the result construction hook for our localised result  // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace  // if the result is errored.</description>
     </item>
     
@@ -389,6 +399,16 @@ Unfortunately it also means that it must be possible for each domain to be insta
     </item>
     
     <item>
+      <title>v2.2 major changes</title>
+      <link>https://ned14.github.io/outcome/changelog/v22/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/changelog/v22/</guid>
+      <description>Major changes in v2.2 over earlier versions are listed here.
+ A new trait is_move_bitcopying&amp;lt;T&amp;gt; is added, which opts types into a library-based emulation of P1029 move = bitcopies. Experimental std::error is opted in by default. If this trait is true for your T or E type, Outcome will track moved-from status for your type, and will only call your type&amp;rsquo;s destructor if it was not moved from. If your compiler&amp;rsquo;s optimiser is sufficiently able to fold code, this improves codegen quality for Experimental Outcome very considerably, approaching the same gains as P1029 types would have.</description>
+    </item>
+    
+    <item>
       <title>Mapping the HTTP library into the Application `2/2`</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -404,8 +424,9 @@ Unfortunately it also means that it must be possible for each domain to be insta
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/poke_exception/</guid>
-      <description>If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
-But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace. Firstly let us look at the function which synthesises the exception ptr:</description>
+      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+ If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
+But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace.</description>
     </item>
     
     <item>
@@ -509,8 +530,9 @@ namespace app { // Specialise an exception type for tidylib errors  struct tidyl
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</guid>
-      <description>The final step is to add ADL discovered event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
-You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it. This can throw an exception. If the copy and/or move constructors of T, EC and EP are noexcept, then so will be outcome&amp;rsquo;s copy and/or move constructor.</description>
+      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+ The final step is to add ADL discovered event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
+You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it.</description>
     </item>
     
     <item>
@@ -2636,7 +2658,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1215 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1216 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2687,7 +2709,7 @@ Defined between stable releases of Outcome. It means the inline namespace will b
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/co_try/</guid>
-      <description>Evaluate within a coroutine an expression which results in a type matching the following customisation points, assigning T to a decl called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+      <description>Evaluate within a coroutine an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
  OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Hints are given to the compiler that the expression will be successful.</description>
     </item>
@@ -2742,7 +2764,7 @@ Hints are given to the compiler that the expression will be unsuccessful. If you
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/co_try_failure_likely/</guid>
-      <description>Evaluate within a coroutine an expression which results in a type matching the following customisation points, assigning T to a decl called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+      <description>Evaluate within a coroutine an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
  OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Hints are given to the compiler that the expression will be unsuccessful.</description>
     </item>
@@ -2839,7 +2861,7 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/try/</guid>
-      <description>Evaluate an expression which results in a type matching the following customisation points, assigning T to a decl called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+      <description>Evaluate an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
  OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Hints are given to the compiler that the expression will be successful. If you expect failure, you should use OUTCOME_TRY_FAILURE_LIKELY(var, expr) instead.</description>
     </item>
@@ -2894,7 +2916,7 @@ Hints are given to the compiler that the expression will be unsuccessful. If you
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/macros/try_failure_likely/</guid>
-      <description>Evaluate an expression which results in a type matching the following customisation points, assigning T to a decl called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+      <description>Evaluate an expression which results in a type matching the following customisation points, assigning T to a variable called var if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
  OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use OUTCOME_TRY(var, expr) instead.</description>
     </item>

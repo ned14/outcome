@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-09-15T16:40:22 UTC">
+<meta name="revised" content="2020-09-16T11:01:55 UTC">
 <title>Hooks :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2645,11 +2645,27 @@
       <a href="/outcome/videos/">Videos</a>
       </div>
     </li>
-    <li data-nav-id="/outcome/changelog/" class="dd-item
+    <li data-nav-id="/outcome/changelog/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/changelog/">Changelog</a>
+      <a href="/outcome/changelog/">Changelog</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
+        <ul>
+      <li data-nav-id="/outcome/changelog/upgrade_v21_v22/" class="dd-item">
+        <div>
+          <a href="/outcome/changelog/upgrade_v21_v22/">
+            Upgrade guide v2.1 =&gt; v2.2
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/changelog/v22/" class="dd-item">
+        <div>
+          <a href="/outcome/changelog/v22/">
+            v2.2 major changes
+          </a>
+        </div>
+    </li>
+        </ul>
     </li>
     <li data-nav-id="/outcome/history/" class="dd-item
         ">
@@ -2737,8 +2753,8 @@
         <h2 class="post-title"><a href="/outcome/tutorial/advanced/hooks/">Hooking events</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Outcome v2.2 has replaced the ADL discovered hooks with a policy-determined implementation instead. This section of the tutorial is awaiting upgrade.
- Outcome provides multiple methods for user code to intercept various events which occur. The deepest method is simply to inherit from basic_result or basic_outcome, and override member functions, for which you will need to study the source code as that form of customisation is out of scope for this tutorial. <a class="read-more" href="/outcome/tutorial/advanced/hooks/">&raquo;</a></p>
+        <p>Outcome provides multiple methods for user code to intercept various lifecycle events which occur. The deepest method is simply to inherit from basic_result or basic_outcome, and override member functions, for which you will need to study the source code as that form of customisation is out of scope for this tutorial.
+Another option is to supply a custom NoValuePolicy (see preceding section). From Outcome v2.2 onwards, intercepting construction, copies and moves requires a custom NoValuePolicy. <a class="read-more" href="/outcome/tutorial/advanced/hooks/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          
@@ -2785,7 +2801,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 19/08/2020
+        <i class='fa fa-calendar'></i> Last update on 16/09/2020
     </div>
     
 

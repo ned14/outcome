@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-09-15T16:40:13 UTC">
+<meta name="revised" content="2020-09-16T11:01:47 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2645,11 +2645,28 @@
       <a href="/outcome/videos/">Videos</a>
       </div>
     </li>
-    <li data-nav-id="/outcome/changelog/" class="dd-item parent active
+    <li data-nav-id="/outcome/changelog/" class="dd-item parent active haschildren
         ">
       <div>
       <a href="/outcome/changelog/">Changelog</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
+        <ul>
+      <li data-nav-id="/outcome/changelog/upgrade_v21_v22/" class="dd-item">
+        <div>
+          <a href="/outcome/changelog/upgrade_v21_v22/">
+            Upgrade guide v2.1 =&gt; v2.2
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/changelog/v22/" class="dd-item">
+        <div>
+          <a href="/outcome/changelog/v22/">
+            v2.2 major changes
+          </a>
+        </div>
+    </li>
+        </ul>
     </li>
     <li data-nav-id="/outcome/history/" class="dd-item
         ">
@@ -2691,6 +2708,8 @@
    Videos</option>
     <option value="/outcome/changelog/"  selected>
    Changelog</option> 
+      <option value="/outcome/changelog/upgrade_v21_v22/" >- Upgrade guide v2.1 =&gt; v2.2</option>
+      <option value="/outcome/changelog/v22/" >- v2.2 major changes</option>
   
     <option value="/outcome/history/" >
    History</option>
@@ -2729,9 +2748,10 @@
 
 <div class="notices note" ><p>The v2.1 branch is expected to be retired end of 2020 with the Boost 1.75 release, with the v2.2 branch
 becoming the default for Boost 1.76 onwards. You can use the future v2.2 branch now using
-<a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a>.
-This branch has a number of major breaking changes to Outcome v2.1, see the front page
-for details.</p>
+<a href="https://github.com/ned14/outcome/tree/better_optimisation"><code>better_optimisation</code></a>,
+how to upgrade your code is described in <a href="/outcome/changelog/upgrade_v21_v22/">the v2.1 =&gt; v2.2 upgrade guide</a>.
+This branch has a number of major breaking changes to Outcome v2.1, see
+<a href="/outcome/changelog/v22/">the list of v2.2 major changes</a>.</p>
 </div>
 
 
@@ -2739,15 +2759,13 @@ for details.</p>
 
 <dl>
 <dt><a href="/outcome/tutorial/advanced/hooks/">The ADL discovered event hooks</a> have been replaced with policy-specified event hooks instead</dt>
-<dd><p>This is due to brittleness (where hooks would quietly
+<dd>This is due to brittleness (where hooks would quietly
 self-disable if somebody changed something), compiler bugs (a difference in compiler settings causes
 the wrong hooks, or some but not all hooks, to get discovered), and end user difficulty in using
 them at all. The policy-specified event hooks can be told to default to ADL discovered hooks for
 backwards compatibility: set <a href="/outcome/reference/macros/enable_legacy_support_for/" class="api-reference"><code>OUTCOME_ENABLE_LEGACY_SUPPORT_FOR</code></a>
  to less than <code>220</code> to
-enable emulation.</p>
-
-<p><strong>TODO: Update docs to match new API.</strong></p></dd>
+enable emulation.</dd>
 </dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
@@ -2814,9 +2832,6 @@ the list of changes between Outcome v2.1 and v2.2.</dd>
 with the fixes to LLVM clang that fix <code>noexcept(std::is_constructible&lt;T, void&gt;)</code>
 failing to compile which I originally submitted years ago. So give up waiting on
 Apple to fix their clang, add a workaround to Outcome.</dd>
-<dt>Use of <code>void</code> in <code>T</code> or <code>E</code> caused <code>noexcept(false)</code></dt>
-<dd>Direct traits examination of <code>void</code> was causing nothrow detection to return false,
-fixed.</dd>
 <dt>Spare storage could not be used from within no-value policy classes</dt>
 <dd>Due to an obvious brain fart when writing the code at the time, the spare storage
 APIs had the wrong prototype which prevented them working from within policy classes.
@@ -3150,7 +3165,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
         <div class="chevrons">
     <div id="navigation">
 <a class="nav nav-prev" href="/outcome/videos/" title="Videos"> <i class="fa fa-chevron-left"></i><label>Videos</label></a>
-    <a class="nav nav-next" href="/outcome/history/" title="History" style="margin-right: 0px;"><label>History</label><i class="fa fa-chevron-right"></i></a></div>
+    <a class="nav nav-next" href="/outcome/changelog/upgrade_v21_v22/" title="Upgrade guide v2.1 =&gt; v2.2" style="margin-right: 0px;"><label>Upgrade guide v2.1 =&gt; v2.2</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -3165,7 +3180,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 10/09/2020
+        <i class='fa fa-calendar'></i> Last update on 16/09/2020
     </div>
     
 

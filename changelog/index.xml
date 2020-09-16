@@ -5,10 +5,29 @@
     <link>https://ned14.github.io/outcome/changelog/</link>
     <description>Recent content in Changelog on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Thu, 10 Sep 2020 12:00:20 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 16 Sep 2020 11:58:04 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/changelog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Upgrade guide v2.1 =&gt; v2.2</title>
+      <link>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</guid>
+      <description>After a year of listening to user feedback since entering Boost, Outcome v2.2 has a number of breaking source changes from Outcome v2.1 which were published start of 2020 in the better_optimisation branch. The full year of 2020 (three Boost releases) was given to announcing those upcoming changes, and testing the v2.2 branch in production. The tutorial remains based on v2.1, as that remains the stable branch. However in early 2021 the tutorial shall be ported to v2.</description>
+    </item>
+    
+    <item>
+      <title>v2.2 major changes</title>
+      <link>https://ned14.github.io/outcome/changelog/v22/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/changelog/v22/</guid>
+      <description>Major changes in v2.2 over earlier versions are listed here.
+ A new trait is_move_bitcopying&amp;lt;T&amp;gt; is added, which opts types into a library-based emulation of P1029 move = bitcopies. Experimental std::error is opted in by default. If this trait is true for your T or E type, Outcome will track moved-from status for your type, and will only call your type&amp;rsquo;s destructor if it was not moved from. If your compiler&amp;rsquo;s optimiser is sufficiently able to fold code, this improves codegen quality for Experimental Outcome very considerably, approaching the same gains as P1029 types would have.</description>
+    </item>
     
   </channel>
 </rss>

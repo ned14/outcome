@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-09-15T16:40:11 UTC">
+<meta name="revised" content="2020-09-16T11:01:44 UTC">
 <title>ADL bridging :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2648,11 +2648,27 @@
       <a href="/outcome/videos/">Videos</a>
       </div>
     </li>
-    <li data-nav-id="/outcome/changelog/" class="dd-item
+    <li data-nav-id="/outcome/changelog/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/changelog/">Changelog</a>
+      <a href="/outcome/changelog/">Changelog</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
+        <ul>
+      <li data-nav-id="/outcome/changelog/upgrade_v21_v22/" class="dd-item">
+        <div>
+          <a href="/outcome/changelog/upgrade_v21_v22/">
+            Upgrade guide v2.1 =&gt; v2.2
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/changelog/v22/" class="dd-item">
+        <div>
+          <a href="/outcome/changelog/v22/">
+            v2.2 major changes
+          </a>
+        </div>
+    </li>
+        </ul>
     </li>
     <li data-nav-id="/outcome/history/" class="dd-item
         ">
@@ -2748,7 +2764,11 @@
     
     
     
-    <p>In a previous section, we used the <code>failure_info</code> type to create
+    <div class="notices note" ><p>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.</p>
+</div>
+
+
+<p>In a previous section, we used the <code>failure_info</code> type to create
 the ADL bridge into the namespace where the ADL discovered <a href="/outcome/reference/functions/policy/"><code>outcome_throw_as_system_error_with_payload()</code></a> function was to be found.</p>
 
 <p>Here we do the same, but more directly by creating a thin clone of <code>std::error_code</code>
@@ -2809,7 +2829,7 @@ namespace bound to the ADL bridging <code>error_code</code>.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 16/09/2020
     </div>
     
 
