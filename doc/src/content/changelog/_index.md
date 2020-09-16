@@ -9,9 +9,10 @@ weight = 80
 {{% notice note %}}
 The v2.1 branch is expected to be retired end of 2020 with the Boost 1.75 release, with the v2.2 branch
 becoming the default for Boost 1.76 onwards. You can use the future v2.2 branch now using
-[`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation).
-This branch has a number of major breaking changes to Outcome v2.1, see the front page
-for details.
+[`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation),
+how to upgrade your code is described in [the v2.1 => v2.2 upgrade guide]({{% relref "/changelog/upgrade_v21_v22" %}}).
+This branch has a number of major breaking changes to Outcome v2.1, see
+[the list of v2.2 major changes]({{% relref "/changelog/v22" %}}).
 {{% /notice %}}
 
 ### Enhancements:
@@ -23,8 +24,6 @@ the wrong hooks, or some but not all hooks, to get discovered), and end user dif
 them at all. The policy-specified event hooks can be told to default to ADL discovered hooks for
 backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to less than `220` to
 enable emulation.
-
-    **TODO: Update docs to match new API.**
 
 ### Bug fixes:
 

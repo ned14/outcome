@@ -4,6 +4,10 @@ description = ""
 weight = 40
 +++
 
+{{% notice note %}}
+In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+{{% /notice %}}
+
 If you merely want `result` to capture stack backtraces without calling a memory allocator
 and retaining any triviality of copy which is important for optimisation,
 you already have everything you need.
