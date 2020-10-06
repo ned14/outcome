@@ -25,6 +25,14 @@ them at all. The policy-specified event hooks can be told to default to ADL disc
 backwards compatibility: set {{% api "OUTCOME_ENABLE_LEGACY_SUPPORT_FOR" %}} to less than `220` to
 enable emulation.
 
+Improve configuring `OUTCOME_GCC6_CONCEPT_BOOL`
+: Older GCCs had boolean based concepts syntax, whereas newer GCCs are standards conforming.
+However the precise logic of when to use legacy and conforming syntax was not well understood,
+which caused Outcome to fail to compile depending on what options you pass to GCC. The new logic
+always uses the legacy syntax if on GCC 8 or older, otherwise we use conforming syntax if and
+only if GCC is in C++ 20 mode or later. This hopefully will resolve the corner case build
+failures on GCC.
+
 ### Bug fixes:
 
 Boost.Outcome should now compile with `BOOST_NO_EXCEPTIONS` defined
