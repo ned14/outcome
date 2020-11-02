@@ -98,7 +98,7 @@ Distributed under the Boost Software License, Version 1.0.
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MAJOR 2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_MINOR 2
+#define OUTCOME_VERSION_MINOR 1
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_PATCH 0
 /*! AWAITING HUGO JSON CONVERSION TOOL */
@@ -108,7 +108,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_UNSTABLE_VERSION
 #endif
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#if defined(__MINGW32__) && !0
+#if defined(__MINGW32__) && !0L
 #include <_mingw.h>
 #endif
 /* Configure QuickCppLib
@@ -160,7 +160,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-#if __cplusplus >= 201103
+#if __cplusplus >= 201103L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -221,7 +221,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_attributes 190000
 #endif
 #if !defined(__cpp_constexpr)
-#if __cplusplus >= 201402
+#if __cplusplus >= 201402L
 #define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
@@ -276,7 +276,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 #endif
-#if __cplusplus >= 201402
+#if __cplusplus >= 201402L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -570,9 +570,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 947358055683a529cafd8934054dab7773313b3f
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-08-05 22:15:21 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 94735805
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 10bf175bddec2aac1bebec46475fc3e85d755843
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-10-27 16:17:30 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 10bf175b
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -677,7 +677,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -724,7 +724,7 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
-#elif __cplusplus >= 201103
+#elif __cplusplus >= 201103L
 #if __GNUC__ >= 5 && !defined(__clang__)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif defined(__has_feature)
@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ba09aa59704ced4f616305d732de4ae0388d8a44
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-08-19 11:15:46 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ba09aa59
+#define OUTCOME_PREVIOUS_COMMIT_REF a853fc09bb9590204a33c62bd3fd32f9b212c69f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-10-09 09:46:07 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a853fc09
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1048,7 +1048,7 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
-#if 0 || __clang_major__ >= 7
+#if 0L || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -1173,7 +1173,7 @@ namespace detail
 #endif
 #endif
 // True if type is nothrow swappable
-#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if !0L && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   template <class T> struct is_nothrow_swappable
@@ -1225,7 +1225,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
-#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
+#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
 #define EXECINFO_DECL inline
 #elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
@@ -1243,7 +1243,7 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 #ifdef __cplusplus
 }
-#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
+#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -2812,7 +2812,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 10
+#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cplusplus < 202000L)
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
@@ -5267,7 +5267,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000
+#if __cplusplus < 202000L
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -5804,7 +5804,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 // 0.01
 #include <initializer_list>
 #ifndef SYSTEM_ERROR2_CONSTEXPR14
-#if 0 || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
+#if 0L || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
 //! Defined to be `constexpr` when on C++ 14 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR14 constexpr
 #else
@@ -5812,7 +5812,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_NORETURN
-#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NORETURN [[noreturn]]
 #endif
 #endif
@@ -5838,7 +5838,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NORETURN
 #endif
 #ifndef SYSTEM_ERROR2_NODISCARD
-#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -5858,7 +5858,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NODISCARD
 #endif
 #ifndef SYSTEM_ERROR2_TRIVIAL_ABI
-#if 0 || (__clang_major__ >= 7 && !defined(__APPLE__))
+#if 0L || (__clang_major__ >= 7 && !defined(__APPLE__))
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -6399,7 +6399,7 @@ protected:
   virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
   //! Return a reference to a string textually representing a code.
   virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
@@ -6615,7 +6615,7 @@ public:
   for the equivalent generic code and those are compared.
   */
   template <class T> inline bool equivalent(const status_code<T> &o) const noexcept;
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN void throw_exception() const
   {
@@ -7276,7 +7276,7 @@ protected:
     const auto &c = static_cast<const generic_code &>(code); // NOLINT
     return string_ref(detail::generic_code_message(c.value()));
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this); // NOLINT
@@ -7449,7 +7449,7 @@ public:
   _quick_status_code_from_enum_domain &operator=(const _quick_status_code_from_enum_domain &) = default;
   _quick_status_code_from_enum_domain &operator=(_quick_status_code_from_enum_domain &&) = default;
   ~_quick_status_code_from_enum_domain() = default;
-#if __cplusplus < 201402 && !defined(_MSC_VER)
+#if __cplusplus < 201402L && !defined(_MSC_VER)
   static inline const _quick_status_code_from_enum_domain &get()
   {
     static _quick_status_code_from_enum_domain v;
@@ -7543,7 +7543,7 @@ protected:
     }
     return string_ref("unknown");
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override
   {
     assert(code.domain() == *this); // NOLINT
@@ -7552,7 +7552,7 @@ protected:
   }
 #endif
 };
-#if __cplusplus >= 201402 || defined(_MSC_VER)
+#if __cplusplus >= 201402L || defined(_MSC_VER)
 template <class Enum> constexpr _quick_status_code_from_enum_domain<Enum> quick_status_code_from_enum_domain = {};
 template <class Enum> inline constexpr const _quick_status_code_from_enum_domain<Enum> &_quick_status_code_from_enum_domain<Enum>::get()
 {
@@ -7612,7 +7612,7 @@ namespace detail
     indirecting_domain &operator=(const indirecting_domain &) = default;
     indirecting_domain &operator=(indirecting_domain &&) = default; // NOLINT
     ~indirecting_domain() = default;
-#if __cplusplus < 201402 && !defined(_MSC_VER)
+#if __cplusplus < 201402L && !defined(_MSC_VER)
     static inline const indirecting_domain &get()
     {
       static indirecting_domain v;
@@ -7648,7 +7648,7 @@ namespace detail
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
       return typename StatusCode::domain_type()._do_message(*c.value());
     }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
     SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
     {
       assert(code.domain() == *this);
@@ -7672,7 +7672,7 @@ namespace detail
       delete c.value(); // NOLINT
     }
   };
-#if __cplusplus >= 201402 || defined(_MSC_VER)
+#if __cplusplus >= 201402L || defined(_MSC_VER)
   template <class StatusCode> constexpr indirecting_domain<StatusCode> _indirecting_domain{};
   template <class StatusCode> inline constexpr const indirecting_domain<StatusCode> &indirecting_domain<StatusCode>::get() { return _indirecting_domain<StatusCode>; }
 #endif
@@ -7839,6 +7839,8 @@ public:
     assert(v.domain() == this->domain()); // NOLINT
     _check();
   }
+  //! Always false (including at compile time), as errored status codes are never successful.
+  constexpr bool success() const noexcept { return false; }
   //! Return a const reference to the `value_type`.
   constexpr const value_type &value() const &noexcept { return this->_value; }
 };
@@ -7948,6 +7950,8 @@ public:
   {
     _check();
   }
+  //! Always false (including at compile time), as errored status codes are never successful.
+  constexpr bool success() const noexcept { return false; }
   //! Return the erased `value_type` by value.
   constexpr value_type value() const noexcept { return this->_value; }
 };
@@ -8233,7 +8237,7 @@ protected:
     const auto &c = static_cast<const posix_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this); // NOLINT
@@ -8256,7 +8260,7 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 #else
 #endif
-#if defined(_WIN32) || 0
+#if defined(_WIN32) || 0L
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -8282,7 +8286,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_NT_CODE_HPP
 #define SYSTEM_ERROR2_NT_CODE_HPP
-#if !defined(_WIN32) && !0
+#if !defined(_WIN32) && !0L
 #error This file should only be included on Windows
 #endif
 /* Proposed SG14 status_code
@@ -8310,7 +8314,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_WIN32_CODE_HPP
 #define SYSTEM_ERROR2_WIN32_CODE_HPP
-#if !defined(_WIN32) && !0
+#if !defined(_WIN32) && !0L
 #error This file should only be included on Windows
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
@@ -8536,7 +8540,7 @@ protected:
     const auto &c = static_cast<const win32_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
@@ -9827,7 +9831,7 @@ protected:
     const auto &c = static_cast<const nt_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);

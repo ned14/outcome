@@ -2,7 +2,7 @@ master branch unit test status: Linux & MacOS: [![Build Status](https://travis-c
 
 develop branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/outcome.svg?branch=develop)](https://travis-ci.org/ned14/outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/q8s29koot2v3nity/branch/develop?svg=true)](https://ci.appveyor.com/project/ned14/outcome/branch/develop)
 
-CTest dashboard: http://my.cdash.org/index.php?project=Boost.Outcome
+CTest dashboard: https://my.cdash.org/index.php?project=Boost.Outcome
 
 Documentation: https://ned14.github.io/outcome/
 
