@@ -109,7 +109,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_UNSTABLE_VERSION
 #endif
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#if defined(__MINGW32__) && !0
+#if defined(__MINGW32__) && !0L
 #include <_mingw.h>
 #endif
 /* Configure QuickCppLib
@@ -161,7 +161,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-#if __cplusplus >= 201103
+#if __cplusplus >= 201103L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -222,7 +222,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_attributes 190000
 #endif
 #if !defined(__cpp_constexpr)
-#if __cplusplus >= 201402
+#if __cplusplus >= 201402L
 #define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
@@ -277,7 +277,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 #endif
-#if __cplusplus >= 201402
+#if __cplusplus >= 201402L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -571,9 +571,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF ac5582cfd7b114f483d497a2dfb808f0b26ed957
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-07-29 14:00:04 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE ac5582cf
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 10bf175bddec2aac1bebec46475fc3e85d755843
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-10-27 16:17:30 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 10bf175b
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -678,7 +678,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -725,7 +725,7 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
-#elif __cplusplus >= 201103
+#elif __cplusplus >= 201103L
 #if __GNUC__ >= 5 && !defined(__clang__)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif defined(__has_feature)
@@ -987,9 +987,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF fde9dc3eaa87a019d4d6d01b557486fffb89660c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-07-24 17:11:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE fde9dc3e
+#define OUTCOME_PREVIOUS_COMMIT_REF 6ca680fe10892cdd44173327a7e1bde12afc5784
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-10-09 09:48:05 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6ca680fe
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1049,7 +1049,7 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
-#if 0 || __clang_major__ >= 7
+#if 0L || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -1174,7 +1174,7 @@ namespace detail
 #endif
 #endif
 // True if type is nothrow swappable
-#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if !0L && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   template <class T> struct is_nothrow_swappable
@@ -1226,7 +1226,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
-#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
+#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
 #define EXECINFO_DECL inline
 #elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
@@ -1244,7 +1244,7 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 #ifdef __cplusplus
 }
-#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
+#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -1687,7 +1687,7 @@ namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* Tells C++ coroutines about Outcome's result
-(C) 2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+(C) 2019-2020 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Oct 2019
 
 
@@ -1714,6 +1714,20 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <cassert>
 #if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines) || (defined(__clang__) && __cpp_coroutines)
+#ifndef OUTCOME_HAVE_NOOP_COROUTINE
+#if defined(__has_builtin)
+#if __has_builtin(__builtin_coro_noop)
+#define OUTCOME_HAVE_NOOP_COROUTINE 1
+#endif
+#endif
+#endif
+#ifndef OUTCOME_HAVE_NOOP_COROUTINE
+#if _MSC_VER >= 1928
+#define OUTCOME_HAVE_NOOP_COROUTINE 1
+#else
+#define OUTCOME_HAVE_NOOP_COROUTINE 0
+#endif
+#endif
 #if __has_include(<coroutine>)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
@@ -1723,6 +1737,9 @@ namespace awaitables
   template <class... Args> using coroutine_traits = std::coroutine_traits<Args...>;
   using std::suspend_always;
   using std::suspend_never;
+#if OUTCOME_HAVE_NOOP_COROUTINE
+  using std::noop_coroutine;
+#endif
 } // namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_FOUND_COROUTINE_HEADER 1
@@ -1735,6 +1752,9 @@ namespace awaitables
   template <class... Args> using coroutine_traits = std::experimental::coroutine_traits<Args...>;
   using std::experimental::suspend_always;
   using std::experimental::suspend_never;
+#if OUTCOME_HAVE_NOOP_COROUTINE
+  using std::experimental::noop_coroutine;
+#endif
 } // namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_FOUND_COROUTINE_HEADER 1
@@ -1763,7 +1783,7 @@ namespace awaitables
     OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
     inline bool try_set_error(T &&e, U *result)
     {
-      new(result) U(static_cast<T&&>(e));
+      new(result) U(static_cast<T &&>(e));
       return true;
     }
     template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
@@ -1787,13 +1807,14 @@ namespace awaitables
     {
       using container_type = typename Awaitable::container_type;
       using result_set_type = std::conditional_t<use_atomic, std::atomic<bool>, fake_atomic<bool>>;
-      union {
+      union
+      {
         OUTCOME_V2_NAMESPACE::detail::empty_type _default{};
         container_type result;
       };
       result_set_type result_set{false};
       coroutine_handle<> continuation;
-      outcome_promise_type() {}
+      outcome_promise_type() noexcept {}
       outcome_promise_type(const outcome_promise_type &) = delete;
       outcome_promise_type(outcome_promise_type &&) = delete;
       outcome_promise_type &operator=(const outcome_promise_type &) = delete;
@@ -1802,18 +1823,21 @@ namespace awaitables
       {
         if(result_set.load(std::memory_order_acquire))
         {
-          result.~container_type();
+          result.~container_type(); // could throw
         }
       }
-      auto get_return_object() { return Awaitable{*this}; }
+      auto get_return_object()
+      {
+        return Awaitable{*this}; // could throw bad_alloc
+      }
       void return_value(container_type &&value)
       {
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
-          result.~container_type();
+          result.~container_type(); // could throw
         }
-        new(&result) container_type(static_cast<container_type &&>(value));
+        new(&result) container_type(static_cast<container_type &&>(value)); // could throw
         result_set.store(true, std::memory_order_release);
       }
       void return_value(const container_type &value)
@@ -1821,9 +1845,9 @@ namespace awaitables
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
-          result.~container_type();
+          result.~container_type(); // could throw
         }
-        new(&result) container_type(value);
+        new(&result) container_type(value); // could throw
         result_set.store(true, std::memory_order_release);
       }
       void unhandled_exception()
@@ -1839,7 +1863,7 @@ namespace awaitables
         // Try to set error code first
         if(!detail::error_is_set(ec) || !detail::try_set_error(static_cast<decltype(ec) &&>(ec), &result))
         {
-          detail::set_or_rethrow(e, &result);
+          detail::set_or_rethrow(e, &result); // could throw
         }
 #else
         std::terminate();
@@ -1852,16 +1876,22 @@ namespace awaitables
         {
           bool await_ready() noexcept { return !suspend_initial; }
           void await_resume() noexcept {}
-          void await_suspend(coroutine_handle<> /*unused*/) {}
+          void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
         };
         return awaiter{};
       }
-      auto final_suspend()
+      auto final_suspend() noexcept
       {
         struct awaiter
         {
           bool await_ready() noexcept { return false; }
           void await_resume() noexcept {}
+#if OUTCOME_HAVE_NOOP_COROUTINE
+          coroutine_handle<> await_suspend(coroutine_handle<outcome_promise_type> self) noexcept
+          {
+            return self.promise().continuation ? self.promise().continuation : noop_coroutine();
+          }
+#else
           void await_suspend(coroutine_handle<outcome_promise_type> self)
           {
             if(self.promise().continuation)
@@ -1869,6 +1899,7 @@ namespace awaitables
               return self.promise().continuation.resume();
             }
           }
+#endif
         };
         return awaiter{};
       }
@@ -1885,8 +1916,11 @@ namespace awaitables
       outcome_promise_type &operator=(const outcome_promise_type &) = delete;
       outcome_promise_type &operator=(outcome_promise_type &&) = delete;
       ~outcome_promise_type() = default;
-      auto get_return_object() { return Awaitable{*this}; }
-      void return_void()
+      auto get_return_object()
+      {
+        return Awaitable{*this}; // could throw bad_alloc
+      }
+      void return_void() noexcept
       {
         assert(!result_set.load(std::memory_order_acquire));
         result_set.store(true, std::memory_order_release);
@@ -1894,7 +1928,7 @@ namespace awaitables
       void unhandled_exception()
       {
         assert(!result_set.load(std::memory_order_acquire));
-        std::rethrow_exception(std::current_exception());
+        std::rethrow_exception(std::current_exception()); // throws
       }
       auto initial_suspend() noexcept
       {
@@ -1902,16 +1936,22 @@ namespace awaitables
         {
           bool await_ready() noexcept { return !suspend_initial; }
           void await_resume() noexcept {}
-          void await_suspend(coroutine_handle<> /*unused*/) {}
+          void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
         };
         return awaiter{};
       }
-      auto final_suspend()
+      auto final_suspend() noexcept
       {
         struct awaiter
         {
           bool await_ready() noexcept { return false; }
           void await_resume() noexcept {}
+#if OUTCOME_HAVE_NOOP_COROUTINE
+          coroutine_handle<> await_suspend(coroutine_handle<outcome_promise_type> self) noexcept
+          {
+            return self.promise().continuation ? self.promise().continuation : noop_coroutine();
+          }
+#else
           void await_suspend(coroutine_handle<outcome_promise_type> self)
           {
             if(self.promise().continuation)
@@ -1919,12 +1959,20 @@ namespace awaitables
               return self.promise().continuation.resume();
             }
           }
+#endif
         };
         return awaiter{};
       }
     };
-    template <class Awaitable, bool suspend_initial, bool use_atomic> constexpr inline auto move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, false> &p) { return static_cast<typename Awaitable::container_type &&>(p.result); }
-    template <class Awaitable, bool suspend_initial, bool use_atomic> constexpr inline void move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, true> & /*unused*/) {}
+    template <class Awaitable, bool suspend_initial, bool use_atomic>
+    constexpr inline auto move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, false> &p)
+    {
+      return static_cast<typename Awaitable::container_type &&>(p.result);
+    }
+    template <class Awaitable, bool suspend_initial, bool use_atomic>
+    constexpr inline void move_result_from_promise_if_not_void(outcome_promise_type<Awaitable, suspend_initial, use_atomic, true> & /*unused*/)
+    {
+    }
     template <class Cont, bool suspend_initial, bool use_atomic> struct OUTCOME_NODISCARD awaitable
     {
       using container_type = Cont;
@@ -1945,7 +1993,7 @@ namespace awaitables
           _h.destroy();
         }
       }
-      explicit awaitable(promise_type &p)
+      explicit awaitable(promise_type &p) // could throw
           : _h(coroutine_handle<promise_type>::from_promise(p))
       {
       }
@@ -1959,11 +2007,19 @@ namespace awaitables
         }
         return detail::move_result_from_promise_if_not_void(_h.promise());
       }
+#if OUTCOME_HAVE_NOOP_COROUTINE
+      coroutine_handle<> await_suspend(coroutine_handle<> cont) noexcept
+      {
+        _h.promise().continuation = cont;
+        return _h;
+      }
+#else
       void await_suspend(coroutine_handle<> cont)
       {
         _h.promise().continuation = cont;
         _h.resume();
       }
+#endif
     };
 #endif
   } // namespace detail
@@ -3753,7 +3809,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && __GNUC__ < 10
+#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cplusplus < 202000L)
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
@@ -6846,7 +6902,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000
+#if __cplusplus < 202000L
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
