@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-10-09T10:02:27 UTC">
+<meta name="revised" content="2020-11-02T11:16:29 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2742,7 +2742,7 @@
  
 
 
-<h1 id="outcome-2-2-library">Outcome 2.2 library</h1>
+<h1 id="outcome-2-1-library">Outcome 2.1 library</h1>
 
 
 
@@ -2809,7 +2809,7 @@ guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="fo
 
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">int_from_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">path</span><span class="p">)</span> <span class="k">noexcept</span>
 <span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">str</span><span class="p">,</span> <span class="n">data_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">));</span>
+  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">data_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">));</span>
   <span class="c1">// if control gets here data_from_file() has succeeded
 </span><span class="c1"></span>  <span class="k">return</span> <span class="nf">process</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>  <span class="c1">// decltype(str) == string
 </span><span class="c1"></span><span class="p">}</span>
