@@ -5,7 +5,7 @@ include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibUtils)
 
 
-CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "cmake_ci")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("outcome" "prebuilt")
 list(APPEND CTEST_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=${CTEST_CONFIGURATION_TYPE})
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
