@@ -40,7 +40,12 @@ jobs:
         if: steps.waitforstatuschecks.outputs.status == 'success'
         shell: bash
         run: |
-         tar cJf ../outcome-v2-all-sources.tar.xz .
+         cd doc/html
+         git checkout gh-pages
+         git pull
+         cd ../../..
+         tar cJf outcome-v2-all-sources.tar.xz --exclude .git outcome
+         cd outcome
 
       - name: Create Release
         id: create_release
