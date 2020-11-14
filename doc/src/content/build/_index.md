@@ -116,17 +116,20 @@ git submodule update
 
 ## Usage as a stable source tarball
 
-If you would prefer a single source tarball of the stable branch containing
-all the documentation, tests and sources, this can always be retrieved from:
+If you would prefer a single source tarball of the stable and develop branches
+known to have had all unit tests passing on all platforms, containing all the
+documentation, tests and sources, this can always be retrieved from:
 
-https://dedi5.nedprod.com/static/files/outcome-v2.0-source-latest.tar.xz
+https://github.com/ned14/outcome/releases
 
 This tarball is automatically generated when Outcome fully compiles and passes
 all unit tests on all platforms tested by the CIs. This currently includes:
 
-- Linux: GCC 6.5, clang 4.0.1
-- MacOS: XCode 9
-- Windows: VS2017.9
+- Linux: GCC 7.5, clang 9, clang 11
+- MacOS: XCode 12
+- Windows: VS2019.7
+
+All unit tests are executed under the Address and Undefined Behaviour sanitisers.
 
 It should be emphasised that newer compilers are not tested, so there is
 an unlikely chance that the tarball may not work on a newer compiler.

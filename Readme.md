@@ -1,8 +1,15 @@
-master branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/outcome.svg?branch=master)](https://travis-ci.org/ned14/outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/q8s29koot2v3nity/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/outcome/branch/master)
-
-develop branch unit test status: Linux & MacOS: [![Build Status](https://travis-ci.org/ned14/outcome.svg?branch=develop)](https://travis-ci.org/ned14/outcome) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/q8s29koot2v3nity/branch/develop?svg=true)](https://ci.appveyor.com/project/ned14/outcome/branch/develop)
+<table width="100%">
+<tr><th>master branch<th>develop branch
+<tr><td align="center"><img src="https://github.com/ned14/outcome/workflows/Documentation/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/outcome/workflows/Documentation/badge.svg?branch=develop">
+<tr><td align="center"><img src="https://github.com/ned14/outcome/workflows/Installability/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/outcome/workflows/Installability/badge.svg?branch=develop">
+<tr><td align="center"><a href="https://github.com/ned14/outcome/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/outcome/workflows/Unit%20tests%20Linux/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/outcome/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/outcome/workflows/Unit%20tests%20Linux/badge.svg?branch=develop"></a>
+<tr><td align="center"><a href="https://github.com/ned14/outcome/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/outcome/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/outcome/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/outcome/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=develop"></a>
+<tr><td align="center"><a href="https://github.com/ned14/outcome/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/outcome/workflows/Unit%20tests%20Windows/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/outcome/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/outcome/workflows/Unit%20tests%20Windows/badge.svg?branch=develop"></a>
+</table>
 
 CTest dashboard: https://my.cdash.org/index.php?project=Boost.Outcome
+
+All tests passing source tarballs: https://github.com/ned14/outcome/releases
 
 Documentation: https://ned14.github.io/outcome/
 

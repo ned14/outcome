@@ -45,7 +45,7 @@ jobs:
          cd doc/html
          git checkout gh-pages
          cd ../..
-         CXX=clang++ ctest -S .docs.cmake -V
+         ctest -S .docs.cmake -V
          cd doc/html
          echo "google-site-verification: google5fc8a1f8de4b73f0.html" > google5fc8a1f8de4b73f0.html
           

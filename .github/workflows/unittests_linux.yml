@@ -35,8 +35,10 @@ jobs:
          sudo apt update;
          sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
+         ctest -S .ci.cmake -VV -E noexcept --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
+       else
+         ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
        fi
-       ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
       
     - name: Upload Test Results
       uses: actions/upload-artifact@v2
