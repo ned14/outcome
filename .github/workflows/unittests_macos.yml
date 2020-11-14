@@ -1,0 +1,51 @@
+name: Unit tests Mac OS
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  MacOS:
+    name: Mac OS 10.15
+    runs-on: macos-10.15
+    env:
+      NAME: MacOS
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: CMake tests Mac OS
+      shell: bash
+      run: |
+       ctest -S .ci.cmake -VV -E 'noexcept|comparison' --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mac OS test results
+        path: prebuilt/merged_junit_results.xml
+
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: [MacOS]
+    runs-on: ubuntu-latest
+    if: success() || failure()
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.3
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: '**/merged_junit_results.xml'

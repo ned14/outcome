@@ -2,11 +2,11 @@ dist: trusty
 language: cpp
 compiler:
  - g++-6
- - clang-4.0
+# - clang-4.0
 sudo: false
 os:
  - linux
- - osx
+# - osx
 osx_image: xcode9
 branches:
   only:
@@ -37,31 +37,31 @@ addons:
 env:
 # - __="Code bloat tests"
 # - __="ABI stability" NAME=TravisABICheck
- - __="Documentation" NAME=TravisDocumentation
+# - __="Documentation" NAME=TravisDocumentation
  - __="cmake tests" NAME=TravisLinuxWorker
- - __="cmake tests osx" NAME=TravisOSXWorker
- - __="Installability"
+# - __="cmake tests osx" NAME=TravisOSXWorker
+# - __="Installability"
  
-matrix:
-  exclude:
-  - os: osx
-    compiler: g++-6
+#matrix:
+#  exclude:
+#  - os: osx
+#    compiler: g++-6
 #  - os: linux
 #    compiler: clang-4.0
 #    env: __="ABI stability" NAME=TravisABICheck
-  - os: linux
-    compiler: clang-4.0
-    env: __="Documentation" NAME=TravisDocumentation
-  - os: linux
-    env: __="cmake tests osx" NAME=TravisOSXWorker
-  - os: osx
-    env: __="Code bloat tests"
+#  - os: linux
+#    compiler: clang-4.0
+#    env: __="Documentation" NAME=TravisDocumentation
+#  - os: linux
+#    env: __="cmake tests osx" NAME=TravisOSXWorker
+#  - os: osx
+#    env: __="Code bloat tests"
 #  - os: osx
 #    env: __="ABI stability" NAME=TravisABICheck
-  - os: osx
-    env: __="Documentation" NAME=TravisDocumentation
-  - os: osx
-    env: __="cmake tests" NAME=TravisLinuxWorker
+#  - os: osx
+#    env: __="Documentation" NAME=TravisDocumentation
+#  - os: osx
+#    env: __="cmake tests" NAME=TravisLinuxWorker
  
 cache:
   apt: true
@@ -102,12 +102,12 @@ script:
      sh ./check-abi.sh abi_dumps/Outcome/2.1/binary_only.dump;
    fi
 #     sh ./check-api-abi.sh abi_dumps/Outcome/2.1/ABI.dump;
- -
-   if [ "$__" = "cmake tests" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
-     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
-     ctest -S .ci.cmake -V;
-   fi
+# -
+#   if [ "$__" = "cmake tests" ]; then
+#     if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
+#     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
+#     ctest -S .ci.cmake -V;
+#   fi
  -
    if [ "$__" = "cmake tests osx" ]; then
      ctest -S .ci.cmake -V;

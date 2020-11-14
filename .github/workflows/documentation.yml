@@ -1,0 +1,58 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  documentation:
+    name: "Regenerate and publish Documentation"
+    runs-on: ubuntu-latest
+    env:
+      NAME: Documentation
+
+    steps:
+      - name: Checkout Documentation
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Cache Hugo
+        id: cache-hugo
+        uses: actions/cache@v2
+        with:
+          path: hugo_bin
+          key: documentation-hugo_bin
+          
+      - name: Download Hugo
+        if: steps.cache-hugo.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+         wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.52/hugo_0.52_Linux-64bit.tar.gz
+         mkdir hugo_bin
+         tar xf hugo.tar.gz -C hugo_bin
+
+      - name: Regenerate Documentation
+        shell: bash
+        run: |
+         export PATH=$PATH:`pwd`/hugo_bin
+         cd doc/html
+         git checkout gh-pages
+         cd ../..
+         CXX=clang++ ctest -S .docs.cmake -V
+         cd doc/html
+         echo "google-site-verification: google5fc8a1f8de4b73f0.html" > google5fc8a1f8de4b73f0.html
+          
+      - name: Publish Documentation
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: doc/html
+          CLEAN: true

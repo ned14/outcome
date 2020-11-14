@@ -1,0 +1,42 @@
+name: Installability
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  installability:
+    name: "Installability"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, macos-10.15, windows-2019]
+    env:
+      NAME: Install-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install
+      shell: bash
+      run: |
+       git config --global core.longpaths true
+       git clone --depth 1 https://github.com/ned14/quickcpplib.git
+       pip install --user gitpython
+       python quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome develop
+       cd test_cpp-pm_install
+       mkdir build
+       cd build
+       cmake .. -DCMAKE_BUILD_TYPE=Release $CMAKE_CONFIGURE_OPTIONS
+       cmake --build .

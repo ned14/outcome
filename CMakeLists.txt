@@ -284,7 +284,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
             POSITION_INDEPENDENT_CODE ON
           )
-          if(NOT example_src MATCHES "[.]c$")
+          if(example_src MATCHES "[.]c$")
+            set_target_properties(${example_bin} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+          else()
             target_compile_features(${example_bin} PUBLIC cxx_std_17)
             if(CMAKE_SYSTEM_NAME MATCHES "Linux")
               target_link_libraries(${example_bin} PRIVATE stdc++fs)

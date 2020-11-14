@@ -1,0 +1,77 @@
+name: Create release if everything passes
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  publish-binaries:
+    name: "Publish Tarball"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      
+      - name: 'Wait for status checks'
+        id: waitforstatuschecks
+        uses: "WyriHaximus/github-action-wait-for-status@v1.2"
+        with:
+          ignoreActions: "Publish Tarball"
+          checkInterval: 60
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+#      - name: Delete Tag
+#        uses: dev-drprasad/delete-tag-and-release@v0.1.2
+#        with:
+#          delete_release: true
+#          tag_name: last_all_tests_passing
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Tarball
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        shell: bash
+        run: |
+         cd doc/html
+         git checkout gh-pages
+         git pull
+         cd ../../..
+         tar cJf outcome-v2-all-sources.tar.xz --exclude .git outcome
+         cd outcome
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: all_tests_passed_${{ github.sha }}
+          release_name: All tests passed ${{ github.sha }}
+          body: |
+            ```
+            ${{ github.event.head_commit.message }}
+            ```
+            
+            Use the 'all-sources' tarball below, NOT the github generated one which is missing dependencies:
+          draft: false
+          prerelease: true
+          
+      - name: Upload
+        uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ../outcome-v2-all-sources.tar.xz
+          asset_name: outcome-v2-all-sources-${{ github.sha }}.tar.xz
+          asset_content_type: application/gzip
