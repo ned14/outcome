@@ -143,7 +143,7 @@ script:
  
 after_success:
  -
-   if [ "$__" = "cmake tests" ] && [ "$NAME" = "TravisLinuxWorkerGCC" ]; then
+   if [ "$__" = "cmake tests" ]; then
      pip install --user gitpython;
      git remote add outcome https://github.com/ned14/outcome;
      git fetch outcome;
