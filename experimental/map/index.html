@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-11-14T23:18:07 UTC">
+<meta name="revised" content="2020-11-15T17:48:42 UTC">
 <title>Approximate map between error code designs :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -75,101 +75,52 @@
       <a href="/outcome/motivation/">Motivation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/hooks/spare_storage/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/exceptions/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/spare_storage/">
-            <code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code>
+          <a href="/outcome/motivation/exceptions/">
+            Exceptions
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/errno/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;) noexcept</code>
+          <a href="/outcome/motivation/errno/">
+            errno
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction2/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/error_codes/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction2/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          <a href="/outcome/motivation/error_codes/">
+            Error codes
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/std_error_code/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          <a href="/outcome/motivation/std_error_code/">
+            std::error_code
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/plug_error_code/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          <a href="/outcome/motivation/plug_error_code/">
+            Plugging a library into std::error_code`
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/plug_error_code2/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/">
-            <code>void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          <a href="/outcome/motivation/plug_error_code2/">
+            Plugging a library into boost::system::error_code
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="dd-item">
+      <li data-nav-id="/outcome/motivation/narrow_contract/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction2/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_construction/">
-            <code>void hook_result_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_copy_construction/">
-            <code>void hook_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_in_place_construction/">
-            <code>void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_move_construction/">
-            <code>void hook_result_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/override_outcome_exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/override_outcome_exception/">
-            <code>void override_outcome_exception(basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/set_spare_storage/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/set_spare_storage/">
-            <code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code>
+          <a href="/outcome/motivation/narrow_contract/">
+            Narrow contracts
           </a>
         </div>
     </li>
