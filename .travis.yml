@@ -148,7 +148,6 @@ after_success:
      git remote add outcome https://github.com/ned14/outcome;
      git fetch outcome;
      git submodule update --init;
-     git clone --depth 1 https://github.com/ned14/quickcpplib.git;
      cd ..;
      git clone https://github.com/boostorg/outcome boost-outcome;
      cd boost-outcome;
@@ -160,7 +159,8 @@ after_success:
      git checkout -b orig-master outcome/master;
      git checkout master;
      cd ..;
-     python outcome/quickcpplib/repo/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
+     git clone --depth 1 https://github.com/ned14/quickcpplib.git;
+     python quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@;
      cd boost-outcome;
      git checkout master;
      cd doc/src;
