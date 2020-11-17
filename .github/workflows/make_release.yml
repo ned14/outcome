@@ -75,3 +75,67 @@ jobs:
           asset_path: ../outcome-v2-all-sources.tar.xz
           asset_name: outcome-v2-all-sources-${{ github.sha }}.tar.xz
           asset_content_type: application/gzip
+          
+      - name: Extract boostorg/outcome ssh keys
+        id: vars
+        shell: bash
+        run: |
+         if [ -n "$BOOSTORG_OUTCOME_DEPLOY_KEY" ] && [ "${{ steps.waitforstatuschecks.outputs.status }}" = "success" ]; then
+           mkdir -p ~/.ssh;
+           printf "%s" "$BOOSTORG_OUTCOME_DEPLOY_KEY" > "~/.ssh/id_boostorg_outcome";
+           chmod -R og-rwx ~/.ssh;
+           unset HAS_DEPLOY_KEY;
+           HAS_DEPLOY_KEY='true';
+         fi
+         echo ::set-output name=HAS_DEPLOY_KEY::${HAS_DEPLOY_KEY}
+
+      - name: Convert to boostorg/outcome
+        if: steps.vars.outputs.HAS_DEPLOY_KEY
+        shell: bash
+        run: |
+         pip install --user gitpython
+         git remote add outcome https://github.com/ned14/outcome
+         git fetch outcome
+         git submodule update --init
+         cd ..
+         git clone https://github.com/boostorg/outcome boost-outcome
+         cd boost-outcome
+         git checkout -b develop origin/develop
+         git checkout master
+         git remote add outcome https://github.com/ned14/outcome
+         git fetch outcome
+         git checkout -b orig-develop outcome/develop
+         git checkout -b orig-master outcome/master
+         git checkout master
+         cd ..
+         git clone --depth 1 https://github.com/ned14/quickcpplib.git
+         python quickcpplib/scripts/boostify_git_repo.py boost-outcome outcome ned14/outcome@
+         cd boost-outcome
+         git checkout master
+         cd doc/src
+         rm -rf ../html
+         HUGO_BOOSTDOCDISABLECOMMONHEADING=1 hugo
+         cd ../html
+         git add . || true
+         cd ../..
+         git commit -a -m "CI regenerates Boost.Outcome docs" || true
+         git checkout develop
+         cd doc/src
+         rm -rf ../html
+         HUGO_BOOSTDOCDISABLECOMMONHEADING=1 hugo
+         cd ../html
+         git add . || true
+         cd ../..
+         git commit -a -m "CI regenerates Boost.Outcome docs" || true
+         git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome master || true
+         git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome develop || true
+         cd doc
+         rm -rf html
+         git clone -b gh-pages --single-branch https://github.com/boostorg/outcome html
+         cd src
+         hugo
+         cd ../html
+         git add . || true
+         git commit -a -m "CI regenerates Boost.Outcome docs" || true
+         git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome gh-pages
+         cd ../..
