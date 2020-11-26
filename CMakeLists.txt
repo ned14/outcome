@@ -148,10 +148,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   foreach(target ${outcome_TEST_TARGETS})
     if(${target} MATCHES "coroutine-support")
       apply_cxx_coroutines_to(PRIVATE ${target})
-    endif()
-    # MSVC's concepts implementation blow up unless permissive is off
-    if(MSVC AND NOT CLANG)
-      target_compile_options(${target} PRIVATE /permissive-)
+      if(MSVC AND CXX_HAS_COROUTINES AND NOT CXX_COROUTINES_FLAGS STREQUAL "")
+        target_compile_definitions(${target} PUBLIC OUTCOME_FORCE_EXPERIMENTAL_COROUTINES=1)
+        # MSVC's experimental concepts implementation blow up unless permissive is off
+        if(NOT CLANG)
+          target_compile_options(${target} PRIVATE /permissive-)
+        endif()
+      endif()
     endif()
   endforeach()
   

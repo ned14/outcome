@@ -41,13 +41,13 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 #ifndef OUTCOME_HAVE_NOOP_COROUTINE
-#if _MSC_VER >= 1928
+#if _MSC_VER >= 1928 && _HAS_CXX20 && !OUTCOME_FORCE_EXPERIMENTAL_COROUTINES
 #define OUTCOME_HAVE_NOOP_COROUTINE 1
 #else
 #define OUTCOME_HAVE_NOOP_COROUTINE 0
 #endif
 #endif
-#if __has_include(<coroutine>)
+#if __has_include(<coroutine>) && !OUTCOME_FORCE_EXPERIMENTAL_COROUTINES && (!defined(_MSC_VER) || _HAS_CXX20)
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace awaitables
