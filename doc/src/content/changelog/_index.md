@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.1.5 ??? (Boost 1.75) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.5)
+## v2.1.5 11th December 2020 (Boost 1.75) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.5)
 
 {{% notice note %}}
 The v2.1 branch is expected to be retired end of 2020 with the Boost 1.75 release, with the v2.2 branch
