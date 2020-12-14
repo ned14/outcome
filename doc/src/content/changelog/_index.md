@@ -4,16 +4,23 @@ weight = 80
 +++
 
 ---
-## v2.1.5 11th December 2020 (Boost 1.75) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.5)
+## v2.2.0 ? (Boost 1.76) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.0)
 
-{{% notice note %}}
-The v2.1 branch is expected to be retired end of 2020 with the Boost 1.75 release, with the v2.2 branch
-becoming the default for Boost 1.76 onwards. You can use the future v2.2 branch now using
-[`better_optimisation`](https://github.com/ned14/outcome/tree/better_optimisation),
-how to upgrade your code is described in [the v2.1 => v2.2 upgrade guide]({{% relref "/changelog/upgrade_v21_v22" %}}).
+BREAKING CHANGE As announced for a year and three Boost releases, Outcome v2.2 became the default, replacing v2.1.
+: All v2.1 Outcome code will need to be upgraded as described in [the v2.1 => v2.2 upgrade guide]({{% relref "/changelog/upgrade_v21_v22" %}}).
 This branch has a number of major breaking changes to Outcome v2.1, see
 [the list of v2.2 major changes]({{% relref "/changelog/v22" %}}).
-{{% /notice %}}
+
+### Enhancements:
+
+VS2019.8 compatibility
+: VS2019.8 changed how to enable Coroutines, which caused Outcome to not compile on that compiler.
+
+### Bug fixes:
+
+
+---
+## v2.1.5 11th December 2020 (Boost 1.75) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.5)
 
 ### Enhancements:
 

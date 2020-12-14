@@ -570,9 +570,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 10bf175bddec2aac1bebec46475fc3e85d755843
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-10-27 16:17:30 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 10bf175b
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF b1fac941934e8d9ac3e82b02cf1264a829860d32
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-11-25 14:28:07 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE b1fac941
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 6ca680fe10892cdd44173327a7e1bde12afc5784
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-10-09 09:48:05 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6ca680fe
+#define OUTCOME_PREVIOUS_COMMIT_REF bbde4ec13b1f9fec23d2ec2b1064e9295f4d9e27
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-12-14 10:10:19 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE bbde4ec1
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -6140,7 +6140,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_STATUS_ERROR_HPP
 #define SYSTEM_ERROR2_STATUS_ERROR_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -7005,6 +7005,8 @@ protected:
       : _domain(v)
   {
   }
+  // Used to work around triggering a ubsan failure. Do NOT remove!
+  constexpr const status_code_domain *_domain_ptr() const noexcept { return _domain; }
 public:
   //! Return the status code domain.
   constexpr const status_code_domain &domain() const noexcept { return *_domain; }
@@ -7287,14 +7289,14 @@ public:
                                     && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
                                     bool>::type = true>
   constexpr status_code(const status_code<DomainType> &v) noexcept // NOLINT
-      : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
+      : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), detail::erasure_cast<value_type>(v.value()))
   {
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
   template <class DomainType, //
             typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value, bool>::type = true>
   SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept // NOLINT
-      : _base(typename _base::_value_type_constructor{}, &v.domain(), detail::erasure_cast<value_type>(v.value()))
+      : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), detail::erasure_cast<value_type>(v.value()))
   {
     v._domain = nullptr;
   }

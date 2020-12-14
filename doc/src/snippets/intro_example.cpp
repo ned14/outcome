@@ -57,7 +57,7 @@ outcome::result<int> process(const string& content) noexcept;
 
 outcome::result<int> int_from_file(string_view path) noexcept
 {
-  OUTCOME_TRY(auto &&str, data_from_file(path));
+  OUTCOME_TRY(auto str, data_from_file(path));
   // if control gets here data_from_file() has succeeded
   return process(str);  // decltype(str) == string
 }
