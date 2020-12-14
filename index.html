@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-11T20:58:56 UTC">
+<meta name="revised" content="2020-12-14T11:38:53 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -40,7 +40,7 @@
     <nav class="shortcuts">
             <li class="" role="">
                 <a href="https://github.com/ned14/outcome"  rel="noopener">
-                  <i class='fa fa-github'></i> Outcome 2.1 github repo
+                  <i class='fa fa-github'></i> Outcome 2.2 github repo
                 </a>
             </li>
             <li class="" role="">
@@ -2746,13 +2746,13 @@
 
 
 
-<div class="notices note" ><p>The final release of Outcome v2.1 will be in Boost 1.75 (end of 2020). From Boost 1.76
-(start of 2021) onwards Outcome v2.2 shall become the default. Please consider upgrading
-your code now to v2.2 using <a href="/outcome/changelog/upgrade_v21_v22/">the v2.1 =&gt; v2.2 upgrade guide</a>.
-The v2.2 branch has a number of major breaking changes to Outcome v2.1, see
+<div class="notices note" ><p>At the end of December 2020, Outcome v2.2 replaced v2.1 in develop branch. This is a breaking
+change and all Outcome v2.1 code will need to be upgraded using <a href="/outcome/changelog/upgrade_v21_v22/">the v2.1 =&gt; v2.2 upgrade guide</a>. See also
 <a href="/outcome/changelog/v22/">the list of v2.2 major changes</a>.
 <br><br>
-This library&rsquo;s tutorial remains v2.1 based. It shall be ported to v2.2 in early 2021.</p>
+This library&rsquo;s tutorial is currently being converted from v2.1 to v2.2, so be aware some code
+examples may not compile correctly yet. Once the documentation is fully upgraded, develop branch
+shall be merged into master branch.</p>
 </div>
 
 
@@ -2809,7 +2809,7 @@ guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="fo
 
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">int_from_file</span><span class="p">(</span><span class="n">string_view</span> <span class="n">path</span><span class="p">)</span> <span class="k">noexcept</span>
 <span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="n">str</span><span class="p">,</span> <span class="n">data_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">));</span>
+  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">str</span><span class="p">,</span> <span class="n">data_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">));</span>
   <span class="c1">// if control gets here data_from_file() has succeeded
 </span><span class="c1"></span>  <span class="k">return</span> <span class="nf">process</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>  <span class="c1">// decltype(str) == string
 </span><span class="c1"></span><span class="p">}</span>
@@ -2856,7 +2856,7 @@ is available in scope.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/09/2020
+        <i class='fa fa-calendar'></i> Last update on 14/12/2020
     </div>
     
 
