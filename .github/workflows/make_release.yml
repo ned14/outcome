@@ -78,6 +78,8 @@ jobs:
           
       - name: Extract boostorg/outcome ssh keys
         id: vars
+        env:
+          BOOSTORG_OUTCOME_DEPLOY_KEY: ${{ secrets.BOOSTORG_OUTCOME_DEPLOY_KEY }}
         shell: bash
         run: |
          if [ -n "$BOOSTORG_OUTCOME_DEPLOY_KEY" ] && [ "${{ steps.waitforstatuschecks.outputs.status }}" = "success" ]; then
