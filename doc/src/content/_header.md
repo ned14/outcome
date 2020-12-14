@@ -1,1 +1,1 @@
-Outcome 2.1 library documentation
+Outcome 2.2 library documentation
