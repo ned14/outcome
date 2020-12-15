@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-14T18:59:08 UTC">
+<meta name="revised" content="2020-12-15T12:25:38 UTC">
 <title>Hook outcome :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -402,7 +402,7 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/value-or-error/">
-            ValueOrError Concept
+            value_or_error Concept
           </a>
         </div>
     </li>
@@ -928,6 +928,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/traits/is_move_bitcopying/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/traits/is_move_bitcopying/">
+            <code>is_move_bitcopying&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/traits/is_success_type/">
@@ -1304,7 +1311,7 @@
       <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -1844,7 +1851,7 @@
       <li data-nav-id="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -2764,11 +2771,7 @@
     
     
     
-    <div class="notices note" ><p>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.</p>
-</div>
-
-
-<p>The final step is to add ADL discovered event hooks for the very specific case of
+    <p>The final step is to add event hooks for the very specific case of
 when our localised <code>outcome</code> is copy or move constructed from our localised <code>result</code>.</p>
 
 <p>You ought to be very careful that the <code>noexcept</code>-ness of these matches the <code>noexcept</code>-ness
@@ -2779,7 +2782,8 @@ copy and/or move constructor. Thus if <code>poke_exception()</code> throws, inst
 termination would occur, which is bad.</p>
 
 <p>We avoid that problem in this case by wrapping <code>poke_exception()</code> in a <code>try...catch</code>
-which throws away any exceptions thrown.</p>
+which throws away any exceptions thrown. For Outcome before v2.2, these specially
+named free functions must be placed into a namespace which is ADL searched:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">namespace</span> <span class="n">error_code_extended</span>
 <span class="p">{</span>
@@ -2813,6 +2817,11 @@ which throws away any exceptions thrown.</p>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/error_code_extended.cpp#L176" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
+<p>For Outcome v2.2 and later, these functions must be placed into a custom no value
+policy with the names <code>on_outcome_copy_construction()</code> and <code>on_outcome_move_construction()</code>
+respectively. As with before, the implementation of the functions is identical, just
+the name and location has changed.</p>
+
 
     
     
@@ -2834,7 +2843,7 @@ which throws away any exceptions thrown.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/09/2020
+        <i class='fa fa-calendar'></i> Last update on 15/12/2020
     </div>
     
 

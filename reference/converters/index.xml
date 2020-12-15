@@ -16,8 +16,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/converters/value_or_error/</guid>
-      <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types. It must have the following form:
-// `T` will be the destination basic_result or basic_outcome. // `U` will be the decayed form of the `ValueOrError&amp;lt;T, E&amp;gt;` concept matching input type. template &amp;lt;classT&amp;gt; struct value_or_error&amp;lt;T, U&amp;gt; { // False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`  static constexpr bool enable_result_inputs = false; // False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`  static constexpr bool enable_outcome_inputs = false; // `X` will be the raw input form of `U`.</description>
+      <description>A customisable converter of concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. It must have the following form:
+// `T` will be the destination basic_result or basic_outcome. // `U` will be the decayed form of the `value_or_error&amp;lt;T, E&amp;gt;` concept matching input type. template &amp;lt;classT&amp;gt; struct value_or_error&amp;lt;T, U&amp;gt; { // False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`  static constexpr bool enable_result_inputs = false; // False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`  static constexpr bool enable_outcome_inputs = false; // `X` will be the raw input form of `U`.</description>
     </item>
     
   </channel>

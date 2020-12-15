@@ -14,7 +14,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/before/</loc>
-    <lastmod>2019-02-09T14:45:47+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -29,7 +29,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/</loc>
-    <lastmod>2019-02-11T17:14:51+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -94,7 +94,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/</loc>
-    <lastmod>2020-12-14T11:56:29+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -114,7 +114,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/experimental/</loc>
-    <lastmod>2020-02-25T11:15:13+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -129,7 +129,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -249,7 +249,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_result/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -279,7 +279,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/result/try/</loc>
-    <lastmod>2019-02-08T22:18:08+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -304,12 +304,12 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib2/</loc>
-    <lastmod>2019-02-11T13:38:04+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/poke_exception/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -379,7 +379,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -389,7 +389,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/interop/app-go/</loc>
-    <lastmod>2019-02-11T13:38:04+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -414,7 +414,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/interop/conclusion/</loc>
-    <lastmod>2019-02-11T13:38:04+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -649,12 +649,12 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</loc>
-    <lastmod>2019-03-03T00:11:47+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</loc>
-    <lastmod>2019-03-03T00:11:47+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -1342,7 +1342,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/adl-bridging/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1400,14 +1400,14 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/tags/constructors/</loc>
-    <lastmod>2019-06-24T21:48:18+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/categories/constructors/</loc>
+    <lastmod>2019-01-21T18:00:41+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/categories/constructors/</loc>
-    <lastmod>2019-01-21T18:00:41+00:00</lastmod>
+    <loc>https://ned14.github.io/outcome/tags/constructors/</loc>
+    <lastmod>2019-06-24T21:48:18+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1497,7 +1497,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/recipes/foreign-try/</loc>
-    <lastmod>2019-06-22T21:22:42+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -1508,7 +1508,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2020-12-14T11:36:27+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -1615,7 +1615,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/playpen/</loc>
-    <lastmod>2019-02-09T14:45:47+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1663,7 +1663,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/value-or-error/</loc>
-    <lastmod>2019-02-11T17:14:51+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1968,6 +1968,11 @@
   </url>
   
   <url>
+    <loc>https://ned14.github.io/outcome/reference/traits/is_move_bitcopying/</loc>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://ned14.github.io/outcome/reference/traits/is_success_type/</loc>
     <lastmod>2019-01-21T18:00:41+00:00</lastmod>
   </url>
@@ -2074,7 +2079,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/converters/value_or_error/</loc>
-    <lastmod>2018-12-15T17:49:37+00:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>
@@ -2084,7 +2089,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/concepts/value_or_none/</loc>
-    <lastmod>2020-08-19T12:15:40+01:00</lastmod>
+    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
   
   <url>

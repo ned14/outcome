@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-14T18:59:05 UTC">
+<meta name="revised" content="2020-12-15T12:25:36 UTC">
 <title>Approximate map between error code designs :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -75,55 +75,6 @@
       <a href="/outcome/motivation/">Motivation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/motivation/exceptions/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/exceptions/">
-            Exceptions
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/motivation/errno/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/errno/">
-            errno
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/motivation/error_codes/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/error_codes/">
-            Error codes
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/motivation/std_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/std_error_code/">
-            std::error_code
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/motivation/plug_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/plug_error_code/">
-            Plugging a library into std::error_code`
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/motivation/plug_error_code2/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/plug_error_code2/">
-            Plugging a library into boost::system::error_code
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/motivation/narrow_contract/" class="dd-item">
-        <div>
-          <a href="/outcome/motivation/narrow_contract/">
-            Narrow contracts
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/tutorial/" class="dd-item haschildren
@@ -399,7 +350,7 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/value-or-error/">
-            ValueOrError Concept
+            value_or_error Concept
           </a>
         </div>
     </li>
@@ -926,6 +877,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/traits/is_move_bitcopying/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/traits/is_move_bitcopying/">
+            <code>is_move_bitcopying&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/traits/is_success_type/">
@@ -1302,7 +1260,7 @@
       <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -1842,7 +1800,7 @@
       <li data-nav-id="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>

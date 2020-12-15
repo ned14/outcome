@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-14T18:59:07 UTC">
+<meta name="revised" content="2020-12-15T12:25:37 UTC">
 <title>TRY operations :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -402,7 +402,7 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/value-or-error/">
-            ValueOrError Concept
+            value_or_error Concept
           </a>
         </div>
     </li>
@@ -928,6 +928,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/traits/is_move_bitcopying/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/traits/is_move_bitcopying/">
+            <code>is_move_bitcopying&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/traits/is_success_type/">
@@ -1304,7 +1311,7 @@
       <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -1844,7 +1851,7 @@
       <li data-nav-id="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -2770,7 +2777,7 @@
 
 <p>In the implementation of function <code>print_half</code> we have seen the usage of the macro <a href="/outcome/reference/macros/tryv/" class="api-reference"><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></a>
 :</p>
-<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_TRY</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_TRY</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span><span class="p">,</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>
 </code></pre></div>
 <p>The <code>OUTCOME_TRY</code> macro uses C macro overloading to select between two implementations based on the number of
 input parameters. If there is exactly one input parameter i.e. without the <code>i</code>, the control statement is
@@ -2786,7 +2793,7 @@ roughly equivalent to:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="n">__result</span> <span class="o">=</span> <span class="n">BigInt</span><span class="o">::</span><span class="n">fromString</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">__result</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">__result</span><span class="p">.</span><span class="n">as_failure</span><span class="p">();</span>
-<span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">=</span> <span class="n">__result</span><span class="p">.</span><span class="n">value</span><span class="p">();</span>
+<span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">__result</span><span class="p">.</span><span class="n">value</span><span class="p">();</span>
 </code></pre></div>
 <p>So here <code>i</code> as the first C macro parameter is set to the value of any successful result.</p>
 
@@ -2844,7 +2851,7 @@ These make it possible to use a more convenient macro: <code>OUTCOME_TRYX</code>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 08/02/2019
+        <i class='fa fa-calendar'></i> Last update on 15/12/2020
     </div>
     
 

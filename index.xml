@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 14 Dec 2020 11:36:27 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 15 Dec 2020 12:22:39 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -42,7 +42,7 @@ namespace outcome = OUTCOME_V2_NAMESPACE; View this code on Github On standalone
     </item>
     
     <item>
-      <title>ValueOrError Concept</title>
+      <title>value_or_error Concept</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -179,9 +179,9 @@ classfile_handle { int _fd{-1}; // file descriptor  struct stat _stat { 0 }; // 
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+      <description>In Outcome v2.2 the ADL-based event hooks were replaced with policy-based event hooks (next page). The code in this section is still valid in v2.2 onwards, it&amp;rsquo;s just that ADL is no longer used to find the hooks.
  In a previous section, we used the failure_info type to create the ADL bridge into the namespace where the ADL discovered outcome_throw_as_system_error_with_payload() function was to be found.
-Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace. This ensures that this namespace will be searched by the compiler when discovering the event hooks.</description>
+Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace.</description>
     </item>
     
     <item>
@@ -332,8 +332,8 @@ int readInt(const char * filename, int&amp;amp; val) { FILE* fd; int r = openFil
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_result/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
- We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
+      <description>We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
+For Outcome before v2.2, we must do this by inserting a specially named free function into a namespace searched by ADL:
 namespace error_code_extended { // Specialise the result construction hook for our localised result  // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace  // if the result is errored.</description>
     </item>
     
@@ -384,7 +384,7 @@ If the Coroutine throws a C++ exception which was not handled inside the Corouti
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/try/</guid>
       <description>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
-OUTCOME_TRY (i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
+OUTCOME_TRY (auto i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
 auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name.</description>
     </item>
     
@@ -414,7 +414,7 @@ Unfortunately it also means that it must be possible for each domain to be insta
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib2/</guid>
-      <description>If you remember the tutorial section on the ValueOrError Concept, this is an example of how to implement a custom ValueOrError Concept converter in Outcome:
+      <description>If you remember the tutorial section on the value_or_error Concept, this is an example of how to implement a custom value_or_error Concept converter in Outcome:
 // Inject custom ValueOrError conversion OUTCOME_V2_NAMESPACE_BEGIN namespace convert { // Provide custom ValueOrError conversion from  // httplib::result&amp;lt;U&amp;gt; into any app::outcome&amp;lt;T&amp;gt;  template &amp;lt;classT, classU&amp;gt; //  struct value_or_error&amp;lt;app::outcome&amp;lt;T&amp;gt;, httplib::result&amp;lt;U&amp;gt;&amp;gt; { // False to indicate that this converter wants `result`/`outcome`  // to NOT reject all other `result`  static constexpr bool enable_result_inputs = true; // False to indicate that this converter wants `outcome` to NOT  // reject all other `outcome`  static constexpr bool enable_outcome_inputs = true; template &amp;lt;classX, //  typename = std::enable_if_t&amp;lt;std::is_same&amp;lt;httplib::result&amp;lt;U&amp;gt;, std::decay_t&amp;lt;X&amp;gt;&amp;gt;::value //  &amp;amp;&amp;amp; std::is_constructible&amp;lt;T, U&amp;gt;::value&amp;gt;&amp;gt; //  constexpr app::outcome&amp;lt;T&amp;gt; operator()(X &amp;amp;&amp;amp;src) { // Forward any successful value, else synthesise an exception ptr  return src.</description>
     </item>
     
@@ -424,9 +424,8 @@ Unfortunately it also means that it must be possible for each domain to be insta
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/poke_exception/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
- If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
-But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace.</description>
+      <description>If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
+But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace. Firstly let us look at the function which synthesises the exception ptr:</description>
     </item>
     
     <item>
@@ -530,9 +529,8 @@ namespace app { // Specialise an exception type for tidylib errors  struct tidyl
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
- The final step is to add ADL discovered event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
-You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it.</description>
+      <description>The final step is to add event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
+You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it. This can throw an exception. If the copy and/or move constructors of T, EC and EP are noexcept, then so will be outcome&amp;rsquo;s copy and/or move constructor.</description>
     </item>
     
     <item>
@@ -1017,23 +1015,23 @@ Guarantees: Never throws an exception.</description>
     </item>
     
     <item>
-      <title>`explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)`</title>
+      <title>`explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;) .
+      <description>Explicit converting constructor from concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;) .
 Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
     
     <item>
-      <title>`explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)`</title>
+      <title>`explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
+      <description>Explicit converting constructor from concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
 Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -2658,7 +2656,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1316 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1317 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2679,7 +2677,7 @@ OUTCOME_TEMPLATE(classErrorCondEnum) OUTCOME_TREQUIRES( // If this is a valid ex
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/recipes/foreign-try/</guid>
-      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the ValueOrError&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
+      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the concepts::value_or_error&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
  A public .has_value() member function which returns a bool. In order of preference, a public .assume_value()/.value() member function. In order of preference, a public .as_failure()/.assume_error()/.error() member function.  This should automatically handle inputs of std::expected&amp;lt;T, E&amp;gt;, and many others, including intermixing Boost.</description>
     </item>
     
@@ -3371,6 +3369,16 @@ Header: &amp;lt;outcome/success_failure.hpp&amp;gt;</description>
     </item>
     
     <item>
+      <title>`is_move_bitcopying&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/traits/is_move_bitcopying/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/traits/is_move_bitcopying/</guid>
+      <description>A customisable integral constant type true for T types which are move bitcopying safe. As per P1029 move bitcopying, these are types for which:
+ There is an inline, constexpr-available, default constructor. The move constructor has side effects equivalent to memcpy of source to destination, followed by a memcpy of a default constructed instance to source. That the destruction of a default constructed instance has no visible side effects.  This implies that if you move from a bit copying type, you need not call its destructor, even if that is a virtual destructor.</description>
+    </item>
+    
+    <item>
       <title>`is_success_type&lt;T&gt;`</title>
       <link>https://ned14.github.io/outcome/reference/traits/is_success_type/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -3633,8 +3641,8 @@ Header: &amp;lt;outcome/result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/converters/value_or_error/</guid>
-      <description>A customisable converter of ValueOrError&amp;lt;T, E&amp;gt; concept matching types. It must have the following form:
-// `T` will be the destination basic_result or basic_outcome. // `U` will be the decayed form of the `ValueOrError&amp;lt;T, E&amp;gt;` concept matching input type. template &amp;lt;classT&amp;gt; struct value_or_error&amp;lt;T, U&amp;gt; { // False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`  static constexpr bool enable_result_inputs = false; // False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`  static constexpr bool enable_outcome_inputs = false; // `X` will be the raw input form of `U`.</description>
+      <description>A customisable converter of concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. It must have the following form:
+// `T` will be the destination basic_result or basic_outcome. // `U` will be the decayed form of the `value_or_error&amp;lt;T, E&amp;gt;` concept matching input type. template &amp;lt;classT&amp;gt; struct value_or_error&amp;lt;T, U&amp;gt; { // False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`  static constexpr bool enable_result_inputs = false; // False to indicate that this converter wants `basic_outcome` to reject all other `basic_outcome`  static constexpr bool enable_outcome_inputs = false; // `X` will be the raw input form of `U`.</description>
     </item>
     
     <item>

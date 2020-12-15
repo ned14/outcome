@@ -26,7 +26,7 @@ eager&amp;lt;result&amp;lt;std::string&amp;gt;&amp;gt; to_string(int x) { if(x &
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/recipes/foreign-try/</guid>
-      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the ValueOrError&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
+      <description>Outcome&amp;rsquo;s OUTCOME_TRY(var, expr) operation is fully extensible to accept as input any foreign types. It already recognises types matching the concepts::value_or_error&amp;lt;T, E&amp;gt; concept, which is to say all types which have:
  A public .has_value() member function which returns a bool. In order of preference, a public .assume_value()/.value() member function. In order of preference, a public .as_failure()/.assume_error()/.error() member function.  This should automatically handle inputs of std::expected&amp;lt;T, E&amp;gt;, and many others, including intermixing Boost.</description>
     </item>
     
@@ -57,7 +57,7 @@ outcome::result&amp;lt;int, std::error_code&amp;gt; test(outcome::result&amp;lt;
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/try/</guid>
       <description>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
-OUTCOME_TRY (i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
+OUTCOME_TRY (auto i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
 auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name.</description>
     </item>
     

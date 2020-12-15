@@ -20,7 +20,7 @@
     </item>
     
     <item>
-      <title>ValueOrError Concept</title>
+      <title>value_or_error Concept</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -85,7 +85,7 @@ We start by dealing with the HTTP library. We will integrate this into our appli
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-httplib2/</guid>
-      <description>If you remember the tutorial section on the ValueOrError Concept, this is an example of how to implement a custom ValueOrError Concept converter in Outcome:
+      <description>If you remember the tutorial section on the value_or_error Concept, this is an example of how to implement a custom value_or_error Concept converter in Outcome:
 // Inject custom ValueOrError conversion OUTCOME_V2_NAMESPACE_BEGIN namespace convert { // Provide custom ValueOrError conversion from  // httplib::result&amp;lt;U&amp;gt; into any app::outcome&amp;lt;T&amp;gt;  template &amp;lt;classT, classU&amp;gt; //  struct value_or_error&amp;lt;app::outcome&amp;lt;T&amp;gt;, httplib::result&amp;lt;U&amp;gt;&amp;gt; { // False to indicate that this converter wants `result`/`outcome`  // to NOT reject all other `result`  static constexpr bool enable_result_inputs = true; // False to indicate that this converter wants `outcome` to NOT  // reject all other `outcome`  static constexpr bool enable_outcome_inputs = true; template &amp;lt;classX, //  typename = std::enable_if_t&amp;lt;std::is_same&amp;lt;httplib::result&amp;lt;U&amp;gt;, std::decay_t&amp;lt;X&amp;gt;&amp;gt;::value //  &amp;amp;&amp;amp; std::is_constructible&amp;lt;T, U&amp;gt;::value&amp;gt;&amp;gt; //  constexpr app::outcome&amp;lt;T&amp;gt; operator()(X &amp;amp;&amp;amp;src) { // Forward any successful value, else synthesise an exception ptr  return src.</description>
     </item>
     

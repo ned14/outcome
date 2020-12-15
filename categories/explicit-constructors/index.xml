@@ -10,17 +10,6 @@
     
     
     <item>
-      <title>`explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)`</title>
-      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;) .
-Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
-Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
-    </item>
-    
-    <item>
       <title>`explicit basic_outcome(basic_outcome&lt;A, B, C, D&gt; &amp;&amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_move_converting_constructor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -54,6 +43,17 @@ Guarantees: If an exception is thrown during the operation, the object is left i
 Requires: predicate::enable_make_error_code_compatible_conversion&amp;lt;A, B, void, C&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/</guid>
+      <description>Explicit converting constructor from concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor explicit basic_outcome(basic_result&amp;lt;A, B, C&amp;gt; &amp;amp;&amp;amp;) .
+Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
+Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
     
     <item>
@@ -165,18 +165,6 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
     </item>
     
     <item>
-      <title>`explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)`</title>
-      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
-Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
-Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
-Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
-    </item>
-    
-    <item>
       <title>`explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_move_converting_constructor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -209,6 +197,18 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <description>Explicit converting move constructor from compatible basic_result. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
+Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
+    </item>
+    
+    <item>
+      <title>`explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)`</title>
+      <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</guid>
+      <description>Explicit converting constructor from concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
+Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
+Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
     </item>
     

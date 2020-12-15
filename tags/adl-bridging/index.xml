@@ -15,9 +15,9 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+      <description>In Outcome v2.2 the ADL-based event hooks were replaced with policy-based event hooks (next page). The code in this section is still valid in v2.2 onwards, it&amp;rsquo;s just that ADL is no longer used to find the hooks.
  In a previous section, we used the failure_info type to create the ADL bridge into the namespace where the ADL discovered outcome_throw_as_system_error_with_payload() function was to be found.
-Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace. This ensures that this namespace will be searched by the compiler when discovering the event hooks.</description>
+Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace.</description>
     </item>
     
   </channel>

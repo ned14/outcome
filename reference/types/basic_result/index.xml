@@ -135,12 +135,12 @@ Guarantees: If an exception is thrown during the operation, the state of the inp
     </item>
     
     <item>
-      <title>`explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)`</title>
+      <title>`explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)`</title>
       <link>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/</guid>
-      <description>Explicit converting constructor from ValueOrError&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
+      <description>Explicit converting constructor from concepts::value_or_error&amp;lt;T, E&amp;gt; concept matching types. Delegates to the basic_result move constructor.
 Requires: convert::value_or_error&amp;lt;T, U&amp;gt; has an available call operator, and if the input is a basic_result or basic_outcome, then convert::value_or_error&amp;lt;&amp;gt; has enabled those inputs for that convert::value_or_error&amp;lt;&amp;gt; specialisation.
 Complexity: Same as for the copy or move constructor from the input&amp;rsquo;s .value() or .error() respectively. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>

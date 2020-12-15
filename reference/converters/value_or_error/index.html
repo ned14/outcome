@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-14T18:59:21 UTC">
+<meta name="revised" content="2020-12-15T12:25:47 UTC">
 <title>`value_or_error&lt;T, U&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -399,7 +399,7 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/value-or-error/">
-            ValueOrError Concept
+            value_or_error Concept
           </a>
         </div>
     </li>
@@ -927,6 +927,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/traits/is_move_bitcopying/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/traits/is_move_bitcopying/">
+            <code>is_move_bitcopying&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/traits/is_success_type/">
@@ -1303,7 +1310,7 @@
       <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -1843,7 +1850,7 @@
       <li data-nav-id="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -2764,10 +2771,10 @@
     
     
     
-    <p>A customisable converter of <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>ValueOrError&lt;T, E&gt;</code></a>
+    <p>A customisable converter of <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>concepts::value_or_error&lt;T, E&gt;</code></a>
  concept matching types. It must have the following form:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// `T` will be the destination basic_result or basic_outcome.
-</span><span class="c1">// `U` will be the decayed form of the `ValueOrError&lt;T, E&gt;` concept matching input type.
+</span><span class="c1">// `U` will be the decayed form of the `value_or_error&lt;T, E&gt;` concept matching input type.
 </span><span class="c1"></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="o">&gt;</span> <span class="k">struct</span> <span class="n">value_or_error</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="o">&gt;</span>
 <span class="p">{</span>
   <span class="c1">// False to indicate that this converter wants `basic_result`/`basic_outcome` to reject all other `basic_result`
@@ -2781,7 +2788,7 @@
 </code></pre></div>
 <p><em>Overridable</em>: By template specialisation into the <code>convert</code> namespace.</p>
 
-<p><em>Default</em>: If decayed <code>X</code> is same as <code>U</code>, concept <code>ValueOrError&lt;U&gt;</code> matches, <code>X::value_type</code> is <code>void</code> or is explicitly constructible to <code>T::value_type</code>, and <code>X::error_type</code> is <code>void</code> or is explicitly constructible to <code>T::error_type</code>, then <code>operator()(X &amp;&amp;)</code> is made available.</p>
+<p><em>Default</em>: If decayed <code>X</code> is same as <code>U</code>, concept <code>value_or_error&lt;U&gt;</code> matches, <code>X::value_type</code> is <code>void</code> or is explicitly constructible to <code>T::value_type</code>, and <code>X::error_type</code> is <code>void</code> or is explicitly constructible to <code>T::error_type</code>, then <code>operator()(X &amp;&amp;)</code> is made available.</p>
 
 <p><code>operator()(X &amp;&amp;v)</code> tests if <code>v.has_value()</code> is true, if so then a <code>T</code> with successful value is returned, else a <code>T</code> with unsuccessful value. If the input type was <code>void</code>, a default constructed value is used for either, else a move/copy construction from the source is performed.</p>
 
@@ -2810,7 +2817,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/12/2018
+        <i class='fa fa-calendar'></i> Last update on 15/12/2020
     </div>
     
 

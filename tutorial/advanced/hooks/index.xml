@@ -26,9 +26,9 @@ We therefore are going to need some completely static and trivially typed storag
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/adl_bridging/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
+      <description>In Outcome v2.2 the ADL-based event hooks were replaced with policy-based event hooks (next page). The code in this section is still valid in v2.2 onwards, it&amp;rsquo;s just that ADL is no longer used to find the hooks.
  In a previous section, we used the failure_info type to create the ADL bridge into the namespace where the ADL discovered outcome_throw_as_system_error_with_payload() function was to be found.
-Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace. This ensures that this namespace will be searched by the compiler when discovering the event hooks.</description>
+Here we do the same, but more directly by creating a thin clone of std::error_code into the local namespace.</description>
     </item>
     
     <item>
@@ -37,8 +37,8 @@ Here we do the same, but more directly by creating a thin clone of std::error_co
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_result/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
- We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
+      <description>We now tell Outcome that for every instance of our localised result&amp;lt;T&amp;gt;, that on failure construction only, we want custom code to be run which increments the current slot in TLS storage and writes the current stack backtrace into it.
+For Outcome before v2.2, we must do this by inserting a specially named free function into a namespace searched by ADL:
 namespace error_code_extended { // Specialise the result construction hook for our localised result  // We hook any non-copy, non-move, non-inplace construction, capturing a stack backtrace  // if the result is errored.</description>
     </item>
     
@@ -48,9 +48,8 @@ namespace error_code_extended { // Specialise the result construction hook for o
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/poke_exception/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
- If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
-But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace.</description>
+      <description>If you merely want result to capture stack backtraces without calling a memory allocator and retaining any triviality of copy which is important for optimisation, you already have everything you need.
+But let&amp;rsquo;s keep going by intercepting any construction of our localised outcome from our localised result, retrieving any stored backtrace and using it to synthesise an exception ptr with a message text including the backtrace. Firstly let us look at the function which synthesises the exception ptr:</description>
     </item>
     
     <item>
@@ -59,9 +58,8 @@ But let&amp;rsquo;s keep going by intercepting any construction of our localised
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</guid>
-      <description>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
- The final step is to add ADL discovered event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
-You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it.</description>
+      <description>The final step is to add event hooks for the very specific case of when our localised outcome is copy or move constructed from our localised result.
+You ought to be very careful that the noexcept-ness of these matches the noexcept-ness of the types in the outcome. You may have noticed that poke_exception() creates a std::string and appends to it. This can throw an exception. If the copy and/or move constructors of T, EC and EP are noexcept, then so will be outcome&amp;rsquo;s copy and/or move constructor.</description>
     </item>
     
   </channel>

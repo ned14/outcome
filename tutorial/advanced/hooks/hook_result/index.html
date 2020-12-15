@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-14T18:59:07 UTC">
+<meta name="revised" content="2020-12-15T12:25:37 UTC">
 <title>Hook result :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -402,7 +402,7 @@
       <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
         <div>
           <a href="/outcome/tutorial/advanced/interop/value-or-error/">
-            ValueOrError Concept
+            value_or_error Concept
           </a>
         </div>
     </li>
@@ -928,6 +928,13 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/traits/is_move_bitcopying/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/traits/is_move_bitcopying/">
+            <code>is_move_bitcopying&lt;T&gt;</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
         <div>
           <a href="/outcome/reference/traits/is_success_type/">
@@ -1304,7 +1311,7 @@
       <li data-nav-id="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_outcome(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -1844,7 +1851,7 @@
       <li data-nav-id="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">
-            <code>explicit basic_result(ValueOrError&lt;T, E&gt; &amp;&amp;)</code>
+            <code>explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
           </a>
         </div>
     </li>
@@ -2369,104 +2376,6 @@
       <a href="/outcome/reference/functions/hooks/">Hooks</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/hooks/spare_storage/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/spare_storage/">
-            <code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction2/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/">
-            <code>void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction2/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_construction/">
-            <code>void hook_result_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_copy_construction/">
-            <code>void hook_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_in_place_construction/">
-            <code>void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_move_construction/">
-            <code>void hook_result_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/override_outcome_exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/override_outcome_exception/">
-            <code>void override_outcome_exception(basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/set_spare_storage/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/set_spare_storage/">
-            <code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/functions/iostream/" class="dd-item haschildren
@@ -2764,13 +2673,12 @@
     
     
     
-    <div class="notices note" ><p>In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.</p>
-</div>
-
-
-<p>We now tell Outcome that for every instance of our localised <code>result&lt;T&gt;</code>, that
+    <p>We now tell Outcome that for every instance of our localised <code>result&lt;T&gt;</code>, that
 on failure construction only, we want custom code to be run which increments the current
 slot in TLS storage and writes the current stack backtrace into it.</p>
+
+<p>For Outcome before v2.2, we must do this by inserting a specially named free function into
+a namespace searched by ADL:</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">namespace</span> <span class="n">error_code_extended</span>
 <span class="p">{</span>
@@ -2794,6 +2702,10 @@ slot in TLS storage and writes the current stack backtrace into it.</p>
 <span class="p">}</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/error_code_extended.cpp#L113" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
+
+<p>For Outcome v2.2 and later, we must do this by using a custom no value policy which contains
+a function named <code>on_result_construction()</code>. The function implementation is identical between
+both mechanisms, just the name and placement of the function declaration differs.</p>
 
 <p>The only non-obvious part above is the call to <a href="/outcome/reference/functions/hooks/set_spare_storage/" class="api-reference"><code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code></a>
 .</p>
@@ -2847,7 +2759,7 @@ The corresponding function to retrieve those sixteen bits is <a href="/outcome/r
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/09/2020
+        <i class='fa fa-calendar'></i> Last update on 15/12/2020
     </div>
     
 
