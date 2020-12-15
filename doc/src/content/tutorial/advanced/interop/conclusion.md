@@ -12,7 +12,7 @@ If you control your application's `E` type, then that is probably a
 better, and certainly simpler, approach.
 
 However there are occasions when you don't have control over the
-implementation of the destination `E` type e.g. in callbacks. Outcome's `ValueOrError`
+implementation of the destination `E` type e.g. in callbacks. Outcome's `value_or_error`
 infrastructure lets you inject custom interop code for any pair
 of incommensurate third party `E` types, without needing to modify either's
 source code.

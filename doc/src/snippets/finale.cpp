@@ -1,5 +1,5 @@
 /* Example of how to marshall Outcomes at namespace boundaries
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");

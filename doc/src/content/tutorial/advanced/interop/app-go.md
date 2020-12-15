@@ -9,7 +9,7 @@ This is how you might now write application code using these three libraries:
 
 The curiosity will be surely the `ext()` markup function, which needs
 explaining. It was felt
-important during Outcome's design that `ValueOrError` conversions never
+important during Outcome's design that `value_or_error` conversions never
 be implicit, as they almost always represent a transition across an
 ABI or semantic boundary. They are also usually non-trivial to implement
 and compile, and it was felt important that the programmer ought to

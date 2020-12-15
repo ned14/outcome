@@ -596,7 +596,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if __has_feature(thread_sanitizer)
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 1
 #endif
-#elif defined(__SANITIZE_ADDRESS__)
+#elif defined(__SANITIZE_THREAD__)
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 1
 #endif
 #endif
@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF bbde4ec13b1f9fec23d2ec2b1064e9295f4d9e27
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-12-14 10:10:19 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE bbde4ec1
+#define OUTCOME_PREVIOUS_COMMIT_REF e0efc833d09928c8be137724037fb8ada587fdf7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-12-14 18:54:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e0efc833
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3172,7 +3172,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cplusplus < 202000L)
+#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cpp_concepts < 201907L)
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL

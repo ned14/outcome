@@ -4,11 +4,7 @@ description = ""
 weight = 50
 +++
 
-{{% notice note %}}
-In Outcome v2.2 the ADL-based event hooks will be replaced with policy-based event hooks.
-{{% /notice %}}
-
-The final step is to add ADL discovered event hooks for the very specific case of
+The final step is to add event hooks for the very specific case of
 when our localised `outcome` is copy or move constructed from our localised `result`.
 
 You ought to be very careful that the `noexcept`-ness of these matches the `noexcept`-ness
@@ -19,7 +15,12 @@ copy and/or move constructor. Thus if `poke_exception()` throws, instant program
 termination would occur, which is bad.
 
 We avoid that problem in this case by wrapping `poke_exception()` in a `try...catch`
-which throws away any exceptions thrown.
+which throws away any exceptions thrown. For Outcome before v2.2, these specially
+named free functions must be placed into a namespace which is ADL searched:
 
 {{% snippet "error_code_extended.cpp" "error_code_extended5" %}}
 
+For Outcome v2.2 and later, these functions must be placed into a custom no value
+policy with the names `on_outcome_copy_construction()` and `on_outcome_move_construction()`
+respectively. As with before, the implementation of the functions is identical, just
+the name and location has changed.

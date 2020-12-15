@@ -7,7 +7,7 @@ If on C++ 20 or the Concepts TS is enabled, a boolean concept matching types wit
 
 If without Concepts, a static constexpr bool which is true for types matching the same requirements, using a SFINAE based emulation.
 
-This concept matches optional-like types such as {{% api "std::optional<T>" %}}. Note it also matches {{% api "std::expected<T, E>" %}}, which also has an optional-like interface. You may thus wish to preferentially match {{% api "ValueOrError<T, E>" %}} for any given `T`.
+This concept matches optional-like types such as {{% api "std::optional<T>" %}}. Note it also matches {{% api "std::expected<T, E>" %}}, which also has an optional-like interface. You may thus wish to preferentially match {{% api "concepts::value_or_error<T, E>" %}} for any given `T`.
 
 *Namespace*: `OUTCOME_V2_NAMESPACE::concepts`
 

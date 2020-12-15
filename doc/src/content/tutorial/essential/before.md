@@ -62,7 +62,7 @@ After this is selected, you can `#include` any of these editions of Outcome:
   edition to use, you should use this one, it ought to "just work".</dd>
 </dl>
 
-Here is the first tutorial topic's source code loaded into Godbolt: https://godbolt.org/z/p-NAho
+Here is the first tutorial topic's source code loaded into Godbolt: https://godbolt.org/z/4of3c8
 
 ### Wandbox
 

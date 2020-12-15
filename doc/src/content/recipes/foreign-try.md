@@ -7,7 +7,7 @@ tags = [ "TRY" ]
 Outcome's {{% api "OUTCOME_TRY(var, expr)" %}} operation is fully extensible
 to accept as input any foreign types.
 It already recognises types matching the
-{{% api "ValueOrError<T, E>" %}} concept, which is to say all types which have:
+{{% api "concepts::value_or_error<T, E>" %}} concept, which is to say all types which have:
 
 - A public `.has_value()` member function which returns a `bool`.
 - In order of preference, a public `.assume_value()`/`.value()` member

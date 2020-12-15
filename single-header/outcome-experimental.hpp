@@ -621,7 +621,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if __has_feature(thread_sanitizer)
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 1
 #endif
-#elif defined(__SANITIZE_ADDRESS__)
+#elif defined(__SANITIZE_THREAD__)
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 1
 #endif
 #endif
@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF bbde4ec13b1f9fec23d2ec2b1064e9295f4d9e27
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-12-14 10:10:19 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE bbde4ec1
+#define OUTCOME_PREVIOUS_COMMIT_REF e0efc833d09928c8be137724037fb8ada587fdf7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-12-14 18:54:51 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e0efc833
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -3197,7 +3197,7 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cplusplus < 202000L)
+#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cpp_concepts < 201907L)
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #else
 #define OUTCOME_GCC6_CONCEPT_BOOL
@@ -7013,7 +7013,15 @@ public:
   //! True if the status code is empty.
   SYSTEM_ERROR2_NODISCARD constexpr bool empty() const noexcept { return _domain == nullptr; }
   //! Return a reference to a string textually representing a code.
-  string_ref message() const noexcept { return (_domain != nullptr) ? _domain->_do_message(*this) : string_ref("(empty)"); }
+  string_ref message() const noexcept
+  {
+    // Avoid MSVC's buggy ternary operator for expensive to destruct things
+    if(_domain != nullptr)
+    {
+      return _domain->_do_message(*this);
+    }
+    return string_ref("(empty)");
+  }
   //! True if code means success.
   bool success() const noexcept { return (_domain != nullptr) ? !_domain->_do_failure(*this) : false; }
   //! True if code means failure.
@@ -7091,9 +7099,9 @@ namespace detail
     }
 #if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
     //! Return a reference to the `value_type`.
-    constexpr value_type &value() & noexcept { return this->_value; }
+    constexpr value_type &value() &noexcept { return this->_value; }
     //! Return a reference to the `value_type`.
-    constexpr value_type &&value() && noexcept { return static_cast<value_type &&>(this->_value); }
+    constexpr value_type &&value() &&noexcept { return static_cast<value_type &&>(this->_value); }
 #endif
     //! Return a reference to the `value_type`.
     constexpr const value_type &value() const &noexcept { return this->_value; }
@@ -7224,7 +7232,15 @@ public:
 #endif
   }
   //! Return a reference to a string textually representing a code.
-  string_ref message() const noexcept { return this->_domain ? string_ref(this->domain()._do_message(*this)) : string_ref("(empty)"); }
+  string_ref message() const noexcept
+  {
+    // Avoid MSVC's buggy ternary operator for expensive to destruct things
+    if(this->_domain != nullptr)
+    {
+      return string_ref(this->domain()._do_message(*this));
+    }
+    return string_ref("(empty)");
+  }
 };
 namespace traits
 {

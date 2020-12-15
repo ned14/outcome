@@ -8,7 +8,7 @@ tags = ["try"]
 In the implementation of function `print_half` we have seen the usage of the macro {{< api "OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)" >}}:
 
 ```c++
-OUTCOME_TRY (i, BigInt::fromString(text));
+OUTCOME_TRY (auto i, BigInt::fromString(text));
 ```
 
 The `OUTCOME_TRY` macro uses C macro overloading to select between two implementations based on the number of
@@ -30,7 +30,7 @@ If there are between two and eight parameters, this control statement is roughly
 auto&& __result = BigInt::fromString(text);
 if (!__result)
   return __result.as_failure();
-auto&& i = __result.value();
+auto i = __result.value();
 ```
 
 So here `i` as the first C macro parameter is set to the value of any successful result. 

@@ -1,11 +1,11 @@
 +++
-title = "`explicit basic_result(ValueOrError<T, E> &&)`"
-description = "Explicit converting constructor from `ValueOrError<T, E>` concept matching types. Available if `convert::value_or_error<>` permits it. Constexpr, triviality and noexcept propagating."
+title = "`explicit basic_result(concepts::value_or_error<T, E> &&)`"
+description = "Explicit converting constructor from `concepts::value_or_error<T, E>` concept matching types. Available if `convert::value_or_error<>` permits it. Constexpr, triviality and noexcept propagating."
 categories = ["constructors", "explicit-constructors", "converting-constructors"]
 weight = 300
 +++
 
-Explicit converting constructor from {{% api "ValueOrError<T, E>" %}} concept matching types. Delegates to the `basic_result` move constructor.
+Explicit converting constructor from {{% api "concepts::value_or_error<T, E>" %}} concept matching types. Delegates to the `basic_result` move constructor.
 
 *Requires*: `convert::`{{% api "value_or_error<T, U>" %}} has an available call operator, and if the input is a `basic_result` or `basic_outcome`, then `convert::value_or_error<>` has enabled those inputs for that `convert::value_or_error<>` specialisation.
 
