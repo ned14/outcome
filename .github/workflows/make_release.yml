@@ -108,6 +108,10 @@ jobs:
            tar xf hugo.tar.gz -C hugo_bin;
          fi
          ls -l hugo_bin
+         ls -l $HOME/.ssh
+         git config --global push.default simple
+         git config --global user.name "Jenkins nedprod CI"
+         git config --global user.email "foo@nowhere"
          export PATH=$PATH:`pwd`/hugo_bin
          pip install --user gitpython
          git remote add outcome https://github.com/ned14/outcome
@@ -143,8 +147,8 @@ jobs:
          git add . || true
          cd ../..
          git commit -a -m "CI regenerates Boost.Outcome docs" || true
-         git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome master || true
-         git push https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome develop || true
+         git push git@github.com:boostorg/outcome.git master || true
+         git push git@github.com:boostorg/outcome.git develop || true
          cd doc
          rm -rf html
          git clone -b gh-pages --single-branch https://github.com/boostorg/outcome html
@@ -153,5 +157,5 @@ jobs:
          cd ../html
          git add . || true
          git commit -a -m "CI regenerates Boost.Outcome docs" || true
-         git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/boostorg/outcome gh-pages
+         git push -f git@github.com:boostorg/outcome.git gh-pages
          cd ../..
