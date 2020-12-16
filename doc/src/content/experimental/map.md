@@ -34,6 +34,8 @@ has been retained in proposed `<system_error2>`, so an approximate map between
   <li><tt>experimental::win32_code_domain</tt> (Microsoft Windows)<p>
   <li><tt>experimental::nt_code_domain</tt> (Microsoft Windows)
  </ul>
+ Note that there are more precanned code categories though they require additional header inclusions:
+<tt>com_code</tt>, <tt>getaddrinfo_code</tt>.
 <tr>
  <td style="vertical-align: top;"><tt>std::error_condition</tt>
  <td style="vertical-align: top;"><tt>boost::system::error_condition</tt>
@@ -49,6 +51,8 @@ has been retained in proposed `<system_error2>`, so an approximate map between
   <li><tt>const experimental::errored_status_code&lt;void&gt; &amp;</tt><p>
   <li><tt>experimental::errored_status_code&lt;erased&lt;intptr_t&gt;&gt;</tt> (aliased to <tt>experimental::error</tt>)
  </ul>
+ The difference between status codes and errored status codes is that the latter are guaranteed
+ to refer to a failure, whereas the former may refer to a success (including warnings and informationals).
 <tr>
  <td style="vertical-align: top;"><tt>std::system_error</tt>
  <td style="vertical-align: top;"><tt>boost::system::system_error</tt>

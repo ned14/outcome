@@ -84,7 +84,7 @@ jobs:
         run: |
          if [ -n "$BOOSTORG_OUTCOME_DEPLOY_KEY" ] && [ "${{ steps.waitforstatuschecks.outputs.status }}" = "success" ]; then
            mkdir -p $HOME/.ssh;
-           printf "%s" "$BOOSTORG_OUTCOME_DEPLOY_KEY" > "$HOME/.ssh/id_boostorg_outcome";
+           printf "%s" "$BOOSTORG_OUTCOME_DEPLOY_KEY" > "$HOME/.ssh/id_ed25519";
            chmod -R og-rwx $HOME/.ssh;
            unset HAS_DEPLOY_KEY;
            HAS_DEPLOY_KEY='true';

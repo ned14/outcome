@@ -16,20 +16,18 @@ will complain.
 The specifications are:
 
 ```c++
-experimental::status_result<T, E = experimental::system_code>
-experimental::status_outcome<T, E = experimental::system_code, EP = std::exception_ptr>
+experimental::status_result<T, E = experimental::error>
+experimental::status_outcome<T, E = experimental::error, EP = std::exception_ptr>
 ```
 
-So, the default `E` is the erased status code `system_code`, which can represent
+So, the default `E` is the erased errored status code `system_code`, which can represent
 any `generic_code`, `posix_code`, `win32_code`, `nt_code`, `com_code` and many
 other integer error and status
-codings. **Note** that `system_code` may represent successes as well as failures.
-This mirrors, somewhat, how `std::error_code` can have an all bits zero defaulted
-state.
+codings. Because it is an errored status code, it will always represent a failure.
 
 You can absolutely choose an `E` type which is non-erased e.g. `posix_code` directly.
-You can also choose an `E` type which is contract guaranteed to be a failure
-rather than an unknown success or failure -- see `errored_status_code`.
+You can also choose an `E` type which is not contract guaranteed to be a failure,
+though your users may find that surprising.
 
 Whether to choose typed status codes versus the erased status codes depends on your
 use cases. Outcome replicates faithfully the implicit and explicit conversion

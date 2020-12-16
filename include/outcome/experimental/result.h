@@ -1,5 +1,5 @@
 /* C interface for result
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Aug 2017
 
 
@@ -27,12 +27,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <stdint.h>  // for intptr_t
 
-#define CXX_DECLARE_RESULT(ident, R, S)                                                                                                                                                                                                                                                                                        \
-  struct cxx_result_##ident                                                                                                                                                                                                                                                                                                    \
-  {                                                                                                                                                                                                                                                                                                                            \
-    R value;                                                                                                                                                                                                                                                                                                                   \
-    unsigned flags;                                                                                                                                                                                                                                                                                                            \
-    S error;                                                                                                                                                                                                                                                                                                                   \
+#define CXX_DECLARE_RESULT(ident, R, S)                                                                                                                        \
+  struct cxx_result_##ident                                                                                                                                    \
+  {                                                                                                                                                            \
+    union                                                                                                                                                      \
+    {                                                                                                                                                          \
+      R value;                                                                                                                                                 \
+      S error;                                                                                                                                                 \
+    };                                                                                                                                                         \
+    unsigned flags;                                                                                                                                            \
   }
 
 #define CXX_RESULT(ident) struct cxx_result_##ident
@@ -47,11 +50,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 /***************************** <system_error2> support ******************************/
 
-#define CXX_DECLARE_STATUS_CODE(ident, value_type)                                                                                                                                                                                                                                                                             \
-  struct cxx_status_code_##ident                                                                                                                                                                                                                                                                                               \
-  {                                                                                                                                                                                                                                                                                                                            \
-    void *domain;                                                                                                                                                                                                                                                                                                              \
-    value_type value;                                                                                                                                                                                                                                                                                                          \
+#define CXX_DECLARE_STATUS_CODE(ident, value_type)                                                                                                             \
+  struct cxx_status_code_##ident                                                                                                                               \
+  {                                                                                                                                                            \
+    void *domain;                                                                                                                                              \
+    value_type value;                                                                                                                                          \
   };
 
 #define CXX_STATUS_CODE(ident) struct cxx_status_code_##ident

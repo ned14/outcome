@@ -34,9 +34,12 @@ standard layout if its `T` and `E` are both so, and it has the C layout:
 ```c++
 struct cxx_result_##ident
 {
-  T value;
+  union
+  {
+    T value;
+    E error;
+  };
   unsigned flags;
-  E error;
 };
 ```
 
