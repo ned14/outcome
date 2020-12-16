@@ -9,5 +9,6 @@
     "Patterns",
     "Emulation",
     "Programming"
-  ]
+  ],
+  "cxxstd": "14"
 }
