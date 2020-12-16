@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/experimental/</link>
     <description>Recent content in Experimental on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Tue, 15 Dec 2020 12:22:39 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 16 Dec 2020 14:14:42 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/experimental/index.xml" rel="self" type="application/rss+xml" />
     
@@ -29,7 +29,7 @@
       
       <guid>https://ned14.github.io/outcome/experimental/map/</guid>
       <description>Much of the design of Boost.System (which went on to become &amp;lt;system_error&amp;gt;) has been retained in proposed &amp;lt;system_error2&amp;gt;, so an approximate map between &amp;lt;system_error2&amp;gt; and &amp;lt;system_error&amp;gt; and Boost.System can be given:
-  C++ 17 &amp;lt;system_error&amp;gt;Boost.SystemProposed &amp;lt;system_error2&amp;gt;  std::errc boost::system::errc experimental::errc (almost identical)  std::error_category boost::system::error_category experimental::status_code_domain  std::generic_category boost::system::generic_category experimental::generic_code_domain  std::system_category boost::system::system_category One of: experimental::posix_code_domain (POSIX systems) experimental::win32_code_domain (Microsoft Windows) experimental::nt_code_domain (Microsoft Windows)   std::error_condition boost::system::error_condition No equivalent (deliberately removed as hindsight proved it to be a design mistake leading to much confusing and hard to audit for correctness code)  std::error_code boost::system::error_code One of: experimental::status_code&amp;lt;DomainType&amp;gt; const experimental::status_code&amp;lt;void&amp;gt; &amp;amp; experimental::status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt; (aliased to experimental::system_code) experimental::errored_status_code&amp;lt;DomainType&amp;gt; const experimental::errored_status_code&amp;lt;void&amp;gt; &amp;amp; experimental::errored_status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt; (aliased to experimental::error)   std::system_error boost::system::system_error One of: const experimental::status_error&amp;lt;void&amp;gt; &amp;amp; experimental::status_error&amp;lt;DomainType&amp;gt;   As is obvious from the above, in &amp;lt;system_error2&amp;gt; one must be much more specific and accurate with respect to intent and specification and desired semantics than with &amp;lt;system_error&amp;gt;.</description>
+  C++ 17 &amp;lt;system_error&amp;gt;Boost.SystemProposed &amp;lt;system_error2&amp;gt;  std::errc boost::system::errc experimental::errc (almost identical)  std::error_category boost::system::error_category experimental::status_code_domain  std::generic_category boost::system::generic_category experimental::generic_code_domain  std::system_category boost::system::system_category One of: experimental::posix_code_domain (POSIX systems) experimental::win32_code_domain (Microsoft Windows) experimental::nt_code_domain (Microsoft Windows)  Note that there are more precanned code categories though they require additional header inclusions: com_code, getaddrinfo_code.</description>
     </item>
     
     <item>
@@ -52,7 +52,7 @@
       <description>status_result and status_outcome are type aliases to basic_result&amp;lt;T, E, NoValuePolicy&amp;gt; and basic_outcome&amp;lt;T, EC, EP, NoValuePolicy&amp;gt; in the usual way, but with a defaulted NoValuePolicy which selects on the basis of status_code&amp;lt;DomainType&amp;gt; instead.
 If the E type is not some status_code&amp;lt;&amp;gt;, the default policy selector will complain.
  The specifications are:
-experimental::status_result&amp;lt;T, E = experimental::system_code&amp;gt; experimental::status_outcome&amp;lt;T, E = experimental::system_code, EP = std::exception_ptr&amp;gt;  So, the default E is the erased status code system_code, which can represent any generic_code, posix_code, win32_code, nt_code, com_code and many other integer error and status codings.</description>
+experimental::status_result&amp;lt;T, E = experimental::error&amp;gt; experimental::status_outcome&amp;lt;T, E = experimental::error, EP = std::exception_ptr&amp;gt;  So, the default E is the erased errored status code system_code, which can represent any generic_code, posix_code, win32_code, nt_code, com_code and many other integer error and status codings.</description>
     </item>
     
     <item>

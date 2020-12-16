@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T10:54:12 UTC">
+<meta name="revised" content="2020-12-16T14:17:32 UTC">
 <title>C Macro API Reference :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2792,9 +2792,12 @@ is a code in the POSIX <code>errno</code> domain.
 standard layout if its <code>T</code> and <code>E</code> are both so, and it has the C layout:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">cxx_result_</span><span class="cp">##ident
 </span><span class="cp"></span><span class="p">{</span>
-  <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+  <span class="k">union</span>
+  <span class="p">{</span>
+    <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+    <span class="n">E</span> <span class="n">error</span><span class="p">;</span>
+  <span class="p">};</span>
   <span class="kt">unsigned</span> <span class="n">flags</span><span class="p">;</span>
-  <span class="n">E</span> <span class="n">error</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
 <h3 id="system-error2-support"><code>&lt;system_error2&gt;</code> support</h3>
@@ -2858,7 +2861,7 @@ type with unique <code>ident</code>.
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 05/02/2019
+        <i class='fa fa-calendar'></i> Last update on 16/12/2020
     </div>
     
 

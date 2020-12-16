@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T10:54:11 UTC">
+<meta name="revised" content="2020-12-16T14:17:31 UTC">
 <title>Experimental :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2768,28 +2768,44 @@ years now. It has shipped on at least one billion devices, as part of a
 games suite very popular on Microsoft Windows, Apple iOS and Google Android
 devices. It powers big iron enterprise applications as well, indeed all
 trades including futures in the United States are captured live into a database
-for the SEC by an Experimental Outcome based codebase.</p>
+for the SEC by an Experimental Outcome based codebase. Finally, Experimental
+Outcome is used in the firmware of parts of driver assisting cars where its
+particularly rich and flexible failure added information combined with
+compatibility with globally disabled C++ exceptions proved to be a big win.</p>
+
+<p>The base for failure handling in future C++ maybe be <code>std::error</code> from <a href="https://wg21.link/P1028">P1028
+<code>status_code</code></a>. This proposal is currently being
+refined before WG21&rsquo;s Library Evolution Working Group with the expectation that
+it will be standardised as a large enhancement and backwards compatible superset
+of <code>std::error_code</code> which is also capable of transporting any move-only type
+such as <code>std::exception_ptr</code>. Like <code>std::error_code</code>, proposed <code>std::error</code>
+occupies exactly two CPU registers of layout, and thus is extremely lightweight.
+It can wrap arbitrary third party error handling systems, and automatically
+constructs from <code>std::error_code</code> and <code>std::exception_ptr</code>, propagating the
+original underlying implementations (no matter how customised) exactly (e.g.
+<code>boost::exception_ptr</code>). Unlike <code>&lt;system_error&gt;</code>, <code>std::error</code> does not have
+dependencies on expensive standard library headers, so including it into your
+global build has a very low build time impact. <code>std::error</code> knows how to throw
+itself as a conventional C++ exception, and knows how to losslessly consume
+arbitrary C++ exception throws. Finally, <code>std::error</code> is ABI stable, and is
+a <a href="https://wg21.link/P1029">P1029 move bitcopying</a> type whereby moved-from
+objects do not need to be destroyed.</p>
+
+<hr />
 
 <p>Experimental Outcome uses the <a href="https://wg21.link/P1028">same proposed <code>std::error</code> object as P1095 would do
 for its <code>E</code> type</a> by bundling internally a copy of
 <a href="https://ned14.github.io/status-code/">https://ned14.github.io/status-code/</a>, the reference implementation library
-for proposed <code>std::error</code>. P1028 <code>status_code</code> is a large enhancement and
-backwards compatible superset of <code>std::error_code</code> which is also capable of
-transporting any move-only type such as <code>std::exception_ptr</code>. Status codes
-are <a href="https://wg21.link/P1029">P1029 move bitcopying</a> whereby moved-from
-objects do not need to be destroyed. Outcome emulates move
-bitcopying semantics for types declaring themselves move bitcopying via the
-trait <a href="/outcome/reference/traits/is_move_bitcopying/" class="api-reference"><code>is_move_bitcopying&lt;T&gt;</code></a>
-, and status codes opt into
-this. This greatly improves codegen to be no worse than with <code>std::error_code</code>
-(a trivially copyable type), as <a href="https://godbolt.org/z/GEdEGc">https://godbolt.org/z/GEdEGc</a>
+for proposed <code>std::error</code>. Outcome emulates move bitcopying semantics for types
+declaring themselves move bitcopying via the trait <a href="/outcome/reference/traits/is_move_bitcopying/" class="api-reference"><code>is_move_bitcopying&lt;T&gt;</code></a>
+,
+and status codes opt into this. This greatly improves codegen to be no worse
+than with <code>std::error_code</code> (a trivially copyable type), as <a href="https://godbolt.org/z/GEdEGc">https://godbolt.org/z/GEdEGc</a>
 demonstrates, despite that proposed <code>std::error</code> is a move-only type with
 a non-trivial destructor.</p>
 
-<p>P1095&rsquo;s reference implementation can be found at <a href="https://ned14.github.io/status-code/">https://ned14.github.io/status-code/</a>.
-You will find terse documentation there, and an API reference.
-This library is wholly incorporated into Outcome in the <code>&lt;outcome/experimental/status-code&gt;</code>
-directory, with bindings into Outcome provided in the following headers:</p>
+<p>Outcome binds <code>status_code</code> into <code>basic_result</code> and <code>basic_outcome</code> customisations
+via the following headers:</p>
 
 <ul>
 <li><code>&lt;outcome/experimental/status_result.hpp&gt;</code></li>
@@ -2815,7 +2831,8 @@ defined. This does not include POSIX headers, and makes available a high fidelit
 fully deterministic, alternative to C++ exceptions on such platforms.</p>
 
 <p>Finally, there is a single include edition of Experimental Outcome, which
-can be found at <a href="https://github.com/ned14/outcome/blob/develop/single-header/outcome-experimental.hpp">https://github.com/ned14/outcome/blob/develop/single-header/outcome-experimental.hpp</a></p>
+can be found at <a href="https://github.com/ned14/outcome/blob/develop/single-header/outcome-experimental.hpp">https://github.com/ned14/outcome/blob/develop/single-header/outcome-experimental.hpp</a>.
+You can play with this on godbolt by <code>#include &lt;outcome-experimental.hpp&gt;</code>.</p>
 
 <div class="notices warning" ><p><b>It is stressed, in the strongest possible terms, that any item inside
 <code>&lt;outcome/experimental&gt;</code> is subject to unannounced breaking change based
@@ -2847,7 +2864,7 @@ fundamental semantics, so you can upgrade with a bit of find and replace.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/12/2020
+        <i class='fa fa-calendar'></i> Last update on 16/12/2020
     </div>
     
 

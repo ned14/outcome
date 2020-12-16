@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T10:54:11 UTC">
+<meta name="revised" content="2020-12-16T14:17:31 UTC">
 <title>Major differences :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2832,7 +2832,7 @@ and so on, thus eliminating ambiguity.</p></li>
 <hr />
 
 <ol>
-<li id="fn:1"><a href="http://wg21.link/P1029">Move relocating is not in the standard, nor has been reviewed by WG21 yet</a>. It is defined to be a type whose move constructor <code>memcpy()</code>&rsquo;s the bits from source to destination, followed by <code>memcpy()</code> of the bits of a default constructed instance to source, and with a programmer-given guarantee that the destructor, when called on a default constructed instance, has no observable side effects. A surprising number of standard library types can meet this definition of move relocating, including <code>std::vector&lt;T&gt;</code>, <code>std::shared_ptr&lt;T&gt;</code>, and <code>std::exception_ptr</code>.
+<li id="fn:1"><a href="http://wg21.link/P1029">Move relocating is not in the standard, it is currently within WG21 Evolution Working Group Incubator</a>. It is defined to be a type whose move constructor <code>memcpy()</code>&rsquo;s the bits from source to destination, followed by <code>memcpy()</code> of the bits of a default constructed instance to source, and with a programmer-given guarantee that the destructor, when called on a default constructed instance, has no observable side effects. A surprising number of standard library types can meet this definition of move relocating, including <code>std::vector&lt;T&gt;</code>, <code>std::shared_ptr&lt;T&gt;</code>, and <code>std::exception_ptr</code>.
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
 </ol>
 </div>
@@ -2858,7 +2858,7 @@ and so on, thus eliminating ambiguity.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 05/02/2019
+        <i class='fa fa-calendar'></i> Last update on 16/12/2020
     </div>
     
 

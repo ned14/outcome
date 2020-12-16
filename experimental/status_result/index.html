@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T10:54:12 UTC">
+<meta name="revised" content="2020-12-16T14:17:32 UTC">
 <title>`status_result` and `status_outcome` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2768,19 +2768,17 @@ will complain.</p>
 
 
 <p>The specifications are:</p>
-<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">experimental</span><span class="o">::</span><span class="n">status_result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">experimental</span><span class="o">::</span><span class="n">system_code</span><span class="o">&gt;</span>
-<span class="n">experimental</span><span class="o">::</span><span class="n">status_outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">experimental</span><span class="o">::</span><span class="n">system_code</span><span class="p">,</span> <span class="n">EP</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">exception_ptr</span><span class="o">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">experimental</span><span class="o">::</span><span class="n">status_result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">experimental</span><span class="o">::</span><span class="n">error</span><span class="o">&gt;</span>
+<span class="n">experimental</span><span class="o">::</span><span class="n">status_outcome</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">experimental</span><span class="o">::</span><span class="n">error</span><span class="p">,</span> <span class="n">EP</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">exception_ptr</span><span class="o">&gt;</span>
 </code></pre></div>
-<p>So, the default <code>E</code> is the erased status code <code>system_code</code>, which can represent
+<p>So, the default <code>E</code> is the erased errored status code <code>system_code</code>, which can represent
 any <code>generic_code</code>, <code>posix_code</code>, <code>win32_code</code>, <code>nt_code</code>, <code>com_code</code> and many
 other integer error and status
-codings. <strong>Note</strong> that <code>system_code</code> may represent successes as well as failures.
-This mirrors, somewhat, how <code>std::error_code</code> can have an all bits zero defaulted
-state.</p>
+codings. Because it is an errored status code, it will always represent a failure.</p>
 
 <p>You can absolutely choose an <code>E</code> type which is non-erased e.g. <code>posix_code</code> directly.
-You can also choose an <code>E</code> type which is contract guaranteed to be a failure
-rather than an unknown success or failure &ndash; see <code>errored_status_code</code>.</p>
+You can also choose an <code>E</code> type which is not contract guaranteed to be a failure,
+though your users may find that surprising.</p>
 
 <p>Whether to choose typed status codes versus the erased status codes depends on your
 use cases. Outcome replicates faithfully the implicit and explicit conversion
@@ -2832,7 +2830,7 @@ compiler warnings about unnecessary use of <code>std::move()</code>.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 05/02/2019
+        <i class='fa fa-calendar'></i> Last update on 16/12/2020
     </div>
     
 
