@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:36 UTC">
+<meta name="revised" content="2020-12-17T11:29:56 UTC">
 <title>`basic_outcome(failure_type&lt;EP&gt; &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2865,7 +2865,7 @@
     
     
     <p>Implicit exception-from-failure-type-sugar move constructor used to disambiguate the construction of the exception type.
-Calls <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="api-reference"><code>void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</code></a>
+Calls <a href="/outcome/reference/policies/base/on_outcome_move_construction/" class="api-reference"><code>void on_outcome_move_construction(T *, U &amp;&amp;) noexcept</code></a>
  with <code>this</code> and <code>failure_type&lt;EP&gt; &amp;&amp;</code>.</p>
 
 <p><em>Requires</em>: <code>predicate::enable_compatible_conversion&lt;void, void, EP, void&gt;</code> is true.</p>
@@ -2893,7 +2893,7 @@ Calls <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 31/01/2019
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

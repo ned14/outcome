@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/reference/types/basic_result/</link>
     <description>Recent content in `basic_result&lt;T, E, NoValuePolicy&gt;` on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sun, 24 May 2020 12:48:39 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 17 Dec 2020 11:27:06 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/reference/types/basic_result/index.xml" rel="self" type="application/rss+xml" />
     
@@ -106,7 +106,7 @@ Complexity: N/A.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_value_converting_constructor/</guid>
-      <description>Implicit value_type constructor. Calls void hook_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and R.
+      <description>Implicit value_type constructor. Calls void on_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and R.
 Requires: predicate::enable_value_converting_constructor&amp;lt;R&amp;gt; is true.
 Complexity: Same as for value_type&amp;rsquo;s copy or move constructor. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -117,7 +117,7 @@ Complexity: Same as for value_type&amp;rsquo;s copy or move constructor. Constex
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_error_converting_constructor/</guid>
-      <description>Implicit error_type constructor. Calls void hook_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and S.
+      <description>Implicit error_type constructor. Calls void on_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and S.
 Requires: predicate::enable_error_converting_constructor&amp;lt;S&amp;gt; is true.
 Complexity: Same as for error_type&amp;rsquo;s copy or move constructor. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -128,7 +128,7 @@ Complexity: Same as for error_type&amp;rsquo;s copy or move constructor. Constex
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/</guid>
-      <description>Implicit error_type from ErrorCondEnum constructor. Calls void hook_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and ErrorCondEnum.
+      <description>Implicit error_type from ErrorCondEnum constructor. Calls void on_result_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and ErrorCondEnum.
 Requires: predicate::enable_error_condition_converting_constructor&amp;lt;R&amp;gt; is true.
 Complexity: Same as for error_type&amp;rsquo;s copy or move constructor from the result of make_error_code(ErrorCondEnum). Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the state of the input is left indeterminate.</description>
@@ -152,7 +152,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_copy_converting_constructor/</guid>
-      <description>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+      <description>Explicit converting copy constructor from compatible basic_result. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -164,7 +164,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_move_converting_constructor/</guid>
-      <description>Explicit converting move constructor from compatible basic_result. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+      <description>Explicit converting move constructor from compatible basic_result. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -176,7 +176,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/</guid>
-      <description>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+      <description>Explicit converting copy constructor from compatible basic_result. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_make_error_code_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -188,7 +188,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_make_error_code_move_converting_constructor/</guid>
-      <description>Explicit converting move constructor from compatible basic_result. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+      <description>Explicit converting move constructor from compatible basic_result. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_make_error_code_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -200,7 +200,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/</guid>
-      <description>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+      <description>Explicit converting copy constructor from compatible basic_result. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -212,7 +212,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_make_exception_ptr_move_converting_constructor/</guid>
-      <description>Explicit converting move constructor from compatible basic_result. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
+      <description>Explicit converting move constructor from compatible basic_result. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and the input.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&amp;lt;R, S, P&amp;gt; is true.
 Complexity: Same as for the move constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct.</description>
@@ -224,7 +224,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor/</guid>
-      <description>Explicit inplace value constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt; and Args ....
+      <description>Explicit inplace value constructor. Calls void on_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt; and Args ....
 Requires: predicate::enable_inplace_value_constructor&amp;lt;Args ...&amp;gt; is true.
 Complexity: Same as for the value_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
@@ -236,7 +236,7 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/</guid>
-      <description>Explicit inplace value constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt;, &amp;lsquo;std::initializer_list&amp;rsquo; and Args ....
+      <description>Explicit inplace value constructor. Calls void on_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;value_type&amp;gt;, &amp;lsquo;std::initializer_list&amp;rsquo; and Args ....
 Requires: predicate::enable_inplace_value_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
 Complexity: Same as for the value_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
@@ -248,7 +248,7 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor/</guid>
-      <description>Explicit inplace error constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt; and Args ....
+      <description>Explicit inplace error constructor. Calls void on_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt; and Args ....
 Requires: predicate::enable_inplace_error_constructor&amp;lt;Args ...&amp;gt; is true.
 Complexity: Same as for the error_type constructor which accepts Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
@@ -260,7 +260,7 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/</guid>
-      <description>Explicit inplace error constructor. Calls void hook_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt;, std::initializer_list&amp;lt;U&amp;gt; and Args ....
+      <description>Explicit inplace error constructor. Calls void on_result_in_place_construction(T *, in_place_type_t&amp;lt;U&amp;gt;, Args &amp;amp;&amp;amp;...) noexcept with this, in_place_type&amp;lt;error_type&amp;gt;, std::initializer_list&amp;lt;U&amp;gt; and Args ....
 Requires: predicate::enable_inplace_error_constructor&amp;lt;std::initializer_list&amp;lt;U&amp;gt;, Args ...&amp;gt; is true.
 Complexity: Same as for the error_type constructor which accepts std::initializer_list&amp;lt;U&amp;gt;, Args .... Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the state of the Args is left indeterminate.</description>
@@ -284,7 +284,7 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_success_copy_constructor/</guid>
-      <description>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const success_type&amp;lt;T&amp;gt; &amp;amp;.
+      <description>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const success_type&amp;lt;T&amp;gt; &amp;amp;.
 Requires: predicate::enable_compatible_conversion&amp;lt;T, void, void&amp;gt; is true, or T is void.
 Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -295,7 +295,7 @@ Complexity: Same as for the value_type constructor which accepts T, or the value
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_success_move_constructor/</guid>
-      <description>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and success_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
+      <description>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and success_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
 Requires: predicate::enable_compatible_conversion&amp;lt;T, void, void&amp;gt; is true, or T is void.
 Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -306,7 +306,7 @@ Complexity: Same as for the value_type constructor which accepts T, or the value
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_copy_constructor/</guid>
-      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
+      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
 Requires: predicate::enable_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -317,7 +317,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_move_constructor/</guid>
-      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
+      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
 Requires: predicate::enable_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -328,7 +328,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/</guid>
-      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
+      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
 Requires: predicate::enable_make_error_code_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -339,7 +339,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/</guid>
-      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
+      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
 Requires: predicate::enable_make_error_code_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -350,7 +350,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/</guid>
-      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
+      <description>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and const failure_type&amp;lt;T&amp;gt; &amp;amp;.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>
@@ -361,7 +361,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/</guid>
-      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
+      <description>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;amp;&amp;amp;) noexcept with this and failure_type&amp;lt;T&amp;gt; &amp;amp;&amp;amp;.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&amp;lt;void, T, void&amp;gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated.</description>
     </item>

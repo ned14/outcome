@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:43 UTC">
+<meta name="revised" content="2020-12-17T11:30:02 UTC">
 <title>`basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2867,7 +2867,7 @@
 
 
 
-<p>A type carrying one of (i) a successful <code>T</code> (ii) a disappointment <code>EC</code> (iii) a failure <code>EP</code> (iv) both a disappointment <code>EC</code> and a failure <code>EP</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there. Any one, two, or all of <code>T</code>, <code>EC</code> and <code>EP</code> can be <code>void</code> to indicate no value for that state is present. Detectable using <a href="/outcome/reference/traits/is_basic_outcome/" class="api-reference"><code>is_basic_outcome&lt;T&gt;</code></a>
+<p>A type carrying one of (i) a successful <code>T</code> (ii) a disappointment <code>EC</code> (iii) a failure <code>EP</code> (iv) both a disappointment <code>EC</code> and a failure <code>EP</code>, with <code>NoValuePolicy</code> specifying what to do if one tries to read state which isn&rsquo;t there, and enabling injection of hooks to trap when lifecycle events occur. Any one, two, or all of <code>T</code>, <code>EC</code> and <code>EP</code> can be <code>void</code> to indicate no value for that state is present. Detectable using <a href="/outcome/reference/traits/is_basic_outcome/" class="api-reference"><code>is_basic_outcome&lt;T&gt;</code></a>
 .</p>
 
 <p><em>Requires</em>: Concept requirements if C++ 20, else static asserted:</p>
@@ -2875,7 +2875,7 @@
 <ul>
 <li>That trait <a href="/outcome/reference/traits/type_can_be_used_in_basic_result/" class="api-reference"><code>type_can_be_used_in_basic_result&lt;R&gt;</code></a>
  is true for <code>T</code>, <code>EC</code> and <code>EP</code>.</li>
-<li>That either <code>EC</code> is <code>void</code> or <code>DefaultConstructible</code>.</li>
+<li>That either <code>EC</code> is <code>void</code> or <code>DefaultConstructible</code> (Outcome v2.1 and earlier only).</li>
 <li>That either <code>EP</code> is <code>void</code> or <code>DefaultConstructible</code>.</li>
 </ul>
 
@@ -3095,6 +3095,8 @@ from <code>Args...</code>.</li>
 <li><code>MoveAssignable</code>, if all of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> implement move constructors and move assignment.</li>
 <li><code>CopyAssignable</code>, if all of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> implement copy constructors and copy assignment.</li>
 <li><code>Destructible</code>.</li>
+<li><code>Swappable</code>, with the strong rather than weak guarantee. See <a href="/outcome/reference/types/basic_outcome/swap/" class="api-reference"><code>void swap(basic_outcome &amp;)</code></a>
+ for more information.</li>
 <li><code>TriviallyCopyable</code>, if all of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> are trivially copyable.</li>
 <li><code>TrivialType</code>, if all of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> are trivial types.</li>
 <li><code>LiteralType</code>, if all of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> are literal types.</li>
@@ -3102,7 +3104,19 @@ from <code>Args...</code>.</li>
 <li><p><del><code>StandardLayoutType</code></del>. It is implementation defined if <code>basic_outcome</code> can be used by C.
 However all of the three major compilers MSVC, GCC and clang implement C layout of <code>basic_outcome</code> as follows:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">outcome_layout</span> <span class="p">{</span>
-  <span class="k">struct</span> <span class="n">result_layout</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">trivially_copyable_result_layout</span> <span class="p">{</span>
+    <span class="k">union</span> <span class="p">{</span>
+      <span class="n">value_type</span> <span class="n">value</span><span class="p">;</span>
+      <span class="n">error_type</span> <span class="n">error</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
+  <span class="p">};</span>
+  <span class="n">exception_type</span> <span class="n">exception</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>&hellip; if both <code>value_type</code> and <code>error_type</code> are <code>TriviallyCopyable</code>, otherwise:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">outcome_layout</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">non_trivially_copyable_result_layout</span> <span class="p">{</span>
     <span class="n">value_type</span> <span class="n">value</span><span class="p">;</span>
     <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
     <span class="n">error_type</span> <span class="n">error</span><span class="p">;</span>
@@ -3115,8 +3129,7 @@ works fine from C on MSVC, GCC and clang.</p></li>
 
 <li><p><code>EqualityComparable</code>, if all of <code>value_type</code>, <code>error_type</code> and <code>exception_type</code> implement equality comparisons with one another.</p></li>
 
-<li><p><del><code>LessThanComparable</code></del>, not implemented due to availability of implicit conversions from <code>value_type</code>, <code>error_type</code> and <code>exception_type</code>, this can cause major surprise (i.e. hard to diagnose bugs), so we don&rsquo;t implement these at all.
-~ <code>Swappable</code></p></li>
+<li><p><del><code>LessThanComparable</code></del>, not implemented due to availability of implicit conversions from <code>value_type</code>, <code>error_type</code> and <code>exception_type</code>, this can cause major surprise (i.e. hard to diagnose bugs), so we don&rsquo;t implement these at all.</p></li>
 
 <li><p><del><code>Hash</code></del>, not implemented as a generic implementation of a unique hash for non-valued items which are unequal would require a dependency on RTTI being enabled.</p></li>
 </ul>
@@ -3343,7 +3356,7 @@ works fine from C on MSVC, GCC and clang.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 24/05/2020
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

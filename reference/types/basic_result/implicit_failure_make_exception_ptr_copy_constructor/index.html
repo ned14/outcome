@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:36 UTC">
+<meta name="revised" content="2020-12-17T11:29:56 UTC">
 <title>`basic_result(const failure_type&lt;T&gt; &amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2849,7 +2849,7 @@
     
     
     <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type.
-Note that if <code>T = void</code>, <code>error_type</code> will be default constructed.  Calls <a href="/outcome/reference/functions/hooks/hook_result_copy_construction/" class="api-reference"><code>void hook_result_copy_construction(T *, U &amp;&amp;) noexcept</code></a>
+Note that if <code>T = void</code>, <code>error_type</code> will be default constructed.  Calls <a href="/outcome/reference/policies/base/on_result_copy_construction/" class="api-reference"><code>void on_result_copy_construction(T *, U &amp;&amp;) noexcept</code></a>
  with <code>this</code> and <code>const failure_type&lt;T&gt; &amp;</code>.</p>
 
 <p><em>Requires</em>: <code>predicate::enable_make_exception_ptr_compatible_conversion&lt;void, T, void&gt;</code> is true, or <code>T</code> is <code>void</code>.</p>
@@ -2877,7 +2877,7 @@ Note that if <code>T = void</code>, <code>error_type</code> will be default cons
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 10/10/2019
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

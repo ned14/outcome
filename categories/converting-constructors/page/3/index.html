@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:40 UTC">
+<meta name="revised" content="2020-12-17T11:29:59 UTC">
 <title>Converting Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2762,7 +2762,7 @@
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/">`explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and the input.
+        <p>Explicit converting copy constructor from compatible basic_result. Calls void on_result_copy_construction(T *, U &amp;&amp;) noexcept with this and the input.
 Requires: predicate::enable_make_error_code_compatible_conversion&lt;R, S, P&gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/">&raquo;</a></p>
@@ -2782,7 +2782,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/">`explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Explicit converting copy constructor from compatible basic_result. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and the input.
+        <p>Explicit converting copy constructor from compatible basic_result. Calls void on_result_copy_construction(T *, U &amp;&amp;) noexcept with this and the input.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&lt;R, S, P&gt; is true.
 Complexity: Same as for the copy constructors of the underlying types. Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the object is left in a partially completed state, as per the normal rules for the same operation on a struct. <a class="read-more" href="/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/">&raquo;</a></p>
@@ -2831,7 +2831,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 10/10/2019
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

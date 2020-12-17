@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:41 UTC">
+<meta name="revised" content="2020-12-17T11:30:01 UTC">
 <title>Tagged Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2762,7 +2762,7 @@
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_error_exception_copy_constructor/">`basic_outcome(const failure_type&lt;EC, EP&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-and-exception-from-failure-type-sugar copy constructor used to disambiguate the construction of the error + exception types. Calls void hook_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept with this, const failure_type&lt;EC&gt; &amp; and const failure_type&lt;EP&gt; &amp;.
+        <p>Implicit error-and-exception-from-failure-type-sugar copy constructor used to disambiguate the construction of the error + exception types. Calls void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept with this, const failure_type&lt;EC&gt; &amp; and const failure_type&lt;EP&gt; &amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, EC, EP, void&gt; is true.
 Complexity: Same as for the error_type and exception_type constructors which accept EC and EP. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_error_exception_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2781,7 +2781,7 @@ Complexity: Same as for the error_type and exception_type constructors which acc
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_error_copy_constructor/">`basic_outcome(const failure_type&lt;EC&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Calls void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;EC&gt; &amp;.
+        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Calls void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;EC&gt; &amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, EC, void, void&gt; is true.
 Complexity: Same as for the error_type constructor which accepts EC. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_error_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2800,7 +2800,7 @@ Complexity: Same as for the error_type constructor which accepts EC. Constexpr, 
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_copy_constructor/">`basic_outcome(const failure_type&lt;EC&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Calls void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;EC&gt; &amp;.
+        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Calls void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;EC&gt; &amp;.
 Requires: predicate::enable_make_error_code_compatible_conversion&lt;void, EC, void, void&gt; is true.
 Complexity: Same as for the error_type constructor which accepts EC. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2819,7 +2819,7 @@ Complexity: Same as for the error_type constructor which accepts EC. Constexpr, 
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_exception_copy_constructor/">`basic_outcome(const failure_type&lt;EP&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit exception-from-failure-type-sugar copy constructor used to disambiguate the construction of the exception type. Calls void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;EP&gt; &amp;.
+        <p>Implicit exception-from-failure-type-sugar copy constructor used to disambiguate the construction of the exception type. Calls void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;EP&gt; &amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, void, EP, void&gt; is true.
 Complexity: Same as for the exception_type constructor which accepts EP. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_exception_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2838,7 +2838,7 @@ Complexity: Same as for the exception_type constructor which accepts EP. Constex
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_success_copy_constructor/">`basic_outcome(const success_type&lt;T&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const success_type&lt;T&gt; &amp;.
+        <p>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept with this and const success_type&lt;T&gt; &amp;.
 Requires: predicate::enable_compatible_conversion&lt;T, void, void&gt; is true, or T is void.
 Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_success_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2857,7 +2857,7 @@ Complexity: Same as for the value_type constructor which accepts T, or the value
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_error_exception_move_constructor/">`basic_outcome(failure_type&lt;EC, EP&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-and-exception-from-failure-type-sugar move constructor used to disambiguate the construction of the error + exception types. Calls void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept with this, failure_type&lt;EC&gt; &amp;&amp; and failure_type&lt;EP&gt; &amp;&amp;.
+        <p>Implicit error-and-exception-from-failure-type-sugar move constructor used to disambiguate the construction of the error + exception types. Calls void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept with this, failure_type&lt;EC&gt; &amp;&amp; and failure_type&lt;EP&gt; &amp;&amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, EC, EP, void&gt; is true.
 Complexity: Same as for the error_type and exception_type constructors which accept EC and EP. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_error_exception_move_constructor/">&raquo;</a></p>
     </section>
@@ -2876,7 +2876,7 @@ Complexity: Same as for the error_type and exception_type constructors which acc
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_error_move_constructor/">`basic_outcome(failure_type&lt;EC&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Calls void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;EC&gt; &amp;&amp;.
+        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Calls void on_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;EC&gt; &amp;&amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, EC, void, void&gt; is true.
 Complexity: Same as for the error_type constructor which accepts EC. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_error_move_constructor/">&raquo;</a></p>
     </section>
@@ -2895,7 +2895,7 @@ Complexity: Same as for the error_type constructor which accepts EC. Constexpr, 
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_move_constructor/">`basic_outcome(failure_type&lt;EC&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Calls void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;EC&gt; &amp;&amp;.
+        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Calls void on_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;EC&gt; &amp;&amp;.
 Requires: predicate::enable_make_error_code_compatible_conversion&lt;void, EC, void, void&gt; is true.
 Complexity: Same as for the error_type constructor which accepts EC. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_move_constructor/">&raquo;</a></p>
     </section>
@@ -2914,7 +2914,7 @@ Complexity: Same as for the error_type constructor which accepts EC. Constexpr, 
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_failure_exception_move_constructor/">`basic_outcome(failure_type&lt;EP&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit exception-from-failure-type-sugar move constructor used to disambiguate the construction of the exception type. Calls void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;EP&gt; &amp;&amp;.
+        <p>Implicit exception-from-failure-type-sugar move constructor used to disambiguate the construction of the exception type. Calls void on_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;EP&gt; &amp;&amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, void, EP, void&gt; is true.
 Complexity: Same as for the exception_type constructor which accepts EP. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_failure_exception_move_constructor/">&raquo;</a></p>
     </section>
@@ -2933,7 +2933,7 @@ Complexity: Same as for the exception_type constructor which accepts EP. Constex
         <h2 class="post-title"><a href="/outcome/reference/types/basic_outcome/implicit_success_move_constructor/">`basic_outcome(success_type&lt;T&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and success_type&lt;T&gt; &amp;&amp;.
+        <p>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void on_outcome_move_construction(T *, U &amp;&amp;) noexcept with this and success_type&lt;T&gt; &amp;&amp;.
 Requires: predicate::enable_compatible_conversion&lt;T, void, void&gt; is true, or T is void.
 Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_outcome/implicit_success_move_constructor/">&raquo;</a></p>
     </section>
@@ -2980,7 +2980,7 @@ Complexity: Same as for the value_type constructor which accepts T, or the value
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 21/01/2019
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

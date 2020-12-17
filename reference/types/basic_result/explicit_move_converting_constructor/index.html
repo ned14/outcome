@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:34 UTC">
+<meta name="revised" content="2020-12-17T11:29:55 UTC">
 <title>`explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2848,7 +2848,7 @@
     
     
     
-    <p>Explicit converting move constructor from compatible <code>basic_result</code>. Calls <a href="/outcome/reference/functions/hooks/hook_result_move_construction/" class="api-reference"><code>void hook_result_move_construction(T *, U &amp;&amp;) noexcept</code></a>
+    <p>Explicit converting move constructor from compatible <code>basic_result</code>. Calls <a href="/outcome/reference/policies/base/on_result_move_construction/" class="api-reference"><code>void on_result_move_construction(T *, U &amp;&amp;) noexcept</code></a>
  with <code>this</code> and the input.</p>
 
 <p><em>Requires</em>: <code>predicate::enable_compatible_conversion&lt;R, S, P&gt;</code> is true.</p>
@@ -2878,7 +2878,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/03/2019
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

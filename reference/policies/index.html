@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:32 UTC">
+<meta name="revised" content="2020-12-17T11:29:53 UTC">
 <title>Policies :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2816,27 +2816,27 @@
 	<a href="/outcome/reference/policies/base/narrow_exception_check/" ><code>static void narrow_exception_check(Impl &amp;&amp;) noexcept</code></a>
 <p>Observer policy performing hard UB if no exception is present. Constexpr, never throws.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_construction/" ><code>static void on_outcome_construction(T *, U &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the implicit constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the implicit constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_construction2/" ><code>static void on_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the implicit constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the implicit constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_copy_construction/" ><code>static void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the converting copy constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the converting copy constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_copy_construction2/" ><code>static void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the converting copy constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the converting copy constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_in_place_construction/" ><code>static void on_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code></a>
-<p>Hook invoked by the in-place constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the in-place constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_move_construction/" ><code>static void on_outcome_move_construction(T *, U &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the converting move constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the converting move constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_outcome_move_construction2/" ><code>static void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the converting move constructors of <code>basic_outcome</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the converting move constructors of <code>basic_outcome</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_result_construction/" ><code>static void on_result_construction(T *, U &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the implicit constructors of <code>basic_result</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the implicit constructors of <code>basic_result</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_result_copy_construction/" ><code>static void on_result_copy_construction(T *, U &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the converting copy constructors of <code>basic_result</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the converting copy constructors of <code>basic_result</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_result_in_place_construction/" ><code>static void on_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code></a>
-<p>Hook invoked by the in-place constructors of <code>basic_result</code>.</p><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the in-place constructors of <code>basic_result</code>.</p><li>
 	<a href="/outcome/reference/policies/base/on_result_move_construction/" ><code>static void on_result_move_construction(T *, U &amp;&amp;) noexcept</code></a>
-<p>Hook invoked by the converting move constructors of <code>basic_result</code>.</p></li></ol><li>
+<p>(&gt;= Outcome v2.2.0) Hook invoked by the converting move constructors of <code>basic_result</code>.</p></li></ol><li>
 	<a href="/outcome/reference/policies/all_narrow/" ><code>all_narrow</code></a>
 <p>Policy class defining that hard undefined behaviour should occur on incorrect narrow and wide value, error or exception observation. Inherits publicly from <code>base</code>.</p><li>
 	<a href="/outcome/reference/policies/error_code_throw_as_system_error_outcome/" ><code>error_code_throw_as_system_error&lt;T, EC, EP&gt;</code></a>

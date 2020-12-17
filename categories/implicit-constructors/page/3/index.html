@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:41 UTC">
+<meta name="revised" content="2020-12-17T11:30:00 UTC">
 <title>Implicit Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2784,7 +2784,7 @@ Guarantees: If an exception is thrown during the operation, the state of the Arg
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/">`basic_result(ErrorCondEnum &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error_type from ErrorCondEnum constructor. Calls void hook_result_construction(T *, U &amp;&amp;) noexcept with this and ErrorCondEnum.
+        <p>Implicit error_type from ErrorCondEnum constructor. Calls void on_result_construction(T *, U &amp;&amp;) noexcept with this and ErrorCondEnum.
 Requires: predicate::enable_error_condition_converting_constructor&lt;R&gt; is true.
 Complexity: Same as for error_type&rsquo;s copy or move constructor from the result of make_error_code(ErrorCondEnum). Constexpr, triviality and noexcept of underlying operations is propagated.
 Guarantees: If an exception is thrown during the operation, the state of the input is left indeterminate. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/">&raquo;</a></p>
@@ -2804,7 +2804,7 @@ Guarantees: If an exception is thrown during the operation, the state of the inp
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_value_converting_constructor/">`basic_result(R &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit value_type constructor. Calls void hook_result_construction(T *, U &amp;&amp;) noexcept with this and R.
+        <p>Implicit value_type constructor. Calls void on_result_construction(T *, U &amp;&amp;) noexcept with this and R.
 Requires: predicate::enable_value_converting_constructor&lt;R&gt; is true.
 Complexity: Same as for value_type&rsquo;s copy or move constructor. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_value_converting_constructor/">&raquo;</a></p>
     </section>
@@ -2823,7 +2823,7 @@ Complexity: Same as for value_type&rsquo;s copy or move constructor. Constexpr, 
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_error_converting_constructor/">`basic_result(S &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error_type constructor. Calls void hook_result_construction(T *, U &amp;&amp;) noexcept with this and S.
+        <p>Implicit error_type constructor. Calls void on_result_construction(T *, U &amp;&amp;) noexcept with this and S.
 Requires: predicate::enable_error_converting_constructor&lt;S&gt; is true.
 Complexity: Same as for error_type&rsquo;s copy or move constructor. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_error_converting_constructor/">&raquo;</a></p>
     </section>
@@ -2882,7 +2882,7 @@ Guarantees: If an exception is thrown during the operation, the object is left i
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_failure_copy_constructor/">`basic_result(const failure_type&lt;T&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;T&gt; &amp;.
+        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;T&gt; &amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, T, void&gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_failure_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2901,7 +2901,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/">`basic_result(const failure_type&lt;T&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;T&gt; &amp;.
+        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;T&gt; &amp;.
 Requires: predicate::enable_make_error_code_compatible_conversion&lt;void, T, void&gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2920,7 +2920,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/">`basic_result(const failure_type&lt;T&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;T&gt; &amp;.
+        <p>Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const failure_type&lt;T&gt; &amp;.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&lt;void, T, void&gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/">&raquo;</a></p>
     </section>
@@ -2939,7 +2939,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_success_copy_constructor/">`basic_result(const success_type&lt;T&gt; &amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const success_type&lt;T&gt; &amp;.
+        <p>Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void on_result_copy_construction(T *, U &amp;&amp;) noexcept with this and const success_type&lt;T&gt; &amp;.
 Requires: predicate::enable_compatible_conversion&lt;T, void, void&gt; is true, or T is void.
 Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_success_copy_constructor/">&raquo;</a></p>
     </section>

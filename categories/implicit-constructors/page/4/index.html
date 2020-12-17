@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:41 UTC">
+<meta name="revised" content="2020-12-17T11:30:00 UTC">
 <title>Implicit Constructors :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2762,7 +2762,7 @@
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_failure_move_constructor/">`basic_result(failure_type&lt;T&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;T&gt; &amp;&amp;.
+        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;T&gt; &amp;&amp;.
 Requires: predicate::enable_compatible_conversion&lt;void, T, void&gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_failure_move_constructor/">&raquo;</a></p>
     </section>
@@ -2781,7 +2781,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/">`basic_result(failure_type&lt;T&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;T&gt; &amp;&amp;.
+        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;T&gt; &amp;&amp;.
 Requires: predicate::enable_make_error_code_compatible_conversion&lt;void, T, void&gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/">&raquo;</a></p>
     </section>
@@ -2800,7 +2800,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/">`basic_result(failure_type&lt;T&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;T&gt; &amp;&amp;.
+        <p>Implicit error-from-failure-type-sugar move constructor used to disambiguate the construction of the error type. Note that if T = void, error_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;&amp;) noexcept with this and failure_type&lt;T&gt; &amp;&amp;.
 Requires: predicate::enable_make_exception_ptr_compatible_conversion&lt;void, T, void&gt; is true, or T is void.
 Complexity: Same as for the error_type constructor which accepts T, or the error_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/">&raquo;</a></p>
     </section>
@@ -2819,7 +2819,7 @@ Complexity: Same as for the error_type constructor which accepts T, or the error
         <h2 class="post-title"><a href="/outcome/reference/types/basic_result/implicit_success_move_constructor/">`basic_result(success_type&lt;T&gt; &amp;&amp;)`</a></h2>
     </header>
     <section class="post-excerpt">
-        <p>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void hook_result_move_construction(T *, U &amp;&amp;) noexcept with this and success_type&lt;T&gt; &amp;&amp;.
+        <p>Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type. Note that if T = void, value_type will be default constructed. Calls void on_result_move_construction(T *, U &amp;&amp;) noexcept with this and success_type&lt;T&gt; &amp;&amp;.
 Requires: predicate::enable_compatible_conversion&lt;T, void, void&gt; is true, or T is void.
 Complexity: Same as for the value_type constructor which accepts T, or the value_type default constructor if T is void. Constexpr, triviality and noexcept of underlying operations is propagated. <a class="read-more" href="/outcome/reference/types/basic_result/implicit_success_move_constructor/">&raquo;</a></p>
     </section>
@@ -2867,7 +2867,7 @@ Complexity: Same as for the value_type constructor which accepts T, or the value
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 21/01/2019
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 

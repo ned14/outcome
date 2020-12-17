@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2020-12-16T14:17:32 UTC">
+<meta name="revised" content="2020-12-17T11:29:53 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2779,13 +2779,22 @@
 
 <p>Outcome is specifically designed for use in the public interfaces of multi-million
 line codebases. <code>result</code>&rsquo;s layout is hard coded to:</p>
-<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span>
-<span class="p">{</span>
-  <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">trivially_copyable_result_layout</span> <span class="p">{</span>
+  <span class="k">union</span> <span class="p">{</span>
+    <span class="n">value_type</span> <span class="n">value</span><span class="p">;</span>
+    <span class="n">error_type</span> <span class="n">error</span><span class="p">;</span>
+  <span class="p">};</span>
   <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
-  <span class="n">EC</span> <span class="n">error</span><span class="p">;</span>
-<span class="p">};</span></code></pre></div>
-<p>This is C-compatible if <code>T</code> and <code>EC</code> are C-compatible. 
+<span class="p">};</span>
+</code></pre></div>
+<p>&hellip; if both <code>value_type</code> and <code>error_type</code> are <code>TriviallyCopyable</code>, otherwise:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">non_trivially_copyable_result_layout</span> <span class="p">{</span>
+  <span class="n">value_type</span> <span class="n">value</span><span class="p">;</span>
+  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
+  <span class="n">error_type</span> <span class="n">error</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>This is C-compatible if <code>value_type</code> and <code>error_type</code> are C-compatible. 
 <a href="https://en.cppreference.com/w/cpp/error/error_code" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> <code>std::error_code</code></a>
 
 is <em>probably</em> C-compatible, but its layout is not standardised (though there is a
@@ -2794,17 +2803,9 @@ C macro API for standard Outcome, but we can for <a href="/outcome/experimental/
 
 <h2 id="does-outcome-implement-over-alignment">Does Outcome implement over-alignment?</h2>
 
-<p>Variant-based alternatives to Outcome such as 
-<a href="https://wg21.link/P0323" class="api-reference" target="_blank"><i class="fa fa-book" aria-hidden="true"></i> P0323 <code>std::expected&lt;T, E&gt;</code></a>
-
-would use <code>std::aligned_union</code> to ensure appropriate over-alignment for the storage of
-either a <code>T</code> or an <code>E</code>. This discovers the over-alignment for a type using
-<code>std::alignment_of</code>, which is defaulted to <code>alignof()</code>.</p>
-
-<p>Outcome uses <code>struct</code>-based storage, as described above. Any over-alignment of
-<code>result</code> or <code>outcome</code> will follow the ordinary alignment and padding rules for
-<code>struct</code> on your compiler. Traits such as <code>std::alignment_of</code>, or other standard
-library facilities, are not used.</p>
+<p>Outcome propagates any over-alignment of the types you supply to it as according
+to the layout specified above. Therefore the ordinary alignment and padding rules
+for your compiler are used.</p>
 
 <h2 id="does-outcome-implement-the-no-fail-strong-or-basic-exception-guarantee">Does Outcome implement the no-fail, strong or basic exception guarantee?</h2>
 
@@ -2851,12 +2852,15 @@ and standard swap is used instead.</p>
 
 <h2 id="does-outcome-have-a-stable-abi-and-api">Does Outcome have a stable ABI and API?</h2>
 
-<p>Right now, no. Though the data layout shown above is not expected to change.</p>
+<p>The layout changed for all trivially copyable types between Outcome v2.1 and v2.2,
+as union based storage was introduced. From v2.2 onwards, the layout is not
+expected to change again.</p>
 
-<p>Outcome&rsquo;s ABI and API will be formally fixed as <strong>the</strong> v2 interface approximately
-one year after its first Boost release. Thereafter the
-<a href="https://lvc.github.io/abi-compliance-checker/">ABI compliance checker</a>
-will be run per-commit to ensure Outcome&rsquo;s ABI and API remains stable.</p>
+<p>If v2.2 proves to be unchanging for 24 months, Outcome&rsquo;s ABI and API will be
+formally fixed as <strong>the</strong> v2 interface and written into stone forever. Thereafter
+the <a href="https://lvc.github.io/abi-compliance-checker/">ABI compliance checker</a>
+will be run per-commit to ensure Outcome&rsquo;s ABI and API remains stable. This is
+currently expected to occur in 2022.</p>
 
 <p>Note that the stable ABI and API guarantee will only apply to standalone
 Outcome, not to Boost.Outcome. Boost.Outcome has dependencies on other
@@ -2867,7 +2871,7 @@ to be ABI stable if <code>result</code> or <code>outcome</code> is to be ABI sta
 
 <h2 id="can-i-use-result-t-ec-across-dll-shared-object-boundaries">Can I use <code>result&lt;T, EC&gt;</code> across DLL/shared object boundaries?</h2>
 
-<p>A known problem with using DLLs (and to smaller extent shared libraries) is that global
+<p>A known problem with using Windows DLLs (and to smaller extent POSIX shared libraries) is that global
 objects may get duplicated: one instance in the executable and one in the DLL. This
 behaviour is not incorrect according to the C++ Standard, as the Standard does not
 recognize the existence of DLLs or shared libraries. Therefore, program designs that
@@ -2878,7 +2882,7 @@ using DLLs.</p>
 layout (see answer above) means that different versions of Outcome can be used in
 different DLLs, and it probably will work okay (it is still not advised that you do that
 as that is an ODR violation).
-However, one of the most likely candidate for <code>EC</code> &ndash; <code>std::error_code</code> &ndash; does depend
+However, one of the most likely candidate for <code>EC</code> &ndash; <code>std::error_code</code> &ndash; <strong>does</strong> depend
 on the addresses of globals for correct functioning.</p>
 
 <p>The standard library is required to implement globally unique addresses for the standard library
@@ -3405,7 +3409,7 @@ C++ 17 or 14 given how much of STL containers would break.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/02/2020
+        <i class='fa fa-calendar'></i> Last update on 17/12/2020
     </div>
     
 
