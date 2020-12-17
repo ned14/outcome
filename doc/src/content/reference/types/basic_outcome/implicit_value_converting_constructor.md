@@ -5,7 +5,7 @@ categories = ["constructors", "implicit-constructors", "converting-constructors"
 weight = 180
 +++
 
-Implicit `value_type` constructor. Calls {{% api "void hook_outcome_construction(T *, U &&) noexcept" %}} with `this` and `R`.
+Implicit `value_type` constructor. Calls {{% api "void on_outcome_construction(T *, U &&) noexcept" %}} with `this` and `R`.
 
 *Requires*: `predicate::enable_value_converting_constructor<R>` is true.
 

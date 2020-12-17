@@ -5,7 +5,7 @@ categories = ["constructors", "explicit-constructors", "converting-constructors"
 weight = 323
 +++
 
-Explicit converting copy constructor from compatible `basic_result`. Calls {{% api "void hook_result_copy_construction(T *, U &&) noexcept" %}} with `this` and the input.
+Explicit converting copy constructor from compatible `basic_result`. Calls {{% api "void on_result_copy_construction(T *, U &&) noexcept" %}} with `this` and the input.
 
 *Requires*: `predicate::enable_make_exception_ptr_compatible_conversion<R, S, P>` is true.
 

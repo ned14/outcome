@@ -6,7 +6,7 @@ weight = 537
 +++
 
 Implicit error-and-exception-from-failure-type-sugar move constructor used to disambiguate the construction of the error + exception types.
-Calls {{% api "void hook_outcome_move_construction(T *, U &&, V &&) noexcept" %}} with `this`, `failure_type<EC> &&` and `failure_type<EP> &&`.
+Calls {{% api "void on_outcome_move_construction(T *, U &&, V &&) noexcept" %}} with `this`, `failure_type<EC> &&` and `failure_type<EP> &&`.
 
 *Requires*: `predicate::enable_compatible_conversion<void, EC, EP, void>` is true.
 

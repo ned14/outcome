@@ -1,6 +1,6 @@
 +++
 title = "`static void on_outcome_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept`"
-description = "Hook invoked by the in-place constructors of `basic_outcome`."
+description = "(>= Outcome v2.2.0) Hook invoked by the in-place constructors of `basic_outcome`."
 categories = ["observer-policies"]
 weight = 450
 +++

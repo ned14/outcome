@@ -1,6 +1,6 @@
 +++
 title = "`is_move_bitcopying<T>`"
-description = "A customisable integral constant type true for `T` types which are move bitcopying safe."
+description = "(>= Outcome v2.2.0) A customisable integral constant type true for `T` types which are move bitcopying safe."
 +++
 
 A customisable integral constant type true for `T` types which are move bitcopying

@@ -3,12 +3,12 @@ title = "`basic_result<T, E, NoValuePolicy>`"
 description = "A sum type carrying either a successful `T`, or a disappointment `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there."
 +++
 
-A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there. Either or both of `T` and `E` can be `void` to indicate no value for that state is present. Note that `E = void` makes basic result into effectively an `optional<T>`, but with `NoValuePolicy` configurable behaviour. Detectable using {{% api "is_basic_result<T>" %}}.
+A sum type carrying either a `T` or an `E`, with `NoValuePolicy` specifying what to do if one tries to read state which isn't there, and enabling injection of hooks to trap when lifecycle events occur. Either or both of `T` and `E` can be `void` to indicate no value for that state is present. Note that `E = void` makes basic result into effectively an `optional<T>`, but with `NoValuePolicy` configurable behaviour. Detectable using {{% api "is_basic_result<T>" %}}.
 
 *Requires*: Concept requirements if C++ 20, else static asserted:
 
 - That trait {{% api "type_can_be_used_in_basic_result<R>" %}} is true for both `T` and `E`.
-- That either `E` is `void` or `DefaultConstructible`.
+- That either `E` is `void` or `DefaultConstructible` (Outcome v2.1 and earlier only).
 
 *Namespace*: `OUTCOME_V2_NAMESPACE`
 
@@ -39,7 +39,7 @@ The basic result type is the main workhorse type of the Outcome library, providi
 
 The first major design difference is that basic result models its constructor design on {{% api "std::variant<...>" %}}, rather than modelling {{% api "std::optional<T>" %}}'s constructor design like `std::expected<T, E>` does. This means that basic result will implicitly construct either a `T` or an `E` if doing so is unambiguous, same as `variant` does. Where implicit construction is ambiguous, the implicit constructors disable and a `T` or `E` can be specified via {{% api "in_place_type_t<T>" %}}, or via {{% api "success_type<T>" %}} or {{% api "failure_type<T>" %}}. We implement a subset of variant's constructors for improved compile time impact, so the implicit and explicit constructor design is split into fixed subsets to reduce SFINAE execution.
 
-The second major design difference is that union storage is NOT used, as it is assumed that `sizeof(E)` will be small for failure handling. This very considerably reduces load on the compiler, and substantially improves compile times in very large C++ 14 codebases, because copies and moves do not need to jump through complex ceremony in order to implement the never-empty guarantees which would be required in a union storage based implementation (C++ 17 onwards does far fewer copy and move constructor instantiations, but it all adds up -- work avoided is always the fastest).
+The second major design difference is that union storage is ONLY used when both `T` and `E` are trivially copyable or `void`, otherwise struct storage is used. This is usually not a problem, as it is assumed that `sizeof(E)` will be small for failure handling. The choice to only use union storage for trivially copyable types only very considerably reduces load on the compiler, and substantially improves compile times in very large C++ 14 codebases, because copies and moves do not need to jump through complex ceremony in order to implement the never-empty guarantees which would be required in a union storage based implementation (C++ 17 onwards does far fewer copy and move constructor instantiations, but it all adds up -- work avoided is always the fastest).
 
 ### Public member type aliases
 
@@ -124,21 +124,35 @@ The second major design difference is that union storage is NOT used, as it is a
 - `MoveAssignable`, if both `value_type` and `error_type` implement move constructors and move assignment.
 - `CopyAssignable`, if both `value_type` and `error_type` implement copy constructors and copy assignment.
 - `Destructible`.
+- `Swappable`, with the strong rather than weak guarantee. See {{% api "void swap(basic_result &)" %}} for more information.
 - `TriviallyCopyable`, if both `value_type` and `error_type` are trivially copyable.
 - `TrivialType`, if both `value_type` and `error_type` are trivial types.
 - `LiteralType`, if both `value_type` and `error_type` are literal types.
-- `StandardLayoutType`, if both `value_type` and `error_type` are standard layout types. If so, layout of `basic_result` in C is guaranteed to be:
+- `StandardLayoutType`, if both `value_type` and `error_type` are standard layout types. If so, layout of `basic_result` in C is guaranteed to be one of:
 
     ```c++
-    struct result_layout {
+    struct trivially_copyable_result_layout {
+      union {
+        value_type value;
+        error_type error;
+      };
+      unsigned int flags;
+    };
+    ```
+
+    ... if both `value_type` and `error_type` are `TriviallyCopyable`, otherwise:
+
+    ```c++
+    struct non_trivially_copyable_result_layout {
       value_type value;
       unsigned int flags;
       error_type error;
     };
     ```
+    
+    Obviously, all C compatible C++ types are `TriviallyCopyable`, so if you are passing non-trivially copyable types from C++ to C, you are doing undefined behaviour.
 - `EqualityComparable`, if both `value_type` and `error_type` implement equality comparisons with one another.
 - ~~`LessThanComparable`~~, not implemented due to availability of implicit conversions from `value_type` and `error_type`, this can cause major surprise (i.e. hard to diagnose bugs), so we don't implement these at all.
-~ `Swappable`
 - ~~`Hash`~~, not implemented as a generic implementation of a unique hash for non-valued items which are unequal would require a dependency on RTTI being enabled.
 
 Thus `basic_result` meets the `Regular` concept if both `value_type` and `error_type` are `Regular`, except for the lack of a default constructor. Often where one needs a default constructor, wrapping `basic_result` into {{% api "std::optional<T>" %}} will suffice.

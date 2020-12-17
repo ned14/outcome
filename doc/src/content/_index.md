@@ -10,10 +10,6 @@ title = "Home"
 At the end of December 2020, Outcome v2.2 replaced v2.1 in develop branch. This is a breaking
 change and all Outcome v2.1 code will need to be upgraded using [the v2.1 => v2.2 upgrade guide]({{% relref "/changelog/upgrade_v21_v22" %}}). See also
 [the list of v2.2 major changes]({{% relref "/changelog/v22" %}}).
-<br><br>
-This library's documentation is currently being converted from v2.1 to v2.2, so be aware some places
-may be out of date. Once the documentation is fully upgraded, develop branch
-shall be merged into master branch.
 {{% /notice %}}
 
 Outcome is a set of tools for reporting and handling function failures in contexts where *directly* using C++ exception handling is unsuitable. Such contexts include:

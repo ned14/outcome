@@ -5,7 +5,7 @@ categories = ["constructors", "explicit-constructors", "inplace-constructors"]
 weight = 410
 +++
 
-Explicit inplace value constructor. Calls {{% api "void hook_result_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<value_type>`, 'std::initializer_list<U>' and `Args ...`.
+Explicit inplace value constructor. Calls {{% api "void on_result_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<value_type>`, 'std::initializer_list<U>' and `Args ...`.
 
 *Requires*: `predicate::enable_inplace_value_constructor<std::initializer_list<U>, Args ...>` is true.
 

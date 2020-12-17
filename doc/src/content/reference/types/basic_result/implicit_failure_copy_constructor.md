@@ -6,7 +6,7 @@ weight = 520
 +++
 
 Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type.
-Note that if `T = void`, `error_type` will be default constructed.  Calls {{% api "void hook_result_copy_construction(T *, U &&) noexcept" %}} with `this` and `const failure_type<T> &`.
+Note that if `T = void`, `error_type` will be default constructed.  Calls {{% api "void on_result_copy_construction(T *, U &&) noexcept" %}} with `this` and `const failure_type<T> &`.
 
 *Requires*: `predicate::enable_compatible_conversion<void, T, void>` is true, or `T` is `void`.
 

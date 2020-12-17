@@ -6,7 +6,7 @@ weight = 510
 +++
 
 Implicit value-from-success-type-sugar move constructor used to disambiguate the construction of the value type.
-Note that if `T = void`, `value_type` will be default constructed.  Calls {{% api "void hook_result_move_construction(T *, U &&) noexcept" %}} with `this` and `success_type<T> &&`.
+Note that if `T = void`, `value_type` will be default constructed.  Calls {{% api "void on_result_move_construction(T *, U &&) noexcept" %}} with `this` and `success_type<T> &&`.
 
 *Requires*: `predicate::enable_compatible_conversion<T, void, void>` is true, or `T` is `void`.
 

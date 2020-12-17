@@ -5,7 +5,7 @@ categories = ["constructors", "implicit-constructors", "converting-constructors"
 weight = 201
 +++
 
-Implicit `exception_type` constructor. Calls {{% api "void hook_outcome_construction(T *, U &&) noexcept" %}} with `this` and `P`.
+Implicit `exception_type` constructor. Calls {{% api "void on_outcome_construction(T *, U &&) noexcept" %}} with `this` and `P`.
 
 *Requires*: `predicate::enable_exception_converting_constructor<P>` is true.
 

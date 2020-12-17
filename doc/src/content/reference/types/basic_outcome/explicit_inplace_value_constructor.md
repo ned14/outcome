@@ -5,7 +5,7 @@ categories = ["constructors", "explicit-constructors", "inplace-constructors"]
 weight = 400
 +++
 
-Explicit inplace value constructor. Calls {{% api "void hook_outcome_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<value_type>` and `Args ...`.
+Explicit inplace value constructor. Calls {{% api "void on_outcome_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<value_type>` and `Args ...`.
 
 *Requires*: `predicate::enable_inplace_value_constructor<Args ...>` is true.
 

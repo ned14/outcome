@@ -27,6 +27,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <stdint.h>  // for intptr_t
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define CXX_DECLARE_RESULT(ident, R, S)                                                                                                                        \
   struct cxx_result_##ident                                                                                                                                    \
   {                                                                                                                                                            \
@@ -48,7 +53,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define CXX_RESULT_ERROR_IS_ERRNO(r) (((r).flags & (1U << 4U)) == (1U << 4U))
 
 
-/***************************** <system_error2> support ******************************/
+  /***************************** <system_error2> support ******************************/
 
 #define CXX_DECLARE_STATUS_CODE(ident, value_type)                                                                                                             \
   struct cxx_status_code_##ident                                                                                                                               \
@@ -59,21 +64,35 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define CXX_STATUS_CODE(ident) struct cxx_status_code_##ident
 
+#define CXX_DECLARE_RESULT_STATUS_CODE(ident, R, S)                                                                                                            \
+  struct cxx_result_status_code_##ident                                                                                                                        \
+  {                                                                                                                                                            \
+    R value;                                                                                                                                                   \
+    unsigned flags;                                                                                                                                            \
+    S error;                                                                                                                                                   \
+  }
 
-struct cxx_status_code_posix
-{
-  void *domain;
-  int value;
-};
-#define CXX_DECLARE_RESULT_ERRNO(ident, R) CXX_DECLARE_RESULT(posix_##ident, R, struct cxx_status_code_posix)
-#define CXX_RESULT_ERRNO(ident) CXX_RESULT(posix_##ident)
+#define CXX_RESULT_STATUS_CODE(ident) struct cxx_result_status_code_##ident
 
-struct cxx_status_code_system
-{
-  void *domain;
-  intptr_t value;
-};
-#define CXX_DECLARE_RESULT_SYSTEM(ident, R) CXX_DECLARE_RESULT(system_##ident, R, struct cxx_status_code_system)
-#define CXX_RESULT_SYSTEM(ident) CXX_RESULT(system_##ident)
+
+  struct cxx_status_code_posix
+  {
+    void *domain;
+    int value;
+  };
+#define CXX_DECLARE_RESULT_ERRNO(ident, R) CXX_DECLARE_RESULT_STATUS_CODE(posix_##ident, R, struct cxx_status_code_posix)
+#define CXX_RESULT_ERRNO(ident) CXX_RESULT_STATUS_CODE(posix_##ident)
+
+  struct cxx_status_code_system
+  {
+    void *domain;
+    intptr_t value;
+  };
+#define CXX_DECLARE_RESULT_SYSTEM(ident, R) CXX_DECLARE_RESULT_STATUS_CODE(system_##ident, R, struct cxx_status_code_system)
+#define CXX_RESULT_SYSTEM(ident) CXX_RESULT_STATUS_CODE(system_##ident)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

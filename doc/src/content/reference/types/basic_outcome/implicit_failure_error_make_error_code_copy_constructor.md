@@ -6,7 +6,7 @@ weight = 531
 +++
 
 Implicit error-from-failure-type-sugar copy constructor used to disambiguate the construction of the error type.
-Calls {{% api "void hook_outcome_copy_construction(T *, U &&) noexcept" %}} with `this` and `const failure_type<EC> &`.
+Calls {{% api "void on_outcome_copy_construction(T *, U &&) noexcept" %}} with `this` and `const failure_type<EC> &`.
 
 *Requires*: `predicate::enable_make_error_code_compatible_conversion<void, EC, void, void>` is true.
 

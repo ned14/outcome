@@ -5,7 +5,7 @@ categories = ["constructors", "explicit-constructors", "inplace-constructors"]
 weight = 420
 +++
 
-Explicit inplace error constructor. Calls {{% api "void hook_result_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<error_type>` and `Args ...`.
+Explicit inplace error constructor. Calls {{% api "void on_result_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<error_type>` and `Args ...`.
 
 *Requires*: `predicate::enable_inplace_error_constructor<Args ...>` is true.
 

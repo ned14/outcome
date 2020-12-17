@@ -1,6 +1,6 @@
 +++
 title = "`static void on_outcome_move_construction(T *, U &&, V &&) noexcept`"
-description = "Hook invoked by the converting move constructors of `basic_outcome`."
+description = "(>= Outcome v2.2.0) Hook invoked by the converting move constructors of `basic_outcome`."
 categories = ["observer-policies"]
 weight = 450
 +++

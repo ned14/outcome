@@ -1,6 +1,6 @@
 +++
 title = "`static void on_result_copy_construction(T *, U &&) noexcept`"
-description = "Hook invoked by the converting copy constructors of `basic_result`."
+description = "(>= Outcome v2.2.0) Hook invoked by the converting copy constructors of `basic_result`."
 categories = ["observer-policies"]
 weight = 450
 +++

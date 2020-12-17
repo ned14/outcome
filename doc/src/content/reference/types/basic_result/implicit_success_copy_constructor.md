@@ -6,7 +6,7 @@ weight = 500
 +++
 
 Implicit value-from-success-type-sugar copy constructor used to disambiguate the construction of the value type.
-Note that if `T = void`, `value_type` will be default constructed.  Calls {{% api "void hook_result_copy_construction(T *, U &&) noexcept" %}} with `this` and `const success_type<T> &`.
+Note that if `T = void`, `value_type` will be default constructed.  Calls {{% api "void on_result_copy_construction(T *, U &&) noexcept" %}} with `this` and `const success_type<T> &`.
 
 *Requires*: `predicate::enable_compatible_conversion<T, void, void>` is true, or `T` is `void`.
 

@@ -5,7 +5,7 @@ categories = ["constructors", "explicit-constructors", "inplace-constructors"]
 weight = 435
 +++
 
-Explicit inplace exception constructor. Calls {{% api "void hook_outcome_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<exception_type>`, `std::initializer_list<U>` and `Args ...`.
+Explicit inplace exception constructor. Calls {{% api "void on_outcome_in_place_construction(T *, in_place_type_t<U>, Args &&...) noexcept" %}} with `this`, `in_place_type<exception_type>`, `std::initializer_list<U>` and `Args ...`.
 
 *Requires*: `predicate::enable_inplace_exception_constructor<std::initializer_list<U>, Args ...>` is true.
 

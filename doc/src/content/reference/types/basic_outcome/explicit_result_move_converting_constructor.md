@@ -5,7 +5,7 @@ categories = ["constructors", "explicit-constructors", "converting-constructors"
 weight = 340
 +++
 
-Explicit converting move constructor from compatible `basic_result`. Calls {{% api "void hook_outcome_move_construction(T *, U &&) noexcept" %}} with `this` and the input.
+Explicit converting move constructor from compatible `basic_result`. Calls {{% api "void on_outcome_move_construction(T *, U &&) noexcept" %}} with `this` and the input.
 
 *Requires*: `predicate::enable_compatible_conversion<A, B, void, C>` is true.
 

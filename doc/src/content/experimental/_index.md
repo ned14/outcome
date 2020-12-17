@@ -20,7 +20,7 @@ Outcome is used in the firmware of parts of driver assisting cars where its
 particularly rich and flexible failure added information combined with
 compatibility with globally disabled C++ exceptions proved to be a big win.
 
-The base for failure handling in future C++ maybe be `std::error` from [P1028
+The base for failure handling in future C++ might be `std::error` from [P1028
 `status_code`](https://wg21.link/P1028). This proposal is currently being
 refined before WG21's Library Evolution Working Group with the expectation that
 it will be standardised as a large enhancement and backwards compatible superset

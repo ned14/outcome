@@ -45,6 +45,10 @@ struct cxx_result_##ident
 
 ### `<system_error2>` support
 
+Because erased status codes are not trivially copyable and
+therefore do not have union based storage, we have separate C macros
+for results whose `E` is an erased status code:
+
 <dl>
 <dt><code>CXX_DECLARE_STATUS_CODE(ident, value_type)</code>
 <dd>Declares to C a status code type with domain <code>value_type</code>
@@ -55,6 +59,16 @@ used to uniquely identify this status code type in other macros.
 <dt><code>CXX_STATUS_CODE(ident)</code>
 <dd>A reference to a previously declared status code type with unique
 <code>ident</code>.
+
+<dt><code>CXX_DECLARE_RESULT_STATUS_CODE(ident, T, E)</code>
+<dd>Declares to C a <code>basic_result<T, E></code> type uniquely
+identified by <code>ident</code>. <code>T</code> is available at the
+member variable <code>.value</code>, and <code>E</code> is available
+at the member variable <code>.error</code>.
+
+<dt><code>CXX_RESULT_STATUS_CODE(ident)</code>
+<dd>A reference to a previously declared <code>result</code> type with
+unique <code>ident</code>.
 </dl>
 
 There is a high likelihood that C++ functions regularly called by C
