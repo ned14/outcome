@@ -39,6 +39,7 @@ set(PROJECT_NAMESPACE)
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
 
+option(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB "Whether to bundle an embedded copy of QuickCppLib with Outcome. Used by various package managers such as vcpkg." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
 
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -57,11 +58,22 @@ if(NOT PROJECT_IS_DEPENDENCY)
   endif()
 endif()
 # Find my library dependencies
-find_quickcpplib_library(quickcpplib
-  GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
-  REQUIRED
-  IS_HEADER_ONLY
-)
+if(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB AND CTEST_QUICKCPPLIB_CLONE_DIR)
+  file(COPY "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/" DESTINATION "${CMAKE_BINARY_DIR}/quickcpplib")
+  find_quickcpplib_library(quickcpplib
+    GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+    REQUIRED
+    IS_HEADER_ONLY
+    INBUILD
+    INCLUDE_ALL
+  )
+else()
+  find_quickcpplib_library(quickcpplib
+    GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+    REQUIRED
+    IS_HEADER_ONLY
+  )
+endif()
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
