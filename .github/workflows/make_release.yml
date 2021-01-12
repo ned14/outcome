@@ -44,7 +44,8 @@ jobs:
          git checkout gh-pages
          git pull
          cd ../..
-         git clone --recurse-submodules --depth 1 --jobs 8 --shallow-submodules "https://github.com/ned14/quickcpplib.git" quickcpplib
+         mkdir quickcpplib
+         git clone --recurse-submodules --depth 1 --jobs 8 --shallow-submodules "https://github.com/ned14/quickcpplib.git" quickcpplib/repo
          cd ..
          tar cJf outcome-v2-all-sources.tar.xz --exclude .git outcome
          cd outcome
