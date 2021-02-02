@@ -142,7 +142,9 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
   )
 endif()
 # Set the library dependencies this library has
-target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
+if(TARGET quickcpplib::hl)
+  target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
+endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
