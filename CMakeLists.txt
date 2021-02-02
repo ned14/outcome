@@ -40,6 +40,7 @@ set(PROJECT_NAMESPACE)
 include(QuickCppLibSetupProject)
 
 option(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB "Whether to bundle an embedded copy of QuickCppLib with Outcome. Used by various package managers such as vcpkg." OFF)
+option(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that Outcome is fully working. Used by various package managers such as vcpkg." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
 
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -311,6 +312,20 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
       add_custom_target(${PROJECT_NAME}-snippets COMMENT "Building all documentation snippets ...")
       add_dependencies(${PROJECT_NAME}-snippets ${example_bins})
     endif()
+  endforeach()
+endif()
+
+if(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST)
+  set(OUTCOME_SMOKE_TESTS)
+  add_executable(outcome-dependency-smoke-test_1 "test/tests/core-result.cpp")
+  list(APPEND OUTCOME_SMOKE_TESTS outcome-dependency-smoke-test_1)
+  add_executable(outcome-dependency-smoke-test_2 "test/tests/experimental-core-result-status.cpp")
+  list(APPEND OUTCOME_SMOKE_TESTS outcome-dependency-smoke-test_2)
+  foreach(target ${OUTCOME_SMOKE_TESTS})
+    target_link_libraries(${target} PRIVATE outcome::hl)
+    add_test(NAME ${target} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+      COMMAND $<TARGET_FILE:${target}> --reporter junit --out $<TARGET_FILE:${target}>.junit.xml
+    )
   endforeach()
 endif()
 
