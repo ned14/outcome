@@ -325,6 +325,9 @@ if(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST)
   list(APPEND OUTCOME_SMOKE_TESTS outcome-dependency-smoke-test_2)
   foreach(target ${OUTCOME_SMOKE_TESTS})
     target_link_libraries(${target} PRIVATE outcome::hl)
+    set_target_properties(${target} PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
     add_test(NAME ${target} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
       COMMAND $<TARGET_FILE:${target}> --reporter junit --out $<TARGET_FILE:${target}>.junit.xml
     )
