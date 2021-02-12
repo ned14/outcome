@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-02T10:23:34 UTC">
+<meta name="revised" content="2021-02-12T14:21:45 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2765,9 +2765,76 @@ This branch has a number of major breaking changes to Outcome v2.1, see
 <dl>
 <dt>VS2019.8 compatibility</dt>
 <dd>VS2019.8 changed how to enable Coroutines, which caused Outcome to not compile on that compiler.</dd>
+<dt><a href="https://github.com/ned14/outcome/issues/237">#237</a></dt>
+<dd>If on C++ 20, we now use C++ 20 <code>[[likely]]</code> instead of compiler-specific markup to indicate
+when TRY has likely success or failure.</dd>
 </dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
+
+<dl>
+<dt>BREAKING CHANGE <a href="https://github.com/ned14/outcome/issues/244">#244</a></dt>
+<dd>It came as a shock to learn that <code>OUTCOME_TRY</code> had been broken since the inception of this
+library for certain corner case code:</dd>
+</dl>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span>    <span class="n">get_foo</span><span class="p">();</span>
+<span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span>    <span class="n">filter1</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span><span class="p">);</span>
+<span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span> <span class="n">filter2</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span><span class="p">);</span>
+
+<span class="c1">// This works fine, and always has
+</span><span class="c1"></span><span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">v</span><span class="p">,</span> <span class="n">filter1</span><span class="p">(</span><span class="n">get_foo</span><span class="p">()))</span>
+
+<span class="c1">// This causes UB due to result&lt;Foo&gt; being destructed before copy of value into v
+</span><span class="c1"></span><span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">v</span><span class="p">,</span> <span class="n">filter2</span><span class="p">(</span><span class="n">get_foo</span><span class="p">()))</span>
+</code></pre></div>
+<p>Whilst rvalue ref passthrough filter functions are not common, they can turn up in highly generic
+code, where destruction before copy/move is not helpful.</p>
+
+<p>The cause is that TRY used to work by binding the result of the expression to an <code>auto &amp;&amp;unique</code>,
+testing if that unique if successful or not, and if successful then moving from <code>unique.value()</code>
+into the user&rsquo;s output variable. If the expression returned is a prvalue, the Result&rsquo;s lifetime is
+extended by the bound reference to outside of the statement, and all is good. If the expression
+returned is an xvalue, then the lifetime extension does not exceed that of the statement, and the
+Result is destructed after the semicolon succeeding the assignment to <code>auto &amp;&amp;unique</code>.</p>
+
+<p>This bug has been fixed by TRY deducing the <a href="https://en.cppreference.com/w/cpp/language/value_category">value category</a>
+of its input expression as follows:</p>
+
+<ul>
+<li>prvalues =&gt; <code>auto &amp;&amp;unique = (expr)</code> (same as before)</li>
+<li>xvalue =&gt; <code>auto unique = (expr)</code>     (new)</li>
+<li>lvalue =&gt; <code>auto &amp;unique = (expr)</code>    (same as before, as lvalue inputs caused <code>auto &amp;&amp;</code> to become <code>auto &amp;</code>)</li>
+</ul>
+
+<p>This ensures that xvalue inputs do not cause unhelpfully early lifetime end, though it does silently
+change the behaviour of existing code which relied on rvalues being passed through, as a new construct-move-destruct
+cycle is introduced to where there was none before.</p>
+
+<p>If one wishes rvalues to be passed through, one can avail of a new TRY syntax based on preprocessor overloading:</p>
+
+<ul>
+<li><code>OUTCOME_TRY((refspec, varname), expr)</code></li>
+<li><code>OUTCOME_TRYV2(refspec, expr)</code></li>
+</ul>
+
+<p>Here <code>refspec</code> is the storage to be used for <strong>both</strong> the internal temporary unique, AND <code>varname</code>.
+So if you write:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">Foo</span> <span class="o">&amp;&amp;</span><span class="n">foo</span><span class="p">;</span>
+<span class="n">OUTCOME_TRY</span><span class="p">((</span><span class="k">auto</span> <span class="o">&amp;&amp;</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">filter2</span><span class="p">(</span><span class="n">foo</span><span class="p">))</span>
+</code></pre></div>
+<p>&hellip; then the internal unique is declared as <code>auto &amp;&amp;unique = (filter2(foo))</code>, and the output variable
+is declared as <code>auto &amp;&amp;v = std::move(unique).assume_value()</code>. This passes through the rvalue referencing,
+and completely avoids copies and moves of <code>Foo</code>.</p>
+
+<p>For those of you using <code>OUTCOME_CO_TRY</code> within Coroutines, be aware that <code>decltype(co_await)</code> is invalid
+in C++ 20 (you will get an error such as &ldquo;&lsquo;co_await&rsquo; cannot appear in an unevaluated context&rdquo;), so if
+<code>co_await</code> appears anywhere in the expression, you cannot use the deducing form of TRY. Instead you will
+need to force the type of the internal unique to avoid the call to <code>decltype()</code> e.g. <code>OUTCOME_CO_TRY((auto &amp;&amp;, v), co_await expr)</code>.
+My hope is that a future C++ standard will remove this restriction of using operator <code>co_await</code> within
+<code>decltype()</code>.</p>
+
+<p>My thanks to KamilCuk from <a href="https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument">https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument</a>
+for all their help in designing the new overloaded TRY syntax.</p>
 
 <hr />
 
@@ -3208,7 +3275,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 14/12/2020
+        <i class='fa fa-calendar'></i> Last update on 12/02/2021
     </div>
     
 
