@@ -52,6 +52,16 @@ namespace issues244
       destructor.push_back(counter);
     }
   };
+  struct Immovable
+  {
+    int x{2};
+    explicit Immovable(int v)
+        : x(v)
+    {
+    }
+      Immovable(const Immovable &) = delete;
+    Immovable(Immovable &&) = delete;
+  };
 
   outcome::result<Foo> get_foo() noexcept { return outcome::result<Foo>(outcome::in_place_type<Foo>, 5); }
 
@@ -131,5 +141,64 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0244 / test, "TRY/TRYX has dangling refere
     OUTCOME_TRY(auto &&v, filter(get_foo()));
     std::cout << "   After TRY " << ++counter << std::endl;
     return v.x;
+  });
+
+  check("TRY lvalue passthrough", []() -> outcome::result<int> {
+    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
+    auto &x = i;  // prvalue inputs trigger use of value unique, which fails to compile as is Immovable
+    OUTCOME_TRY(auto &v, x);
+    return v.x;
+  });
+
+  // Force use of rvalue refs for unique and bound value
+  check("TRY rvalue passthrough", []() -> outcome::result<int> {
+    auto &&x = outcome::result<Immovable>(outcome::in_place_type<Immovable>, 5);
+    // Normally an xvalue input triggers value unique, which would fail to compile here
+    OUTCOME_TRY((auto &&, v), x);
+    return v.x;
+  });
+
+  // Force use of lvalue refs for unique and bound value
+  check("TRY prvalue as lvalue passthrough", []() -> outcome::result<int> {
+    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
+    OUTCOME_TRY((auto &, v), i);
+    return v.x;
+  });
+
+  // Force use of rvalue refs for unique and bound value
+  check("TRY prvalue as rvalue passthrough", []() -> outcome::result<int> {
+    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
+    OUTCOME_TRY((auto &&, v), i);
+    return v.x;
+  });
+
+
+  check("TRYV lvalue passthrough", []() -> outcome::result<int> {
+    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
+    auto &x = i;  // prvalue inputs trigger use of value unique, which fails to compile as is Immovable
+    OUTCOME_TRYV((x));
+    return 5;
+  });
+
+  // Force use of rvalue refs for unique and bound value
+  check("TRYV rvalue passthrough", []() -> outcome::result<int> {
+    auto &&x = outcome::result<Immovable>(outcome::in_place_type<Immovable>, 5);
+    // Normally an xvalue input triggers value unique, which would fail to compile here
+    OUTCOME_TRYV_(auto &&, x);
+    return 5;
+  });
+
+  // Force use of lvalue refs for unique and bound value
+  check("TRYV prvalue as lvalue passthrough", []() -> outcome::result<int> {
+    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
+    OUTCOME_TRYV_(auto &, i);
+    return 5;
+  });
+
+  // Force use of rvalue refs for unique and bound value
+  check("TRYV prvalue as rvalue passthrough", []() -> outcome::result<int> {
+    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
+    OUTCOME_TRYV_(auto &, i);
+    return 5;
   });
 }

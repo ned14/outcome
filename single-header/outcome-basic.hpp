@@ -545,9 +545,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF b1fac941934e8d9ac3e82b02cf1264a829860d32
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2020-11-25 14:28:07 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE b1fac941
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF eec4a9b6e9539e939d942ce1bb9e5219f599b16d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-02-03 09:12:58 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE eec4a9b6
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF ee6acdda1e8b4f05f1782618ce4a8b8aa025521c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2020-12-16 14:14:48 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE ee6acdda
+#define OUTCOME_PREVIOUS_COMMIT_REF 0f42fb94cf17d027d03f6fc14f32ed19c787a817
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-09 12:33:45 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0f42fb94
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1276,21 +1276,33 @@ namespace win32
   extern _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
   typedef int(__stdcall *GetProcAddress_returntype)();
   extern GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
-  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture, _Out_writes_to_(FramesToCapture, return ) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
+  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture,
+                                                                                  _Out_writes_to_(FramesToCapture, return ) void **BackTrace,
+                                                                                  _Out_opt_ unsigned long *BackTraceHash);
   extern _Success_(return != 0)
-  _When_((cchWideChar == -1) && (cbMultiByte != 0), _Post_equal_to_(_String_length_(lpMultiByteStr) + 1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr, _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
-                                                                                                                                            _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
+  _When_((cchWideChar == -1) && (cbMultiByte != 0),
+         _Post_equal_to_(_String_length_(lpMultiByteStr) +
+                         1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr,
+                                                               _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
+                                                               _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
 #pragma comment(lib, "kernel32.lib")
-#if defined(_WIN64)
+#if (defined(__x86_64__) || defined(_M_X64)) || (defined(__aarch64__) || defined(_M_ARM64))
 #pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPEAXPEBD@Z=LoadLibraryA")
 #pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YAP6AHXZPEAXPEBD@Z=GetProcAddress")
 #pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YAGKKPEAPEAXPEAK@Z=RtlCaptureStackBackTrace")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
-#else
+#elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
 #pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YGPAXPBD@Z=__imp__LoadLibraryA@4")
 #pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YGP6GHXZPAXPBD@Z=__imp__GetProcAddress@8")
 #pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YGGKKPAPAXPAK@Z=__imp__RtlCaptureStackBackTrace@16")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
+#elif defined(__arm__) || defined(_M_ARM)
+#pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPAXPBD@Z=LoadLibraryA")
+#pragma comment(linker, "/alternatename:?GetProcAddress@win32@@YAP6AHXZPAXPBD@Z=GetProcAddress")
+#pragma comment(linker, "/alternatename:?RtlCaptureStackBackTrace@win32@@YAGKKPAPAXPAK@Z=RtlCaptureStackBackTrace")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@@YAHIKPB_WHPADHPBDPAH@Z=WideCharToMultiByte")
+#else
+#error Unknown architecture
 #endif
 } // namespace win32
 #else
@@ -1315,7 +1327,8 @@ namespace
     unsigned long long int Address;
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
   typedef int(__stdcall *SymInitialize_t)(_In_ void *hProcess, _In_opt_ const wchar_t *UserSearchPath, _In_ int fInvadeProcess);
-  typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
+  typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement,
+                                                 _Out_ PIMAGEHLP_LINE64 Line);
   static std::atomic<unsigned> dbghelp_init_lock;
 #if defined(__cplusplus) && !defined(__clang__)
   static void *dbghelp;
@@ -5892,6 +5905,63 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
   constexpr inline bool has_value(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_value(...) { return false; }
+  // prvalues go to rvalues to avoid extra copy/move as lifetime is extended for us
+  template <class T> struct try_unique_storage
+  {
+    using type = T &&;
+  };
+  // void passes through
+  template <> struct try_unique_storage<void>
+  {
+    using type = void;
+  };
+  template <> struct try_unique_storage<const void>
+  {
+    using type = const void;
+  };
+  template <> struct try_unique_storage<volatile void>
+  {
+    using type = volatile void;
+  };
+  template <> struct try_unique_storage<const volatile void>
+  {
+    using type = const volatile void;
+  };
+  // glvalues pass through
+  template <class T> struct try_unique_storage<T &>
+  {
+    using type = T &;
+  };
+  template <class T> struct try_unique_storage<const T &>
+  {
+    using type = const T &;
+  };
+  template <class T> struct try_unique_storage<volatile T &>
+  {
+    using type = volatile T &;
+  };
+  template <class T> struct try_unique_storage<const volatile T &>
+  {
+    using type = const volatile T &;
+  };
+  // xvalues go to values to extend lifetime
+  template <class T> struct try_unique_storage<T &&>
+  {
+    using type = T;
+  };
+  template <class T> struct try_unique_storage<const T &&>
+  {
+    using type = const T;
+  };
+  template <class T> struct try_unique_storage<volatile T &&>
+  {
+    using type = volatile T;
+  };
+  template <class T> struct try_unique_storage<const volatile T &&>
+  {
+    using type = const volatile T;
+  };
+  template <class T> using try_unique_storage_t = typename try_unique_storage<T>::type;
 } // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -5963,40 +6033,51 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
 #define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
-#ifndef OUTCOME_TRY_LIKELY
-#if defined(__clang__) || defined(__GNUC__)
-#define OUTCOME_TRY_LIKELY(expr) (__builtin_expect(!!(expr), true))
+#ifndef OUTCOME_TRY_LIKELY_IF
+#if __cplusplus >= 202000L || _HAS_CXX20
+#define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
+#elif defined(__clang__) || defined(__GNUC__)
+#define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
 #else
-#define OUTCOME_TRY_LIKELY(expr) (expr)
+#define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__)
 #endif
 #endif
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK(...) __VA_ARGS__
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, ...) ::OUTCOME_V2_NAMESPACE::detail::try_unique_storage_t<decltype(__VA_ARGS__)> unique = (__VA_ARGS__)
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(x) x
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE(unique, x, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, __VA_ARGS__))
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, x, y, ...) x unique = (__VA_ARGS__)
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED2(x) x
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED(unique, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED2(OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, __VA_ARGS__))
+#define OUTCOME_TRYV2_UNIQUE_STORAGE1(...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE
+#define OUTCOME_TRYV2_UNIQUE_STORAGE2(...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED
+#define OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, ...) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRYV2_UNIQUE_STORAGE, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec) (unique, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, __VA_ARGS__)
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
-#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_CO_TRY2_SUCCESS_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_SUCCESS_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, ...) auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) co_return OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_CO_TRY2_FAILURE_LIKELY(unique, v, ...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(unique, __VA_ARGS__); v = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)); else retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_FAILURE_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)) retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_VAR_SECOND2(x, var) var
+#define OUTCOME_TRY2_VAR_SECOND3(x, y, ...) x y
+#define OUTCOME_TRY2_VAR(spec) OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY2_VAR_SECOND, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, spec)
+#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_FAILURE_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV2_FAILURE_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV(...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+#define OUTCOME_TRYV(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, s, s, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV_FAILURE_LIKELY(...) OUTCOME_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+#define OUTCOME_TRYV_FAILURE_LIKELY(s, ...) OUTCOME_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, s, s, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV(...) OUTCOME_CO_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+#define OUTCOME_CO_TRYV(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s, s, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV_FAILURE_LIKELY(...) OUTCOME_CO_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, __VA_ARGS__)
+#define OUTCOME_CO_TRYV_FAILURE_LIKELY(s, ...) OUTCOME_TRYV2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s, s, __VA_ARGS__)
 #if defined(__GNUC__) || defined(__clang__)
-#define OUTCOME_TRYX2(unique, retstmt, ...) ({ auto &&unique = (__VA_ARGS__); if(OUTCOME_TRY_LIKELY(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))) ; else retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique)); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
+#define OUTCOME_TRYX2(unique, retstmt, s, ...) ({ OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, s, s, __VA_ARGS__); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -6009,19 +6090,19 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, v, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, v, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYA(v, ...) OUTCOME_CO_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_CO_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, v, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_CO_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, v, __VA_ARGS__)
+#define OUTCOME_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, v, __VA_ARGS__)
 #define OUTCOME_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME_TRYA(a, b, c, d, e, f, g)
 #define OUTCOME_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME_TRYA(a, b, c, d, e, f)
