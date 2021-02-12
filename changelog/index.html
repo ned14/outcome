@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T14:21:45 UTC">
+<meta name="revised" content="2021-02-12T19:00:44 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2784,7 +2784,7 @@ library for certain corner case code:</dd>
 <span class="c1">// This works fine, and always has
 </span><span class="c1"></span><span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">v</span><span class="p">,</span> <span class="n">filter1</span><span class="p">(</span><span class="n">get_foo</span><span class="p">()))</span>
 
-<span class="c1">// This causes UB due to result&lt;Foo&gt; being destructed before copy of value into v
+<span class="c1">// This causes UB due to result&lt;Foo&gt; being destructed before move of value into v
 </span><span class="c1"></span><span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">v</span><span class="p">,</span> <span class="n">filter2</span><span class="p">(</span><span class="n">get_foo</span><span class="p">()))</span>
 </code></pre></div>
 <p>Whilst rvalue ref passthrough filter functions are not common, they can turn up in highly generic
@@ -2794,23 +2794,25 @@ code, where destruction before copy/move is not helpful.</p>
 testing if that unique if successful or not, and if successful then moving from <code>unique.value()</code>
 into the user&rsquo;s output variable. If the expression returned is a prvalue, the Result&rsquo;s lifetime is
 extended by the bound reference to outside of the statement, and all is good. If the expression
-returned is an xvalue, then the lifetime extension does not exceed that of the statement, and the
-Result is destructed after the semicolon succeeding the assignment to <code>auto &amp;&amp;unique</code>.</p>
+returned is an xvalue or lvalue, then the lifetime extension does not exceed that of the statement,
+and the Result is destructed after the semicolon succeeding the assignment to <code>auto &amp;&amp;unique</code>.</p>
 
 <p>This bug has been fixed by TRY deducing the <a href="https://en.cppreference.com/w/cpp/language/value_category">value category</a>
 of its input expression as follows:</p>
 
 <ul>
 <li>prvalues =&gt; <code>auto &amp;&amp;unique = (expr)</code> (same as before)</li>
-<li>xvalue =&gt; <code>auto unique = (expr)</code>     (new)</li>
-<li>lvalue =&gt; <code>auto &amp;unique = (expr)</code>    (same as before, as lvalue inputs caused <code>auto &amp;&amp;</code> to become <code>auto &amp;</code>)</li>
+<li>xvalue =&gt; <code>auto unique = (expr)</code>     (breaking change)</li>
+<li>lvalue =&gt; <code>auto unique = (expr)</code>     (breaking change)</li>
 </ul>
 
-<p>This ensures that xvalue inputs do not cause unhelpfully early lifetime end, though it does silently
-change the behaviour of existing code which relied on rvalues being passed through, as a new construct-move-destruct
-cycle is introduced to where there was none before.</p>
+<p>This ensures that xvalue and lvalue inputs do not cause unhelpfully early lifetime end, though it
+does silently change the behaviour of existing code which relied on rvalues and lvalues being passed
+through, as a new construct-move-destruct or construct-copy-destruct cycle is introduced to where
+there was none before.</p>
 
-<p>If one wishes rvalues to be passed through, one can avail of a new TRY syntax based on preprocessor overloading:</p>
+<p>If one wishes rvalues or lvalues to be passed through, one can avail of a new TRY syntax based on
+preprocessor overloading:</p>
 
 <ul>
 <li><code>OUTCOME_TRY((refspec, varname), expr)</code></li>
@@ -2824,17 +2826,21 @@ So if you write:</p>
 </code></pre></div>
 <p>&hellip; then the internal unique is declared as <code>auto &amp;&amp;unique = (filter2(foo))</code>, and the output variable
 is declared as <code>auto &amp;&amp;v = std::move(unique).assume_value()</code>. This passes through the rvalue referencing,
-and completely avoids copies and moves of <code>Foo</code>.</p>
+and completely avoids copies and moves of <code>Foo</code>. If you wish to not extract the value but also
+specify unique storage, there is a new <code>OUTCOME_TRYV2(refspec, expr)</code>.</p>
 
-<p>For those of you using <code>OUTCOME_CO_TRY</code> within Coroutines, be aware that <code>decltype(co_await)</code> is invalid
-in C++ 20 (you will get an error such as &ldquo;&lsquo;co_await&rsquo; cannot appear in an unevaluated context&rdquo;), so if
+<p>For those of you using <code>OUTCOME_CO_TRY</code> within Coroutines, be aware that <code>decltype(co_await)</code> is not permitted
+in C++ 20 (you will get an error such as &ldquo;&lsquo;co_await&rsquo; cannot appear in an unevaluated context&rdquo;, see
+<a href="https://stackoverflow.com/questions/61274146/c-find-co-await-awaitable-result-type">https://stackoverflow.com/questions/61274146/c-find-co-await-awaitable-result-type</a> for why). Some compilers
+implement, as an extension, support for <code>decltype(co_await)</code> (currently: GCC only). Therefore if
 <code>co_await</code> appears anywhere in the expression, you cannot use the deducing form of TRY. Instead you will
 need to force the type of the internal unique to avoid the call to <code>decltype()</code> e.g. <code>OUTCOME_CO_TRY((auto &amp;&amp;, v), co_await expr)</code>.
 My hope is that a future C++ standard will remove this restriction of using operator <code>co_await</code> within
-<code>decltype()</code>.</p>
+<code>decltype()</code> for simple types of awaitable which do not change their signature based on the calling Coroutine.</p>
 
 <p>My thanks to KamilCuk from <a href="https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument">https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument</a>
-for all their help in designing the new overloaded TRY syntax.</p>
+for all their help in designing the new overloaded TRY syntax. My thanks also to vasama for reporting this
+issue and working through how best to fix it with me.</p>
 
 <hr />
 
