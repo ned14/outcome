@@ -44,12 +44,12 @@ namespace coroutines
 
   template <class U, class... Args> inline eager<result<std::string>> eager_coawait(U &&f, Args... args)
   {
-    OUTCOME_CO_TRY(co_await f(args...));
+    OUTCOME_CO_TRYV2(auto &&, co_await f(args...));
     co_return "hi";
   }
   template <class U, class... Args> inline lazy<result<std::string>> lazy_coawait(U &&f, Args... args)
   {
-    OUTCOME_CO_TRY(co_await f(args...));
+    OUTCOME_CO_TRYV2(auto &&, co_await f(args...));
     co_return "hi";
   }
 

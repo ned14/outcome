@@ -16,7 +16,74 @@ This branch has a number of major breaking changes to Outcome v2.1, see
 VS2019.8 compatibility
 : VS2019.8 changed how to enable Coroutines, which caused Outcome to not compile on that compiler.
 
+[#237](https://github.com/ned14/outcome/issues/237)
+: If on C++ 20, we now use C++ 20 `[[likely]]` instead of compiler-specific markup to indicate
+when TRY has likely success or failure.
+
 ### Bug fixes:
+
+BREAKING CHANGE [#244](https://github.com/ned14/outcome/issues/244)
+: It came as a shock to learn that `OUTCOME_TRY` had been broken since the inception of this
+library for certain corner case code:
+
+```c++
+outcome::result<Foo>    get_foo();
+outcome::result<Foo>    filter1(outcome::result<Foo> &&);
+outcome::result<Foo> && filter2(outcome::result<Foo> &&);
+
+// This works fine, and always has
+OUTCOME_TRY(auto v, filter1(get_foo()))
+
+// This causes UB due to result<Foo> being destructed before copy of value into v
+OUTCOME_TRY(auto v, filter2(get_foo()))
+```
+
+Whilst rvalue ref passthrough filter functions are not common, they can turn up in highly generic
+code, where destruction before copy/move is not helpful.
+
+The cause is that TRY used to work by binding the result of the expression to an `auto &&unique`,
+testing if that unique if successful or not, and if successful then moving from `unique.value()`
+into the user's output variable. If the expression returned is a prvalue, the Result's lifetime is
+extended by the bound reference to outside of the statement, and all is good. If the expression
+returned is an xvalue, then the lifetime extension does not exceed that of the statement, and the
+Result is destructed after the semicolon succeeding the assignment to `auto &&unique`.
+
+This bug has been fixed by TRY deducing the [value category](https://en.cppreference.com/w/cpp/language/value_category)
+of its input expression as follows:
+
+- prvalues => `auto &&unique = (expr)` (same as before)
+- xvalue => `auto unique = (expr)`     (new)
+- lvalue => `auto &unique = (expr)`    (same as before, as lvalue inputs caused `auto &&` to become `auto &`)
+
+This ensures that xvalue inputs do not cause unhelpfully early lifetime end, though it does silently
+change the behaviour of existing code which relied on rvalues being passed through, as a new construct-move-destruct
+cycle is introduced to where there was none before.
+
+If one wishes rvalues to be passed through, one can avail of a new TRY syntax based on preprocessor overloading:
+
+- `OUTCOME_TRY((refspec, varname), expr)`
+- `OUTCOME_TRYV2(refspec, expr)`
+
+Here `refspec` is the storage to be used for **both** the internal temporary unique, AND `varname`.
+So if you write:
+
+```c++
+Foo &&foo;
+OUTCOME_TRY((auto &&, v), filter2(foo))
+```
+... then the internal unique is declared as `auto &&unique = (filter2(foo))`, and the output variable
+is declared as `auto &&v = std::move(unique).assume_value()`. This passes through the rvalue referencing,
+and completely avoids copies and moves of `Foo`.
+
+For those of you using `OUTCOME_CO_TRY` within Coroutines, be aware that `decltype(co_await)` is invalid
+in C++ 20 (you will get an error such as "'co_await' cannot appear in an unevaluated context"), so if
+`co_await` appears anywhere in the expression, you cannot use the deducing form of TRY. Instead you will
+need to force the type of the internal unique to avoid the call to `decltype()` e.g. `OUTCOME_CO_TRY((auto &&, v), co_await expr)`.
+My hope is that a future C++ standard will remove this restriction of using operator `co_await` within
+`decltype()`.
+
+My thanks to KamilCuk from https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument
+for all their help in designing the new overloaded TRY syntax.
 
 
 ---
