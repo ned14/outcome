@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 873ceddd1ff309876d595e6929a32f34e596004b
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-12 13:17:59 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 873ceddd
+#define OUTCOME_PREVIOUS_COMMIT_REF 19de1cfcda6c2debde67f539f90523edc251835b
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-12 14:19:10 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 19de1cfc
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -10635,22 +10635,22 @@ namespace detail
   {
     using type = const volatile void;
   };
-  // glvalues pass through
+  // glvalues go to values to extend lifetime
   template <class T> struct try_unique_storage<T &>
   {
-    using type = T &;
+    using type = T;
   };
   template <class T> struct try_unique_storage<const T &>
   {
-    using type = const T &;
+    using type = const T;
   };
   template <class T> struct try_unique_storage<volatile T &>
   {
-    using type = volatile T &;
+    using type = volatile T;
   };
   template <class T> struct try_unique_storage<const volatile T &>
   {
-    using type = const volatile T &;
+    using type = const volatile T;
   };
   // xvalues go to values to extend lifetime
   template <class T> struct try_unique_storage<T &&>

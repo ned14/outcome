@@ -30,7 +30,7 @@ namespace issues244
   namespace outcome = OUTCOME_V2_NAMESPACE;
 
   static int counter = 0;
-  static std::vector<int> default_constructor, move_constructor, destructor;
+  static std::vector<int> default_constructor, copy_constructor, move_constructor, destructor;
   struct Foo
   {
     int x{2};
@@ -39,6 +39,12 @@ namespace issues244
     {
       std::cout << "   Default constructor " << ++counter << std::endl;
       default_constructor.push_back(counter);
+    }
+    Foo(const Foo &o) noexcept
+        : x(o.x)
+    {
+      std::cout << "   Copy constructor " << ++counter << std::endl;
+      copy_constructor.push_back(counter);
     }
     Foo(Foo &&o) noexcept
         : x(o.x)
@@ -65,7 +71,8 @@ namespace issues244
 
   outcome::result<Foo> get_foo() noexcept { return outcome::result<Foo>(outcome::in_place_type<Foo>, 5); }
 
-  template <typename T> T &&filter(T &&v) { return static_cast<T &&>(v); }
+  template <typename T> T &&filterR(T &&v) { return static_cast<T &&>(v); }
+  template <typename T> const T &filterL(T &&v) { return v; }
 }  // namespace issues244
 
 
@@ -125,7 +132,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0244 / test, "TRY/TRYX has dangling refere
    Check integer 8
   */
   check("xvalue from expression without lifetime extension is moved into temporary and then moved into value", []() -> outcome::result<int> {
-    OUTCOME_TRY(auto v, filter(get_foo()));
+    OUTCOME_TRY(auto v, filterR(get_foo()));
     std::cout << "   After TRY " << ++counter << std::endl;
     return v.x;
   });
@@ -138,15 +145,45 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0244 / test, "TRY/TRYX has dangling refere
    Check integer 6
   */
   check("xvalue from expression without lifetime extension is moved into temporary and then bound into rvalue", []() -> outcome::result<int> {
-    OUTCOME_TRY(auto &&v, filter(get_foo()));
+    OUTCOME_TRY(auto &&v, filterR(get_foo()));
     std::cout << "   After TRY " << ++counter << std::endl;
     return v.x;
   });
 
+  /*
+   Default constructor 1
+   Copy constructor 2       (copy expression lvalue into unique value)
+   Destructor 3             (destruct expression lvalue)
+   Copy constructor 4       (copy from unique value to v value)
+   After TRY 5
+   Destructor 6             (destruct v value)
+   Destructor 7             (destruct unique value)
+   Check integer 8
+  */
+  check("lvalue from expression without lifetime extension is moved into temporary and then moved into value", []() -> outcome::result<int> {
+    OUTCOME_TRY(auto v, filterL(get_foo()));
+    std::cout << "   After TRY " << ++counter << std::endl;
+    return v.x;
+  });
+  /*
+   Default constructor 1
+   Copy constructor 2       (copy expression lvalue into unique value)
+   Destructor 3             (destruct expression lvalue)
+   After TRY 4
+   Destructor 5             (destruct unique value)
+   Check integer 6
+  */
+  check("lvalue from expression without lifetime extension is moved into temporary and then bound into rvalue", []() -> outcome::result<int> {
+    OUTCOME_TRY(auto &&v, filterL(get_foo()));
+    std::cout << "   After TRY " << ++counter << std::endl;
+    return v.x;
+  });
+
+
   check("TRY lvalue passthrough", []() -> outcome::result<int> {
-    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
-    auto &x = i;  // prvalue inputs trigger use of value unique, which fails to compile as is Immovable
-    OUTCOME_TRY(auto &v, x);
+    const auto &x = outcome::result<Immovable>(outcome::in_place_type<Immovable>, 5);
+    // Normally a lvalue input triggers value unique, which would fail to compile here
+    OUTCOME_TRY((auto &, v), x);
     return v.x;
   });
 
@@ -174,9 +211,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0244 / test, "TRY/TRYX has dangling refere
 
 
   check("TRYV lvalue passthrough", []() -> outcome::result<int> {
-    outcome::result<Immovable> i(outcome::in_place_type<Immovable>, 5);
-    auto &x = i;  // prvalue inputs trigger use of value unique, which fails to compile as is Immovable
-    OUTCOME_TRYV((x));
+    const auto &x = outcome::result<Immovable>(outcome::in_place_type<Immovable>, 5);
+    // Normally a lvalue input triggers value unique, which would fail to compile here
+    OUTCOME_TRYV2(auto &, x);
     return 5;
   });
 

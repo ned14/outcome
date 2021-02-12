@@ -34,7 +34,7 @@ outcome::result<Foo> && filter2(outcome::result<Foo> &&);
 // This works fine, and always has
 OUTCOME_TRY(auto v, filter1(get_foo()))
 
-// This causes UB due to result<Foo> being destructed before copy of value into v
+// This causes UB due to result<Foo> being destructed before move of value into v
 OUTCOME_TRY(auto v, filter2(get_foo()))
 ```
 
@@ -45,21 +45,23 @@ The cause is that TRY used to work by binding the result of the expression to an
 testing if that unique if successful or not, and if successful then moving from `unique.value()`
 into the user's output variable. If the expression returned is a prvalue, the Result's lifetime is
 extended by the bound reference to outside of the statement, and all is good. If the expression
-returned is an xvalue, then the lifetime extension does not exceed that of the statement, and the
-Result is destructed after the semicolon succeeding the assignment to `auto &&unique`.
+returned is an xvalue or lvalue, then the lifetime extension does not exceed that of the statement,
+and the Result is destructed after the semicolon succeeding the assignment to `auto &&unique`.
 
 This bug has been fixed by TRY deducing the [value category](https://en.cppreference.com/w/cpp/language/value_category)
 of its input expression as follows:
 
 - prvalues => `auto &&unique = (expr)` (same as before)
-- xvalue => `auto unique = (expr)`     (new)
-- lvalue => `auto &unique = (expr)`    (same as before, as lvalue inputs caused `auto &&` to become `auto &`)
+- xvalue => `auto unique = (expr)`     (breaking change)
+- lvalue => `auto unique = (expr)`     (breaking change)
 
-This ensures that xvalue inputs do not cause unhelpfully early lifetime end, though it does silently
-change the behaviour of existing code which relied on rvalues being passed through, as a new construct-move-destruct
-cycle is introduced to where there was none before.
+This ensures that xvalue and lvalue inputs do not cause unhelpfully early lifetime end, though it
+does silently change the behaviour of existing code which relied on rvalues and lvalues being passed
+through, as a new construct-move-destruct or construct-copy-destruct cycle is introduced to where
+there was none before.
 
-If one wishes rvalues to be passed through, one can avail of a new TRY syntax based on preprocessor overloading:
+If one wishes rvalues or lvalues to be passed through, one can avail of a new TRY syntax based on
+preprocessor overloading:
 
 - `OUTCOME_TRY((refspec, varname), expr)`
 - `OUTCOME_TRYV2(refspec, expr)`
@@ -73,17 +75,21 @@ OUTCOME_TRY((auto &&, v), filter2(foo))
 ```
 ... then the internal unique is declared as `auto &&unique = (filter2(foo))`, and the output variable
 is declared as `auto &&v = std::move(unique).assume_value()`. This passes through the rvalue referencing,
-and completely avoids copies and moves of `Foo`.
+and completely avoids copies and moves of `Foo`. If you wish to not extract the value but also
+specify unique storage, there is a new `OUTCOME_TRYV2(refspec, expr)`.
 
-For those of you using `OUTCOME_CO_TRY` within Coroutines, be aware that `decltype(co_await)` is invalid
-in C++ 20 (you will get an error such as "'co_await' cannot appear in an unevaluated context"), so if
+For those of you using `OUTCOME_CO_TRY` within Coroutines, be aware that `decltype(co_await)` is not permitted
+in C++ 20 (you will get an error such as "'co_await' cannot appear in an unevaluated context", see
+https://stackoverflow.com/questions/61274146/c-find-co-await-awaitable-result-type for why). Some compilers
+implement, as an extension, support for `decltype(co_await)` (currently: GCC only). Therefore if
 `co_await` appears anywhere in the expression, you cannot use the deducing form of TRY. Instead you will
 need to force the type of the internal unique to avoid the call to `decltype()` e.g. `OUTCOME_CO_TRY((auto &&, v), co_await expr)`.
 My hope is that a future C++ standard will remove this restriction of using operator `co_await` within
-`decltype()`.
+`decltype()` for simple types of awaitable which do not change their signature based on the calling Coroutine.
 
 My thanks to KamilCuk from https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument
-for all their help in designing the new overloaded TRY syntax.
+for all their help in designing the new overloaded TRY syntax. My thanks also to vasama for reporting this
+issue and working through how best to fix it with me.
 
 
 ---

@@ -96,22 +96,22 @@ namespace detail
   {
     using type = const volatile void;
   };
-  // glvalues pass through
+  // glvalues go to values to extend lifetime
   template <class T> struct try_unique_storage<T &>
   {
-    using type = T &;
+    using type = T;
   };
   template <class T> struct try_unique_storage<const T &>
   {
-    using type = const T &;
+    using type = const T;
   };
   template <class T> struct try_unique_storage<volatile T &>
   {
-    using type = volatile T &;
+    using type = volatile T;
   };
   template <class T> struct try_unique_storage<const volatile T &>
   {
-    using type = const volatile T &;
+    using type = const volatile T;
   };
   // xvalues go to values to extend lifetime
   template <class T> struct try_unique_storage<T &&>
