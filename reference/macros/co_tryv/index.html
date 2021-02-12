@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T19:00:51 UTC">
+<meta name="revised" content="2021-02-12T20:28:57 UTC">
 <title>`OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -169,6 +169,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try_greedy/">
             TRY is greedy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_ref/">
+            TRY avoiding copy/move
           </a>
         </div>
     </li>
@@ -686,6 +693,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2/">
+            <code>OUTCOME_CO_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2_failure_likely/">
+            <code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryv_failure_likely/">
@@ -774,6 +795,20 @@
         <div>
           <a href="/outcome/reference/macros/tryv/">
             <code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2/">
+            <code>OUTCOME_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2_failure_likely/">
+            <code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code>
           </a>
         </div>
     </li>
@@ -2717,6 +2752,8 @@
       <option value="/outcome/reference/macros/version/" >-- Version macros</option>
       <option value="/outcome/reference/macros/co_try/" >-- `OUTCOME_CO_TRY(var, expr)`</option>
       <option value="/outcome/reference/macros/co_tryv/"  selected>-- `OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/co_tryv2/" >-- `OUTCOME_CO_TRYV2(spec, expr)`</option>
+      <option value="/outcome/reference/macros/co_tryv2_failure_likely/" >-- `OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)`</option>
       <option value="/outcome/reference/macros/co_tryv_failure_likely/" >-- `OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)`</option>
       <option value="/outcome/reference/macros/co_tryx/" >-- `OUTCOME_CO_TRYX(expr)`</option>
       <option value="/outcome/reference/macros/co_tryx_failure_likely/" >-- `OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)`</option>
@@ -2730,6 +2767,8 @@
       <option value="/outcome/reference/macros/throw_exception/" >-- `OUTCOME_THROW_EXCEPTION(expr)`</option>
       <option value="/outcome/reference/macros/try/" >-- `OUTCOME_TRY(var, expr)`</option>
       <option value="/outcome/reference/macros/tryv/" >-- `OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/tryv2/" >-- `OUTCOME_TRYV2(spec, expr)`</option>
+      <option value="/outcome/reference/macros/tryv2_failure_likely/" >-- `OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)`</option>
       <option value="/outcome/reference/macros/tryv_failure_likely/" >-- `OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)`</option>
       <option value="/outcome/reference/macros/tryx/" >-- `OUTCOME_TRYX(expr)`</option>
       <option value="/outcome/reference/macros/tryx_failure_likely/" >-- `OUTCOME_TRYX_FAILURE_LIKELY(expr)`</option>
@@ -2813,6 +2852,8 @@
 <p>Hints are given to the compiler that the expression will be successful. If you expect failure, you should use <a href="/outcome/reference/macros/co_tryv_failure_likely/" class="api-reference"><code>OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)</code></a>
  instead.</p>
 
+<p>An internal temporary to hold the value of the expression is created, which generally invokes a copy/move. <a href="/outcome/tutorial/essential/result/try_ref/">If you wish to never copy/move, you can tell this macro to create the internal temporary as a reference instead.</a></p>
+
 <p><em>Overridable</em>: Not overridable.</p>
 
 <p><em>Definition</em>: Firstly the expression&rsquo;s temporary is bound to a uniquely named, stack allocated, <code>auto &amp;&amp;</code>. If that reference&rsquo;s bound object&rsquo;s <code>try_operation_has_value()</code> is false, immediately execute <code>return try_operation_return_as(propagated unique reference);</code>, propagating the rvalue/lvalue/etc-ness of the original expression.</p>
@@ -2825,7 +2866,7 @@
         <div class="chevrons">
     <div id="navigation">
 <a class="nav nav-prev" href="/outcome/reference/macros/co_try/" title="`OUTCOME_CO_TRY(var, expr)`"> <i class="fa fa-chevron-left"></i><label><code>OUTCOME_CO_TRY(var, expr)</code></label></a>
-    <a class="nav nav-next" href="/outcome/reference/macros/co_tryv_failure_likely/" title="`OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)`" style="margin-right: 0px;"><label><code>OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)</code></label><i class="fa fa-chevron-right"></i></a></div>
+    <a class="nav nav-next" href="/outcome/reference/macros/co_tryv2/" title="`OUTCOME_CO_TRYV2(spec, expr)`" style="margin-right: 0px;"><label><code>OUTCOME_CO_TRYV2(spec, expr)</code></label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2840,7 +2881,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/10/2019
+        <i class='fa fa-calendar'></i> Last update on 12/02/2021
     </div>
     
 

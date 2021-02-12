@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T19:00:50 UTC">
+<meta name="revised" content="2021-02-12T20:28:56 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -170,6 +170,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try_greedy/">
             TRY is greedy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_ref/">
+            TRY avoiding copy/move
           </a>
         </div>
     </li>
@@ -685,6 +692,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2/">
+            <code>OUTCOME_CO_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2_failure_likely/">
+            <code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryv_failure_likely/">
@@ -773,6 +794,20 @@
         <div>
           <a href="/outcome/reference/macros/tryv/">
             <code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2/">
+            <code>OUTCOME_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2_failure_likely/">
+            <code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code>
           </a>
         </div>
     </li>
@@ -2789,6 +2824,12 @@ to not use exceptions to propagate failure reports across threads, tasks, fibers
 thus making it suitable for use in the global headers of really large codebases. Storage layout is
 guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>, thus making Outcome based code long term ABI-stable.</p>
 
+<p>Fully deterministic all-<code>noexcept</code> C++ Coroutine support in Outcome is particularly strong, and we
+supply Outcome-optimising <a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code></a>
+ and <a href="/outcome/reference/types/awaitables/lazy/" class="api-reference"><code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code></a>
+
+awaitables which work for any user type.</p>
+
 <h2 id="sample-usage">Sample usage</h2>
 
 <p>The main workhorse in the Outcome library is <code>result&lt;T&gt;</code>: it represents either a successfully computed value of type <code>T</code>, or a <code>std::error_code</code>/<code>boost::system::error_code</code><sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup> representing the reason for failure. You use it in the function&rsquo;s return type:</p>
@@ -2859,7 +2900,7 @@ is available in scope.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 17/12/2020
+        <i class='fa fa-calendar'></i> Last update on 12/02/2021
     </div>
     
 

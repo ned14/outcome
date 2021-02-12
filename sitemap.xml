@@ -184,7 +184,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
@@ -279,7 +279,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/result/try/</loc>
-    <lastmod>2020-12-15T12:22:39+00:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
@@ -294,7 +294,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/v22/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
@@ -403,6 +403,11 @@
   </url>
   
   <url>
+    <loc>https://ned14.github.io/outcome/tutorial/essential/result/try_ref/</loc>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://ned14.github.io/outcome/reference/types/</loc>
     <lastmod>2018-12-13T21:10:19+00:00</lastmod>
   </url>
@@ -454,7 +459,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/</loc>
-    <lastmod>2021-02-12T18:57:24+00:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
@@ -1508,7 +1513,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2020-12-17T11:27:06+00:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
@@ -1674,32 +1679,42 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/co_try/</loc>
-    <lastmod>2020-06-01T12:18:26+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/co_tryv/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/reference/macros/co_tryv2/</loc>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/reference/macros/co_tryv2_failure_likely/</loc>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/co_tryv_failure_likely/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/co_tryx/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/co_tryx_failure_likely/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/co_try_failure_likely/</loc>
-    <lastmod>2020-06-01T12:18:26+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
@@ -1739,32 +1754,42 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/try/</loc>
-    <lastmod>2020-06-01T12:18:26+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/tryv/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/reference/macros/tryv2/</loc>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/reference/macros/tryv2_failure_likely/</loc>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/tryv_failure_likely/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/tryx/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/tryx_failure_likely/</loc>
-    <lastmod>2019-10-16T10:26:35+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/macros/try_failure_likely/</loc>
-    <lastmod>2020-06-01T12:18:26+01:00</lastmod>
+    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
   </url>
   
   <url>

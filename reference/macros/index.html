@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T19:00:41 UTC">
+<meta name="revised" content="2021-02-12T20:28:48 UTC">
 <title>Macros :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -138,6 +138,128 @@
       <a href="/outcome/tutorial/essential/">Essential</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/essential/before/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/before/">
+            Before we begin
+          </a>
+        </div>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/result/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/result/">result&lt;&gt;</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/result/inspecting/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/inspecting/">
+            Inspecting result<T, EC>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try/">
+            TRY operations
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_greedy/">
+            TRY is greedy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_ref/">
+            TRY avoiding copy/move
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/outcome/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/outcome/">outcome&lt;&gt;</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/outcome/inspecting/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/outcome/inspecting/">
+            Inspecting outcome<T, EC, EP>
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/no-value/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/no-value/">No-value policies</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/no-value/custom/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/no-value/custom/">
+            A custom no-value policy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/no-value/builtin/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/no-value/builtin/">
+            Built-in policies
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/coroutines/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/coroutines/">Coroutines</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/try/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/try/">
+            Coroutine TRY operation
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/awaitables/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/awaitables/">
+            Coroutine awaitables
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/returning/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/returning/">
+            Returning Outcome types from Coroutines
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/coroutines/co_await/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/coroutines/co_await/">
+            <code>operator co_await</code> as TRY operator
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/essential/conventions/" class="dd-item
+        ">
+      <div>
+      <a href="/outcome/tutorial/essential/conventions/">Conventions</a>
+      </div>
+    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/tutorial/advanced/" class="dd-item haschildren
@@ -571,6 +693,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2/">
+            <code>OUTCOME_CO_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2_failure_likely/">
+            <code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryv_failure_likely/">
@@ -659,6 +795,20 @@
         <div>
           <a href="/outcome/reference/macros/tryv/">
             <code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2/">
+            <code>OUTCOME_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2_failure_likely/">
+            <code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code>
           </a>
         </div>
     </li>
@@ -2602,6 +2752,8 @@
       <option value="/outcome/reference/macros/version/" >-- Version macros</option>
       <option value="/outcome/reference/macros/co_try/" >-- `OUTCOME_CO_TRY(var, expr)`</option>
       <option value="/outcome/reference/macros/co_tryv/" >-- `OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/co_tryv2/" >-- `OUTCOME_CO_TRYV2(spec, expr)`</option>
+      <option value="/outcome/reference/macros/co_tryv2_failure_likely/" >-- `OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)`</option>
       <option value="/outcome/reference/macros/co_tryv_failure_likely/" >-- `OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)`</option>
       <option value="/outcome/reference/macros/co_tryx/" >-- `OUTCOME_CO_TRYX(expr)`</option>
       <option value="/outcome/reference/macros/co_tryx_failure_likely/" >-- `OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)`</option>
@@ -2615,6 +2767,8 @@
       <option value="/outcome/reference/macros/throw_exception/" >-- `OUTCOME_THROW_EXCEPTION(expr)`</option>
       <option value="/outcome/reference/macros/try/" >-- `OUTCOME_TRY(var, expr)`</option>
       <option value="/outcome/reference/macros/tryv/" >-- `OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)`</option>
+      <option value="/outcome/reference/macros/tryv2/" >-- `OUTCOME_TRYV2(spec, expr)`</option>
+      <option value="/outcome/reference/macros/tryv2_failure_likely/" >-- `OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)`</option>
       <option value="/outcome/reference/macros/tryv_failure_likely/" >-- `OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)`</option>
       <option value="/outcome/reference/macros/tryx/" >-- `OUTCOME_TRYX(expr)`</option>
       <option value="/outcome/reference/macros/tryx_failure_likely/" >-- `OUTCOME_TRYX_FAILURE_LIKELY(expr)`</option>
@@ -2686,6 +2840,10 @@
 <p>Evaluate within a coroutine an expression which results in an understood type, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/co_tryv/" ><code>OUTCOME_CO_TRYV(expr)/OUTCOME_CO_TRY(expr)</code></a>
 <p>Evaluate from within a coroutine an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/co_tryv2/" ><code>OUTCOME_CO_TRYV2(spec, expr)</code></a>
+<p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/co_tryv2_failure_likely/" ><code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code></a>
+<p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/co_tryv_failure_likely/" ><code>OUTCOME_CO_TRYV_FAILURE_LIKELY(expr)/OUTCOME_CO_TRY_FAILURE_LIKELY(expr)</code></a>
 <p>Evaluate from within a coroutine an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/co_tryx/" ><code>OUTCOME_CO_TRYX(expr)</code></a>
@@ -2711,6 +2869,10 @@
 	<a href="/outcome/reference/macros/try/" ><code>OUTCOME_TRY(var, expr)</code></a>
 <p>Evaluate an expression which results in an understood type, assigning <code>T</code> to a decl called <code>var</code> if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/tryv/" ><code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code></a>
+<p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/tryv2/" ><code>OUTCOME_TRYV2(spec, expr)</code></a>
+<p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
+	<a href="/outcome/reference/macros/tryv2_failure_likely/" ><code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code></a>
 <p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>
 	<a href="/outcome/reference/macros/tryv_failure_likely/" ><code>OUTCOME_TRYV_FAILURE_LIKELY(expr)/OUTCOME_TRY_FAILURE_LIKELY(expr)</code></a>
 <p>Evaluate an expression which results in an understood type, continuing execution if successful, immediately returning <code>try_operation_return_as(X)</code> from the calling function if unsuccessful.</p><li>

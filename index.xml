@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Thu, 17 Dec 2020 11:27:06 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 12 Feb 2021 20:25:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -263,7 +263,7 @@ public: // This is the value type for `file_io_error`. We add line number and so
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</guid>
-      <description>After a year of listening to user feedback since entering Boost, Outcome v2.2 has a number of breaking source changes from Outcome v2.1 which were published start of 2020 in the better_optimisation branch. The full year of 2020 (three Boost releases) was given to announcing those upcoming changes, and testing the v2.2 branch in production. The tutorial remains based on v2.1, as that remains the stable branch. However in early 2021 the tutorial shall be ported to v2.</description>
+      <description>In the start of 2020, after a year of listening to user feedback since entering Boost, Outcome v2.2 was published with a number of breaking source changes from Outcome v2.1 The full year of 2020 (three Boost releases) was given to announcing those upcoming changes, and testing the v2.2 branch in production. In late December 2020, Outcome v2.2 became the default Outcome, and all Outcome v2.1 code shall need to be upgraded to work with v2.</description>
     </item>
     
     <item>
@@ -385,7 +385,7 @@ If the Coroutine throws a C++ exception which was not handled inside the Corouti
       <guid>https://ned14.github.io/outcome/tutorial/essential/result/try/</guid>
       <description>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
 OUTCOME_TRY (auto i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
-auto&amp;amp;&amp;amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name.</description>
+auto __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name.</description>
     </item>
     
     <item>
@@ -562,6 +562,16 @@ This section illustrates how you can hook into the std::error_code system from t
       <description>You may remember that our custom _file_io_error_domain inherits from outcome_e::posix_code::domain_type, and thus does not have to implement the many pure virtual functions required by outcome_e::status_code_domain.
 What we do need to do is reimplement _do_message() to append the file and line information to the POSIX error description string returned by outcome_e::posix_code::domain_type. This causes the status code&amp;rsquo;s .message() observer to return a string with the extra payload information represented in text.
 // Return a string describing a specific code.</description>
+    </item>
+    
+    <item>
+      <title>TRY avoiding copy/move</title>
+      <link>https://ned14.github.io/outcome/tutorial/essential/result/try_ref/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/tutorial/essential/result/try_ref/</guid>
+      <description>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) works by creating an internal uniquely named variable which holds the value emitted by the expression. This implies that a copy or move operation shall be performed on the object emitted (unless you are on C++ 17 or later, which has guaranteed copy elision), which may be undesirable for your use case.
+You can tell OUTCOME_TRY to use a reference rather than a value for the internal uniquely named variable like this:</description>
     </item>
     
     <item>
@@ -2656,7 +2666,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1333 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1335 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -2721,6 +2731,28 @@ Hints are given to the compiler that the expression will be successful.</descrip
       <description>Evaluate from within a coroutine an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
  OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 The difference between the OUTCOME_CO_TRYV(expr) and OUTCOME_CO_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_CO_TRY(var, expr) ).</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_CO_TRYV2(spec, expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/co_tryv2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/co_tryv2/</guid>
+      <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+Hints are given to the compiler that the expression will be successful. If you expect failure, you should use OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr) instead.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/co_tryv2_failure_likely/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/co_tryv2_failure_likely/</guid>
+      <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use OUTCOME_TRYV(expr) instead.</description>
     </item>
     
     <item>
@@ -2873,6 +2905,28 @@ Hints are given to the compiler that the expression will be successful. If you e
       <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
  OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
 The difference between the OUTCOME_TRYV(expr) and OUTCOME_TRY(expr) editions is that the latter will set a variable if two or more macro arguments are present (see OUTCOME_TRY(var, expr) ).</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_TRYV2(spec, expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/tryv2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/tryv2/</guid>
+      <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+Hints are given to the compiler that the expression will be successful. If you expect failure, you should use OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr) instead.</description>
+    </item>
+    
+    <item>
+      <title>`OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)`</title>
+      <link>https://ned14.github.io/outcome/reference/macros/tryv2_failure_likely/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/macros/tryv2_failure_likely/</guid>
+      <description>Evaluate an expression which results in a type matching the following customisation points, continuing execution if successful, immediately returning try_operation_return_as(X) from the calling function if unsuccessful:
+ OUTCOME_V2_NAMESPACE::try_operation_has_value(X)  OUTCOME_V2_NAMESPACE::try_operation_return_as(X)  OUTCOME_V2_NAMESPACE::try_operation_extract_value(X)   Default overloads for these customisation points are provided. See the recipe for supporting foreign input to OUTCOME_TRY.
+Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use OUTCOME_TRYV(expr) instead.</description>
     </item>
     
     <item>

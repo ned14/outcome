@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T19:00:51 UTC">
+<meta name="revised" content="2021-02-12T20:28:57 UTC">
 <title>Try :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -169,6 +169,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try_greedy/">
             TRY is greedy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_ref/">
+            TRY avoiding copy/move
           </a>
         </div>
     </li>
@@ -684,6 +691,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2/">
+            <code>OUTCOME_CO_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2_failure_likely/">
+            <code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryv_failure_likely/">
@@ -772,6 +793,20 @@
         <div>
           <a href="/outcome/reference/macros/tryv/">
             <code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2/">
+            <code>OUTCOME_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2_failure_likely/">
+            <code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code>
           </a>
         </div>
     </li>
@@ -2831,6 +2866,28 @@ outcome::result&lt;void&gt; print_half(const std::string&amp; text); View this c
 
    <article class="post tutorial">
     <header class="post-header">
+        <h2 class="post-title"><a href="/outcome/tutorial/essential/result/try_ref/">TRY avoiding copy/move</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) works by creating an internal uniquely named variable which holds the value emitted by the expression. This implies that a copy or move operation shall be performed on the object emitted (unless you are on C++ 17 or later, which has guaranteed copy elision), which may be undesirable for your use case.
+You can tell OUTCOME_TRY to use a reference rather than a value for the internal uniquely named variable like this: <a class="read-more" href="/outcome/tutorial/essential/result/try_ref/">&raquo;</a></p>
+    </section>
+    <footer class=" footline" >
+         
+        
+
+        
+          
+            
+                <a class="label label-default" href="https://ned14.github.io/outcome/tags/try/">try</a>
+            
+        
+
+    </footer>
+</article>
+
+   <article class="post tutorial">
+    <header class="post-header">
         <h2 class="post-title"><a href="/outcome/tutorial/essential/result/try_greedy/">TRY is greedy</a></h2>
     </header>
     <section class="post-excerpt">
@@ -2858,7 +2915,7 @@ outcome::result&lt;int, std::error_code&gt; test(outcome::result&lt;int, std::er
     <section class="post-excerpt">
         <p>In the implementation of function print_half we have seen the usage of the macro OUTCOME_TRYV(expr)/OUTCOME_TRY(expr) :
 OUTCOME_TRY (auto i, BigInt::fromString(text));  The OUTCOME_TRY macro uses C macro overloading to select between two implementations based on the number of input parameters. If there is exactly one input parameter i.e. without the i, the control statement is roughly equivalent to:
-auto&amp;&amp; __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name. <a class="read-more" href="/outcome/tutorial/essential/result/try/">&raquo;</a></p>
+auto __result = BigInt::fromString(text); if (!__result) return __result.as_failure();  Where __result is a compile time generated unique name. <a class="read-more" href="/outcome/tutorial/essential/result/try/">&raquo;</a></p>
     </section>
     <footer class=" footline" >
          

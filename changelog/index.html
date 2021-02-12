@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T19:00:44 UTC">
+<meta name="revised" content="2021-02-12T20:28:50 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -169,6 +169,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try_greedy/">
             TRY is greedy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_ref/">
+            TRY avoiding copy/move
           </a>
         </div>
     </li>
@@ -684,6 +691,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2/">
+            <code>OUTCOME_CO_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2_failure_likely/">
+            <code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryv_failure_likely/">
@@ -772,6 +793,20 @@
         <div>
           <a href="/outcome/reference/macros/tryv/">
             <code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2/">
+            <code>OUTCOME_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2_failure_likely/">
+            <code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code>
           </a>
         </div>
     </li>
@@ -2787,7 +2822,7 @@ library for certain corner case code:</dd>
 <span class="c1">// This causes UB due to result&lt;Foo&gt; being destructed before move of value into v
 </span><span class="c1"></span><span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">v</span><span class="p">,</span> <span class="n">filter2</span><span class="p">(</span><span class="n">get_foo</span><span class="p">()))</span>
 </code></pre></div>
-<p>Whilst rvalue ref passthrough filter functions are not common, they can turn up in highly generic
+<p>Whilst reference passthrough filter functions are not common, they can turn up in highly generic
 code, where destruction before copy/move is not helpful.</p>
 
 <p>The cause is that TRY used to work by binding the result of the expression to an <code>auto &amp;&amp;unique</code>,
@@ -2801,7 +2836,7 @@ and the Result is destructed after the semicolon succeeding the assignment to <c
 of its input expression as follows:</p>
 
 <ul>
-<li>prvalues =&gt; <code>auto &amp;&amp;unique = (expr)</code> (same as before)</li>
+<li>prvalues =&gt; <code>auto unique = (expr)</code>   (breaking change)</li>
 <li>xvalue =&gt; <code>auto unique = (expr)</code>     (breaking change)</li>
 <li>lvalue =&gt; <code>auto unique = (expr)</code>     (breaking change)</li>
 </ul>
@@ -2809,7 +2844,10 @@ of its input expression as follows:</p>
 <p>This ensures that xvalue and lvalue inputs do not cause unhelpfully early lifetime end, though it
 does silently change the behaviour of existing code which relied on rvalues and lvalues being passed
 through, as a new construct-move-destruct or construct-copy-destruct cycle is introduced to where
-there was none before.</p>
+there was none before. Also, before C++ 17, there is now an added copy/move for prvalue inputs,
+which does not affect runtime codegen due to Return Value Optimisation (RVO), but does cause
+Results containing non-copying non-moving types to fail to compile, which is a breaking change
+from beforehand.</p>
 
 <p>If one wishes rvalues or lvalues to be passed through, one can avail of a new TRY syntax based on
 preprocessor overloading:</p>
@@ -2828,15 +2866,6 @@ So if you write:</p>
 is declared as <code>auto &amp;&amp;v = std::move(unique).assume_value()</code>. This passes through the rvalue referencing,
 and completely avoids copies and moves of <code>Foo</code>. If you wish to not extract the value but also
 specify unique storage, there is a new <code>OUTCOME_TRYV2(refspec, expr)</code>.</p>
-
-<p>For those of you using <code>OUTCOME_CO_TRY</code> within Coroutines, be aware that <code>decltype(co_await)</code> is not permitted
-in C++ 20 (you will get an error such as &ldquo;&lsquo;co_await&rsquo; cannot appear in an unevaluated context&rdquo;, see
-<a href="https://stackoverflow.com/questions/61274146/c-find-co-await-awaitable-result-type">https://stackoverflow.com/questions/61274146/c-find-co-await-awaitable-result-type</a> for why). Some compilers
-implement, as an extension, support for <code>decltype(co_await)</code> (currently: GCC only). Therefore if
-<code>co_await</code> appears anywhere in the expression, you cannot use the deducing form of TRY. Instead you will
-need to force the type of the internal unique to avoid the call to <code>decltype()</code> e.g. <code>OUTCOME_CO_TRY((auto &amp;&amp;, v), co_await expr)</code>.
-My hope is that a future C++ standard will remove this restriction of using operator <code>co_await</code> within
-<code>decltype()</code> for simple types of awaitable which do not change their signature based on the calling Coroutine.</p>
 
 <p>My thanks to KamilCuk from <a href="https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument">https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument</a>
 for all their help in designing the new overloaded TRY syntax. My thanks also to vasama for reporting this

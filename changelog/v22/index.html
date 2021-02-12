@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-12T19:00:43 UTC">
+<meta name="revised" content="2021-02-12T20:28:49 UTC">
 <title>v2.2 major changes :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -169,6 +169,13 @@
         <div>
           <a href="/outcome/tutorial/essential/result/try_greedy/">
             TRY is greedy
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/essential/result/try_ref/">
+            TRY avoiding copy/move
           </a>
         </div>
     </li>
@@ -684,6 +691,20 @@
           </a>
         </div>
     </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2/">
+            <code>OUTCOME_CO_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/co_tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/co_tryv2_failure_likely/">
+            <code>OUTCOME_CO_TRYV2_FAILURE_LIKELY(spec, expr)</code>
+          </a>
+        </div>
+    </li>
       <li data-nav-id="/outcome/reference/macros/co_tryv_failure_likely/" class="dd-item">
         <div>
           <a href="/outcome/reference/macros/co_tryv_failure_likely/">
@@ -772,6 +793,20 @@
         <div>
           <a href="/outcome/reference/macros/tryv/">
             <code>OUTCOME_TRYV(expr)/OUTCOME_TRY(expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2/">
+            <code>OUTCOME_TRYV2(spec, expr)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/macros/tryv2_failure_likely/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/macros/tryv2_failure_likely/">
+            <code>OUTCOME_TRYV2_FAILURE_LIKELY(spec, expr)</code>
           </a>
         </div>
     </li>
@@ -2777,6 +2812,14 @@ as is. This allows <code>TRY</code> to initialise or assign. You can use the mac
 want the pre-Outcome v2.2 behaviour. You may find the regular expression <code>_TRY\(([^(]*?),(.*?)\);</code> =&gt;
 <code>_TRY(auto &amp;&amp;\1,\2);</code> of use to you when upgrading code.</p></li>
 
+<li><p><code>OUTCOME_TRY</code> now declares its internal uniquely named temporary variable which holds the result
+of the expression as <code>auto unique = expr</code> instead of <code>auto &amp;&amp;unique = expr</code>. This will cause TRY of
+<code>result&lt;UncopyableAndImmovable&gt;</code> and <code>outcome&lt;UncopyableAndImmovable&gt;</code> to fail to compile, whereas
+previously they did compile. The reason for this change was that the previous behaviour produced
+undefined behaviour in various corner use cases, particulary in generic code. You can tell TRY to
+use references instead of values for its uniquely named temporary <a href="/outcome/tutorial/essential/result/try_ref/">using a special
+syntax</a>.</p></li>
+
 <li><p><a href="/outcome/tutorial/advanced/hooks/">The ADL discovered event hooks</a> have been replaced
 with policy-specified event hooks instead. This is due to brittleness (where hooks would quietly
 self-disable if somebody changed something), compiler bugs (a difference in compiler settings causes
@@ -2808,7 +2851,7 @@ enable emulation.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/09/2020
+        <i class='fa fa-calendar'></i> Last update on 12/02/2021
     </div>
     
 

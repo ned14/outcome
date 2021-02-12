@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/changelog/</link>
     <description>Recent content in Changelog on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 12 Feb 2021 18:57:24 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 12 Feb 2021 20:25:43 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/changelog/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,7 +16,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/changelog/upgrade_v21_v22/</guid>
-      <description>After a year of listening to user feedback since entering Boost, Outcome v2.2 has a number of breaking source changes from Outcome v2.1 which were published start of 2020 in the better_optimisation branch. The full year of 2020 (three Boost releases) was given to announcing those upcoming changes, and testing the v2.2 branch in production. The tutorial remains based on v2.1, as that remains the stable branch. However in early 2021 the tutorial shall be ported to v2.</description>
+      <description>In the start of 2020, after a year of listening to user feedback since entering Boost, Outcome v2.2 was published with a number of breaking source changes from Outcome v2.1 The full year of 2020 (three Boost releases) was given to announcing those upcoming changes, and testing the v2.2 branch in production. In late December 2020, Outcome v2.2 became the default Outcome, and all Outcome v2.1 code shall need to be upgraded to work with v2.</description>
     </item>
     
     <item>
