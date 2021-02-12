@@ -987,9 +987,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 19de1cfcda6c2debde67f539f90523edc251835b
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-12 14:19:10 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 19de1cfc
+#define OUTCOME_PREVIOUS_COMMIT_REF 6dfd389582fe511fd531393817cba48ddea5757d
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-12 18:57:30 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6dfd3895
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -7499,7 +7499,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* Try operation macros
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: July 2017
 
 
@@ -7568,63 +7568,6 @@ namespace detail
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
   constexpr inline bool has_value(int /*unused */) { return true; }
   template <class T> constexpr inline bool has_value(...) { return false; }
-  // prvalues go to rvalues to avoid extra copy/move as lifetime is extended for us
-  template <class T> struct try_unique_storage
-  {
-    using type = T &&;
-  };
-  // void passes through
-  template <> struct try_unique_storage<void>
-  {
-    using type = void;
-  };
-  template <> struct try_unique_storage<const void>
-  {
-    using type = const void;
-  };
-  template <> struct try_unique_storage<volatile void>
-  {
-    using type = volatile void;
-  };
-  template <> struct try_unique_storage<const volatile void>
-  {
-    using type = const volatile void;
-  };
-  // glvalues go to values to extend lifetime
-  template <class T> struct try_unique_storage<T &>
-  {
-    using type = T;
-  };
-  template <class T> struct try_unique_storage<const T &>
-  {
-    using type = const T;
-  };
-  template <class T> struct try_unique_storage<volatile T &>
-  {
-    using type = volatile T;
-  };
-  template <class T> struct try_unique_storage<const volatile T &>
-  {
-    using type = const volatile T;
-  };
-  // xvalues go to values to extend lifetime
-  template <class T> struct try_unique_storage<T &&>
-  {
-    using type = T;
-  };
-  template <class T> struct try_unique_storage<const T &&>
-  {
-    using type = const T;
-  };
-  template <class T> struct try_unique_storage<volatile T &&>
-  {
-    using type = volatile T;
-  };
-  template <class T> struct try_unique_storage<const volatile T &&>
-  {
-    using type = const volatile T;
-  };
-  template <class T> using try_unique_storage_t = typename try_unique_storage<T>::type;
 } // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -7714,7 +7657,7 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 #endif
 #define OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK(...) __VA_ARGS__
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, ...) ::OUTCOME_V2_NAMESPACE::detail::try_unique_storage_t<decltype(__VA_ARGS__)> unique = (__VA_ARGS__)
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, ...) auto unique = (__VA_ARGS__)
 #define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(x) x
 #define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE(unique, x, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, __VA_ARGS__))
 #define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, x, y, ...) x unique = (__VA_ARGS__)
@@ -7724,13 +7667,13 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRYV2_UNIQUE_STORAGE2(...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED
 #define OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, ...) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRYV2_UNIQUE_STORAGE, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec) (unique, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, __VA_ARGS__)
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
-#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)); else retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)) retstmt OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(::OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)); else retstmt ::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)) retstmt ::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRY2_VAR_SECOND2(x, var) var
 #define OUTCOME_TRY2_VAR_SECOND3(x, y, ...) x y
 #define OUTCOME_TRY2_VAR(spec) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY2_VAR_SECOND, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, spec)
-#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRY2_FAILURE_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_SUCCESS_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRY2_FAILURE_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -7764,7 +7707,7 @@ SIGNATURE NOT RECOGNISED
 */
 #define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s(,), __VA_ARGS__)
 #if defined(__GNUC__) || defined(__clang__)
-#define OUTCOME_TRYX2(unique, retstmt, ...) ({ OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, deduce, __VA_ARGS__); OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
+#define OUTCOME_TRYX2(unique, retstmt, ...) ({ OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, deduce, __VA_ARGS__); ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -7845,19 +7788,19 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME21_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+#define OUTCOME21_TRYA(v, ...) OUTCOME_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, deduce, auto &&v, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME21_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+#define OUTCOME21_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, deduce, auto &&v, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME21_CO_TRYA(v, ...) OUTCOME_CO_TRY2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+#define OUTCOME21_CO_TRYA(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, deduce, auto &&v, __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME21_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_CO_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, auto &&v, __VA_ARGS__)
+#define OUTCOME21_CO_TRYA_FAILURE_LIKELY(v, ...) OUTCOME_TRY2_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_retrn, deduce, auto &&v, __VA_ARGS__)
 #define OUTCOME21_TRY_INVOKE_TRY8(a, b, c, d, e, f, g, h) OUTCOME21_TRYA(a, b, c, d, e, f, g, h)
 #define OUTCOME21_TRY_INVOKE_TRY7(a, b, c, d, e, f, g) OUTCOME21_TRYA(a, b, c, d, e, f, g)
 #define OUTCOME21_TRY_INVOKE_TRY6(a, b, c, d, e, f) OUTCOME21_TRYA(a, b, c, d, e, f)

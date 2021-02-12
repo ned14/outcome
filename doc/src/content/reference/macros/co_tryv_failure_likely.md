@@ -15,6 +15,8 @@ The difference between the `OUTCOME_CO_TRYV(expr)` and `OUTCOME_CO_TRY(expr)` ed
 
 Hints are given to the compiler that the expression will be unsuccessful. If you expect success, you should use {{% api "OUTCOME_CO_TRYV(expr)" %}} instead.
 
+An internal temporary to hold the value of the expression is created, which generally invokes a copy/move. [If you wish to never copy/move, you can tell this macro to create the internal temporary as a reference instead.]({{% relref "/tutorial/essential/result/try_ref" %}})
+
 *Overridable*: Not overridable.
 
 *Definition*: Firstly the expression's temporary is bound to a uniquely named, stack allocated, `auto &&`. If that reference's bound object's `try_operation_has_value()` is false, immediately execute `return try_operation_return_as(propagated unique reference);`, propagating the rvalue/lvalue/etc-ness of the original expression.

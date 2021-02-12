@@ -40,6 +40,10 @@ Particular care has been taken to ensure that Outcome has the lowest possible im
 thus making it suitable for use in the global headers of really large codebases. Storage layout is
 guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based code long term ABI-stable.
 
+Fully deterministic all-`noexcept` C++ Coroutine support in Outcome is particularly strong, and we
+supply Outcome-optimising {{< api "eager<T>/atomic_eager<T>" >}} and {{< api "lazy<T>/atomic_lazy<T>" >}}
+awaitables which work for any user type.
+
 ## Sample usage
 
 The main workhorse in the Outcome library is `result<T>`: it represents either a successfully computed value of type `T`, or a `std::error_code`/`boost::system::error_code`[^2] representing the reason for failure. You use it in the function's return type:

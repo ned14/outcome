@@ -13,6 +13,8 @@ Default overloads for these customisation points are provided. See [the recipe f
 
 Hints are given to the compiler that the expression will be successful. If you expect failure, you should use {{% api "OUTCOME_CO_TRYX_FAILURE_LIKELY(expr)" %}} instead.
 
+An internal temporary to hold the value of the expression is created, which generally invokes a copy/move. [If you wish to never copy/move, you can tell this macro to create the internal temporary as a reference instead.]({{% relref "/tutorial/essential/result/try_ref" %}})
+
 *Availability*: GCC and clang only. Use `#ifdef OUTCOME_CO_TRYX` to determine if available.
 
 *Overridable*: Not overridable.
