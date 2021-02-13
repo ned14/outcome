@@ -82,6 +82,7 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0244 / test, "TRY/TRYX has dangling refere
   auto check = [](const char *desc, auto &&f) {
     counter = 0;
     default_constructor.clear();
+    copy_constructor.clear();
     move_constructor.clear();
     destructor.clear();
     std::cout << "\n" << desc << std::endl;
@@ -89,7 +90,11 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0244 / test, "TRY/TRYX has dangling refere
     std::cout << "   Check integer " << ++counter << std::endl;
     BOOST_REQUIRE(r);
     BOOST_CHECK(r.value() == 5);
-    if(!move_constructor.empty())
+    if(!copy_constructor.empty())
+    {
+      BOOST_CHECK(copy_constructor.front() < destructor.front());
+    }
+    else if(!move_constructor.empty())
     {
       BOOST_CHECK(move_constructor.front() < destructor.front());
     }
