@@ -570,9 +570,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF eec4a9b6e9539e939d942ce1bb9e5219f599b16d
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-02-03 09:12:58 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE eec4a9b6
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 887f602d43210129890af1d61bbc84ddf48731c2
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-02-16 11:02:31 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 887f602d
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 6dfd389582fe511fd531393817cba48ddea5757d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-12 18:57:30 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 6dfd3895
+#define OUTCOME_PREVIOUS_COMMIT_REF 378f8484886a93c9ce271eb9ba2d2bc8cabe6e62
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-15 16:17:30 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 378f8484
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -5705,7 +5705,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000L
+#if __cplusplus < 202000L && !_HAS_CXX20
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
