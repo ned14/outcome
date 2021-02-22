@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-#if 0L && !defined(GENERATING_OUTCOME_MODULE_INTERFACE)
+#if 0L && !defined(GENERATING_OUTCOME_MODULE_INTERFACE) && !OUTCOME_DISABLE_CXX_MODULES
 import outcome_v2_0;
 #else
 /* Tells C++ coroutines about Outcome's result
@@ -987,9 +987,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 378f8484886a93c9ce271eb9ba2d2bc8cabe6e62
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-15 16:17:30 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 378f8484
+#define OUTCOME_PREVIOUS_COMMIT_REF 2de44e8d86aaa6d04635e301125a10133d527e53
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-22 17:56:21 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2de44e8d
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))

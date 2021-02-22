@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define _CRT_SECURE_NO_WARNINGS
 #define OUTCOME_ENABLE_LEGACY_SUPPORT_FOR 210  // legacy ADL hooks support
 
-#include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
 #include <iostream>

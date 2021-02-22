@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../include/outcome/coroutine_support.hpp"
-#include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome.hpp"
 #include "../../include/outcome/try.hpp"
 
 #if OUTCOME_FOUND_COROUTINE_HEADER

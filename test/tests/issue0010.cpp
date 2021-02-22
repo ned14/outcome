@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0010 / test, "Expected's operator->(), operator*() and .error() throw exceptions when they should not")

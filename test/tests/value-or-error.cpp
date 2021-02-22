@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../include/outcome/outcome.hpp"
+#include "../../include/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / valueorerror, "Tests that outcome constructs from value_or_error and value_or_none concept inputs")

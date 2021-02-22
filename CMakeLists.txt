@@ -41,6 +41,7 @@ include(QuickCppLibSetupProject)
 
 option(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB "Whether to bundle an embedded copy of QuickCppLib with Outcome. Used by various package managers such as vcpkg." OFF)
 option(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that Outcome is fully working. Used by various package managers such as vcpkg." OFF)
+option(OUTCOME_ENABLE_CXX_MODULES "Whether to enable the building of an Outcome C++ module" OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
 
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -147,6 +148,13 @@ if(TARGET quickcpplib::hl)
   target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
 endif()
 
+if(OUTCOME_ENABLE_CXX_MODULES)
+  # Right now this is very hacky, as cmake doesn't support building C++ Modules yet
+  add_custom_target(outcome_module
+    COMMAND "${CMAKE_CXX_COMPILER}" /std:c++latest /EHsc /MD /fp:precise /c "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.ixx" "-I${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/include" "-I${CMAKE_BINARY_DIR}/quickcpplib/include"
+  )
+endif()
+
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
@@ -229,14 +237,19 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
             POSITION_INDEPENDENT_CODE ON
           )
-          #set(target_name "outcome_hl--${testname}-modules")
-          #add_executable(${target_name} "${testsource}")
-          #target_link_libraries(${target_name} PRIVATE outcome::hl)
-          #target_compile_options(${target_name} PRIVATE /experimental:module)
-          #set_target_properties(${target_name} PROPERTIES
-          #  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-          #  POSITION_INDEPENDENT_CODE ON
-          #)
+          if(OUTCOME_ENABLE_CXX_MODULES)
+            set(target_name "outcome_hl--${testname}-modules")
+            add_executable(${target_name} "${testsource}")
+            add_dependencies(${target_name} outcome_module)
+            target_link_libraries(${target_name} PRIVATE outcome::hl)
+            target_compile_options(${target_name} PRIVATE /experimental:module /std:c++latest)
+            target_compile_definitions(${target_name} PRIVATE __cpp_modules=202001L)
+            set_target_properties(${target_name} PROPERTIES
+              RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+              POSITION_INDEPENDENT_CODE ON
+              DISABLE_PRECOMPILE_HEADERS On
+            )
+          endif()
         endif()
       endif()
     endif()
