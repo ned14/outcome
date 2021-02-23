@@ -545,9 +545,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 887f602d43210129890af1d61bbc84ddf48731c2
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-02-16 11:02:31 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 887f602d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 9a151aab3abaf1ced6b0b82f9328beb536386254
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-02-23 11:25:30 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 9a151aab
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -961,9 +961,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 2de44e8d86aaa6d04635e301125a10133d527e53
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-22 17:56:21 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2de44e8d
+#define OUTCOME_PREVIOUS_COMMIT_REF 38142ef2a368047f1169c4527e45a5e74936c5f9
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-22 18:54:48 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 38142ef2
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
@@ -1527,7 +1527,7 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 #endif
 /* A very simple result type
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: June 2017
 
 
@@ -1635,6 +1635,7 @@ template <class T> struct OUTCOME_NODISCARD success_type
   using value_type = T;
 private:
   value_type _value;
+  uint16_t _spare_storage{0};
 public:
   success_type() = default;
   success_type(const success_type &) = default;
@@ -1644,18 +1645,21 @@ public:
   ~success_type() = default;
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<success_type, std::decay_t<U>>::value))
-  constexpr explicit success_type(U &&v)
+  constexpr explicit success_type(U &&v, uint16_t spare_storage = 0)
       : _value(static_cast<U &&>(v)) // NOLINT
+      , _spare_storage(spare_storage)
   {
   }
   constexpr value_type &value() & { return _value; }
   constexpr const value_type &value() const & { return _value; }
   constexpr value_type &&value() && { return static_cast<value_type &&>(_value); }
   constexpr const value_type &&value() const && { return static_cast<value_type &&>(_value); }
+  constexpr uint16_t spare_storage() const { return _spare_storage; }
 };
 template <> struct OUTCOME_NODISCARD success_type<void>
 {
   using value_type = void;
+  constexpr uint16_t spare_storage() const { return 0; }
 };
 /*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state,
 default constructing `T` if necessary.
@@ -1667,9 +1671,9 @@ inline constexpr success_type<void> success() noexcept
 /*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
 \effects Copies or moves the successful state supplied into the returned type sugar.
 */
-template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v)
+template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v, uint16_t spare_storage = 0)
 {
-  return success_type<std::decay_t<T>>{static_cast<T &&>(v)};
+  return success_type<std::decay_t<T>>{static_cast<T &&>(v), spare_storage};
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class EC, class E = void> failure_type. Potential doc page: `failure_type<EC, EP = void>`
@@ -1679,9 +1683,10 @@ template <class EC, class E = void> struct OUTCOME_NODISCARD failure_type
   using error_type = EC;
   using exception_type = E;
 private:
-  bool _have_error{}, _have_exception{};
   error_type _error;
   exception_type _exception;
+  bool _have_error{false}, _have_exception{false};
+  uint16_t _spare_storage{0};
   struct error_init_tag
   {
   };
@@ -1696,25 +1701,29 @@ public:
   failure_type &operator=(failure_type &&) = default; // NOLINT
   ~failure_type() = default;
   template <class U, class V>
-  constexpr explicit failure_type(U &&u, V &&v)
-      : _have_error(true)
-      , _have_exception(true)
-      , _error(static_cast<U &&>(u))
+  constexpr explicit failure_type(U &&u, V &&v, uint16_t spare_storage = 0)
+      : _error(static_cast<U &&>(u))
       , _exception(static_cast<V &&>(v))
+      , _have_error(true)
+      , _have_exception(true)
+      , _spare_storage(spare_storage)
   {
   }
   template <class U>
-  constexpr explicit failure_type(in_place_type_t<error_type> /*unused*/, U &&u, error_init_tag /*unused*/ = error_init_tag())
-      : _have_error(true)
-      , _error(static_cast<U &&>(u))
+  constexpr explicit failure_type(in_place_type_t<error_type> /*unused*/, U &&u, uint16_t spare_storage = 0, error_init_tag /*unused*/ = error_init_tag())
+      : _error(static_cast<U &&>(u))
       , _exception()
+      , _have_error(true)
+      , _spare_storage(spare_storage)
   {
   }
   template <class U>
-  constexpr explicit failure_type(in_place_type_t<exception_type> /*unused*/, U &&u, exception_init_tag /*unused*/ = exception_init_tag())
-      : _have_exception(true)
-      , _error()
+  constexpr explicit failure_type(in_place_type_t<exception_type> /*unused*/, U &&u, uint16_t spare_storage = 0,
+                                  exception_init_tag /*unused*/ = exception_init_tag())
+      : _error()
       , _exception(static_cast<U &&>(u))
+      , _have_exception(true)
+      , _spare_storage(spare_storage)
   {
   }
   constexpr bool has_error() const { return _have_error; }
@@ -1727,6 +1736,7 @@ public:
   constexpr const exception_type &exception() const & { return _exception; }
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
+  constexpr uint16_t spare_storage() const { return _spare_storage; }
 };
 template <class EC> struct OUTCOME_NODISCARD failure_type<EC, void>
 {
@@ -1734,6 +1744,7 @@ template <class EC> struct OUTCOME_NODISCARD failure_type<EC, void>
   using exception_type = void;
 private:
   error_type _error;
+  uint16_t _spare_storage{0};
 public:
   failure_type() = default;
   failure_type(const failure_type &) = default;
@@ -1743,14 +1754,16 @@ public:
   ~failure_type() = default;
   OUTCOME_TEMPLATE(class U)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<U>>::value))
-  constexpr explicit failure_type(U &&u)
+  constexpr explicit failure_type(U &&u, uint16_t spare_storage = 0)
       : _error(static_cast<U &&>(u)) // NOLINT
+      , _spare_storage(spare_storage)
   {
   }
   constexpr error_type &error() & { return _error; }
   constexpr const error_type &error() const & { return _error; }
   constexpr error_type &&error() && { return static_cast<error_type &&>(_error); }
   constexpr const error_type &&error() const && { return static_cast<error_type &&>(_error); }
+  constexpr uint16_t spare_storage() const { return _spare_storage; }
 };
 template <class E> struct OUTCOME_NODISCARD failure_type<void, E>
 {
@@ -1758,6 +1771,7 @@ template <class E> struct OUTCOME_NODISCARD failure_type<void, E>
   using exception_type = E;
 private:
   exception_type _exception;
+  uint16_t _spare_storage{0};
 public:
   failure_type() = default;
   failure_type(const failure_type &) = default;
@@ -1767,28 +1781,30 @@ public:
   ~failure_type() = default;
   OUTCOME_TEMPLATE(class V)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(!std::is_same<failure_type, std::decay_t<V>>::value))
-  constexpr explicit failure_type(V &&v)
+  constexpr explicit failure_type(V &&v, uint16_t spare_storage = 0)
       : _exception(static_cast<V &&>(v)) // NOLINT
+      , _spare_storage(spare_storage)
   {
   }
   constexpr exception_type &exception() & { return _exception; }
   constexpr const exception_type &exception() const & { return _exception; }
   constexpr exception_type &&exception() && { return static_cast<exception_type &&>(_exception); }
   constexpr const exception_type &&exception() const && { return static_cast<exception_type &&>(_exception); }
+  constexpr uint16_t spare_storage() const { return _spare_storage; }
 };
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v)
+template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v, uint16_t spare_storage = 0)
 {
-  return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v)};
+  return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v), spare_storage};
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w)
+template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w, uint16_t spare_storage = 0)
 {
-  return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), static_cast<E &&>(w)};
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), static_cast<E &&>(w), spare_storage};
 }
 namespace detail
 {
@@ -4421,6 +4437,7 @@ SIGNATURE NOT RECOGNISED
   constexpr basic_result(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value) // NOLINT
       : base{in_place_type<value_type_if_enabled>}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4431,6 +4448,7 @@ SIGNATURE NOT RECOGNISED
   constexpr basic_result(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(o)}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4441,6 +4459,7 @@ SIGNATURE NOT RECOGNISED
   constexpr basic_result(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<value_type_if_enabled>, detail::extract_value_from_success<value_type>(static_cast<success_type<T> &&>(o))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_move_construction(this, static_cast<success_type<T> &&>(o));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4452,6 +4471,7 @@ SIGNATURE NOT RECOGNISED
   detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(o)}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4463,6 +4483,7 @@ SIGNATURE NOT RECOGNISED
   detail::is_nothrow_constructible<error_type, T>) // NOLINT
       : base{in_place_type<error_type_if_enabled>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_move_construction(this, static_cast<failure_type<T> &&>(o));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4475,6 +4496,7 @@ SIGNATURE NOT RECOGNISED
                          explicit_make_error_code_compatible_copy_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_error_code(detail::extract_error_from_failure<error_type>(o))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4487,6 +4509,7 @@ SIGNATURE NOT RECOGNISED
                          explicit_make_error_code_compatible_move_conversion_tag()) noexcept(noexcept(make_error_code(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_error_code(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_move_construction(this, static_cast<failure_type<T> &&>(o));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4499,6 +4522,7 @@ SIGNATURE NOT RECOGNISED
                          explicit_make_exception_ptr_compatible_copy_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_exception_ptr(detail::extract_error_from_failure<error_type>(o))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4511,6 +4535,7 @@ SIGNATURE NOT RECOGNISED
                          explicit_make_exception_ptr_compatible_move_conversion_tag()) noexcept(noexcept(make_exception_ptr(std::declval<T>()))) // NOLINT
       : base{in_place_type<error_type_if_enabled>, make_exception_ptr(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_result_move_construction(this, static_cast<failure_type<T> &&>(o));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -4524,14 +4549,14 @@ SIGNATURE NOT RECOGNISED
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  auto as_failure() const & { return failure(this->assume_error()); }
+  auto as_failure() const & { return failure(this->assume_error(), hooks::spare_storage(this)); }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
   auto as_failure() &&
   {
     this->_state._status.set_have_moved_from(true);
-    return failure(static_cast<basic_result &&>(*this).assume_error());
+    return failure(static_cast<basic_result &&>(*this).assume_error(), hooks::spare_storage(this));
   }
 #ifdef __APPLE__
   failure_type<error_type> _xcode_workaround_as_failure() &&;
@@ -5308,6 +5333,7 @@ SIGNATURE NOT RECOGNISED
   constexpr basic_outcome(const success_type<void> &o) noexcept(std::is_nothrow_default_constructible<value_type>::value) // NOLINT
       : base{in_place_type<typename base::_value_type>}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5318,6 +5344,7 @@ SIGNATURE NOT RECOGNISED
   constexpr basic_outcome(const success_type<T> &o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(o)}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5328,6 +5355,7 @@ SIGNATURE NOT RECOGNISED
   constexpr basic_outcome(success_type<T> &&o) noexcept(detail::is_nothrow_constructible<value_type, T>) // NOLINT
       : base{in_place_type<typename base::_value_type>, detail::extract_value_from_success<value_type>(static_cast<success_type<T> &&>(o))}
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_move_construction(this, static_cast<success_type<T> &&>(o));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5340,6 +5368,7 @@ SIGNATURE NOT RECOGNISED
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(o)}
       , _ptr()
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5353,6 +5382,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(detail::extract_exception_from_failure<exception_type>(o))
   {
     this->_state._status.set_have_exception(true);
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5366,6 +5396,7 @@ SIGNATURE NOT RECOGNISED
       : base{in_place_type<typename base::_error_type>, make_error_code(detail::extract_error_from_failure<error_type>(o))}
       , _ptr()
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5386,6 +5417,7 @@ SIGNATURE NOT RECOGNISED
     {
       this->_state._status.set_have_exception(true);
     }
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5398,6 +5430,7 @@ SIGNATURE NOT RECOGNISED
       : base{in_place_type<typename base::_error_type>, detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o))}
       , _ptr()
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5411,6 +5444,7 @@ SIGNATURE NOT RECOGNISED
       , _ptr(detail::extract_exception_from_failure<exception_type>(static_cast<failure_type<T> &&>(o)))
   {
     this->_state._status.set_have_exception(true);
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5424,6 +5458,7 @@ SIGNATURE NOT RECOGNISED
       : base{in_place_type<typename base::_error_type>, make_error_code(detail::extract_error_from_failure<error_type>(static_cast<failure_type<T> &&>(o)))}
       , _ptr()
   {
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_copy_construction(this, o);
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5444,6 +5479,7 @@ SIGNATURE NOT RECOGNISED
     {
       this->_state._status.set_have_exception(true);
     }
+    hooks::set_spare_storage(this, o.spare_storage());
     no_value_policy_type::on_outcome_move_construction(this, static_cast<failure_type<T, U> &&>(o));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -5460,8 +5496,8 @@ SIGNATURE NOT RECOGNISED
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   constexpr bool operator==(const basic_outcome<T, U, V, W> &o) const noexcept( //
   noexcept(std::declval<detail::devoid<value_type>>() == std::declval<detail::devoid<T>>()) //
-  && noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
-  && noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
+  &&noexcept(std::declval<detail::devoid<error_type>>() == std::declval<detail::devoid<U>>()) //
+  &&noexcept(std::declval<detail::devoid<exception_type>>() == std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
@@ -5489,7 +5525,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() == std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() == std::declval<U>()))
   constexpr bool operator==(const failure_type<T, U> &o) const noexcept( //
-  noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
+  noexcept(std::declval<error_type>() == std::declval<T>()) &&noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
     if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
@@ -5515,8 +5551,8 @@ SIGNATURE NOT RECOGNISED
                     OUTCOME_TEXPR(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   constexpr bool operator!=(const basic_outcome<T, U, V, W> &o) const noexcept( //
   noexcept(std::declval<detail::devoid<value_type>>() != std::declval<detail::devoid<T>>()) //
-  && noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
-  && noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
+  &&noexcept(std::declval<detail::devoid<error_type>>() != std::declval<detail::devoid<U>>()) //
+  &&noexcept(std::declval<detail::devoid<exception_type>>() != std::declval<detail::devoid<V>>()))
   {
     if(this->_state._status.have_value() && o._state._status.have_value())
     {
@@ -5544,7 +5580,7 @@ SIGNATURE NOT RECOGNISED
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<error_type>() != std::declval<T>()), //
                     OUTCOME_TEXPR(std::declval<exception_type>() != std::declval<U>()))
   constexpr bool operator!=(const failure_type<T, U> &o) const noexcept( //
-  noexcept(std::declval<error_type>() == std::declval<T>()) && noexcept(std::declval<exception_type>() == std::declval<U>()))
+  noexcept(std::declval<error_type>() == std::declval<T>()) &&noexcept(std::declval<exception_type>() == std::declval<U>()))
   {
     if(this->_state._status.have_error() && o._state._status.have_error() //
        && this->_state._status.have_exception() && o._state._status.have_exception())
@@ -5650,13 +5686,13 @@ SIGNATURE NOT RECOGNISED
   {
     if(this->has_error() && this->has_exception())
     {
-      return failure_type<error_type, exception_type>(this->assume_error(), this->assume_exception());
+      return failure_type<error_type, exception_type>(this->assume_error(), this->assume_exception(), hooks::spare_storage(this));
     }
     if(this->has_exception())
     {
-      return failure_type<error_type, exception_type>(in_place_type<exception_type>, this->assume_exception());
+      return failure_type<error_type, exception_type>(in_place_type<exception_type>, this->assume_exception(), hooks::spare_storage(this));
     }
-    return failure_type<error_type, exception_type>(in_place_type<error_type>, this->assume_error());
+    return failure_type<error_type, exception_type>(in_place_type<error_type>, this->assume_error(), hooks::spare_storage(this));
   }
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
@@ -5666,13 +5702,14 @@ SIGNATURE NOT RECOGNISED
     this->_state._status.set_have_moved_from(true);
     if(this->has_error() && this->has_exception())
     {
-      return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(this->assume_exception()));
+      return failure_type<error_type, exception_type>(static_cast<S &&>(this->assume_error()), static_cast<P &&>(this->assume_exception()),
+                                                      hooks::spare_storage(this));
     }
     if(this->has_exception())
     {
-      return failure_type<error_type, exception_type>(in_place_type<exception_type>, static_cast<P &&>(this->assume_exception()));
+      return failure_type<error_type, exception_type>(in_place_type<exception_type>, static_cast<P &&>(this->assume_exception()), hooks::spare_storage(this));
     }
-    return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()));
+    return failure_type<error_type, exception_type>(in_place_type<error_type>, static_cast<S &&>(this->assume_error()), hooks::spare_storage(this));
   }
 #ifdef __APPLE__
   failure_type<error_type, exception_type> _xcode_workaround_as_failure() &&;

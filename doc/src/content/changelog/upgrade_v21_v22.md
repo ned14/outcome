@@ -16,13 +16,26 @@ To upgrade an Outcome v2.1 based codebase to Outcome v2.2 is very easy:
 files in a directory tree and replacing them -- most IDEs such as Visual Studio
 have such a tool with GUI, on POSIX a shell script such as this ought to work:
 
-        find /path/to/project -type f -name "*.hpp" | xargs sed -i "s/_TRY\(([^(]*?),(.*?)\);/_TRY(auto &&\1,\2);/g"
-        find /path/to/project -type f -name "*.cpp" | xargs sed -i "s/_TRY\(([^(]*?),(.*?)\);/_TRY(auto &&\1,\2);/g"
+        find /path/to/project -type f -name "*.hpp" | xargs sed -i "s/_TRY\(([^(]*?),(.*?)\);/_TRY((auto &&, \1),\2);/g"
+        find /path/to/project -type f -name "*.cpp" | xargs sed -i "s/_TRY\(([^(]*?),(.*?)\);/_TRY((auto &&, \1),\2);/g"
+        find /path/to/project -type f -name "*.hpp" | xargs sed -i "s/_TRY\(([^(]*?)\);/_TRYV2(auto &&, \1);/g"
+        find /path/to/project -type f -name "*.cpp" | xargs sed -i "s/_TRY\(([^(]*?)\);/_TRYV2(auto &&, \1);/g"
 
-    The transformation needed is the regular expression `_TRY\(([^(]*?),(.*?)\);` =>
-    `_TRY(auto &&\1,\2);`. This is because in Outcome v2.2 onwards, `OUTCOME_TRY(var, expr)`
+    The transformation needed are the regular expressions `_TRY\(([^(]*?),(.*?)\);` =>
+    `_TRY((auto &&, \1),\2);` and `TRY\(([^(]*?)\);` => `_TRYV2(auto &&, \1);`.
+    This is because in Outcome v2.2 onwards, `OUTCOME_TRY(var, expr)`
     no longer implicitly declares the variable created as `auto&&` on your behalf,
-    now you must specify the storage of the variable.
+    now you must specify the storage of the variable. It also declares the internal
+    uniquely named temporary as a value rather than as a reference, the initial
+    brackets overrides this to force the use of a rvalue reference for the internal
+    uniquely named temporary instead.
+    
+    This makes use of Outcome's [new TRY syntax]({{% relref "/tutorial/essential/result/try_ref" %}})
+    to tell the TRY operation to use references rather than values for the internal
+    uniquely named temporary, thus avoiding any copies and moves. The only way to
+    override the storage of the internal uniquely named temporary for non-value
+    outputting TRY is via the new `OUTCOME_TRYV2()` which takes the storage specifier
+    you desire as its first parameter.
 
     The principle advantage of this change is that you can now assign to
     existing variables the successful results of expressions, instead of being
@@ -30,17 +43,14 @@ have such a tool with GUI, on POSIX a shell script such as this ought to work:
     you intended. Also, because you can now specify storage, you can now assign
     the result of a TRYied operation into static or thread local storage.
 
-2. If your code uses non-copyable and non-movable types within its `result<T>`
-and `outcome<T>` types, performing a TRY operation upon them will no longer compile.
-To fix this, rewrite as follows:
-
-    - `OUTCOME_TRY(auto &&v, expr)` => `OUTCOME_TRY((auto &&, v), expr)`
-    - `OUTCOME_TRY(expr)` => `OUTCOME_TRYV2(auto &&, expr)`
-    - `OUTCOME_TRYV(expr)` => `OUTCOME_TRYV2(auto &&, expr)`
-    
-    This makes use of Outcome's [new TRY syntax]({{% relref "/tutorial/essential/result/try_ref" %}})
-    to tell the TRY operation to use references rather than values for the internal
-    uniquely named temporary, thus avoiding any copies and moves.
+2. The find regex and replace rule above is to preserve exact semantics with
+Outcome v2.1 whereby the internal uniquely named temporary and the variable for
+the value are both rvalue references. If you're feeling like more work, it is
+safer if you convert as many `OUTCOME_TRY((auto &&, v), expr)` to
+`OUTCOME_TRY(auto &&v, expr)` as possible. This will mean that TRY 'consumes'
+`expr` i.e. moves it into the internal uniquely named temporary, if expr is
+an rvalue reference. Usually this does not affect existing code, but occasionally
+it can, generally a bit of code reordering will fix it.
 
 3. If your code uses [the ADL discovered event hooks]({{% relref "/tutorial/advanced/hooks" %}})
 to intercept when `basic_result` and `basic_outcome` is constructed, copies or
