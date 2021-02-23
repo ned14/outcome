@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:57:51 UTC">
+<meta name="revised" content="2021-02-23T17:40:19 UTC">
 <title>v2.2 major changes :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2625,7 +2625,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2781,7 +2781,7 @@
     
     
     
-    <p>Major changes in v2.2 over earlier versions are listed here.</p>
+    <p>Major changes in v2.2 over v2.1 are listed here.</p>
 
 <ol>
 <li><p>A new trait <code>is_move_bitcopying&lt;T&gt;</code> is added, which opts types into a library-based emulation of
@@ -2815,10 +2815,23 @@ want the pre-Outcome v2.2 behaviour. You may find the regular expression <code>_
 <li><p><code>OUTCOME_TRY</code> now declares its internal uniquely named temporary variable which holds the result
 of the expression as <code>auto unique = expr</code> instead of <code>auto &amp;&amp;unique = expr</code>. This will cause TRY of
 <code>result&lt;UncopyableAndImmovable&gt;</code> and <code>outcome&lt;UncopyableAndImmovable&gt;</code> to fail to compile, whereas
-previously they did compile. The reason for this change was that the previous behaviour produced
-undefined behaviour in various corner use cases, particulary in generic code. You can tell TRY to
-use references instead of values for its uniquely named temporary <a href="/outcome/tutorial/essential/result/try_ref/">using a special
+previously they did compile. Another big change in semantic is that TRY now will &lsquo;consume&rsquo; values
+moved into it, whereas previously it did not/ The reason for this change was that the previous behaviour
+produced undefined behaviour in various corner use cases, particulary in generic code. You can tell
+TRY to use references instead of values for its uniquely named temporary <a href="/outcome/tutorial/essential/result/try_ref/">using a special
 syntax</a>.</p></li>
+
+<li><p><code>OUTCOME_TRY</code> now propagates the value from <a href="/outcome/reference/functions/hooks/spare_storage/" class="api-reference"><code>spare_storage(const basic_result|basic_outcome *) noexcept</code></a>
+
+of the input Result/Outcome into any <a href="/outcome/reference/traits/is_failure_type/" class="api-reference"><code>failure_type&lt;T&gt;</code></a>
+ returned by TRY. Result/Outcome
+now sets its spare storage value from any <a href="/outcome/reference/types/success_type/" class="api-reference"><code>success_type&lt;T&gt;</code></a>
+ or <a href="/outcome/reference/traits/is_failure_type/" class="api-reference"><code>failure_type&lt;T&gt;</code></a>
+
+from which it is constructed. This is a breaking change, as spare storage values were not propagated
+beforehand. However this change means that any stack backtrace identifier captured by a failed
+result construction hook is now fully propagated from failure point up through all TRY operations
+to the code which handles the failure.</p></li>
 
 <li><p><a href="/outcome/tutorial/advanced/hooks/">The ADL discovered event hooks</a> have been replaced
 with policy-specified event hooks instead. This is due to brittleness (where hooks would quietly
@@ -2851,7 +2864,7 @@ enable emulation.</p></li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 12/02/2021
+        <i class='fa fa-calendar'></i> Last update on 23/02/2021
     </div>
     
 

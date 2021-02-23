@@ -96,7 +96,7 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/success_type/</guid>
-      <description>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function success(T &amp;amp;&amp;amp;) . Detectable using is_success_type&amp;lt;T&amp;gt; .
+      <description>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function success(T &amp;amp;&amp;amp;, ...) . Detectable using is_success_type&amp;lt;T&amp;gt; .
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 A member type alias value_type indicates T.
 There is an explicit initialising constructor taking any type U which is not a success_type&amp;lt;T&amp;gt;, and which will forward construct the contained T from that U.</description>

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:58:01 UTC">
+<meta name="revised" content="2021-02-23T17:40:30 UTC">
 <title>`auto failure(T &amp;&amp;, ...)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2627,7 +2627,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2779,7 +2779,7 @@
   -- 
    Policy</option>
       <option value="/outcome/reference/functions/failure/"  selected>-- `auto failure(T &amp;&amp;, ...)`</option>
-      <option value="/outcome/reference/functions/success/" >-- `auto success(T &amp;&amp;)`</option>
+      <option value="/outcome/reference/functions/success/" >-- `auto success(T &amp;&amp;, ...)`</option>
       <option value="/outcome/reference/functions/try_operation_has_value/" >-- `bool try_operation_has_value(X)`</option>
       <option value="/outcome/reference/functions/try_operation_extract_value/" >-- `decltype(auto) try_operation_extract_value(X)`</option>
       <option value="/outcome/reference/functions/try_operation_return_as/" >-- `decltype(auto) try_operation_return_as(X)`</option>
@@ -2825,7 +2825,7 @@
     <p>Returns appropriate type sugar for constructing an unsuccessful result or outcome, usually <a href="/outcome/reference/types/failure_type/" class="api-reference"><code>failure_type&lt;EC, EP = void&gt;</code></a>
  with a decayed <code>T</code>.</p>
 
-<p>Two default overloads are provided, one taking a single parameter returning <code>failure_type&lt;std::decay_t&lt;T&gt;&gt;</code>, the other taking two parameters returning <code>failure_type&lt;std::decay_t&lt;T&gt;, std::decay_t&lt;U&gt;&gt;</code>. Both overloads perfectly forward their inputs.</p>
+<p>Two default overloads are provided, one taking a single required parameter with optional spare storage value parameter returning <code>failure_type&lt;std::decay_t&lt;T&gt;&gt;</code>, the other taking two required parameters with optional spare storage value parameter returning <code>failure_type&lt;std::decay_t&lt;T&gt;, std::decay_t&lt;U&gt;&gt;</code>. Both overloads perfectly forward their inputs.</p>
 
 <p>Note that <code>failure()</code> overloads are permitted by Outcome to return something other than <code>failure_type</code>. For example, <code>basic_result</code>&rsquo;s <a href="/outcome/reference/types/basic_result/as_failure_lvalue/" class="api-reference"><code>auto as_failure() const &amp;</code></a>
  returns whatever type <code>failure()</code> returns, and <a href="/outcome/reference/macros/try/" class="api-reference"><code>OUTCOME_TRY(var, expr)</code></a>
@@ -2845,7 +2845,7 @@
         <div class="chevrons">
     <div id="navigation">
 <a class="nav nav-prev" href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/" title="`void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)`"> <i class="fa fa-chevron-left"></i><label><code>void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)</code></label></a>
-    <a class="nav nav-next" href="/outcome/reference/functions/success/" title="`auto success(T &amp;&amp;)`" style="margin-right: 0px;"><label><code>auto success(T &amp;&amp;)</code></label><i class="fa fa-chevron-right"></i></a></div>
+    <a class="nav nav-next" href="/outcome/reference/functions/success/" title="`auto success(T &amp;&amp;, ...)`" style="margin-right: 0px;"><label><code>auto success(T &amp;&amp;, ...)</code></label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2860,7 +2860,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 01/02/2019
+        <i class='fa fa-calendar'></i> Last update on 23/02/2021
     </div>
     
 

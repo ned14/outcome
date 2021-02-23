@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:58:02 UTC">
+<meta name="revised" content="2021-02-23T17:40:31 UTC">
 <title>`failure_type&lt;EC, EP = void&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2627,7 +2627,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2827,11 +2827,13 @@
 
 <p>Member type aliases <code>error_type</code> and <code>exception_type</code> indicate <code>EC</code> and <code>E</code>.</p>
 
-<p>There is an explicit initialising constructor taking any types <code>U</code> and <code>V</code> which will forward construct the contained <code>error_type</code> and <code>exception_type</code> respectively.</p>
+<p>There is an explicit initialising constructor taking any types <code>U</code> and <code>V</code> which will forward construct the contained <code>error_type</code> and <code>exception_type</code> respectively. It also has an optional parameter <code>spare_storage</code>, if you wish to specify a spare storage value.</p>
 
-<p>There are two tagged initialising constructors taking <code>in_place_type_t&lt;error_type&gt;</code> or <code>in_place_type_t&lt;exception_type&gt;</code>, and a <code>U</code> which will forward construct the contained <code>error_type</code> and <code>exception_type</code> respectively.</p>
+<p>There are two tagged initialising constructors taking <code>in_place_type_t&lt;error_type&gt;</code> or <code>in_place_type_t&lt;exception_type&gt;</code>, and a <code>U</code> which will forward construct the contained <code>error_type</code> and <code>exception_type</code> respectively. These both also have an optional parameter <code>spare_storage</code>, if you wish to specify a spare storage value.</p>
 
 <p>There are <code>.error()</code> and <code>.exception()</code> reference observers with the usual constexpr lvalue, const lvalue, rvalue and const rvalue overloads. One can discover which or both of these is valid using the usual <code>.has_error()</code> and <code>.has_exception()</code> observers.</p>
+
+<p>There is a <code>.spare_storage()</code> observer which returns the spare storage value with which the failure type sugar was constructed.</p>
 
 <p>There are specialisations <code>failure_type&lt;EC, void&gt;</code> and <code>failure_type&lt;void, E&gt;</code> which store nothing for the voided type and do not provide their observer functions.</p>
 
@@ -2862,7 +2864,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 24/01/2019
+        <i class='fa fa-calendar'></i> Last update on 23/02/2021
     </div>
     
 

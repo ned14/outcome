@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:58:01 UTC">
-<title>`auto success(T &amp;&amp;)` :: Outcome documentation</title>
+<meta name="revised" content="2021-02-23T17:40:30 UTC">
+<title>`auto success(T &amp;&amp;, ...)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -2627,7 +2627,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item active">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2779,7 +2779,7 @@
   -- 
    Policy</option>
       <option value="/outcome/reference/functions/failure/" >-- `auto failure(T &amp;&amp;, ...)`</option>
-      <option value="/outcome/reference/functions/success/"  selected>-- `auto success(T &amp;&amp;)`</option>
+      <option value="/outcome/reference/functions/success/"  selected>-- `auto success(T &amp;&amp;, ...)`</option>
       <option value="/outcome/reference/functions/try_operation_has_value/" >-- `bool try_operation_has_value(X)`</option>
       <option value="/outcome/reference/functions/try_operation_extract_value/" >-- `decltype(auto) try_operation_extract_value(X)`</option>
       <option value="/outcome/reference/functions/try_operation_return_as/" >-- `decltype(auto) try_operation_return_as(X)`</option>
@@ -2818,14 +2818,14 @@
       </div>
     
 
-    <h1><code>auto success(T &amp;&amp;)</code></h1>
+    <h1><code>auto success(T &amp;&amp;, ...)</code></h1>
     
     
     
     <p>Returns appropriate type sugar for constructing a successful result or outcome, usually <a href="/outcome/reference/types/success_type/" class="api-reference"><code>success_type&lt;T&gt;</code></a>
  with a decayed <code>T</code>.</p>
 
-<p>Two default overloads are provided, one taking a single parameter returning <code>success_type&lt;std::decay_t&lt;T&gt;&gt;</code> and perfectly forwarding the input. The other overload takes no parameters, and returns <code>success_type&lt;void&gt;</code>, which usually causes the construction of the receiving <code>basic_result</code> or <code>basic_outcome</code>&rsquo;s with a default construction of their value type.</p>
+<p>Two default overloads are provided, one taking a single required parameter with optional spare storage value parameter returning <code>success_type&lt;std::decay_t&lt;T&gt;&gt;</code> and perfectly forwarding the input. The other overload takes no parameters, and returns <code>success_type&lt;void&gt;</code>, which usually causes the construction of the receiving <code>basic_result</code> or <code>basic_outcome</code>&rsquo;s with a default construction of their value type.</p>
 
 <p><em>Overridable</em>: By Argument Dependent Lookup (ADL).</p>
 
@@ -2856,7 +2856,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 01/02/2019
+        <i class='fa fa-calendar'></i> Last update on 23/02/2021
     </div>
     
 

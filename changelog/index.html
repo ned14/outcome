@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:57:52 UTC">
+<meta name="revised" content="2021-02-23T17:40:21 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2625,7 +2625,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2803,15 +2803,28 @@ This branch has a number of major breaking changes to Outcome v2.1, see
 <dt><a href="https://github.com/ned14/outcome/issues/237">#237</a></dt>
 <dd>If on C++ 20, we now use C++ 20 <code>[[likely]]</code> instead of compiler-specific markup to indicate
 when TRY has likely success or failure.</dd>
+<dt>BREAKING CHANGE <a href="https://github.com/ned14/outcome/issues/247">#247</a></dt>
+<dd><p>Previously the value of <a href="/outcome/reference/functions/hooks/spare_storage/" class="api-reference"><code>spare_storage(const basic_result|basic_outcome *) noexcept</code></a>
+ was
+not propagated over <code>OUTCOME_TRY</code>, which causes things like stack backtraces captured at the point of
+construction of an errored result to get dropped at every <code>TRY</code> point. This has been fixed by adding
+an optional <code>spare_storage</code> to <a href="/outcome/reference/types/success_type/" class="api-reference"><code>success_type&lt;T&gt;</code></a>
+ and <a href="/outcome/reference/traits/is_failure_type/" class="api-reference"><code>failure_type&lt;T&gt;</code></a>
+, as well
+as to <a href="/outcome/reference/functions/success/" class="api-reference"><code>auto success(T &amp;&amp;, ...)</code></a>
+ and <a href="/outcome/reference/functions/failure/" class="api-reference"><code>auto failure(T &amp;&amp;, ...)</code></a>
+.</p>
+
+<p>You should not notice this in your code, except that where before spare storage values did not
+propagate through TRY, now they do, which is a breaking change.</p></dd>
 </dl>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
 <dl>
 <dt>BREAKING CHANGE <a href="https://github.com/ned14/outcome/issues/244">#244</a></dt>
-<dd>It came as a shock to learn that <code>OUTCOME_TRY</code> had been broken since the inception of this
-library for certain corner case code:</dd>
-</dl>
+<dd><p>It came as a shock to learn that <code>OUTCOME_TRY</code> had been broken since the inception of this
+library for certain corner case code:</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span>    <span class="n">get_foo</span><span class="p">();</span>
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span>    <span class="n">filter1</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span><span class="p">);</span>
 <span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span> <span class="n">filter2</span><span class="p">(</span><span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="n">Foo</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span><span class="p">);</span>
@@ -2869,7 +2882,8 @@ specify unique storage, there is a new <code>OUTCOME_TRYV2(refspec, expr)</code>
 
 <p>My thanks to KamilCuk from <a href="https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument">https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument</a>
 for all their help in designing the new overloaded TRY syntax. My thanks also to vasama for reporting this
-issue and working through how best to fix it with me.</p>
+issue and working through how best to fix it with me.</p></dd>
+</dl>
 
 <hr />
 
@@ -3310,7 +3324,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 12/02/2021
+        <i class='fa fa-calendar'></i> Last update on 23/02/2021
     </div>
     
 

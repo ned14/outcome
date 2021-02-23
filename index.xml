@@ -404,7 +404,7 @@ Unfortunately it also means that it must be possible for each domain to be insta
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/changelog/v22/</guid>
-      <description>Major changes in v2.2 over earlier versions are listed here.
+      <description>Major changes in v2.2 over v2.1 are listed here.
  A new trait is_move_bitcopying&amp;lt;T&amp;gt; is added, which opts types into a library-based emulation of P1029 move = bitcopies. Experimental std::error is opted in by default. If this trait is true for your T or E type, Outcome will track moved-from status for your type, and will only call your type&amp;rsquo;s destructor if it was not moved from. If your compiler&amp;rsquo;s optimiser is sufficiently able to fold code, this improves codegen quality for Experimental Outcome very considerably, approaching the same gains as P1029 types would have.</description>
     </item>
     
@@ -2666,7 +2666,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1338 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1339 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libboze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @gusrb406 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
@@ -3033,20 +3033,19 @@ Header: &amp;lt;outcome/std_outcome.hpp&amp;gt;, &amp;lt;outcome/boost_outcome.h
       
       <guid>https://ned14.github.io/outcome/reference/functions/failure/</guid>
       <description>Returns appropriate type sugar for constructing an unsuccessful result or outcome, usually failure_type&amp;lt;EC, EP = void&amp;gt; with a decayed T.
-Two default overloads are provided, one taking a single parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt;, the other taking two parameters returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;, std::decay_t&amp;lt;U&amp;gt;&amp;gt;. Both overloads perfectly forward their inputs.
-Note that failure() overloads are permitted by Outcome to return something other than failure_type. For example, basic_result&amp;rsquo;s auto as_failure() const &amp;amp; returns whatever type failure() returns, and OUTCOME_TRY(var, expr) by default returns for failure whatever .</description>
+Two default overloads are provided, one taking a single required parameter with optional spare storage value parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt;, the other taking two required parameters with optional spare storage value parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;, std::decay_t&amp;lt;U&amp;gt;&amp;gt;. Both overloads perfectly forward their inputs.
+Note that failure() overloads are permitted by Outcome to return something other than failure_type.</description>
     </item>
     
     <item>
-      <title>`auto success(T &amp;&amp;)`</title>
+      <title>`auto success(T &amp;&amp;, ...)`</title>
       <link>https://ned14.github.io/outcome/reference/functions/success/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/success/</guid>
       <description>Returns appropriate type sugar for constructing a successful result or outcome, usually success_type&amp;lt;T&amp;gt; with a decayed T.
-Two default overloads are provided, one taking a single parameter returning success_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt; and perfectly forwarding the input. The other overload takes no parameters, and returns success_type&amp;lt;void&amp;gt;, which usually causes the construction of the receiving basic_result or basic_outcome&amp;rsquo;s with a default construction of their value type.
-Overridable: By Argument Dependent Lookup (ADL).
-Requires: Always available.</description>
+Two default overloads are provided, one taking a single required parameter with optional spare storage value parameter returning success_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt; and perfectly forwarding the input. The other overload takes no parameters, and returns success_type&amp;lt;void&amp;gt;, which usually causes the construction of the receiving basic_result or basic_outcome&amp;rsquo;s with a default construction of their value type.
+Overridable: By Argument Dependent Lookup (ADL).</description>
     </item>
     
     <item>
@@ -3622,7 +3621,7 @@ Header: &amp;lt;outcome/std_result.hpp&amp;gt;</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/success_type/</guid>
-      <description>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function success(T &amp;amp;&amp;amp;) . Detectable using is_success_type&amp;lt;T&amp;gt; .
+      <description>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function success(T &amp;amp;&amp;amp;, ...) . Detectable using is_success_type&amp;lt;T&amp;gt; .
 This is a regular wrapper type, with defaulted default, copy and move constructor, defaulted assignment, and defaulted destructor.
 A member type alias value_type indicates T.
 There is an explicit initialising constructor taking any type U which is not a success_type&amp;lt;T&amp;gt;, and which will forward construct the contained T from that U.</description>

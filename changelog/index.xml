@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/changelog/</link>
     <description>Recent content in Changelog on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 12 Feb 2021 20:25:43 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 23 Feb 2021 17:37:27 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/changelog/index.xml" rel="self" type="application/rss+xml" />
     
@@ -25,7 +25,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/changelog/v22/</guid>
-      <description>Major changes in v2.2 over earlier versions are listed here.
+      <description>Major changes in v2.2 over v2.1 are listed here.
  A new trait is_move_bitcopying&amp;lt;T&amp;gt; is added, which opts types into a library-based emulation of P1029 move = bitcopies. Experimental std::error is opted in by default. If this trait is true for your T or E type, Outcome will track moved-from status for your type, and will only call your type&amp;rsquo;s destructor if it was not moved from. If your compiler&amp;rsquo;s optimiser is sufficiently able to fold code, this improves codegen quality for Experimental Outcome very considerably, approaching the same gains as P1029 types would have.</description>
     </item>
     

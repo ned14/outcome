@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:58:02 UTC">
+<meta name="revised" content="2021-02-23T17:40:32 UTC">
 <title>`success_type&lt;T&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2627,7 +2627,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2819,7 +2819,7 @@
     
     
     
-    <p>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function <a href="/outcome/reference/functions/success/" class="api-reference"><code>success(T &amp;&amp;)</code></a>
+    <p>Type sugar for constructing a successful result or outcome. Generally not constructed directly, but via the free function <a href="/outcome/reference/functions/success/" class="api-reference"><code>success(T &amp;&amp;, ...)</code></a>
 . Detectable using <a href="/outcome/reference/traits/is_success_type/" class="api-reference"><code>is_success_type&lt;T&gt;</code></a>
 .</p>
 
@@ -2827,11 +2827,13 @@
 
 <p>A member type alias <code>value_type</code> indicates <code>T</code>.</p>
 
-<p>There is an explicit initialising constructor taking any type <code>U</code> which is not a <code>success_type&lt;T&gt;</code>, and which will forward construct the contained <code>T</code> from that <code>U</code>.</p>
+<p>There is an explicit initialising constructor taking any type <code>U</code> which is not a <code>success_type&lt;T&gt;</code>, and which will forward construct the contained <code>T</code> from that <code>U</code>. It also has an optional parameter <code>spare_storage</code>, if you wish to specify a spare storage value.</p>
 
 <p>There is a <code>.value()</code> reference observer with the usual constexpr lvalue, const lvalue, rvalue and const rvalue overloads.</p>
 
 <p>There is a specialisation <code>success_type&lt;void&gt;</code> which stores nothing and provides no <code>.value()</code> observers.</p>
+
+<p>There is a <code>.spare_storage()</code> observer which returns the spare storage value with which the success type sugar was constructed.</p>
 
 <p><em>Requires</em>: Nothing.</p>
 
@@ -2860,7 +2862,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 21/01/2019
+        <i class='fa fa-calendar'></i> Last update on 23/02/2021
     </div>
     
 

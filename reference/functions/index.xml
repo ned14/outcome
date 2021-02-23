@@ -17,20 +17,19 @@
       
       <guid>https://ned14.github.io/outcome/reference/functions/failure/</guid>
       <description>Returns appropriate type sugar for constructing an unsuccessful result or outcome, usually failure_type&amp;lt;EC, EP = void&amp;gt; with a decayed T.
-Two default overloads are provided, one taking a single parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt;, the other taking two parameters returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;, std::decay_t&amp;lt;U&amp;gt;&amp;gt;. Both overloads perfectly forward their inputs.
-Note that failure() overloads are permitted by Outcome to return something other than failure_type. For example, basic_result&amp;rsquo;s auto as_failure() const &amp;amp; returns whatever type failure() returns, and OUTCOME_TRY(var, expr) by default returns for failure whatever .</description>
+Two default overloads are provided, one taking a single required parameter with optional spare storage value parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt;, the other taking two required parameters with optional spare storage value parameter returning failure_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;, std::decay_t&amp;lt;U&amp;gt;&amp;gt;. Both overloads perfectly forward their inputs.
+Note that failure() overloads are permitted by Outcome to return something other than failure_type.</description>
     </item>
     
     <item>
-      <title>`auto success(T &amp;&amp;)`</title>
+      <title>`auto success(T &amp;&amp;, ...)`</title>
       <link>https://ned14.github.io/outcome/reference/functions/success/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/functions/success/</guid>
       <description>Returns appropriate type sugar for constructing a successful result or outcome, usually success_type&amp;lt;T&amp;gt; with a decayed T.
-Two default overloads are provided, one taking a single parameter returning success_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt; and perfectly forwarding the input. The other overload takes no parameters, and returns success_type&amp;lt;void&amp;gt;, which usually causes the construction of the receiving basic_result or basic_outcome&amp;rsquo;s with a default construction of their value type.
-Overridable: By Argument Dependent Lookup (ADL).
-Requires: Always available.</description>
+Two default overloads are provided, one taking a single required parameter with optional spare storage value parameter returning success_type&amp;lt;std::decay_t&amp;lt;T&amp;gt;&amp;gt; and perfectly forwarding the input. The other overload takes no parameters, and returns success_type&amp;lt;void&amp;gt;, which usually causes the construction of the receiving basic_result or basic_outcome&amp;rsquo;s with a default construction of their value type.
+Overridable: By Argument Dependent Lookup (ADL).</description>
     </item>
     
     <item>

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-02-22T18:57:50 UTC">
+<meta name="revised" content="2021-02-23T17:40:18 UTC">
 <title>API reference :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2626,7 +2626,7 @@
       <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
         <div>
           <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;)</code>
+            <code>auto success(T &amp;&amp;, ...)</code>
           </a>
         </div>
     </li>
@@ -2967,7 +2967,7 @@
 <p>Functions used to customise how the policy classes operate.</p><li>
 	<a href="/outcome/reference/functions/failure/" ><code>auto failure(T &amp;&amp;, ...)</code></a>
 <p>Returns appropriate type sugar for constructing an unsuccessful result or outcome.</p><li>
-	<a href="/outcome/reference/functions/success/" ><code>auto success(T &amp;&amp;)</code></a>
+	<a href="/outcome/reference/functions/success/" ><code>auto success(T &amp;&amp;, ...)</code></a>
 <p>Returns appropriate type sugar for constructing a successful result or outcome.</p><li>
 	<a href="/outcome/reference/functions/try_operation_has_value/" ><code>bool try_operation_has_value(X)</code></a>
 <p>Default implementation of <code>try_operation_has_value(X)</code> ADL customisation point for <code>OUTCOME_TRY</code>.</p><li>
