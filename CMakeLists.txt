@@ -151,7 +151,7 @@ endif()
 if(OUTCOME_ENABLE_CXX_MODULES)
   # Right now this is very hacky, as cmake doesn't support building C++ Modules yet
   add_custom_target(outcome_module
-    COMMAND "${CMAKE_CXX_COMPILER}" /std:c++latest /EHsc /MD /fp:precise /c "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.ixx" "-I${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/include" "-I${CMAKE_BINARY_DIR}/quickcpplib/include"
+    COMMAND "${CMAKE_CXX_COMPILER}" /std:c++latest /EHsc $<$<CONFIG:Debug>:/MDd> $<$<NOT:$<CONFIG:Debug>>:/MD> /fp:precise /c "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.ixx" "-I${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/include" "-I${CMAKE_BINARY_DIR}/quickcpplib/include"
   )
 endif()
 
