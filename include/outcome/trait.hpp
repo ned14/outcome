@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "config.hpp"
 
-OUTCOME_V2_NAMESPACE_BEGIN
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace trait
 {
