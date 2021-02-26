@@ -22,10 +22,12 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#if defined(__cpp_modules) && !defined(GENERATING_OUTCOME_MODULE_INTERFACE) && !OUTCOME_DISABLE_CXX_MODULES
-import outcome_v2_0;
-#else
+#if !defined(__cpp_modules) || defined(GENERATING_OUTCOME_MODULE_INTERFACE) || OUTCOME_DISABLE_CXX_MODULES
 #include "outcome/coroutine_support.hpp"
 #include "outcome/iostream_support.hpp"
 #include "outcome/try.hpp"
+#else
+#include "outcome/try.hpp"
+
+import OUTCOME_V2_CXX_MODULE_NAME;
 #endif

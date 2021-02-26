@@ -21,9 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-#if 0L && !defined(GENERATING_OUTCOME_MODULE_INTERFACE) && !OUTCOME_DISABLE_CXX_MODULES
-import outcome_v2_0;
-#else
+#if !0L || defined(GENERATING_OUTCOME_MODULE_INTERFACE) || OUTCOME_DISABLE_CXX_MODULES
 /* Tells C++ coroutines about Outcome's result
 (C) 2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Oct 2019
@@ -50,7 +48,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_COROUTINE_SUPPORT_HPP
 #define OUTCOME_COROUTINE_SUPPORT_HPP
 /* Configure Outcome with QuickCppLib
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -987,12 +985,22 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 38142ef2a368047f1169c4527e45a5e74936c5f9
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-22 18:54:48 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 38142ef2
+#define OUTCOME_PREVIOUS_COMMIT_REF 55b1f3285e4ed8e37f12ef3c03d8ec71ec4e1bc1
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-25 15:24:04 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 55b1f328
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
+#ifdef _DEBUG
+#define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d, OUTCOME_PREVIOUS_COMMIT_UNIQUE)))
+#else
+#define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE)))
+#endif
 #else
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
+#ifdef _DEBUG
+#define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
+#else
+#define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2)))
+#endif
 #endif
 #if defined(GENERATING_OUTCOME_MODULE_INTERFACE)
 #define OUTCOME_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(OUTCOME_V2)
@@ -2616,7 +2624,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_VALUE_STORAGE_HPP
 #define OUTCOME_VALUE_STORAGE_HPP
 #include <cassert>
-OUTCOME_V2_NAMESPACE_BEGIN
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace detail
 {
   template <class T, bool nothrow> struct strong_swap_impl
@@ -7685,7 +7693,7 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY_IF
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
 #elif defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
@@ -7890,4 +7898,6 @@ SIGNATURE NOT RECOGNISED
 #pragma GCC diagnostic pop
 #endif
 #endif
+#else
+import OUTCOME_V2_CXX_MODULE_NAME;
 #endif
