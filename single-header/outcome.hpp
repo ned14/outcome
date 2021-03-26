@@ -985,9 +985,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 55b1f3285e4ed8e37f12ef3c03d8ec71ec4e1bc1
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-25 15:24:04 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 55b1f328
+#define OUTCOME_PREVIOUS_COMMIT_REF 35644f5cdeb90f6f29d80714a371098d311cbd47
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-26 10:38:25 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 35644f5c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d, OUTCOME_PREVIOUS_COMMIT_UNIQUE)))
@@ -2505,7 +2505,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef OUTCOME_TRAIT_HPP
 #define OUTCOME_TRAIT_HPP
-OUTCOME_V2_NAMESPACE_BEGIN
+OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace trait
 {
   /*! AWAITING HUGO JSON CONVERSION TOOL
@@ -3846,10 +3846,10 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cpp_concepts < 201907L)
-#define OUTCOME_GCC6_CONCEPT_BOOL bool
-#else
+#if (defined(_MSC_VER) || defined(__clang__) || (defined(__GNUC__) && __cpp_concepts >= 201707) || OUTCOME_FORCE_STD_CXX_CONCEPTS) && !OUTCOME_FORCE_LEGACY_GCC_CXX_CONCEPTS
 #define OUTCOME_GCC6_CONCEPT_BOOL
+#else
+#define OUTCOME_GCC6_CONCEPT_BOOL bool
 #endif
   namespace detail
   {

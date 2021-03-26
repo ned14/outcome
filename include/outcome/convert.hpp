@@ -32,10 +32,10 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if !defined(_MSC_VER) && !defined(__clang__) && (__GNUC__ < 9 || __cpp_concepts < 201907L)
-#define OUTCOME_GCC6_CONCEPT_BOOL bool
-#else
+#if (defined(_MSC_VER) || defined(__clang__) || (defined(__GNUC__) && __cpp_concepts >= 201707) || OUTCOME_FORCE_STD_CXX_CONCEPTS) && !OUTCOME_FORCE_LEGACY_GCC_CXX_CONCEPTS
 #define OUTCOME_GCC6_CONCEPT_BOOL
+#else
+#define OUTCOME_GCC6_CONCEPT_BOOL bool
 #endif
   namespace detail
   {
