@@ -95,6 +95,11 @@ library for certain corner case code:
     for all their help in designing the new overloaded TRY syntax. My thanks also to vasama for reporting this
     issue and working through how best to fix it with me.
 
+[#249](https://github.com/ned14/outcome/issues/249)
+: The preprocessor logic for choosing when to use `bool` with `concept` on GCC was yet again refactored.
+This should fix those choices of GCC configuration which caused failure due to the wrong combination
+being chosen.
+
 ---
 ## v2.1.5 11th December 2020 (Boost 1.75) [[release]](https://github.com/ned14/outcome/releases/tag/v2.1.5)
 
