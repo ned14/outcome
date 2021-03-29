@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-03-26T11:56:04 UTC">
+<meta name="revised" content="2021-03-29T14:01:22 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2883,6 +2883,10 @@ specify unique storage, there is a new <code>OUTCOME_TRYV2(refspec, expr)</code>
 <p>My thanks to KamilCuk from <a href="https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument">https://stackoverflow.com/questions/66069152/token-detection-within-a-c-preprocessor-macro-argument</a>
 for all their help in designing the new overloaded TRY syntax. My thanks also to vasama for reporting this
 issue and working through how best to fix it with me.</p></dd>
+<dt><a href="https://github.com/ned14/outcome/issues/249">#249</a></dt>
+<dd><p>The preprocessor logic for choosing when to use <code>bool</code> with <code>concept</code> on GCC was yet again refactored.
+This should fix those choices of GCC configuration which caused failure due to the wrong combination
+being chosen.</p></dd>
 </dl>
 
 <hr />
@@ -3324,7 +3328,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 23/02/2021
+        <i class='fa fa-calendar'></i> Last update on 29/03/2021
     </div>
     
 
