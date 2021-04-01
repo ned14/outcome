@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-03-29T19:19:48 UTC">
+<meta name="revised" content="2021-04-01T02:41:26 UTC">
 <title>Advanced :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -152,34 +152,6 @@
       <a href="/outcome/tutorial/essential/result/">result&lt;&gt;</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/tutorial/essential/result/inspecting/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/essential/result/inspecting/">
-            Inspecting result<T, EC>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/essential/result/try/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/essential/result/try/">
-            TRY operations
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/essential/result/try_greedy/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/essential/result/try_greedy/">
-            TRY is greedy
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/tutorial/essential/result/try_ref/" class="dd-item">
-        <div>
-          <a href="/outcome/tutorial/essential/result/try_ref/">
-            TRY avoiding copy/move
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/tutorial/essential/outcome/" class="dd-item haschildren
@@ -523,274 +495,133 @@
       <a href="/outcome/experimental/">Experimental</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-    <li data-nav-id="/outcome/reference/functions/hooks/" class="dd-item haschildren
+      <li data-nav-id="/outcome/experimental/advantages/" class="dd-item">
+        <div>
+          <a href="/outcome/experimental/advantages/">
+            The main advantages
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/experimental/map/" class="dd-item">
+        <div>
+          <a href="/outcome/experimental/map/">
+            Approximate map between error code designs
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/experimental/differences/" class="dd-item">
+        <div>
+          <a href="/outcome/experimental/differences/">
+            Major differences
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/experimental/status_result/" class="dd-item">
+        <div>
+          <a href="/outcome/experimental/status_result/">
+            <code>status_result</code> and <code>status_outcome</code>
+          </a>
+        </div>
+    </li>
+    <li data-nav-id="/outcome/experimental/worked-example/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/reference/functions/hooks/">Hooks</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/experimental/worked-example/">Worked example: Custom domain</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/hooks/spare_storage/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/preamble/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/spare_storage/">
-            <code>uint16_t spare_storage(const basic_result|basic_outcome *) noexcept</code>
+          <a href="/outcome/experimental/worked-example/preamble/">
+            Define a custom code domain
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/value_type/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;) noexcept</code>
+          <a href="/outcome/experimental/worked-example/value_type/">
+            The payload
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_construction2/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/constructor/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_construction2/">
-            <code>void hook_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          <a href="/outcome/experimental/worked-example/constructor/">
+            The constructor
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/string_ref/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
+          <a href="/outcome/experimental/worked-example/string_ref/">
+            String refs
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/message/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_copy_construction2/">
-            <code>void hook_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
+          <a href="/outcome/experimental/worked-example/message/">
+            Redefining <code>message()</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/source/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_in_place_construction/">
-            <code>void hook_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
+          <a href="/outcome/experimental/worked-example/source/">
+            Constexpr domain source
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/worked-example/implicit_conversion/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_outcome_move_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_outcome_move_construction2/">
-            <code>void hook_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_construction/">
-            <code>void hook_result_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_copy_construction/">
-            <code>void hook_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_in_place_construction/">
-            <code>void hook_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/hook_result_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/hook_result_move_construction/">
-            <code>void hook_result_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/override_outcome_exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/override_outcome_exception/">
-            <code>void override_outcome_exception(basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/hooks/set_spare_storage/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/hooks/set_spare_storage/">
-            <code>void set_spare_storage(basic_result|basic_outcome *, uint16_t) noexcept</code>
+          <a href="/outcome/experimental/worked-example/implicit_conversion/">
+            Implicit conversion
           </a>
         </div>
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/reference/functions/iostream/" class="dd-item haschildren
+      <li data-nav-id="/outcome/experimental/outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/experimental/outcome/">
+            Tying it all together
+          </a>
+        </div>
+    </li>
+    <li data-nav-id="/outcome/experimental/c-api/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/reference/functions/iostream/">Iostream</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/experimental/c-api/">Using Outcome from C code</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_in/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/c-api/limitations/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/iostream/outcome_operator_in/">
-            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          <a href="/outcome/experimental/c-api/limitations/">
+            Limitations
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_in/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/c-api/example/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/iostream/result_operator_in/">
-            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          <a href="/outcome/experimental/c-api/example/">
+            Example C++ function
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_out/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/c-api/example2/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/iostream/outcome_operator_out/">
-            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          <a href="/outcome/experimental/c-api/example2/">
+            Calling it from C
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_out/" class="dd-item">
+      <li data-nav-id="/outcome/experimental/c-api/reference/" class="dd-item">
         <div>
-          <a href="/outcome/reference/functions/iostream/result_operator_out/">
-            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/iostream/outcome_print/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/iostream/outcome_print/">
-            <code>std::string print(const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/iostream/result_print/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/iostream/result_print/">
-            <code>std::string print(const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          <a href="/outcome/experimental/c-api/reference/">
+            C Macro API Reference
           </a>
         </div>
     </li>
         </ul>
-    </li>
-    <li data-nav-id="/outcome/reference/functions/policy/" class="dd-item haschildren
-        ">
-      <div>
-      <a href="/outcome/reference/functions/policy/">Policy</a><i class="fa fa-angle-right fa-lg category-icon"></i>
-      </div>
-        <ul>
-      <li data-nav-id="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/">
-            <code>auto basic_outcome_failure_exception_from_error(const EC &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/error_code/">
-            <code>decltype(auto) error_code(T &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/exception_ptr/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/exception_ptr/">
-            <code>decltype(auto) exception_ptr(T &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(BoostErrorCodeEnum &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(ErrorCodeEnum &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const boost::system::error_code &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)</code>
-          </a>
-        </div>
-    </li>
-        </ul>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/failure/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/failure/">
-            <code>auto failure(T &amp;&amp;, ...)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/success/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/success/">
-            <code>auto success(T &amp;&amp;, ...)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_has_value/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_has_value/">
-            <code>bool try_operation_has_value(X)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_extract_value/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_extract_value/">
-            <code>decltype(auto) try_operation_extract_value(X)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_operation_return_as/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_operation_return_as/">
-            <code>decltype(auto) try_operation_return_as(X)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/error_from_exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/error_from_exception/">
-            <code>std::error_code error_from_exception(std::exception_ptr &amp;&amp;ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/strong_swap/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/strong_swap/">
-            <code>void strong_swap(bool &amp;all_good, T &amp;a, T &amp;b)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/try_throw_std_exception_from_error/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/try_throw_std_exception_from_error/">
-            <code>void try_throw_std_exception_from_error(std::error_code ec, const std::string &amp;msg = std::string{})</code>
-          </a>
-        </div>
     </li>
         </ul>
     </li>
