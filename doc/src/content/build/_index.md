@@ -30,6 +30,18 @@ visualisation file at https://github.com/ned14/outcome/raw/master/include/outcom
 useful to include into your build.
 
 
+## Usage from the vcpkg package manager
+
+This is particularly easy, and works on Mac OS, Linux and Microsoft Windows:
+
+```
+vcpkg install outcome
+```
+
+Outcome appears at `<outcome/outcome.hpp>`. This is a full copy of Outcome, so
+Experimental Outcome and all the usual headers are where you would expect.
+
+
 ## Usage from the Conan package manager
 
 *(thanks to Théo Delrieu for contributing this support)*
@@ -52,8 +64,8 @@ Outcome will be made available by Conan at `<outcome.hpp>`.
 
 ## Usage from the cmake hunter package manager
 
-Outcome has not been submitted to the main cmake hunter package manager repo as
-it changes too frequently. You can however add it as a git submodule:
+Outcome has not been submitted to the main cmake hunter package manager repo yet.
+You can however add it as a git submodule:
 
 ```
 cd yourthirdpartyrepodir
