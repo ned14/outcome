@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-04-01T02:41:25 UTC">
+<meta name="revised" content="2021-04-02T10:09:08 UTC">
 <title>Build and install :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2804,6 +2804,16 @@ If you might be debugging using Microsoft Visual Studio, you may find the debugg
 visualisation file at <a href="https://github.com/ned14/outcome/raw/master/include/outcome/outcome.natvis">https://github.com/ned14/outcome/raw/master/include/outcome/outcome.natvis</a>
 useful to include into your build.</p>
 
+<h2 id="usage-from-the-vcpkg-package-manager">Usage from the vcpkg package manager</h2>
+
+<p>This is particularly easy, and works on Mac OS, Linux and Microsoft Windows:</p>
+
+<pre><code>vcpkg install outcome
+</code></pre>
+
+<p>Outcome appears at <code>&lt;outcome/outcome.hpp&gt;</code>. This is a full copy of Outcome, so
+Experimental Outcome and all the usual headers are where you would expect.</p>
+
 <h2 id="usage-from-the-conan-package-manager">Usage from the Conan package manager</h2>
 
 <p><em>(thanks to Théo Delrieu for contributing this support)</em></p>
@@ -2823,8 +2833,8 @@ Outcome/master@ned14/stable
 
 <h2 id="usage-from-the-cmake-hunter-package-manager">Usage from the cmake hunter package manager</h2>
 
-<p>Outcome has not been submitted to the main cmake hunter package manager repo as
-it changes too frequently. You can however add it as a git submodule:</p>
+<p>Outcome has not been submitted to the main cmake hunter package manager repo yet.
+You can however add it as a git submodule:</p>
 
 <pre><code>cd yourthirdpartyrepodir
 git submodule add https://github.com/ned14/quickcpplib
@@ -2988,7 +2998,7 @@ suite along with your own.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 14/11/2020
+        <i class='fa fa-calendar'></i> Last update on 02/04/2021
     </div>
     
 
