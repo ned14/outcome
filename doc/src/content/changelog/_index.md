@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.2.0 ? (Boost 1.76) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.0)
+## v2.2.0 16th April 2021 (Boost 1.76) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.0)
 
 BREAKING CHANGE As announced for a year and three Boost releases, Outcome v2.2 became the default, replacing v2.1.
 : All v2.1 Outcome code will need to be upgraded as described in [the v2.1 => v2.2 upgrade guide]({{% relref "/changelog/upgrade_v21_v22" %}}).
