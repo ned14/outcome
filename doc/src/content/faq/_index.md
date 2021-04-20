@@ -388,7 +388,9 @@ Expected permits `T` and `E` to be the same.
    `.assume_value()` and `.assume_error()` for narrow (UB causing) observers].
 8. `checked<T, E>` uses `success<T>` and `failure<E>` type sugars for disambiguation.
 Expected uses `unexpected<E>` only.
-9. `checked<T, E>` requires `E` to be default constructible.
+9. `checked<T, E>` does not implement (prone to unintended misoperation) comparison
+operators which permit implicit conversion e.g. `checked<T> == T` will fail to compile.
+Instead write unambiguous code e.g. `checked<T> == success(T)` or `checked<T> == failure(T)`.
 10. `checked<T, E>` defaults `E` to `std::error_code` or `boost::system::error_code`.
 Expected does not default `E`.
 
@@ -425,6 +427,12 @@ party libraries each using incommensurate Outcome (or Expected) configurations. 
 not do any of this, but subsequent WG21 papers do propose various interoperation
 mechanisms, [one of which](https://wg21.link/P0786) Outcome implements so code using Expected will seamlessly
 interoperate with code using Outcome.
+
+6. Outcome was designed with the benefit of hindsight after Optional and Expected,
+where how those do implicit conversions have been found to be prone to writing
+unintentionally buggy code. Outcome simultaneously permits more implicit conversions
+for ease of use and convenience, where those are unambigiously safe, and prevents
+other implicit conversions which the Boost peer review reported as dangerous.
 
 
 ## Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?
