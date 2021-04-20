@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-04-19T11:34:45 UTC">
+<meta name="revised" content="2021-04-20T10:42:13 UTC">
 <title>Frequently asked questions :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -3217,7 +3217,9 @@ Expected&rsquo;s <code>.error()</code> is narrow (UB on no-error). [<code>checke
 </ul></li>
 <li><code>checked&lt;T, E&gt;</code> uses <code>success&lt;T&gt;</code> and <code>failure&lt;E&gt;</code> type sugars for disambiguation.
 Expected uses <code>unexpected&lt;E&gt;</code> only.</li>
-<li><code>checked&lt;T, E&gt;</code> requires <code>E</code> to be default constructible.</li>
+<li><code>checked&lt;T, E&gt;</code> does not implement (prone to unintended misoperation) comparison
+operators which permit implicit conversion e.g. <code>checked&lt;T&gt; == T</code> will fail to compile.
+Instead write unambiguous code e.g. <code>checked&lt;T&gt; == success(T)</code> or <code>checked&lt;T&gt; == failure(T)</code>.</li>
 <li><code>checked&lt;T, E&gt;</code> defaults <code>E</code> to <code>std::error_code</code> or <code>boost::system::error_code</code>.
 Expected does not default <code>E</code>.</li>
 </ol>
@@ -3346,6 +3348,12 @@ party libraries each using incommensurate Outcome (or Expected) configurations. 
 not do any of this, but subsequent WG21 papers do propose various interoperation
 mechanisms, <a href="https://wg21.link/P0786">one of which</a> Outcome implements so code using Expected will seamlessly
 interoperate with code using Outcome.</p></li>
+
+<li><p>Outcome was designed with the benefit of hindsight after Optional and Expected,
+where how those do implicit conversions have been found to be prone to writing
+unintentionally buggy code. Outcome simultaneously permits more implicit conversions
+for ease of use and convenience, where those are unambigiously safe, and prevents
+other implicit conversions which the Boost peer review reported as dangerous.</p></li>
 </ol>
 
 <h2 id="is-outcome-riddled-with-undefined-behaviour-for-const-const-containing-and-reference-containing-types">Is Outcome riddled with undefined behaviour for const, const-containing and reference-containing types?</h2>
@@ -3444,7 +3452,7 @@ C++ 17 or 14 given how much of STL containers would break.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 17/12/2020
+        <i class='fa fa-calendar'></i> Last update on 20/04/2021
     </div>
     
 
