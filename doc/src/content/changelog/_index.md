@@ -4,6 +4,18 @@ weight = 80
 +++
 
 ---
+## v2.2.1 ? (Boost 1.77) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.1)
+
+
+### Enhancements:
+
+
+### Bug fixes:
+
+[#251](https://github.com/ned14/outcome/issues/251)
+: Fix failure to compile Boot.Outcome when the compiler declares support for C++ modules.
+
+---
 ## v2.2.0 16th April 2021 (Boost 1.76) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.0)
 
 BREAKING CHANGE As announced for a year and three Boost releases, Outcome v2.2 became the default, replacing v2.1.
