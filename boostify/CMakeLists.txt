@@ -13,4 +13,5 @@ target_link_libraries(boost_outcome INTERFACE
   Boost::config
   Boost::exception
   Boost::system
+  Boost::throw_exception
 )
