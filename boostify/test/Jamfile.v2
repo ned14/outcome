@@ -24,6 +24,7 @@ project
 {
   test-suite outcome :
 
+    [ compile-fail compile-fail/issue0071-fail.cpp ]
     [ compile-fail compile-fail/outcome-int-int-1.cpp ]
     [ compile-fail compile-fail/result-int-int-1.cpp ]
     [ compile-fail compile-fail/result-int-int-2.cpp ]
@@ -53,6 +54,12 @@ project
     [ run tests/issue0115.cpp ]
     [ run tests/issue0116.cpp ]
     [ run tests/issue0140.cpp ]
+    [ run tests/issue0182.cpp ]
+    [ run tests/issue0203.cpp ]
+    [ run tests/issue0210.cpp ]
+    [ run tests/issue0220.cpp ]
+    [ run tests/issue0244.cpp ]
+    [ run tests/issue0247.cpp ]
     [ run tests/noexcept-propagation.cpp ]
     [ run tests/propagate.cpp ]
     [ run tests/serialisation.cpp ]

@@ -20,6 +20,11 @@ target_link_libraries(boost_outcome
     Boost::throw_exception
 )
 
+target_compile_features(boost_outcome
+  INTERFACE
+    cxx_std_14
+)
+
 if(BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
 
   add_subdirectory(test)
