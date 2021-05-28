@@ -13,6 +13,9 @@ boost_test(TYPE compile-fail SOURCES "compile-fail/outcome-int-int-1.cpp")
 boost_test(TYPE compile-fail SOURCES "compile-fail/result-int-int-1.cpp")
 boost_test(TYPE compile-fail SOURCES "compile-fail/result-int-int-2.cpp")
 
+set(BOOST_TEST_LINK_LIBRARIES Boost::outcome Boost::unit_test_framework)
+set(BOOST_TEST_COMPILE_DEFINITIONS BOOST_TEST_MODULE=Outcome)
+
 boost_test(TYPE run SOURCES "tests/comparison.cpp")
 boost_test(TYPE run SOURCES "tests/constexpr.cpp")
 boost_test(TYPE run SOURCES "tests/containers.cpp")
@@ -38,7 +41,7 @@ boost_test(TYPE run SOURCES "tests/issue0095.cpp")
 boost_test(TYPE run SOURCES "tests/issue0115.cpp")
 boost_test(TYPE run SOURCES "tests/issue0116.cpp")
 boost_test(TYPE run SOURCES "tests/issue0140.cpp")
-boost_test(TYPE run SOURCES "tests/issue0182.cpp")
+#boost_test(TYPE run SOURCES "tests/issue0182.cpp")  ## not applicable to Boost
 boost_test(TYPE run SOURCES "tests/issue0203.cpp")
 boost_test(TYPE run SOURCES "tests/issue0210.cpp")
 boost_test(TYPE run SOURCES "tests/issue0220.cpp")

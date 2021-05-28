@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
-BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0189 / test, "result<void, int>.value() compiles without tripping fail_to_compile_observers")
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0182 / test, "result<void, int>.value() compiles without tripping fail_to_compile_observers")
 {
   namespace outcome = OUTCOME_V2_NAMESPACE;
   static_assert(!outcome::trait::is_error_code_available<int>::value, "int is clearly not a source for make_error_code()");
