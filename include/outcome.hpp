@@ -1,5 +1,5 @@
 /* Include the default amount of outcome
-(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
+(C) 2018-2021 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
 File Created: Mar 2018
 
 
@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#if !defined(__cpp_modules) || defined(GENERATING_OUTCOME_MODULE_INTERFACE) || OUTCOME_DISABLE_CXX_MODULES
+#if !OUTCOME_ENABLE_CXX_MODULES || !defined(__cpp_modules) || defined(GENERATING_OUTCOME_MODULE_INTERFACE) || OUTCOME_DISABLE_CXX_MODULES
 #include "outcome/coroutine_support.hpp"
 #include "outcome/iostream_support.hpp"
 #include "outcome/try.hpp"

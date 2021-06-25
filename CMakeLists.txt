@@ -153,6 +153,9 @@ if(OUTCOME_ENABLE_CXX_MODULES)
   add_custom_target(outcome_module
     COMMAND "${CMAKE_CXX_COMPILER}" /std:c++latest /EHsc $<$<CONFIG:Debug>:/MDd> $<$<NOT:$<CONFIG:Debug>>:/MD> /fp:precise /c "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome.ixx" "-I${CMAKE_CURRENT_SOURCE_DIR}/../quickcpplib/include" "-I${CMAKE_BINARY_DIR}/quickcpplib/include"
   )
+  all_compile_definitions(PUBLIC
+    OUTCOME_ENABLE_CXX_MODULES=1
+  )
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
