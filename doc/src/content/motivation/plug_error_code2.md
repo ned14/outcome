@@ -1,5 +1,5 @@
 +++
-title = "Plugging a library into boost::system::error_code"
+title = "Plugging a library into `boost::system::error_code`"
 description = "Illustrates how you can hook into the `boost::system::error_code` system from Boost in order to work with your own set of error codes."
 weight = 55
 +++
