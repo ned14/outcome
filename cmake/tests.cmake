@@ -34,6 +34,7 @@ set(outcome_TESTS
   "test/tests/issue0220.cpp"
   "test/tests/issue0244.cpp"
   "test/tests/issue0247.cpp"
+  "test/tests/issue0255.cpp"
   "test/tests/noexcept-propagation.cpp"
   "test/tests/propagate.cpp"
   "test/tests/serialisation.cpp"

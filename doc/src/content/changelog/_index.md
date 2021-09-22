@@ -4,6 +4,19 @@ weight = 80
 +++
 
 ---
+## v2.2.2 ??? (Boost 1.78) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
+
+### Enhancements:
+
+[#255](https://github.com/ned14/outcome/issues/255)
+: Restore Experimental Outcome constexpr compatibility in C++ 20 which was an undocumented
+property of the Outcome v2.1 series, and which had been dropped in the v2.2 series.
+
+
+### Bug fixes:
+
+
+---
 ## v2.2.1 13th August 2021 (Boost 1.77) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.1)
 
 ### Bug fixes:

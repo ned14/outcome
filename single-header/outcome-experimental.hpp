@@ -570,9 +570,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF 9a151aab3abaf1ced6b0b82f9328beb536386254
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-02-23 11:25:30 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE 9a151aab
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF d04c15bb5dd702869c91161cc5fc42422917e0a8
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-09-02 11:52:08 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d04c15bb
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 35644f5cdeb90f6f29d80714a371098d311cbd47
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-02-26 10:38:25 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 35644f5c
+#define OUTCOME_PREVIOUS_COMMIT_REF a2d37fa9840de0791dce73f0a944da830b8e6e99
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-09-22 10:11:15 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a2d37fa9
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d, OUTCOME_PREVIOUS_COMMIT_UNIQUE)))
@@ -1449,15 +1449,25 @@ extern "C"
         {
           // Keep offset till later
           ret[n] = (char *) ((char *) p - (char *) ret);
-          if(!SymGetLineFromAddr64 || !SymGetLineFromAddr64((void *) (size_t) -1 /*GetCurrentProcess()*/, (size_t) bt[n], &displ, &ihl))
           {
-            if(n == 0)
+            static std::atomic<unsigned> symlock(0);
+            while(symlock.exchange(1, std::memory_order_acq_rel))
+              ;
+            if(!SymGetLineFromAddr64 || !SymGetLineFromAddr64((void *) (size_t) -1 /*GetCurrentProcess()*/, (size_t) bt[n], &displ, &ihl))
             {
-              free(ret);
-              return NULL;
+              symlock.store(0, std::memory_order_release);
+              if(n == 0)
+              {
+                free(ret);
+                return NULL;
+              }
+              ihl.FileName = (wchar_t *) L"unknown";
+              ihl.LineNumber = 0;
             }
-            ihl.FileName = (wchar_t *) L"unknown";
-            ihl.LineNumber = 0;
+            else
+            {
+              symlock.store(0, std::memory_order_release);
+            }
           }
         retry:
           if(please_realloc)
@@ -2305,7 +2315,8 @@ namespace detail
     using _error_type = std::conditional_t<std::is_same<value_type, error_type>::value, disable_in_place_error_type, error_type>;
     using _value_type_ = devoid<value_type>;
     using _error_type_ = devoid<error_type>;
-    union {
+    union
+    {
       empty_type _empty;
       _value_type_ _value;
       _error_type_ _error;
@@ -2327,21 +2338,21 @@ namespace detail
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<_value_type> /*unused*/,
-                                             Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type_, Args...>)
+                                             Args &&...args) noexcept(detail::is_nothrow_constructible<_value_type_, Args...>)
         : _value(static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<_value_type> /*unused*/, std::initializer_list<U> il,
-                                    Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type_, std::initializer_list<U>, Args...>)
+                                    Args &&...args) noexcept(detail::is_nothrow_constructible<_value_type_, std::initializer_list<U>, Args...>)
         : _value(il, static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class... Args>
     constexpr explicit value_storage_trivial(in_place_type_t<_error_type> /*unused*/,
-                                             Args &&... args) noexcept(detail::is_nothrow_constructible<_error_type_, Args...>)
+                                             Args &&...args) noexcept(detail::is_nothrow_constructible<_error_type_, Args...>)
         : _error(static_cast<Args &&>(args)...)
         , _status(status::have_error)
     {
@@ -2349,7 +2360,7 @@ namespace detail
     }
     template <class U, class... Args>
     constexpr value_storage_trivial(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il,
-                                    Args &&... args) noexcept(detail::is_nothrow_constructible<_error_type_, std::initializer_list<U>, Args...>)
+                                    Args &&...args) noexcept(detail::is_nothrow_constructible<_error_type_, std::initializer_list<U>, Args...>)
         : _error(il, static_cast<Args &&>(args)...)
         , _status(status::have_error)
     {
@@ -2387,8 +2398,7 @@ namespace detail
     {
     };
     template <class V>
-    static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
+    static constexpr bool enable_void_value_converting_constructor = std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -2414,8 +2424,7 @@ namespace detail
     {
     };
     template <class U>
-    static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
+    static constexpr bool enable_void_error_converting_constructor = std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
     constexpr explicit value_storage_trivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
@@ -2444,7 +2453,9 @@ namespace detail
       o = static_cast<value_storage_trivial &&>(temp);
     }
   };
-  // Used if T is non-trivial
+  /* Used if T or E is non-trivial. The additional constexpr is injected in C++ 20 to enable Outcome to
+  work in constexpr evaluation contexts in C++ 20 where non-trivial constexpr destructors are now allowed.
+  */
   template <class T, class E> struct value_storage_nontrivial
   {
     using value_type = T;
@@ -2459,15 +2470,20 @@ namespace detail
     using _error_type = std::conditional_t<std::is_same<value_type, error_type>::value, disable_in_place_error_type, error_type>;
     using _value_type_ = devoid<value_type>;
     using _error_type_ = devoid<error_type>;
-    union {
+    union
+    {
       empty_type _empty1;
       _value_type_ _value;
     };
     status_bitfield_type _status;
-    union {
+    union
+    {
       empty_type _empty2;
       _error_type_ _error;
     };
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
     value_storage_nontrivial() noexcept
         : _empty1{}
         , _empty2{}
@@ -2475,6 +2491,9 @@ namespace detail
     }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
     value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // NOLINT if reaches here, move assignment is trivial
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(
     std::is_nothrow_move_constructible<_value_type_>::value &&std::is_nothrow_move_constructible<_error_type_>::value) // NOLINT
     {
@@ -2489,6 +2508,9 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(
     std::is_nothrow_copy_constructible<_value_type_>::value &&std::is_nothrow_copy_constructible<_error_type_>::value)
     {
@@ -2502,6 +2524,9 @@ namespace detail
       }
       _status = o._status;
     }
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
     explicit value_storage_nontrivial(status_bitfield_type status)
         : _empty1()
         , _status(status)
@@ -2509,30 +2534,30 @@ namespace detail
     {
     }
     template <class... Args>
-    explicit value_storage_nontrivial(in_place_type_t<_value_type> /*unused*/,
-                                      Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type_, Args...>)
+    constexpr explicit value_storage_nontrivial(in_place_type_t<_value_type> /*unused*/,
+                                                Args &&...args) noexcept(detail::is_nothrow_constructible<_value_type_, Args...>)
         : _value(static_cast<Args &&>(args)...) // NOLINT
         , _status(status::have_value)
     {
     }
     template <class U, class... Args>
-    value_storage_nontrivial(in_place_type_t<_value_type> /*unused*/, std::initializer_list<U> il,
-                             Args &&... args) noexcept(detail::is_nothrow_constructible<_value_type_, std::initializer_list<U>, Args...>)
+    constexpr value_storage_nontrivial(in_place_type_t<_value_type> /*unused*/, std::initializer_list<U> il,
+                                       Args &&...args) noexcept(detail::is_nothrow_constructible<_value_type_, std::initializer_list<U>, Args...>)
         : _value(il, static_cast<Args &&>(args)...)
         , _status(status::have_value)
     {
     }
     template <class... Args>
-    explicit value_storage_nontrivial(in_place_type_t<_error_type> /*unused*/,
-                                      Args &&... args) noexcept(detail::is_nothrow_constructible<_error_type_, Args...>)
+    constexpr explicit value_storage_nontrivial(in_place_type_t<_error_type> /*unused*/,
+                                                Args &&...args) noexcept(detail::is_nothrow_constructible<_error_type_, Args...>)
         : _status(status::have_error)
         , _error(static_cast<Args &&>(args)...) // NOLINT
     {
       _set_error_is_errno(*this);
     }
     template <class U, class... Args>
-    value_storage_nontrivial(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il,
-                             Args &&... args) noexcept(detail::is_nothrow_constructible<_error_type_, std::initializer_list<U>, Args...>)
+    constexpr value_storage_nontrivial(in_place_type_t<_error_type> /*unused*/, std::initializer_list<U> il,
+                                       Args &&...args) noexcept(detail::is_nothrow_constructible<_error_type_, std::initializer_list<U>, Args...>)
         : _status(status::have_error)
         , _error(il, static_cast<Args &&>(args)...)
     {
@@ -2591,11 +2616,10 @@ namespace detail
     {
     };
     template <class V>
-    static constexpr bool enable_void_value_converting_constructor =
-    std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
+    static constexpr bool enable_void_value_converting_constructor = std::is_default_constructible<value_type>::value &&detail::is_constructible<error_type, V>;
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
-    explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<void, V> &o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_default_constructible<_value_type_>::value &&detail::is_nothrow_constructible<_error_type_, V>)
     {
       if(o._status.have_value())
@@ -2610,7 +2634,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class V)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_value_converting_constructor<V>))
-    explicit value_storage_nontrivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<void, V> &&o, void_value_converting_constructor_tag /*unused*/ = {}) noexcept(
     std::is_nothrow_default_constructible<_value_type_>::value &&detail::is_nothrow_constructible<_error_type_, V>)
     {
       if(o._status.have_value())
@@ -2628,11 +2652,10 @@ namespace detail
     {
     };
     template <class U>
-    static constexpr bool enable_void_error_converting_constructor =
-    std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
+    static constexpr bool enable_void_error_converting_constructor = std::is_default_constructible<error_type>::value &&detail::is_constructible<value_type, U>;
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
-    explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
+    constexpr explicit value_storage_nontrivial(const value_storage_trivial<U, void> &o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
     detail::is_nothrow_constructible<_value_type_, U> &&std::is_nothrow_default_constructible<_error_type_>::value)
     {
       if(o._status.have_value())
@@ -2647,7 +2670,7 @@ namespace detail
     }
     OUTCOME_TEMPLATE(class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(enable_void_error_converting_constructor<U>))
-    explicit value_storage_nontrivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
+    constexpr explicit value_storage_nontrivial(value_storage_trivial<U, void> &&o, void_error_converting_constructor_tag /*unused*/ = {}) noexcept(
     detail::is_nothrow_constructible<_value_type_, U> &&std::is_nothrow_default_constructible<_error_type_>::value)
     {
       if(o._status.have_value())
@@ -2661,6 +2684,9 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<_value_type_>::value &&std::is_nothrow_destructible<_error_type_>::value)
     {
       if(this->_status.have_value())
@@ -2680,7 +2706,10 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-    constexpr void
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
+    void
     swap(value_storage_nontrivial &o) noexcept(detail::is_nothrow_swappable<_value_type_>::value &&detail::is_nothrow_swappable<_error_type_>::value)
     {
       using std::swap;
@@ -2865,7 +2894,11 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default; // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-    value_storage_nontrivial_move_assignment &operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
+    value_storage_nontrivial_move_assignment &
+    operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
     std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value) // NOLINT
     {
       using _value_type_ = typename Base::_value_type_;
@@ -2878,14 +2911,14 @@ namespace detail
       }
       if(this->_status.have_value() && o._status.have_value())
       {
-        this->_value = static_cast<_value_type_&&>(o._value); // NOLINT
+        this->_value = static_cast<_value_type_ &&>(o._value); // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
       }
       if(this->_status.have_error() && o._status.have_error())
       {
-        this->_error = static_cast<_error_type_&&>(o._error); // NOLINT
+        this->_error = static_cast<_error_type_ &&>(o._error); // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2902,7 +2935,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value)); // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2919,7 +2952,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error)); // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2930,7 +2963,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        new(&this->_error) _error_type_(static_cast<_error_type_&&>(o._error)); // NOLINT
+        new(&this->_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2941,7 +2974,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        new(&this->_value) _value_type_(static_cast<_value_type_&&>(o._value)); // NOLINT
+        new(&this->_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2959,13 +2992,16 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default; // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default; // NOLINT
-    value_storage_nontrivial_copy_assignment &operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
+#if __cplusplus >= 202000L || _HAS_CXX20
+    constexpr
+#endif
+    value_storage_nontrivial_copy_assignment &
+    operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
     std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
-      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value()
-         && !o._status.have_error())
+      if(!this->_status.have_value() && !this->_status.have_error() && !o._status.have_value() && !o._status.have_error())
       {
         this->_status = o._status;
         return *this;
@@ -6175,7 +6211,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_GENERIC_CODE_HPP
 #define SYSTEM_ERROR2_GENERIC_CODE_HPP
 /* Proposed SG14 status_code
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2021 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6250,7 +6286,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 #define SYSTEM_ERROR2_STATUS_CODE_DOMAIN_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2021 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6288,12 +6324,39 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <new>
 // 0.01
 #include <initializer_list>
+#ifndef SYSTEM_ERROR2_HAVE_BIT_CAST
+#ifdef __has_include
+#if __has_include(<bit>) && (__cplusplus >= 202002L || _HAS_CXX20)
+#define SYSTEM_ERROR2_HAVE_BIT_CAST 1
+#endif
+#elif __cplusplus >= 202002L
+#define SYSTEM_ERROR2_HAVE_BIT_CAST 1
+#endif
+#ifndef SYSTEM_ERROR2_HAVE_BIT_CAST
+#define SYSTEM_ERROR2_HAVE_BIT_CAST 0
+#endif
+#endif
+#if SYSTEM_ERROR2_HAVE_BIT_CAST
+#include <bit>
+#if __cpp_lib_bit_cast < 201806L
+#undef SYSTEM_ERROR2_HAVE_BIT_CAST
+#define SYSTEM_ERROR2_HAVE_BIT_CAST 0
+#endif
+#endif
 #ifndef SYSTEM_ERROR2_CONSTEXPR14
 #if 0L || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
 //! Defined to be `constexpr` when on C++ 14 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR14 constexpr
 #else
 #define SYSTEM_ERROR2_CONSTEXPR14
+#endif
+#endif
+#ifndef SYSTEM_ERROR2_CONSTEXPR20
+#if 0L || __cplusplus >= 202000 || _HAS_CXX20
+//! Defined to be `constexpr` when on C++ 20 or better compilers. Usually automatic, can be overriden.
+#define SYSTEM_ERROR2_CONSTEXPR20 constexpr
+#else
+#define SYSTEM_ERROR2_CONSTEXPR20
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_NORETURN
@@ -6385,17 +6448,11 @@ namespace detail
     return end - str;
   }
 #else
-  inline constexpr size_t cstrlen_(const char *str, size_t acc)
-  {
-    return (str[0] == 0) ? acc : cstrlen_(str + 1, acc + 1);
-  }
-  inline constexpr size_t cstrlen(const char *str)
-  {
-    return cstrlen_(str, 0);
-  }
+  inline constexpr size_t cstrlen_(const char *str, size_t acc) { return (str[0] == 0) ? acc : cstrlen_(str + 1, acc + 1); }
+  inline constexpr size_t cstrlen(const char *str) { return cstrlen_(str, 0); }
 #endif
   /* A partially compliant implementation of C++20's std::bit_cast function contributed
-  by Jesse Towner. TODO FIXME Replace with C++ 20 bit_cast when available.
+  by Jesse Towner.
 
   Our bit_cast is only guaranteed to be constexpr when both the input and output
   arguments are either integrals or enums. However, this covers most use cases
@@ -6408,10 +6465,35 @@ namespace detail
   template <class To, class From> using is_static_castable = std::integral_constant<bool, is_integral_or_enum<To>::value && is_integral_or_enum<From>::value>;
   template <class To, class From> using is_union_castable = std::integral_constant<bool, !is_static_castable<To, From>::value && !std::is_array<To>::value && !std::is_array<From>::value>;
   template <class To, class From> using is_bit_castable = std::integral_constant<bool, sizeof(To) == sizeof(From) && traits::is_move_bitcopying<To>::value && traits::is_move_bitcopying<From>::value>;
-  template <class To, class From> union bit_cast_union {
+  template <class To, class From> union bit_cast_union
+  {
     From source;
     To target;
   };
+#if SYSTEM_ERROR2_HAVE_BIT_CAST
+  using std::bit_cast; // available for all trivially copyable types
+  // For move bit copying types
+  template <class To, class From>
+  requires(is_bit_castable<To, From>::value //
+           &&is_union_castable<To, From>::value //
+           && (!std::is_trivially_copyable_v<From> //
+               || !std::is_trivially_copyable_v<To>) ) //
+  constexpr To bit_cast(const From &from) noexcept
+  {
+    return bit_cast_union<To, From>{from}.target;
+  }
+  template <class To, class From>
+  requires(is_bit_castable<To, From>::value //
+           && !is_union_castable<To, From>::value //
+           && (!std::is_trivially_copyable_v<From> //
+               || !std::is_trivially_copyable_v<To>) ) //
+  To bit_cast(const From &from) noexcept
+  {
+    bit_cast_union<To, From> ret;
+    memmove(&ret.source, &from, sizeof(ret.source));
+    return ret.target;
+  }
+#else
   template <class To, class From,
             typename std::enable_if< //
             is_bit_castable<To, From>::value //
@@ -6451,6 +6533,7 @@ namespace detail
     memmove(&ret.source, &from, sizeof(ret.source));
     return ret.target;
   }
+#endif
   /* erasure_cast performs a bit_cast with additional rules to handle types
   of differing sizes. For integral & enum types, it may perform a narrowing
   or widing conversion with static_cast if necessary, before doing the final
@@ -6675,7 +6758,7 @@ public:
     {
     }
     //! Copy construct the derived implementation.
-    string_ref(const string_ref &o)
+    SYSTEM_ERROR2_CONSTEXPR20 string_ref(const string_ref &o)
         : _begin(o._begin)
         , _end(o._end)
         , _state{o._state[0], o._state[1], o._state[2]}
@@ -6687,7 +6770,7 @@ public:
       }
     }
     //! Move construct the derived implementation.
-    string_ref(string_ref &&o) noexcept
+    SYSTEM_ERROR2_CONSTEXPR20 string_ref(string_ref &&o) noexcept
         : _begin(o._begin)
         , _end(o._end)
         , _state{o._state[0], o._state[1], o._state[2]}
@@ -6699,7 +6782,7 @@ public:
       }
     }
     //! Copy assignment
-    string_ref &operator=(const string_ref &o)
+    SYSTEM_ERROR2_CONSTEXPR20 string_ref &operator=(const string_ref &o)
     {
       if(this != &o)
       {
@@ -6723,7 +6806,7 @@ public:
       return *this;
     }
     //! Move assignment
-    string_ref &operator=(string_ref &&o) noexcept
+    SYSTEM_ERROR2_CONSTEXPR20 string_ref &operator=(string_ref &&o) noexcept
     {
       if(this != &o)
       {
@@ -6733,7 +6816,7 @@ public:
       return *this;
     }
     //! Destruction
-    ~string_ref()
+    SYSTEM_ERROR2_CONSTEXPR20 ~string_ref()
     {
       if(_thunk != nullptr)
       {
@@ -6742,25 +6825,25 @@ public:
       _begin = _end = nullptr;
     }
     //! Returns whether the reference is empty or not
-    SYSTEM_ERROR2_NODISCARD bool empty() const noexcept { return _begin == _end; }
+    SYSTEM_ERROR2_NODISCARD constexpr bool empty() const noexcept { return _begin == _end; }
     //! Returns the size of the string
-    size_type size() const noexcept { return _end - _begin; }
+    constexpr size_type size() const noexcept { return _end - _begin; }
     //! Returns a null terminated C string
-    const_pointer c_str() const noexcept { return _begin; }
+    constexpr const_pointer c_str() const noexcept { return _begin; }
     //! Returns a null terminated C string
-    const_pointer data() const noexcept { return _begin; }
+    constexpr const_pointer data() const noexcept { return _begin; }
     //! Returns the beginning of the string
-    iterator begin() noexcept { return _begin; }
+    constexpr iterator begin() noexcept { return _begin; }
     //! Returns the beginning of the string
-    const_iterator begin() const noexcept { return _begin; }
+    constexpr const_iterator begin() const noexcept { return _begin; }
     //! Returns the beginning of the string
-    const_iterator cbegin() const noexcept { return _begin; }
+    constexpr const_iterator cbegin() const noexcept { return _begin; }
     //! Returns the end of the string
-    iterator end() noexcept { return _end; }
+    constexpr iterator end() noexcept { return _end; }
     //! Returns the end of the string
-    const_iterator end() const noexcept { return _end; }
+    constexpr const_iterator end() const noexcept { return _end; }
     //! Returns the end of the string
-    const_iterator cend() const noexcept { return _end; }
+    constexpr const_iterator cend() const noexcept { return _end; }
   };
   /*! A reference counted, threadsafe reference to a message string.
    */
@@ -6770,9 +6853,9 @@ public:
     {
       mutable std::atomic<unsigned> count{1};
     };
-    _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
-    const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
-    static void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
+     _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
+     const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
+    static SYSTEM_ERROR2_CONSTEXPR20 void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
     {
       auto dest = static_cast<atomic_refcounted_string_ref *>(_dest); // NOLINT
       auto src = static_cast<const atomic_refcounted_string_ref *>(_src); // NOLINT
@@ -6876,27 +6959,27 @@ public:
   //! Returns the unique id used to identify identical category instances.
   constexpr unique_id_type id() const noexcept { return _id; }
   //! Name of this category.
-  virtual string_ref name() const noexcept = 0;
+  SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref name() const noexcept = 0;
 protected:
   //! True if code means failure.
-  virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
+  SYSTEM_ERROR2_CONSTEXPR20 virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
   //! True if code is (potentially non-transitively) equivalent to another code in another domain.
-  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept = 0;
+  SYSTEM_ERROR2_CONSTEXPR20 virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept = 0;
   //! Returns the generic code closest to this code, if any.
-  virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
+  SYSTEM_ERROR2_CONSTEXPR20 virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
   //! Return a reference to a string textually representing a code.
-  virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
+  SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   //! Throw a code as a C++ exception.
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const = 0;
+  SYSTEM_ERROR2_NORETURN SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
   // Keep a vtable slot for binary compatibility
-  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
+  SYSTEM_ERROR2_NORETURN SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
 #endif
   // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
   virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); } // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
-  virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept // NOLINT
+  SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept // NOLINT
   {
     (void) code;
     (void) bytes;
@@ -7075,7 +7158,7 @@ public:
   //! True if the status code is empty.
   SYSTEM_ERROR2_NODISCARD constexpr bool empty() const noexcept { return _domain == nullptr; }
   //! Return a reference to a string textually representing a code.
-  string_ref message() const noexcept
+  SYSTEM_ERROR2_CONSTEXPR20 string_ref message() const noexcept
   {
     // Avoid MSVC's buggy ternary operator for expensive to destruct things
     if(_domain != nullptr)
@@ -7085,15 +7168,15 @@ public:
     return string_ref("(empty)");
   }
   //! True if code means success.
-  bool success() const noexcept { return (_domain != nullptr) ? !_domain->_do_failure(*this) : false; }
+  SYSTEM_ERROR2_CONSTEXPR20 bool success() const noexcept { return (_domain != nullptr) ? !_domain->_do_failure(*this) : false; }
   //! True if code means failure.
-  bool failure() const noexcept { return (_domain != nullptr) ? _domain->_do_failure(*this) : false; }
+  SYSTEM_ERROR2_CONSTEXPR20 bool failure() const noexcept { return (_domain != nullptr) ? _domain->_do_failure(*this) : false; }
   /*! True if code is strictly (and potentially non-transitively) semantically equivalent to another code in another domain.
   Note that usually non-semantic i.e. pure value comparison is used when the other status code has the same domain.
   As `equivalent()` will try mapping to generic code, this usually captures when two codes have the same semantic
   meaning in `equivalent()`.
   */
-  template <class T> bool strictly_equivalent(const status_code<T> &o) const noexcept
+  template <class T> constexpr bool strictly_equivalent(const status_code<T> &o) const noexcept
   {
     if(_domain && o._domain)
     {
@@ -7111,7 +7194,7 @@ public:
   Firstly `strictly_equivalent()` is run in both directions. If neither succeeds, each domain is asked
   for the equivalent generic code and those are compared.
   */
-  template <class T> inline bool equivalent(const status_code<T> &o) const noexcept;
+  template <class T> constexpr inline bool equivalent(const status_code<T> &o) const noexcept;
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN void throw_exception() const
@@ -7294,7 +7377,7 @@ public:
 #endif
   }
   //! Return a reference to a string textually representing a code.
-  string_ref message() const noexcept
+  SYSTEM_ERROR2_CONSTEXPR20 string_ref message() const noexcept
   {
     // Avoid MSVC's buggy ternary operator for expensive to destruct things
     if(this->_domain != nullptr)
@@ -7342,7 +7425,7 @@ public:
   status_code &operator=(const status_code &) = delete;
   //! Move assignment
   status_code &operator=(status_code &&) = default; // NOLINT
-  ~status_code()
+  SYSTEM_ERROR2_CONSTEXPR20 ~status_code()
   {
     if(nullptr != this->_domain)
     {
@@ -7350,7 +7433,7 @@ public:
     }
   }
   //! Return a copy of the erased code by asking the domain to perform the erased copy.
-  status_code clone() const
+  SYSTEM_ERROR2_CONSTEXPR20 status_code clone() const
   {
     if(nullptr == this->_domain)
     {
@@ -7417,10 +7500,10 @@ SYSTEM_ERROR2_NAMESPACE_END
 #include <exception> // for std::exception
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 /*! Exception type representing a thrown status_code
-*/
+ */
 template <class DomainType> class status_error;
 /*! The erased type edition of status_error.
-*/
+ */
 template <> class status_error<void> : public std::exception
 {
 protected:
@@ -7436,18 +7519,23 @@ protected:
   status_error &operator=(status_error &&) = default;
   //! Destructor. Not publicly available.
   ~status_error() override = default;
+  virtual const status_code<void> &_do_code() const noexcept = 0;
 public:
   //! The type of the status domain
   using domain_type = void;
   //! The type of the status code
   using status_code_type = status_code<void>;
+public:
+  //! The erased status code which generated this exception instance.
+  const status_code<void> &code() const noexcept { return _do_code(); }
 };
 /*! Exception type representing a thrown status_code
-*/
+ */
 template <class DomainType> class status_error : public status_error<void>
 {
   status_code<DomainType> _code;
   typename DomainType::string_ref _msgref;
+  virtual const status_code<void> &_do_code() const noexcept override final { return _code; }
 public:
   //! The type of the status domain
   using domain_type = DomainType;
@@ -7804,7 +7892,7 @@ SYSTEM_ERROR2_CONSTEXPR14 inline generic_code make_status_code(errc c) noexcept
   return generic_code(in_place, c);
 }
 /*************************************************************************************************************/
-template <class T> inline bool status_code<void>::equivalent(const status_code<T> &o) const noexcept
+template <class T> inline constexpr bool status_code<void>::equivalent(const status_code<T> &o) const noexcept
 {
   if(_domain && o._domain)
   {
@@ -7831,12 +7919,12 @@ template <class T> inline bool status_code<void>::equivalent(const status_code<T
   return (!_domain && !o._domain);
 }
 //! True if the status code's are semantically equal via `equivalent()`.
-template <class DomainType1, class DomainType2> inline bool operator==(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
+template <class DomainType1, class DomainType2> constexpr inline bool operator==(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return a.equivalent(b);
 }
 //! True if the status code's are not semantically equal via `equivalent()`.
-template <class DomainType1, class DomainType2> inline bool operator!=(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
+template <class DomainType1, class DomainType2> constexpr inline bool operator!=(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return !a.equivalent(b);
 }
@@ -7844,7 +7932,7 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const sta
 template <class DomainType1, class T, //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
-inline bool operator==(const status_code<DomainType1> &a, const T &b)
+constexpr inline bool operator==(const status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
@@ -7852,7 +7940,7 @@ inline bool operator==(const status_code<DomainType1> &a, const T &b)
 template <class T, class DomainType1, //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
-inline bool operator==(const T &a, const status_code<DomainType1> &b)
+constexpr inline bool operator==(const T &a, const status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
@@ -7860,7 +7948,7 @@ inline bool operator==(const T &a, const status_code<DomainType1> &b)
 template <class DomainType1, class T, //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
-inline bool operator!=(const status_code<DomainType1> &a, const T &b)
+constexpr inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
@@ -7868,7 +7956,7 @@ inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 template <class T, class DomainType1, //
           class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type, // Safe ADL lookup of make_status_code(), returns void if not found
           typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true> // ADL makes a status code
-inline bool operator!=(const T &a, const status_code<DomainType1> &b)
+constexpr inline bool operator!=(const T &a, const status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
 }
@@ -7876,7 +7964,7 @@ inline bool operator!=(const T &a, const status_code<DomainType1> &b)
 template <class DomainType1, class T, //
           class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
           >
-inline bool operator==(const status_code<DomainType1> &a, const T &b)
+constexpr inline bool operator==(const status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(QuickStatusCodeType(b));
 }
@@ -7884,7 +7972,7 @@ inline bool operator==(const status_code<DomainType1> &a, const T &b)
 template <class T, class DomainType1, //
           class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
           >
-inline bool operator==(const T &a, const status_code<DomainType1> &b)
+constexpr inline bool operator==(const T &a, const status_code<DomainType1> &b)
 {
   return b.equivalent(QuickStatusCodeType(a));
 }
@@ -7892,7 +7980,7 @@ inline bool operator==(const T &a, const status_code<DomainType1> &b)
 template <class DomainType1, class T, //
           class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
           >
-inline bool operator!=(const status_code<DomainType1> &a, const T &b)
+constexpr inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(QuickStatusCodeType(b));
 }
@@ -7900,7 +7988,7 @@ inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 template <class T, class DomainType1, //
           class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type // Enumeration has been activated
           >
-inline bool operator!=(const T &a, const status_code<DomainType1> &b)
+constexpr inline bool operator!=(const T &a, const status_code<DomainType1> &b)
 {
   return !b.equivalent(QuickStatusCodeType(a));
 }
@@ -10740,7 +10828,7 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY_IF
-#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12)
+#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
 #elif defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
