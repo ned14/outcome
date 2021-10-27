@@ -108,11 +108,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_UNSTABLE_VERSION
 #endif
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#if defined(__MINGW32__) && !0L
+#if defined(__MINGW32__) && !0
 #include <_mingw.h>
 #endif
 /* Configure QuickCppLib
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2016-2021 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -160,7 +160,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -221,7 +221,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_attributes 190000
 #endif
 #if !defined(__cpp_constexpr)
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402
 #define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
@@ -276,7 +276,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 #endif
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -570,9 +570,9 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_DISABLE_ABI_PERMUTATION
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define QUICKCPPLIB_PREVIOUS_COMMIT_REF d04c15bb5dd702869c91161cc5fc42422917e0a8
-#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-09-02 11:52:08 +00:00"
-#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE d04c15bb
+#define QUICKCPPLIB_PREVIOUS_COMMIT_REF e691a6dc0358c1091d59022af06a97d68fcc074d
+#define QUICKCPPLIB_PREVIOUS_COMMIT_DATE "2021-09-15 10:28:22 +00:00"
+#define QUICKCPPLIB_PREVIOUS_COMMIT_UNIQUE e691a6dc
 #endif
 #define QUICKCPPLIB_VERSION_GLUE2(a, b) a##b
 #define QUICKCPPLIB_VERSION_GLUE(a, b) QUICKCPPLIB_VERSION_GLUE2(a, b)
@@ -677,7 +677,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -724,7 +724,7 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
-#elif __cplusplus >= 201103L
+#elif __cplusplus >= 201103
 #if __GNUC__ >= 5 && !defined(__clang__)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif defined(__has_feature)
@@ -986,9 +986,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF a2d37fa9840de0791dce73f0a944da830b8e6e99
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-09-22 10:11:15 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE a2d37fa9
+#define OUTCOME_PREVIOUS_COMMIT_REF e261cebddfd2d5d1229dbf66c6dc0091a9f2a6f8
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2021-10-26 10:23:56 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e261cebd
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2, OUTCOME_PREVIOUS_COMMIT_UNIQUE))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d, OUTCOME_PREVIOUS_COMMIT_UNIQUE)))
@@ -1058,7 +1058,7 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
-#if 0L || __clang_major__ >= 7
+#if 0 || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -1183,7 +1183,7 @@ namespace detail
 #endif
 #endif
 // True if type is nothrow swappable
-#if !0L && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   template <class T> struct is_nothrow_swappable
@@ -1235,7 +1235,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
-#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
+#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define EXECINFO_DECL inline
 #elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
@@ -1253,7 +1253,7 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 #ifdef __cplusplus
 }
-#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
+#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -2481,7 +2481,7 @@ namespace detail
       empty_type _empty2;
       _error_type_ _error;
     };
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial() noexcept
@@ -2491,7 +2491,7 @@ namespace detail
     }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
     value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // NOLINT if reaches here, move assignment is trivial
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(
@@ -2508,7 +2508,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(
@@ -2524,7 +2524,7 @@ namespace detail
       }
       _status = o._status;
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     explicit value_storage_nontrivial(status_bitfield_type status)
@@ -2684,7 +2684,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<_value_type_>::value &&std::is_nothrow_destructible<_error_type_>::value)
@@ -2706,7 +2706,7 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     void
@@ -2894,7 +2894,7 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default; // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_move_assignment &
@@ -2992,7 +2992,7 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default; // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default; // NOLINT
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_copy_assignment &
@@ -5788,7 +5788,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000L && !_HAS_CXX20
+#if __cplusplus < 202000 && !_HAS_CXX20
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -6326,10 +6326,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <initializer_list>
 #ifndef SYSTEM_ERROR2_HAVE_BIT_CAST
 #ifdef __has_include
-#if __has_include(<bit>) && (__cplusplus >= 202002L || _HAS_CXX20)
+#if __has_include(<bit>) && (__cplusplus >= 202002 || _HAS_CXX20)
 #define SYSTEM_ERROR2_HAVE_BIT_CAST 1
 #endif
-#elif __cplusplus >= 202002L
+#elif __cplusplus >= 202002
 #define SYSTEM_ERROR2_HAVE_BIT_CAST 1
 #endif
 #ifndef SYSTEM_ERROR2_HAVE_BIT_CAST
@@ -6338,13 +6338,13 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #if SYSTEM_ERROR2_HAVE_BIT_CAST
 #include <bit>
-#if __cpp_lib_bit_cast < 201806L
+#if __cpp_lib_bit_cast < 201806
 #undef SYSTEM_ERROR2_HAVE_BIT_CAST
 #define SYSTEM_ERROR2_HAVE_BIT_CAST 0
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_CONSTEXPR14
-#if 0L || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
+#if 0 || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
 //! Defined to be `constexpr` when on C++ 14 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR14 constexpr
 #else
@@ -6352,7 +6352,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_CONSTEXPR20
-#if 0L || __cplusplus >= 202000 || _HAS_CXX20
+#if 0 || __cplusplus >= 202000 || _HAS_CXX20
 //! Defined to be `constexpr` when on C++ 20 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR20 constexpr
 #else
@@ -6360,7 +6360,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_NORETURN
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NORETURN [[noreturn]]
 #endif
 #endif
@@ -6386,7 +6386,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NORETURN
 #endif
 #ifndef SYSTEM_ERROR2_NODISCARD
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -6406,7 +6406,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NODISCARD
 #endif
 #ifndef SYSTEM_ERROR2_TRIVIAL_ABI
-#if 0L || (__clang_major__ >= 7 && !defined(__APPLE__))
+#if 0 || (__clang_major__ >= 7 && !defined(__APPLE__))
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -6969,12 +6969,12 @@ protected:
   SYSTEM_ERROR2_CONSTEXPR20 virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
   //! Return a reference to a string textually representing a code.
   SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
   // Keep a vtable slot for binary compatibility
-  SYSTEM_ERROR2_NORETURN SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
+  SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
 #endif
   // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
   virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); } // NOLINT
@@ -7195,7 +7195,7 @@ public:
   for the equivalent generic code and those are compared.
   */
   template <class T> constexpr inline bool equivalent(const status_code<T> &o) const noexcept;
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN void throw_exception() const
   {
@@ -7869,7 +7869,7 @@ protected:
     const auto &c = static_cast<const generic_code &>(code); // NOLINT
     return string_ref(detail::generic_code_message(c.value()));
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this); // NOLINT
@@ -8042,7 +8042,7 @@ public:
   _quick_status_code_from_enum_domain &operator=(const _quick_status_code_from_enum_domain &) = default;
   _quick_status_code_from_enum_domain &operator=(_quick_status_code_from_enum_domain &&) = default;
   ~_quick_status_code_from_enum_domain() = default;
-#if __cplusplus < 201402L && !defined(_MSC_VER)
+#if __cplusplus < 201402 && !defined(_MSC_VER)
   static inline const _quick_status_code_from_enum_domain &get()
   {
     static _quick_status_code_from_enum_domain v;
@@ -8136,7 +8136,7 @@ protected:
     }
     return string_ref("unknown");
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override
   {
     assert(code.domain() == *this); // NOLINT
@@ -8145,7 +8145,7 @@ protected:
   }
 #endif
 };
-#if __cplusplus >= 201402L || defined(_MSC_VER)
+#if __cplusplus >= 201402 || defined(_MSC_VER)
 template <class Enum> constexpr _quick_status_code_from_enum_domain<Enum> quick_status_code_from_enum_domain = {};
 template <class Enum> inline constexpr const _quick_status_code_from_enum_domain<Enum> &_quick_status_code_from_enum_domain<Enum>::get()
 {
@@ -8205,7 +8205,7 @@ namespace detail
     indirecting_domain &operator=(const indirecting_domain &) = default;
     indirecting_domain &operator=(indirecting_domain &&) = default; // NOLINT
     ~indirecting_domain() = default;
-#if __cplusplus < 201402L && !defined(_MSC_VER)
+#if __cplusplus < 201402 && !defined(_MSC_VER)
     static inline const indirecting_domain &get()
     {
       static indirecting_domain v;
@@ -8241,12 +8241,13 @@ namespace detail
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
       return typename StatusCode::domain_type()._do_message(*c.value());
     }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
     SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
     {
       assert(code.domain() == *this);
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
       typename StatusCode::domain_type()._do_throw_exception(*c.value());
+      abort(); // suppress buggy GCC warning
     }
 #endif
     virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t /*unused*/) const override // NOLINT
@@ -8265,7 +8266,7 @@ namespace detail
       delete c.value(); // NOLINT
     }
   };
-#if __cplusplus >= 201402L || defined(_MSC_VER)
+#if __cplusplus >= 201402 || defined(_MSC_VER)
   template <class StatusCode> constexpr indirecting_domain<StatusCode> _indirecting_domain{};
   template <class StatusCode> inline constexpr const indirecting_domain<StatusCode> &indirecting_domain<StatusCode>::get() { return _indirecting_domain<StatusCode>; }
 #endif
@@ -8830,7 +8831,7 @@ protected:
     const auto &c = static_cast<const posix_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this); // NOLINT
@@ -8853,7 +8854,7 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 #else
 #endif
-#if defined(_WIN32) || 0L
+#if defined(_WIN32) || 0
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -8879,7 +8880,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_NT_CODE_HPP
 #define SYSTEM_ERROR2_NT_CODE_HPP
-#if !defined(_WIN32) && !0L
+#if !defined(_WIN32) && !0
 #error This file should only be included on Windows
 #endif
 /* Proposed SG14 status_code
@@ -8907,7 +8908,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_WIN32_CODE_HPP
 #define SYSTEM_ERROR2_WIN32_CODE_HPP
-#if !defined(_WIN32) && !0L
+#if !defined(_WIN32) && !0
 #error This file should only be included on Windows
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
@@ -9139,7 +9140,7 @@ protected:
     const auto &c = static_cast<const win32_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
@@ -10434,7 +10435,7 @@ protected:
     const auto &c = static_cast<const nt_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
@@ -10828,7 +10829,7 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY_IF
-#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
+#if (__cplusplus >= 202000 || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
 #elif defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
