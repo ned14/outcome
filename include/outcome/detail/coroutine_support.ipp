@@ -35,7 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines) || (defined(__clang__) && __cpp_coroutines)
 #ifndef OUTCOME_HAVE_NOOP_COROUTINE
 #if defined(__has_builtin)
-#if __has_builtin(__builtin_coro_noop)
+#if __has_builtin(__builtin_coro_noop) || (!defined(__clang__) && __GNUC >= 10)
 #define OUTCOME_HAVE_NOOP_COROUTINE 1
 #endif
 #endif

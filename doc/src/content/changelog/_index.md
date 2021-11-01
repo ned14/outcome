@@ -12,6 +12,8 @@ weight = 80
 : Restore Experimental Outcome constexpr compatibility in C++ 20 which was an undocumented
 property of the Outcome v2.1 series, and which had been dropped in the v2.2 series.
 
+GCC Coroutines support
+: Coroutine support in GCCs after 10 is now correctly detected.
 
 ### Bug fixes:
 
