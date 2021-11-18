@@ -1,0 +1,281 @@
+# Copyright 2020-2021 Peter Dimov
+# Copyright 2021 Andrey Semashev
+# Copyright 2021 Alexander Grund
+#
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - feature/**
+
+concurrency:
+  group: ${{format('{0}:{1}', github.repository, github.ref)}}
+  cancel-in-progress: true
+
+env:
+  GIT_FETCH_JOBS: 8
+  NET_RETRY_COUNT: 5
+  B2_CI_VERSION: 1
+  B2_VARIANT: debug,release
+  B2_LINK: shared,static
+  LCOV_BRANCH_COVERAGE: 0
+
+jobs:
+  posix:
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux, gcc
+          - { compiler: gcc-4.4,   cxxstd: '98,0x',          os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: gcc-4.6,   cxxstd: '03,0x',          os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: gcc-4.7,   cxxstd: '03,11',          os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: gcc-4.8,   cxxstd: '03,11',          os: ubuntu-18.04 }
+          - { compiler: gcc-4.9,   cxxstd: '03,11',          os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: gcc-5,     cxxstd: '03,11,14,1z',    os: ubuntu-18.04 }
+          - { compiler: gcc-6,     cxxstd: '03,11,14,17',    os: ubuntu-18.04 }
+          - { compiler: gcc-7,     cxxstd: '03,11,14,17',    os: ubuntu-18.04 }
+          - { compiler: gcc-8,     cxxstd: '03,11,14,17,2a', os: ubuntu-18.04 }
+          - { compiler: gcc-9,     cxxstd: '03,11,14,17,2a', os: ubuntu-18.04 }
+          - { compiler: gcc-10,    cxxstd: '03,11,14,17,20', os: ubuntu-20.04 }
+          - { compiler: gcc-11,    cxxstd: '03,11,14,17,20', os: ubuntu-20.04 }
+          - { name: GCC w/ sanitizers, sanitize: yes,
+              compiler: gcc-11,    cxxstd: '03,11,14,17,20', os: ubuntu-20.04 }
+          - { name: Collect coverage, coverage: yes,
+              compiler: gcc-8,     cxxstd: '03,11',          os: ubuntu-20.04 }
+
+          # Linux, clang
+          - { compiler: clang-3.5, cxxstd: '03,11',          os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: clang-3.6, cxxstd: '03,11,14',       os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: clang-3.7, cxxstd: '03,11,14',       os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: clang-3.8, cxxstd: '03,11,14',       os: ubuntu-20.04, container: 'ubuntu:16.04' }
+          - { compiler: clang-3.9, cxxstd: '03,11,14',       os: ubuntu-18.04 }
+          - { compiler: clang-4.0, cxxstd: '03,11,14',       os: ubuntu-18.04 }
+          - { compiler: clang-5.0, cxxstd: '03,11,14,1z',    os: ubuntu-18.04 }
+          - { compiler: clang-6.0, cxxstd: '03,11,14,17',    os: ubuntu-18.04 }
+          - { compiler: clang-7,   cxxstd: '03,11,14,17',    os: ubuntu-18.04 }
+            # Note: clang-8 does not fully support C++20, so it is not compatible with some libstdc++ versions in this mode
+          - { compiler: clang-8,   cxxstd: '03,11,14,17,2a', os: ubuntu-18.04, install: [ clang-8, g++-7 ], gcc_toolchain: 7 }
+          - { compiler: clang-9,   cxxstd: '03,11,14,17,2a', os: ubuntu-20.04 }
+          - { compiler: clang-10,  cxxstd: '03,11,14,17,20', os: ubuntu-20.04 }
+          - { compiler: clang-11,  cxxstd: '03,11,14,17,20', os: ubuntu-20.04 }
+          - { compiler: clang-12,  cxxstd: '03,11,14,17,20', os: ubuntu-20.04 }
+          - { compiler: clang-12,  cxxstd: '03,11,14,17,20', os: ubuntu-20.04, install: [clang-12, libc++-12-dev, libc++abi-12-dev], env: {B2_STDLIB: libc++ } }
+          - { name: Clang w/ sanitizers, sanitize: yes,
+              compiler: clang-12,  cxxstd: '03,11,14,17,20', os: ubuntu-20.04, install: [clang-12, libc++-12-dev, libc++abi-12-dev], env: {B2_STDLIB: libc++ } }
+
+          # OSX, clang
+          - { compiler: clang,     cxxstd: '03,11,14,17,2a', os: macos-10.15, sanitize: yes }
+
+    timeout-minutes: 120
+    runs-on: ${{matrix.os}}
+    container: ${{matrix.container}}
+
+    steps:
+      - name: Setup environment
+        run: |
+            if [ -f "/etc/debian_version" ]; then
+                echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
+                export DEBIAN_FRONTEND=noninteractive
+            fi
+            if [ -n "${{matrix.container}}" ] && [ -f "/etc/debian_version" ]; then
+                apt-get -o Acquire::Retries=$NET_RETRY_COUNT update
+                apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y sudo software-properties-common build-essential g++ python libpython-dev
+                # Need newer git
+                add-apt-repository ppa:git-core/ppa
+                apt-get -o Acquire::Retries=$NET_RETRY_COUNT update && apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y git
+            fi
+            git config --global pack.threads 0
+
+      - uses: actions/checkout@v2
+        if: '!matrix.coverage'
+      - uses: actions/checkout@v2
+        if: 'matrix.coverage'
+        with:
+          fetch-depth: 0
+
+      - name: Fetch Boost.CI
+        uses: actions/checkout@v2
+        with:
+          repository: boostorg/boost-ci
+          ref: master
+          path: boost-ci-cloned
+      - name: Get CI scripts folder
+        run: |
+            # Copy ci folder if not testing Boost.CI
+            [[ "$GITHUB_REPOSITORY" =~ "boost-ci" ]] || cp -r boost-ci-cloned/ci .
+            rm -rf boost-ci-cloned
+
+      - name: Install packages
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+            SOURCE_KEYS=(${{join(matrix.source_keys, ' ')}})
+            SOURCES=(${{join(matrix.sources, ' ')}})
+            # Add this by default
+            SOURCES+=(ppa:ubuntu-toolchain-r/test)
+            for key in "${SOURCE_KEYS[@]}"; do
+                for i in {1..$NET_RETRY_COUNT}; do
+                    wget -O - "$key" | sudo apt-key add - && break || sleep 2
+                done
+            done
+            for source in "${SOURCES[@]}"; do
+                for i in {1..$NET_RETRY_COUNT}; do
+                    sudo add-apt-repository $source && break || sleep 2
+                done
+            done
+            sudo apt-get -o Acquire::Retries=$NET_RETRY_COUNT update
+            if [[ -z "${{matrix.install}}" ]]; then
+                pkgs="${{matrix.compiler}}"
+                pkgs="${pkgs/gcc-/g++-}"
+            else
+                pkgs="${{join(matrix.install, ' ')}}"
+            fi
+            sudo apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y $pkgs
+
+      - name: Setup GCC Toolchain
+        if: matrix.gcc_toolchain
+        run: |
+            GCC_TOOLCHAIN_ROOT="$HOME/gcc-toolchain"
+            echo "GCC_TOOLCHAIN_ROOT=$GCC_TOOLCHAIN_ROOT" >> $GITHUB_ENV
+            MULTIARCH_TRIPLET="$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
+            mkdir -p "$GCC_TOOLCHAIN_ROOT"
+            ln -s /usr/include "$GCC_TOOLCHAIN_ROOT/include"
+            ln -s /usr/bin "$GCC_TOOLCHAIN_ROOT/bin"
+            mkdir -p "$GCC_TOOLCHAIN_ROOT/lib/gcc/$MULTIARCH_TRIPLET"
+            ln -s "/usr/lib/gcc/$MULTIARCH_TRIPLET/${{matrix.gcc_toolchain}}" "$GCC_TOOLCHAIN_ROOT/lib/gcc/$MULTIARCH_TRIPLET/${{matrix.gcc_toolchain}}"
+
+      - name: Setup Boost
+        env:
+          B2_COMPILER: ${{matrix.compiler}}
+          B2_CXXSTD: ${{matrix.cxxstd}}
+          B2_SANITIZE: ${{matrix.sanitize}}
+        run: source ci/github/install.sh
+
+      - name: Setup coverage collection
+        if: matrix.coverage
+        run: ci/github/codecov.sh "setup"
+
+      - name: Run tests
+        run: ci/build.sh
+
+      - name: Upload coverage
+        if: matrix.coverage
+        run: ci/codecov.sh "upload"
+
+  windows:
+    defaults:
+      run:
+        shell: cmd
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { toolset: msvc-14.1, cxxstd: '14,17,latest',   addrmd: 32,64, os: windows-2016 }
+          - { toolset: msvc-14.2, cxxstd: '14,17,20',       addrmd: 32,64, os: windows-2019 }
+          - { toolset: gcc,       cxxstd: '03,11,14,17,2a', addrmd: 64,    os: windows-2019 }
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Fetch Boost.CI
+        uses: actions/checkout@v2
+        with:
+          repository: boostorg/boost-ci
+          ref: master
+          path: boost-ci-cloned
+      - name: Get CI scripts folder
+        run: |
+            REM Copy ci folder if not testing Boost.CI
+            if "%GITHUB_REPOSITORY%" == "%GITHUB_REPOSITORY:boost-ci=%" xcopy /s /e /q /i /y boost-ci-cloned\ci .\ci
+            rmdir /s /q boost-ci-cloned
+
+      - name: Setup Boost
+        run: ci\github\install.bat
+
+      - name: Run tests
+        run: ci\build.bat
+        env:
+          B2_TOOLSET: ${{matrix.toolset}}
+          B2_CXXSTD: ${{matrix.cxxstd}}
+          B2_ADDRESS_MODEL: ${{matrix.addrmd}}
+
+  CMake:
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-20.04, build_shared: ON,  build_type: Debug, generator: 'Unix Makefiles' }
+          - { os: ubuntu-20.04, build_shared: OFF, build_type: Debug, generator: 'Unix Makefiles' }
+          - { os: windows-2019, build_shared: ON,  build_type: Debug, generator: 'Visual Studio 16 2019' }
+          - { os: windows-2019, build_shared: OFF, build_type: Debug, generator: 'Visual Studio 16 2019' }
+
+    timeout-minutes: 120
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch Boost.CI
+        uses: actions/checkout@v2
+        with:
+          repository: boostorg/boost-ci
+          ref: master
+          path: boost-ci-cloned
+      - name: Get CI scripts folder
+        run: |
+            # Copy ci folder if not testing Boost.CI
+            [[ "$GITHUB_REPOSITORY" =~ "boost-ci" ]] || cp -r boost-ci-cloned/ci .
+            rm -rf boost-ci-cloned
+      - name: Setup Boost
+        env: {B2_DONT_BOOTSTRAP: 1}
+        run: source ci/github/install.sh
+
+      - name: Run CMake tests
+        run: |
+            cd "$BOOST_ROOT"
+            mkdir __build_cmake_test__ && cd __build_cmake_test__
+            cmake -G "${{matrix.generator}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DBOOST_INCLUDE_LIBRARIES=$SELF -DBUILD_SHARED_LIBS=${{matrix.build_shared}} -DBUILD_TESTING=ON -DBoost_VERBOSE=ON ..
+            cmake --build . --target tests --config ${{matrix.build_type}}
+            ctest --output-on-failure --build-config ${{matrix.build_type}}
+
+      - name: Run CMake subdir tests
+        run: |
+            cmake_test_folder="$BOOST_ROOT/libs/$SELF/test/cmake_test" # New unified folder
+            [ -d "$cmake_test_folder" ] || cmake_test_folder="$BOOST_ROOT/libs/$SELF/test/cmake_subdir_test"
+            cd "$cmake_test_folder"
+            mkdir __build_cmake_subdir_test__ && cd __build_cmake_subdir_test__
+            cmake -G "${{matrix.generator}}" -DBOOST_CI_INSTALL_TEST=OFF -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DBUILD_SHARED_LIBS=${{matrix.build_shared}} ..
+            cmake --build . --config ${{matrix.build_type}}
+            ctest --output-on-failure --build-config ${{matrix.build_type}}
+
+      - name: Install Library
+        run: |
+            cd "$BOOST_ROOT"
+            mkdir __build_cmake_install_test__ && cd __build_cmake_install_test__
+            cmake -G "${{matrix.generator}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DBOOST_INCLUDE_LIBRARIES=$SELF -DBUILD_SHARED_LIBS=${{matrix.build_shared}} -DCMAKE_INSTALL_PREFIX=~/.local -DBoost_VERBOSE=ON -DBoost_DEBUG=ON ..
+            cmake --build . --target install --config ${{matrix.build_type}}
+      - name: Run CMake install tests
+        run: |
+            cmake_test_folder="$BOOST_ROOT/libs/$SELF/test/cmake_test" # New unified folder
+            [ -d "$cmake_test_folder" ] || cmake_test_folder="$BOOST_ROOT/libs/$SELF/test/cmake_install_test"
+            cd "$cmake_test_folder"
+            mkdir __build_cmake_install_test__ && cd __build_cmake_install_test__
+            cmake -G "${{matrix.generator}}" -DBOOST_CI_INSTALL_TEST=ON -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DBUILD_SHARED_LIBS=${{matrix.build_shared}} -DCMAKE_PREFIX_PATH=~/.local ..
+            cmake --build . --config ${{matrix.build_type}}
+            ctest --output-on-failure --build-config ${{matrix.build_type}}
