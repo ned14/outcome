@@ -1,4 +1,4 @@
-Build and tests passing: Linux [![Build Status](https://travis-ci.org/boostorg/outcome.svg?branch=master)](https://travis-ci.org/boostorg/outcome)
+Build and tests passing: Linux [![CI](https://github.com/boostorg/outcome/actions/workflows/.ci.yml/badge.svg)](https://github.com/boostorg/outcome/actions/workflows/.ci.yml)
 
 Boost's regression test matrix and history: https://www.boost.org/development/tests/develop/developer/outcome.html
 
