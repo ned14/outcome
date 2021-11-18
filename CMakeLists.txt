@@ -22,6 +22,17 @@
 #           http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+
+set(OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
+if(NOT OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
+  # Don't reuse the bootstrapped git clone as the dependency itself
+  if(CMAKE_BINARY_DIR)
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib-bootstrap")
+  else()
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib-bootstrap")
+  endif()
+endif()
+
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
@@ -72,6 +83,7 @@ if(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB AND CTEST_QUICKCPPLIB_CLONE_DIR)
 else()
   find_quickcpplib_library(quickcpplib
     GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+    GIT_TAG "${OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG}"
     REQUIRED
     IS_HEADER_ONLY
   )
