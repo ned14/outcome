@@ -150,7 +150,9 @@ jobs:
          git add . || true
          cd ../..
          git commit -a -m "CI regenerates Boost.Outcome docs" || true
-         git push git@github.com:boostorg/outcome.git master || true
+         if [ "${GITHUB_REF##*/}" = "master" ]; then
+           git push git@github.com:boostorg/outcome.git master || true
+         fi
          git push git@github.com:boostorg/outcome.git develop || true
          cd doc
          rm -rf html
