@@ -1,4 +1,4 @@
-Build and tests passing: Linux [![CI](https://github.com/boostorg/outcome/actions/workflows/.ci.yml/badge.svg)](https://github.com/boostorg/outcome/actions/workflows/.ci.yml)
+Build and tests passing: POSIX [![Build Status](https://drone.cpp.al/api/badges/boostorg/outcome/status.svg)](https://drone.cpp.al/boostorg/outcome)
 
 Boost's regression test matrix and history: https://www.boost.org/development/tests/develop/developer/outcome.html
 
