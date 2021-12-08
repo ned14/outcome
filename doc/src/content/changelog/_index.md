@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.2.2 ??? (Boost 1.78) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
+## v2.2.2 8th December 2021 (Boost 1.78) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
 
 ### Enhancements:
 
@@ -17,6 +17,7 @@ GCC Coroutines support
 
 ### Bug fixes:
 
+- None.
 
 ---
 ## v2.2.1 13th August 2021 (Boost 1.77) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.1)
