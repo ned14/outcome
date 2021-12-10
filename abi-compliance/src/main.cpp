@@ -1,5 +1,5 @@
 /* A shared library which uses Outcome in order to guarantee its ABI
-(C) 2018-2019 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
+(C) 2018-2021 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
 File Created: Mar 2018
 
 
@@ -46,16 +46,17 @@ template <class T> using outcome = OUTCOME_V2_NAMESPACE::basic_outcome<T, long, 
 
 extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::status_bitfield_type status_bits()
 {
-  using namespace OUTCOME_V2_NAMESPACE::detail;
-  return (status_have_value | status_have_error | status_have_exception | status_error_is_errno) & status_2byte_mask;
+  using status = OUTCOME_V2_NAMESPACE::detail::status;
+  return (status)((uint16_t) status::have_value | (uint16_t) status::have_error | (uint16_t) status::have_exception | (uint16_t) status::have_error_is_errno |
+                  (uint16_t) status::have_lost_consistency | (uint16_t) status::have_moved_from);
 }
 
-extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::value_storage_trivial<int> value_storage_int(OUTCOME_V2_NAMESPACE::detail::value_storage_trivial<int> &v)
+extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::value_storage_trivial<int, long> value_storage_int(OUTCOME_V2_NAMESPACE::detail::value_storage_trivial<int, long> &v)
 {
   return v;
 }
 
-extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::value_storage_nontrivial<NonTrivialType> value_storage_NonTrivialType(OUTCOME_V2_NAMESPACE::detail::value_storage_nontrivial<NonTrivialType> &v)
+extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::value_storage_nontrivial<NonTrivialType, int> value_storage_NonTrivialType(OUTCOME_V2_NAMESPACE::detail::value_storage_nontrivial<NonTrivialType, int> &v)
 {
   return v;
 }

@@ -96,7 +96,7 @@ include(QuickCppLibMakeHeaderOnlyLibrary)
 apply_cxx_concepts_to(INTERFACE outcome_hl)
 
 # Make preprocessed edition of this library target
-if(NOT PROJECT_IS_DEPENDENCY)
+if(NOT PROJECT_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   else()
