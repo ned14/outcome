@@ -2,19 +2,22 @@ $VAR1 = {
           'ABI_DUMPER_VERSION' => '1.1',
           'ABI_DUMP_VERSION' => '3.5',
           'Arch' => 'x86_64',
-          'Compiler' => 'GNU C++14 7.5.0 -mtune=generic -march=x86-64 -g -std=gnu++14 -fPIC -fconcepts -fstack-protector-strong',
+          'Compiler' => 'GNU C++17 9.3.0 -mtune=generic -march=x86-64 -g -std=gnu++17 -fPIC -fconcepts -fasynchronous-unwind-tables -fstack-protector-strong -fstack-clash-protection -fcf-protection',
           'Headers' => {},
           'Language' => 'C++',
-          'LibraryName' => 'liboutcome-abi-lib-gcc7-cxx14.so',
-          'LibraryVersion' => '2.2-gcc7-cxx14',
+          'LibraryName' => 'liboutcome-abi-lib-gcc9-cxx17.so',
+          'LibraryVersion' => '2.2-gcc9-cxx17',
           'MissedOffsets' => '1',
           'MissedRegs' => '1',
           'NameSpaces' => {
                             '__gnu_cxx' => 1,
                             'outcome_v2' => 1,
+                            'outcome_v2::convert' => 1,
                             'outcome_v2::detail' => 1,
                             'outcome_v2::policy' => 1,
                             'outcome_v2::trait' => 1,
+                            'outcome_v2::trait::detail' => 1,
+                            'outcome_v2::trait::detail::detector_impl' => 1,
                             'std' => 1,
                             'std::__exception_ptr' => 1
                           },
@@ -23,9 +26,9 @@ $VAR1 = {
                       },
           'Sources' => {},
           'SymbolInfo' => {
-                            '14853' => {
+                            '25252' => {
                                          'Artificial' => 1,
-                                         'Class' => '7843',
+                                         'Class' => '13057',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -34,18 +37,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14175'
+                                                               'type' => '23323'
                                                              },
                                                       '1' => {
                                                                'name' => 'o',
-                                                               'type' => '14186'
+                                                               'type' => '23334'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial'
                                        },
-                            '14854' => {
+                            '25253' => {
                                          'Artificial' => 1,
-                                         'Class' => '7843',
+                                         'Class' => '13057',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -54,18 +57,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14175'
+                                                               'type' => '23323'
                                                              },
                                                       '1' => {
                                                                'name' => 'o',
-                                                               'type' => '14186'
+                                                               'type' => '23334'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial'
                                        },
-                            '14943' => {
+                            '25339' => {
                                          'Artificial' => 1,
-                                         'Class' => '6148',
+                                         'Class' => '11037',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -74,18 +77,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '13996'
+                                                               'type' => '23044'
                                                              },
                                                       '1' => {
                                                                'name' => 'o',
-                                                               'type' => '14007'
+                                                               'type' => '23055'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial'
                                        },
-                            '14944' => {
+                            '25340' => {
                                          'Artificial' => 1,
-                                         'Class' => '6148',
+                                         'Class' => '11037',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -94,18 +97,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '13996'
+                                                               'type' => '23044'
                                                              },
                                                       '1' => {
                                                                'name' => 'o',
-                                                               'type' => '14007'
+                                                               'type' => '23055'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial'
                                        },
-                            '15023' => {
+                            '25415' => {
                                          'Artificial' => 1,
-                                         'Class' => '5041',
+                                         'Class' => '6444',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -114,14 +117,14 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '12749'
+                                                               'type' => '20872'
                                                              }
                                                     },
                                          'ShortName' => 'status_bitfield_type'
                                        },
-                            '15024' => {
+                            '25416' => {
                                          'Artificial' => 1,
-                                         'Class' => '5041',
+                                         'Class' => '6444',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -130,27 +133,27 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '12749'
+                                                               'type' => '20872'
                                                              }
                                                     },
                                          'ShortName' => 'status_bitfield_type'
                                        },
-                            '15082' => {
+                            '25471' => {
                                          'Header' => undef,
                                          'Line' => '79',
                                          'MnglName' => '_Z22outcome_NonTrivialTypeRN10outcome_v213basic_outcomeI14NonTrivialTypeldNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '15132'
+                                                               'type' => '25523'
                                                              }
                                                     },
-                                         'Return' => '15071',
+                                         'Return' => '25459',
                                          'ShortName' => 'outcome_NonTrivialType'
                                        },
-                            '15176' => {
+                            '25568' => {
                                          'Artificial' => 1,
-                                         'Class' => '12399',
+                                         'Class' => '20418',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -159,18 +162,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14527'
+                                                               'type' => '23905'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15138'
+                                                               'type' => '25529'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome'
                                        },
-                            '15177' => {
+                            '25569' => {
                                          'Artificial' => 1,
-                                         'Class' => '12399',
+                                         'Class' => '20418',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -179,18 +182,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14527'
+                                                               'type' => '23905'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15138'
+                                                               'type' => '25529'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome'
                                        },
-                            '15270' => {
+                            '25659' => {
                                          'Artificial' => 1,
-                                         'Class' => '10360',
+                                         'Class' => '16123',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -199,18 +202,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14492'
+                                                               'type' => '23820'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15232'
+                                                               'type' => '25620'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome_exception_observers'
                                        },
-                            '15271' => {
+                            '25660' => {
                                          'Artificial' => 1,
-                                         'Class' => '10360',
+                                         'Class' => '16123',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -219,44 +222,44 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14492'
+                                                               'type' => '23820'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15232'
+                                                               'type' => '25620'
                                                              }
                                                     },
                                          'ShortName' => 'basic_outcome_exception_observers'
                                        },
-                            '15337' => {
+                            '25723' => {
                                          'Header' => undef,
                                          'Line' => '74',
                                          'MnglName' => '_Z11outcome_intRN10outcome_v213basic_outcomeIildNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '15132'
+                                                               'type' => '25523'
                                                              }
                                                     },
-                                         'Return' => '15071',
+                                         'Return' => '25459',
                                          'ShortName' => 'outcome_int'
                                        },
-                            '15404' => {
+                            '25793' => {
                                          'Header' => undef,
                                          'Line' => '69',
                                          'MnglName' => '_Z21result_NonTrivialTypeRN10outcome_v212basic_resultI14NonTrivialTypelNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '15454'
+                                                               'type' => '25845'
                                                              }
                                                     },
-                                         'Return' => '15393',
+                                         'Return' => '25781',
                                          'ShortName' => 'result_NonTrivialType'
                                        },
-                            '15489' => {
+                            '25880' => {
                                          'Artificial' => 1,
-                                         'Class' => '11828',
+                                         'Class' => '19724',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -265,18 +268,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14397'
+                                                               'type' => '23615'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14408'
+                                                               'type' => '23626'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result'
                                        },
-                            '15490' => {
+                            '25881' => {
                                          'Artificial' => 1,
-                                         'Class' => '11828',
+                                         'Class' => '19724',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -285,18 +288,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14397'
+                                                               'type' => '23615'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14408'
+                                                               'type' => '23626'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result'
                                        },
-                            '15594' => {
+                            '25982' => {
                                          'Artificial' => 1,
-                                         'Class' => '9693',
+                                         'Class' => '15017',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -305,18 +308,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '15551'
+                                                               'type' => '25938'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15556'
+                                                               'type' => '25943'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_final'
                                        },
-                            '15595' => {
+                            '25983' => {
                                          'Artificial' => 1,
-                                         'Class' => '9693',
+                                         'Class' => '15017',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -325,18 +328,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '15551'
+                                                               'type' => '25938'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15556'
+                                                               'type' => '25943'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_final'
                                        },
-                            '15688' => {
+                            '26073' => {
                                          'Artificial' => 1,
-                                         'Class' => '9346',
+                                         'Class' => '14660',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -345,18 +348,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14356'
+                                                               'type' => '23514'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15650'
+                                                               'type' => '26034'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_error_observers'
                                        },
-                            '15689' => {
+                            '26074' => {
                                          'Artificial' => 1,
-                                         'Class' => '9346',
+                                         'Class' => '14660',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -365,18 +368,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14356'
+                                                               'type' => '23514'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15650'
+                                                               'type' => '26034'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_error_observers'
                                        },
-                            '15782' => {
+                            '26164' => {
                                          'Artificial' => 1,
-                                         'Class' => '9000',
+                                         'Class' => '14304',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -385,18 +388,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14315'
+                                                               'type' => '23473'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15744'
+                                                               'type' => '26125'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_value_observers'
                                        },
-                            '15783' => {
+                            '26165' => {
                                          'Artificial' => 1,
-                                         'Class' => '9000',
+                                         'Class' => '14304',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -405,18 +408,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14315'
+                                                               'type' => '23473'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '15744'
+                                                               'type' => '26125'
                                                              }
                                                     },
                                          'ShortName' => 'basic_result_value_observers'
                                        },
-                            '15867' => {
+                            '26245' => {
                                          'Artificial' => 1,
-                                         'Class' => '8638',
+                                         'Class' => '13929',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -425,19 +428,19 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14268'
+                                                               'type' => '23426'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14285'
+                                                               'type' => '23443'
                                                              }
                                                     },
                                          'Protected' => 1,
                                          'ShortName' => 'basic_result_storage'
                                        },
-                            '15868' => {
+                            '26246' => {
                                          'Artificial' => 1,
-                                         'Class' => '8638',
+                                         'Class' => '13929',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -446,19 +449,19 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14268'
+                                                               'type' => '23426'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14285'
+                                                               'type' => '23443'
                                                              }
                                                     },
                                          'Protected' => 1,
                                          'ShortName' => 'basic_result_storage'
                                        },
-                            '15952' => {
+                            '26326' => {
                                          'Artificial' => 1,
-                                         'Class' => '8442',
+                                         'Class' => '13680',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -467,18 +470,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14233'
+                                                               'type' => '23391'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14238'
+                                                               'type' => '23396'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial_copy_assignment'
                                        },
-                            '15953' => {
+                            '26327' => {
                                          'Artificial' => 1,
-                                         'Class' => '8442',
+                                         'Class' => '13680',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -487,18 +490,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14233'
+                                                               'type' => '23391'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14238'
+                                                               'type' => '23396'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial_copy_assignment'
                                        },
-                            '16037' => {
+                            '26407' => {
                                          'Artificial' => 1,
-                                         'Class' => '8246',
+                                         'Class' => '13478',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -507,18 +510,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14204'
+                                                               'type' => '23362'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14209'
+                                                               'type' => '23367'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial_move_assignment'
                                        },
-                            '16038' => {
+                            '26408' => {
                                          'Artificial' => 1,
-                                         'Class' => '8246',
+                                         'Class' => '13478',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -527,64 +530,64 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '14204'
+                                                               'type' => '23362'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '14209'
+                                                               'type' => '23367'
                                                              }
                                                     },
                                          'ShortName' => 'value_storage_nontrivial_move_assignment'
                                        },
-                            '16104' => {
+                            '26471' => {
                                          'Header' => undef,
                                          'Line' => '64',
                                          'MnglName' => '_Z10result_intRN10outcome_v212basic_resultIilNS_6policy9terminateEEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '15454'
+                                                               'type' => '25845'
                                                              }
                                                     },
-                                         'Return' => '15393',
+                                         'Return' => '25781',
                                          'ShortName' => 'result_int'
                                        },
-                            '16160' => {
+                            '26529' => {
                                          'Header' => undef,
                                          'Line' => '59',
                                          'MnglName' => '_Z28value_storage_NonTrivialTypeRN10outcome_v26detail24value_storage_nontrivialI14NonTrivialTypeiEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '14001'
+                                                               'type' => '23049'
                                                              }
                                                     },
-                                         'Return' => '6148',
+                                         'Return' => '11037',
                                          'ShortName' => 'value_storage_NonTrivialType'
                                        },
-                            '16210' => {
+                            '26581' => {
                                          'Header' => undef,
                                          'Line' => '54',
                                          'MnglName' => '_Z17value_storage_intRN10outcome_v26detail21value_storage_trivialIilEE',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'v',
-                                                               'type' => '12801'
+                                                               'type' => '20962'
                                                              }
                                                     },
-                                         'Return' => '5702',
+                                         'Return' => '7265',
                                          'ShortName' => 'value_storage_int'
                                        },
-                            '16260' => {
+                            '26633' => {
                                          'Header' => undef,
                                          'Line' => '47',
                                          'MnglName' => '_Z11status_bitsv',
-                                         'Return' => '5041',
+                                         'Return' => '6444',
                                          'ShortName' => 'status_bits'
                                        },
-                            '16338' => {
+                            '26713' => {
                                          'Artificial' => 1,
-                                         'Class' => '13752',
+                                         'Class' => '22792',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -593,18 +596,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '13967'
+                                                               'type' => '23015'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '13972'
+                                                               'type' => '23020'
                                                              }
                                                     },
                                          'ShortName' => 'NonTrivialType'
                                        },
-                            '16339' => {
+                            '26714' => {
                                          'Artificial' => 1,
-                                         'Class' => '13752',
+                                         'Class' => '22792',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -613,18 +616,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '13967'
+                                                               'type' => '23015'
                                                              },
                                                       '1' => {
                                                                'name' => 'p1',
-                                                               'type' => '13972'
+                                                               'type' => '23020'
                                                              }
                                                     },
                                          'ShortName' => 'NonTrivialType'
                                        },
-                            '16524' => {
+                            '26888' => {
                                          'Artificial' => 1,
-                                         'Class' => '5041',
+                                         'Class' => '6444',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -633,18 +636,18 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '12749'
+                                                               'type' => '20872'
                                                              },
                                                       '1' => {
                                                                'name' => 'v',
-                                                               'type' => '4926'
+                                                               'type' => '6328'
                                                              }
                                                     },
                                          'ShortName' => 'status_bitfield_type'
                                        },
-                            '16525' => {
+                            '26889' => {
                                          'Artificial' => 1,
-                                         'Class' => '5041',
+                                         'Class' => '6444',
                                          'Constructor' => 1,
                                          'Header' => undef,
                                          'InLine' => 1,
@@ -653,35 +656,35 @@ $VAR1 = {
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'this',
-                                                               'type' => '12749'
+                                                               'type' => '20872'
                                                              },
                                                       '1' => {
                                                                'name' => 'v',
-                                                               'type' => '4926'
+                                                               'type' => '6328'
                                                              }
                                                     },
                                          'ShortName' => 'status_bitfield_type'
                                        },
-                            '16580' => {
+                            '26940' => {
                                          'Header' => undef,
                                          'InLine' => 2,
-                                         'Line' => '168',
+                                         'Line' => '173',
                                          'MnglName' => '_ZnwmPv',
                                          'Param' => {
                                                       '0' => {
                                                                'name' => 'p1',
-                                                               'type' => '2021'
+                                                               'type' => '2006'
                                                              },
                                                       '1' => {
                                                                'name' => '__p',
-                                                               'type' => '2413'
+                                                               'type' => '3268'
                                                              }
                                                     },
-                                         'Return' => '2413',
+                                         'Return' => '3268',
                                          'ShortName' => 'operator new'
                                        },
-                            '5310' => {
-                                        'Class' => '5041',
+                            '6723' => {
+                                        'Class' => '6444',
                                         'Const' => 1,
                                         'Header' => undef,
                                         'InLine' => 2,
@@ -690,14 +693,14 @@ $VAR1 = {
                                         'Param' => {
                                                      '0' => {
                                                               'name' => 'this',
-                                                              'type' => '12778'
+                                                              'type' => '20901'
                                                             }
                                                    },
-                                        'Return' => '4843',
+                                        'Return' => '5956',
                                         'ShortName' => 'have_value'
                                       },
-                            '5340' => {
-                                        'Class' => '5041',
+                            '6754' => {
+                                        'Class' => '6444',
                                         'Const' => 1,
                                         'Header' => undef,
                                         'InLine' => 2,
@@ -706,16 +709,16 @@ $VAR1 = {
                                         'Param' => {
                                                      '0' => {
                                                               'name' => 'this',
-                                                              'type' => '12778'
+                                                              'type' => '20901'
                                                             }
                                                    },
-                                        'Return' => '4843',
+                                        'Return' => '5956',
                                         'ShortName' => 'have_error'
                                       }
                           },
           'SymbolVersion' => {},
           'Symbols' => {
-                         'liboutcome-abi-lib-gcc7-cxx14.so' => {
+                         'liboutcome-abi-lib-gcc9-cxx17.so' => {
                                                                  '_Z10result_intRN10outcome_v212basic_resultIilNS_6policy9terminateEEE' => 1,
                                                                  '_Z11outcome_intRN10outcome_v213basic_outcomeIildNS_6policy9terminateEEE' => 1,
                                                                  '_Z11status_bitsv' => 1,
@@ -762,17 +765,400 @@ $VAR1 = {
                                    'Name' => 'void',
                                    'Type' => 'Intrinsic'
                                  },
-                          '10024' => {
-                                       'BaseType' => '9693',
+                          '11037' => {
+                                       'Header' => undef,
+                                       'Line' => '2418',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => 'unnamed0',
+                                                            'offset' => '0',
+                                                            'type' => '11051'
+                                                          },
+                                                   '1' => {
+                                                            'name' => '_status',
+                                                            'offset' => '8',
+                                                            'type' => '6444'
+                                                          },
+                                                   '2' => {
+                                                            'name' => 'unnamed1',
+                                                            'offset' => '12',
+                                                            'type' => '11101'
+                                                          }
+                                                 },
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '16',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'T',
+                                                              'type' => '22792'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'E',
+                                                              'type' => '3098'
+                                                            }
+                                                   },
+                                       'Type' => 'Struct'
+                                     },
+                          '11051' => {
+                                       'Header' => undef,
+                                       'Line' => '2433',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => '_empty1',
+                                                            'offset' => '0',
+                                                            'type' => '6166'
+                                                          },
+                                                   '1' => {
+                                                            'name' => '_value',
+                                                            'offset' => '0',
+                                                            'type' => '11088'
+                                                          }
+                                                 },
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
+                                       'Size' => '8',
+                                       'Type' => 'Union'
+                                     },
+                          '11088' => {
+                                       'BaseType' => '7659',
+                                       'Header' => undef,
+                                       'Line' => '2430',
+                                       'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>::_value_type_',
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
+                                       'Size' => '4',
+                                       'Type' => 'Typedef'
+                                     },
+                          '11101' => {
+                                       'Header' => undef,
+                                       'Line' => '2439',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => '_empty2',
+                                                            'offset' => '0',
+                                                            'type' => '6166'
+                                                          },
+                                                   '1' => {
+                                                            'name' => '_error',
+                                                            'offset' => '0',
+                                                            'type' => '11138'
+                                                          }
+                                                 },
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
+                                       'Size' => '4',
+                                       'Type' => 'Union'
+                                     },
+                          '11138' => {
+                                       'BaseType' => '7659',
+                                       'Header' => undef,
+                                       'Line' => '2431',
+                                       'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>::_error_type_',
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
+                                       'Size' => '4',
+                                       'Type' => 'Typedef'
+                                     },
+                          '11453' => {
+                                       'BaseType' => '11037',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>const',
+                                       'Size' => '16',
+                                       'Type' => 'Const'
+                                     },
+                          '13057' => {
+                                       'Header' => undef,
+                                       'Line' => '2418',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => 'unnamed0',
+                                                            'offset' => '0',
+                                                            'type' => '13071'
+                                                          },
+                                                   '1' => {
+                                                            'name' => '_status',
+                                                            'offset' => '8',
+                                                            'type' => '6444'
+                                                          },
+                                                   '2' => {
+                                                            'name' => 'unnamed1',
+                                                            'offset' => '16',
+                                                            'type' => '13121'
+                                                          }
+                                                 },
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'T',
+                                                              'type' => '22792'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'E',
+                                                              'type' => '3129'
+                                                            }
+                                                   },
+                                       'Type' => 'Struct'
+                                     },
+                          '13071' => {
+                                       'Header' => undef,
+                                       'Line' => '2433',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => '_empty1',
+                                                            'offset' => '0',
+                                                            'type' => '6166'
+                                                          },
+                                                   '1' => {
+                                                            'name' => '_value',
+                                                            'offset' => '0',
+                                                            'type' => '13108'
+                                                          }
+                                                 },
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
+                                       'Size' => '8',
+                                       'Type' => 'Union'
+                                     },
+                          '13108' => {
+                                       'BaseType' => '7659',
+                                       'Header' => undef,
+                                       'Line' => '2430',
+                                       'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>::_value_type_',
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
+                                       'Size' => '4',
+                                       'Type' => 'Typedef'
+                                     },
+                          '13121' => {
+                                       'Header' => undef,
+                                       'Line' => '2439',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'name' => '_empty2',
+                                                            'offset' => '0',
+                                                            'type' => '6166'
+                                                          },
+                                                   '1' => {
+                                                            'name' => '_error',
+                                                            'offset' => '0',
+                                                            'type' => '13158'
+                                                          }
+                                                 },
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
+                                       'Size' => '8',
+                                       'Type' => 'Union'
+                                     },
+                          '13158' => {
+                                       'BaseType' => '7659',
+                                       'Header' => undef,
+                                       'Line' => '2431',
+                                       'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>::_error_type_',
+                                       'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
+                                       'Size' => '4',
+                                       'Type' => 'Typedef'
+                                     },
+                          '13473' => {
+                                       'BaseType' => '13057',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '13478' => {
+                                       'Base' => {
+                                                   '13057' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => undef,
+                                       'Line' => '2847',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'Base',
+                                                              'type' => '13057'
+                                                            }
+                                                   },
+                                       'Type' => 'Struct'
+                                     },
+                          '13675' => {
+                                       'BaseType' => '13478',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '13680' => {
+                                       'Base' => {
+                                                   '13478' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => undef,
+                                       'Line' => '2945',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'Base',
+                                                              'type' => '13478'
+                                                            }
+                                                   },
+                                       'Type' => 'Struct'
+                                     },
+                          '13877' => {
+                                       'BaseType' => '13680',
+                                       'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '13929' => {
+                                       'Header' => undef,
+                                       'Line' => '3119',
+                                       'Memb' => {
+                                                   '0' => {
+                                                            'access' => 'protected',
+                                                            'name' => '_state',
+                                                            'offset' => '0',
+                                                            'type' => '13943'
+                                                          }
+                                                 },
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'R',
+                                                              'type' => '22792'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'EC',
+                                                              'type' => '3129'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '17445'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '13943' => {
+                                       'BaseType' => '8344',
+                                       'Header' => undef,
+                                       'Line' => '3140',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>::_state_type',
+                                       'NameSpace' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                       'Protected' => 1,
+                                       'Size' => '4',
+                                       'Type' => 'Typedef'
+                                     },
+                          '14273' => {
+                                       'BaseType' => '13929',
+                                       'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '14304' => {
+                                       'Base' => {
+                                                   '13929' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => undef,
+                                       'Line' => '3489',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'Base',
+                                                              'type' => '13929'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'R',
+                                                              'type' => '22792'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '17445'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '14655' => {
+                                       'BaseType' => '14304',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '14660' => {
+                                       'Base' => {
+                                                   '14304' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => undef,
+                                       'Line' => '3405',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'Base',
+                                                              'type' => '14304'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'EC',
+                                                              'type' => '3129'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '17445'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '15012' => {
+                                       'BaseType' => '14660',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const',
+                                       'Size' => '24',
+                                       'Type' => 'Const'
+                                     },
+                          '15017' => {
+                                       'Base' => {
+                                                   '14660' => {
+                                                                'pos' => '0'
+                                                              }
+                                                 },
+                                       'Header' => undef,
+                                       'Line' => '3550',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>',
+                                       'NameSpace' => 'outcome_v2::detail',
+                                       'Size' => '24',
+                                       'TParam' => {
+                                                     '0' => {
+                                                              'key' => 'R',
+                                                              'type' => '22792'
+                                                            },
+                                                     '1' => {
+                                                              'key' => 'S',
+                                                              'type' => '3129'
+                                                            },
+                                                     '2' => {
+                                                              'key' => 'NoValuePolicy',
+                                                              'type' => '17445'
+                                                            }
+                                                   },
+                                       'Type' => 'Class'
+                                     },
+                          '15357' => {
+                                       'BaseType' => '15017',
                                        'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const',
                                        'Size' => '24',
                                        'Type' => 'Const'
                                      },
-                          '10360' => {
+                          '16123' => {
                                        'Base' => {
-                                                   '9693' => {
-                                                               'pos' => '0'
-                                                             }
+                                                   '15017' => {
+                                                                'pos' => '0'
+                                                              }
                                                  },
                                        'Header' => undef,
                                        'Line' => '4651',
@@ -782,34 +1168,34 @@ $VAR1 = {
                                        'TParam' => {
                                                      '0' => {
                                                               'key' => 'Base',
-                                                              'type' => '9693'
+                                                              'type' => '15017'
                                                             },
                                                      '1' => {
                                                               'key' => 'R',
-                                                              'type' => '13752'
+                                                              'type' => '22792'
                                                             },
                                                      '2' => {
                                                               'key' => 'S',
-                                                              'type' => '2285'
+                                                              'type' => '3129'
                                                             },
                                                      '3' => {
                                                               'key' => 'P',
-                                                              'type' => '2762'
+                                                              'type' => '3645'
                                                             },
                                                      '4' => {
                                                               'key' => 'NoValuePolicy',
-                                                              'type' => '11333'
+                                                              'type' => '17445'
                                                             }
                                                    },
                                        'Type' => 'Class'
                                      },
-                          '10715' => {
-                                       'BaseType' => '10360',
+                          '16488' => {
+                                       'BaseType' => '16123',
                                        'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>const',
                                        'Size' => '24',
                                        'Type' => 'Const'
                                      },
-                          '11324' => {
+                          '17414' => {
                                        'Header' => undef,
                                        'Line' => '3762',
                                        'Name' => 'struct outcome_v2::policy::base',
@@ -817,9 +1203,9 @@ $VAR1 = {
                                        'Size' => '1',
                                        'Type' => 'Struct'
                                      },
-                          '11333' => {
+                          '17445' => {
                                        'Base' => {
-                                                   '11324' => {
+                                                   '17414' => {
                                                                 'pos' => '0'
                                                               }
                                                  },
@@ -830,11 +1216,11 @@ $VAR1 = {
                                        'Size' => '1',
                                        'Type' => 'Struct'
                                      },
-                          '11828' => {
+                          '19724' => {
                                        'Base' => {
-                                                   '9693' => {
-                                                               'pos' => '0'
-                                                             }
+                                                   '15017' => {
+                                                                'pos' => '0'
+                                                              }
                                                  },
                                        'Header' => undef,
                                        'Line' => '4140',
@@ -844,28 +1230,37 @@ $VAR1 = {
                                        'TParam' => {
                                                      '0' => {
                                                               'key' => 'R',
-                                                              'type' => '13752'
+                                                              'type' => '22792'
                                                             },
                                                      '1' => {
                                                               'key' => 'S',
-                                                              'type' => '2285'
+                                                              'type' => '3129'
                                                             },
                                                      '2' => {
                                                               'key' => 'NoValuePolicy',
-                                                              'type' => '11333'
+                                                              'type' => '17445'
                                                             }
                                                    },
                                        'Type' => 'Class'
                                      },
-                          '12198' => {
-                                       'BaseType' => '11828',
+                          '2006' => {
+                                      'BaseType' => '3012',
+                                      'Header' => undef,
+                                      'Line' => '254',
+                                      'Name' => 'std::size_t',
+                                      'NameSpace' => 'std',
+                                      'Size' => '8',
+                                      'Type' => 'Typedef'
+                                    },
+                          '20149' => {
+                                       'BaseType' => '19724',
                                        'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const',
                                        'Size' => '24',
                                        'Type' => 'Const'
                                      },
-                          '12399' => {
+                          '20418' => {
                                        'Base' => {
-                                                   '10360' => {
+                                                   '16123' => {
                                                                 'pos' => '0'
                                                               }
                                                  },
@@ -876,7 +1271,7 @@ $VAR1 = {
                                                             'access' => 'protected',
                                                             'name' => '_ptr',
                                                             'offset' => '24',
-                                                            'type' => '6080'
+                                                            'type' => '7659'
                                                           }
                                                  },
                                        'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>',
@@ -885,326 +1280,202 @@ $VAR1 = {
                                        'TParam' => {
                                                      '0' => {
                                                               'key' => 'R',
-                                                              'type' => '13752'
+                                                              'type' => '22792'
                                                             },
                                                      '1' => {
                                                               'key' => 'S',
-                                                              'type' => '2285'
+                                                              'type' => '3129'
                                                             },
                                                      '2' => {
                                                               'key' => 'P',
-                                                              'type' => '2762'
+                                                              'type' => '3645'
                                                             },
                                                      '3' => {
                                                               'key' => 'NoValuePolicy',
-                                                              'type' => '11333'
+                                                              'type' => '17445'
                                                             }
                                                    },
                                        'Type' => 'Class'
                                      },
-                          '12619' => {
-                                       'BaseType' => '12399',
+                          '20706' => {
+                                       'BaseType' => '20418',
                                        'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const',
                                        'Size' => '32',
                                        'Type' => 'Const'
                                      },
-                          '12743' => {
-                                       'BaseType' => '5041',
+                          '20866' => {
+                                       'BaseType' => '6444',
                                        'Name' => 'struct outcome_v2::detail::status_bitfield_type*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '12749' => {
-                                       'BaseType' => '12743',
+                          '20872' => {
+                                       'BaseType' => '20866',
                                        'Name' => 'struct outcome_v2::detail::status_bitfield_type*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '12772' => {
-                                       'BaseType' => '5697',
+                          '20895' => {
+                                       'BaseType' => '7122',
                                        'Name' => 'struct outcome_v2::detail::status_bitfield_type const*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '12778' => {
-                                       'BaseType' => '12772',
+                          '20901' => {
+                                       'BaseType' => '20895',
                                        'Name' => 'struct outcome_v2::detail::status_bitfield_type const*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '12801' => {
-                                       'BaseType' => '5702',
+                          '20962' => {
+                                       'BaseType' => '7265',
                                        'Name' => 'struct outcome_v2::detail::value_storage_trivial<int, long>&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '13752' => {
+                          '22792' => {
                                        'Header' => undef,
                                        'Line' => '27',
                                        'Memb' => {
                                                    '0' => {
                                                             'name' => 'foo',
                                                             'offset' => '0',
-                                                            'type' => '2413'
+                                                            'type' => '3268'
                                                           }
                                                  },
                                        'Name' => 'struct NonTrivialType',
                                        'Size' => '8',
                                        'Type' => 'Struct'
                                      },
-                          '13956' => {
-                                       'BaseType' => '13752',
+                          '23004' => {
+                                       'BaseType' => '22792',
                                        'Name' => 'struct NonTrivialType const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '13961' => {
-                                       'BaseType' => '13752',
+                          '23009' => {
+                                       'BaseType' => '22792',
                                        'Name' => 'struct NonTrivialType*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '13967' => {
-                                       'BaseType' => '13961',
+                          '23015' => {
+                                       'BaseType' => '23009',
                                        'Name' => 'struct NonTrivialType*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '13972' => {
-                                       'BaseType' => '13956',
+                          '23020' => {
+                                       'BaseType' => '23004',
                                        'Name' => 'struct NonTrivialType const&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '13990' => {
-                                       'BaseType' => '6148',
+                          '23038' => {
+                                       'BaseType' => '11037',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '13996' => {
-                                       'BaseType' => '13990',
+                          '23044' => {
+                                       'BaseType' => '23038',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '14001' => {
-                                       'BaseType' => '6148',
+                          '23049' => {
+                                       'BaseType' => '11037',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '14007' => {
-                                       'BaseType' => '6546',
+                          '23055' => {
+                                       'BaseType' => '11453',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>const&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '14169' => {
-                                       'BaseType' => '7843',
+                          '23317' => {
+                                       'BaseType' => '13057',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '14175' => {
-                                       'BaseType' => '14169',
+                          '23323' => {
+                                       'BaseType' => '23317',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '14186' => {
-                                       'BaseType' => '8241',
+                          '23334' => {
+                                       'BaseType' => '13473',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>const&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '14198' => {
-                                       'BaseType' => '8246',
+                          '23356' => {
+                                       'BaseType' => '13478',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '14204' => {
-                                       'BaseType' => '14198',
+                          '23362' => {
+                                       'BaseType' => '23356',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '14209' => {
-                                       'BaseType' => '8437',
+                          '23367' => {
+                                       'BaseType' => '13675',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >const&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '14227' => {
-                                       'BaseType' => '8442',
+                          '23385' => {
+                                       'BaseType' => '13680',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '14233' => {
-                                       'BaseType' => '14227',
+                          '23391' => {
+                                       'BaseType' => '23385',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '14238' => {
-                                       'BaseType' => '8633',
+                          '23396' => {
+                                       'BaseType' => '13877',
                                        'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >const&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '14262' => {
-                                       'BaseType' => '8638',
+                          '23420' => {
+                                       'BaseType' => '13929',
                                        'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '14268' => {
-                                       'BaseType' => '14262',
+                          '23426' => {
+                                       'BaseType' => '23420',
                                        'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>*const',
                                        'Size' => '8',
                                        'Type' => 'Const'
                                      },
-                          '14285' => {
-                                       'BaseType' => '8971',
+                          '23443' => {
+                                       'BaseType' => '14273',
                                        'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const&',
                                        'Size' => '8',
                                        'Type' => 'Ref'
                                      },
-                          '14309' => {
-                                       'BaseType' => '9000',
+                          '23467' => {
+                                       'BaseType' => '14304',
                                        'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*',
                                        'Size' => '8',
                                        'Type' => 'Pointer'
                                      },
-                          '14315' => {
-                                       'BaseType' => '14309',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '14350' => {
-                                       'BaseType' => '9346',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '14356' => {
-                                       'BaseType' => '14350',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '14391' => {
-                                       'BaseType' => '11828',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '14397' => {
-                                       'BaseType' => '14391',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '14408' => {
-                                       'BaseType' => '12198',
-                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '14486' => {
-                                       'BaseType' => '10360',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '14492' => {
-                                       'BaseType' => '14486',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '14521' => {
-                                       'BaseType' => '12399',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '14527' => {
-                                       'BaseType' => '14521',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '15071' => {
-                                       'BaseType' => '12399',
-                                       'Header' => undef,
-                                       'Line' => '45',
-                                       'Name' => 'outcome',
-                                       'Size' => '32',
-                                       'Type' => 'Typedef'
-                                     },
-                          '15132' => {
-                                       'BaseType' => '15071',
-                                       'Name' => 'outcome&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '15138' => {
-                                       'BaseType' => '12619',
-                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '15232' => {
-                                       'BaseType' => '10715',
-                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '15393' => {
-                                       'BaseType' => '11828',
-                                       'Header' => undef,
-                                       'Line' => '44',
-                                       'Name' => 'result',
-                                       'Size' => '24',
-                                       'Type' => 'Typedef'
-                                     },
-                          '15454' => {
-                                       'BaseType' => '15393',
-                                       'Name' => 'result&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '15545' => {
-                                       'BaseType' => '9693',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*',
-                                       'Size' => '8',
-                                       'Type' => 'Pointer'
-                                     },
-                          '15551' => {
-                                       'BaseType' => '15545',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*const',
-                                       'Size' => '8',
-                                       'Type' => 'Const'
-                                     },
-                          '15556' => {
-                                       'BaseType' => '10024',
-                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '15650' => {
-                                       'BaseType' => '9688',
-                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const&',
-                                       'Size' => '8',
-                                       'Type' => 'Ref'
-                                     },
-                          '1569' => {
+                          '2347' => {
                                       'Header' => undef,
-                                      'Line' => '2170',
+                                      'Line' => '2065',
                                       'Name' => 'struct std::conditional<false, outcome_v2::detail::void_type, int>',
                                       'NameSpace' => 'std',
                                       'Size' => '1',
@@ -1221,92 +1492,207 @@ $VAR1 = {
                                                   },
                                       'Type' => 'Struct'
                                     },
-                          '15744' => {
-                                       'BaseType' => '9341',
-                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const&',
+                          '23473' => {
+                                       'BaseType' => '23467',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>*const',
                                        'Size' => '8',
-                                       'Type' => 'Ref'
+                                       'Type' => 'Const'
                                      },
-                          '1582' => {
-                                      'BaseType' => '2256',
+                          '23508' => {
+                                       'BaseType' => '14660',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '23514' => {
+                                       'BaseType' => '23508',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '23609' => {
+                                       'BaseType' => '19724',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '2361' => {
+                                      'BaseType' => '3098',
                                       'Header' => undef,
-                                      'Line' => '2171',
+                                      'Line' => '2066',
                                       'Name' => 'std::conditional<false, outcome_v2::detail::void_type, int>::type',
                                       'NameSpace' => 'std::conditional<false, outcome_v2::detail::void_type, int>',
                                       'Size' => '4',
                                       'Type' => 'Typedef'
                                     },
-                          '1647' => {
-                                      'BaseType' => '1582',
+                          '23615' => {
+                                       'BaseType' => '23609',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '23626' => {
+                                       'BaseType' => '20149',
+                                       'Name' => 'outcome_v2::basic_result<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '23814' => {
+                                       'BaseType' => '16123',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '23820' => {
+                                       'BaseType' => '23814',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '23899' => {
+                                       'BaseType' => '20418',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '23905' => {
+                                       'BaseType' => '23899',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '2431' => {
+                                      'BaseType' => '2361',
                                       'Header' => undef,
-                                      'Line' => '2480',
+                                      'Line' => '2389',
                                       'Name' => 'std::conditional_t',
                                       'NameSpace' => 'std',
                                       'Size' => '4',
                                       'Type' => 'Typedef'
                                     },
-                          '2021' => {
-                                      'BaseType' => '2180',
-                                      'Header' => undef,
-                                      'Line' => '231',
-                                      'Name' => 'std::size_t',
-                                      'NameSpace' => 'std',
-                                      'Size' => '8',
-                                      'Type' => 'Typedef'
-                                    },
-                          '2166' => {
+                          '25459' => {
+                                       'BaseType' => '20418',
+                                       'Header' => undef,
+                                       'Line' => '45',
+                                       'Name' => 'outcome',
+                                       'Size' => '32',
+                                       'Type' => 'Typedef'
+                                     },
+                          '25523' => {
+                                       'BaseType' => '25459',
+                                       'Name' => 'outcome&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '25529' => {
+                                       'BaseType' => '20706',
+                                       'Name' => 'outcome_v2::basic_outcome<NonTrivialType, long, double, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '25620' => {
+                                       'BaseType' => '16488',
+                                       'Name' => 'outcome_v2::detail::basic_outcome_exception_observers<outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, long, double, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '25781' => {
+                                       'BaseType' => '19724',
+                                       'Header' => undef,
+                                       'Line' => '44',
+                                       'Name' => 'result',
+                                       'Size' => '24',
+                                       'Type' => 'Typedef'
+                                     },
+                          '25845' => {
+                                       'BaseType' => '25781',
+                                       'Name' => 'result&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '25932' => {
+                                       'BaseType' => '15017',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*',
+                                       'Size' => '8',
+                                       'Type' => 'Pointer'
+                                     },
+                          '25938' => {
+                                       'BaseType' => '25932',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>*const',
+                                       'Size' => '8',
+                                       'Type' => 'Const'
+                                     },
+                          '25943' => {
+                                       'BaseType' => '15357',
+                                       'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '26034' => {
+                                       'BaseType' => '15012',
+                                       'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '26125' => {
+                                       'BaseType' => '14655',
+                                       'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const&',
+                                       'Size' => '8',
+                                       'Type' => 'Ref'
+                                     },
+                          '2998' => {
                                       'Name' => 'unsigned short',
                                       'Size' => '2',
                                       'Type' => 'Intrinsic'
                                     },
-                          '2180' => {
+                          '3012' => {
                                       'Name' => 'unsigned long',
                                       'Size' => '8',
                                       'Type' => 'Intrinsic'
                                     },
-                          '2234' => {
-                                      'BaseType' => '2166',
+                          '3074' => {
+                                      'BaseType' => '2998',
                                       'Header' => undef,
                                       'Line' => '40',
                                       'Name' => '__uint16_t',
                                       'Size' => '2',
                                       'Type' => 'Typedef'
                                     },
-                          '2256' => {
+                          '3098' => {
                                       'Name' => 'int',
                                       'Size' => '4',
                                       'Type' => 'Intrinsic'
                                     },
-                          '2285' => {
+                          '3129' => {
                                       'Name' => 'long',
                                       'Size' => '8',
                                       'Type' => 'Intrinsic'
                                     },
-                          '2413' => {
+                          '3268' => {
                                       'BaseType' => '1',
                                       'Name' => 'void*',
                                       'Size' => '8',
                                       'Type' => 'Pointer'
                                     },
-                          '2488' => {
-                                      'BaseType' => '2234',
+                          '3348' => {
+                                      'BaseType' => '3074',
                                       'Header' => undef,
                                       'Line' => '25',
                                       'Name' => 'uint16_t',
                                       'Size' => '2',
                                       'Type' => 'Typedef'
                                     },
-                          '2762' => {
+                          '3645' => {
                                       'Name' => 'double',
                                       'Size' => '8',
                                       'Type' => 'Intrinsic'
                                     },
-                          '4843' => {
+                          '5956' => {
                                       'Name' => 'bool',
                                       'Size' => '1',
                                       'Type' => 'Intrinsic'
                                     },
-                          '4917' => {
+                          '6166' => {
                                       'Header' => undef,
                                       'Line' => '1040',
                                       'Name' => 'struct outcome_v2::detail::empty_type',
@@ -1314,7 +1700,7 @@ $VAR1 = {
                                       'Size' => '1',
                                       'Type' => 'Struct'
                                     },
-                          '4926' => {
+                          '6328' => {
                                       'Header' => undef,
                                       'Line' => '2139',
                                       'Memb' => {
@@ -1388,19 +1774,19 @@ $VAR1 = {
                                       'Size' => '2',
                                       'Type' => 'Enum'
                                     },
-                          '5041' => {
+                          '6444' => {
                                       'Header' => undef,
                                       'Line' => '2162',
                                       'Memb' => {
                                                   '0' => {
                                                            'name' => 'status_value',
                                                            'offset' => '0',
-                                                           'type' => '4926'
+                                                           'type' => '6328'
                                                          },
                                                   '1' => {
                                                            'name' => 'spare_storage_value',
                                                            'offset' => '2',
-                                                           'type' => '2488'
+                                                           'type' => '3348'
                                                          }
                                                 },
                                       'Name' => 'struct outcome_v2::detail::status_bitfield_type',
@@ -1408,25 +1794,25 @@ $VAR1 = {
                                       'Size' => '4',
                                       'Type' => 'Struct'
                                     },
-                          '5697' => {
-                                      'BaseType' => '5041',
+                          '7122' => {
+                                      'BaseType' => '6444',
                                       'Name' => 'struct outcome_v2::detail::status_bitfield_type const',
                                       'Size' => '4',
                                       'Type' => 'Const'
                                     },
-                          '5702' => {
+                          '7265' => {
                                       'Header' => undef,
                                       'Line' => '2262',
                                       'Memb' => {
                                                   '0' => {
                                                            'name' => 'unnamed0',
                                                            'offset' => '0',
-                                                           'type' => '5715'
+                                                           'type' => '7279'
                                                          },
                                                   '1' => {
                                                            'name' => '_status',
                                                            'offset' => '8',
-                                                           'type' => '5041'
+                                                           'type' => '6444'
                                                          }
                                                 },
                                       'Name' => 'struct outcome_v2::detail::value_storage_trivial<int, long>',
@@ -1435,41 +1821,41 @@ $VAR1 = {
                                       'TParam' => {
                                                     '0' => {
                                                              'key' => 'T',
-                                                             'type' => '2256'
+                                                             'type' => '3098'
                                                            },
                                                     '1' => {
                                                              'key' => 'E',
-                                                             'type' => '2285'
+                                                             'type' => '3129'
                                                            }
                                                   },
                                       'Type' => 'Struct'
                                     },
-                          '5715' => {
+                          '7279' => {
                                       'Header' => undef,
                                       'Line' => '2278',
                                       'Memb' => {
                                                   '0' => {
                                                            'name' => '_empty',
                                                            'offset' => '0',
-                                                           'type' => '4917'
+                                                           'type' => '6166'
                                                          },
                                                   '1' => {
                                                            'name' => '_value',
                                                            'offset' => '0',
-                                                           'type' => '5761'
+                                                           'type' => '7329'
                                                          },
                                                   '2' => {
                                                            'name' => '_error',
                                                            'offset' => '0',
-                                                           'type' => '5773'
+                                                           'type' => '7342'
                                                          }
                                                 },
                                       'NameSpace' => 'outcome_v2::detail::value_storage_trivial<int, long>',
                                       'Size' => '8',
                                       'Type' => 'Union'
                                     },
-                          '5761' => {
-                                      'BaseType' => '6080',
+                          '7329' => {
+                                      'BaseType' => '7659',
                                       'Header' => undef,
                                       'Line' => '2275',
                                       'Name' => 'outcome_v2::detail::value_storage_trivial<int, long>::_value_type_',
@@ -1477,8 +1863,8 @@ $VAR1 = {
                                       'Size' => '4',
                                       'Type' => 'Typedef'
                                     },
-                          '5773' => {
-                                      'BaseType' => '6080',
+                          '7342' => {
+                                      'BaseType' => '7659',
                                       'Header' => undef,
                                       'Line' => '2276',
                                       'Name' => 'outcome_v2::detail::value_storage_trivial<int, long>::_error_type_',
@@ -1486,8 +1872,8 @@ $VAR1 = {
                                       'Size' => '4',
                                       'Type' => 'Typedef'
                                     },
-                          '6080' => {
-                                      'BaseType' => '1647',
+                          '7659' => {
+                                      'BaseType' => '2431',
                                       'Header' => undef,
                                       'Line' => '1049',
                                       'Name' => 'outcome_v2::detail::devoid',
@@ -1495,8 +1881,8 @@ $VAR1 = {
                                       'Size' => '4',
                                       'Type' => 'Typedef'
                                     },
-                          '6104' => {
-                                      'BaseType' => '6116',
+                          '8344' => {
+                                      'BaseType' => '8357',
                                       'Header' => undef,
                                       'Line' => '3076',
                                       'Name' => 'outcome_v2::detail::value_storage_select_impl',
@@ -1504,401 +1890,18 @@ $VAR1 = {
                                       'Size' => '4',
                                       'Type' => 'Typedef'
                                     },
-                          '6116' => {
-                                      'BaseType' => '1647',
+                          '8357' => {
+                                      'BaseType' => '2431',
                                       'Header' => undef,
-                                      'Line' => '3075',
+                                      'Line' => '3070',
                                       'Name' => 'outcome_v2::detail::value_storage_select_copy_assignment',
                                       'NameSpace' => 'outcome_v2::detail',
                                       'Size' => '4',
                                       'Type' => 'Typedef'
-                                    },
-                          '6148' => {
-                                      'Header' => undef,
-                                      'Line' => '2418',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'name' => 'unnamed0',
-                                                           'offset' => '0',
-                                                           'type' => '6161'
-                                                         },
-                                                  '1' => {
-                                                           'name' => '_status',
-                                                           'offset' => '8',
-                                                           'type' => '5041'
-                                                         },
-                                                  '2' => {
-                                                           'name' => 'unnamed1',
-                                                           'offset' => '12',
-                                                           'type' => '6207'
-                                                         }
-                                                },
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '16',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'T',
-                                                             'type' => '13752'
-                                                           },
-                                                    '1' => {
-                                                             'key' => 'E',
-                                                             'type' => '2256'
-                                                           }
-                                                  },
-                                      'Type' => 'Struct'
-                                    },
-                          '6161' => {
-                                      'Header' => undef,
-                                      'Line' => '2433',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'name' => '_empty1',
-                                                           'offset' => '0',
-                                                           'type' => '4917'
-                                                         },
-                                                  '1' => {
-                                                           'name' => '_value',
-                                                           'offset' => '0',
-                                                           'type' => '6195'
-                                                         }
-                                                },
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
-                                      'Size' => '8',
-                                      'Type' => 'Union'
-                                    },
-                          '6195' => {
-                                      'BaseType' => '6080',
-                                      'Header' => undef,
-                                      'Line' => '2430',
-                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>::_value_type_',
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
-                                      'Size' => '4',
-                                      'Type' => 'Typedef'
-                                    },
-                          '6207' => {
-                                      'Header' => undef,
-                                      'Line' => '2439',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'name' => '_empty2',
-                                                           'offset' => '0',
-                                                           'type' => '4917'
-                                                         },
-                                                  '1' => {
-                                                           'name' => '_error',
-                                                           'offset' => '0',
-                                                           'type' => '6241'
-                                                         }
-                                                },
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
-                                      'Size' => '4',
-                                      'Type' => 'Union'
-                                    },
-                          '6241' => {
-                                      'BaseType' => '6080',
-                                      'Header' => undef,
-                                      'Line' => '2431',
-                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>::_error_type_',
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>',
-                                      'Size' => '4',
-                                      'Type' => 'Typedef'
-                                    },
-                          '6546' => {
-                                      'BaseType' => '6148',
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, int>const',
-                                      'Size' => '16',
-                                      'Type' => 'Const'
-                                    },
-                          '7843' => {
-                                      'Header' => undef,
-                                      'Line' => '2418',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'name' => 'unnamed0',
-                                                           'offset' => '0',
-                                                           'type' => '7856'
-                                                         },
-                                                  '1' => {
-                                                           'name' => '_status',
-                                                           'offset' => '8',
-                                                           'type' => '5041'
-                                                         },
-                                                  '2' => {
-                                                           'name' => 'unnamed1',
-                                                           'offset' => '16',
-                                                           'type' => '7902'
-                                                         }
-                                                },
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'T',
-                                                             'type' => '13752'
-                                                           },
-                                                    '1' => {
-                                                             'key' => 'E',
-                                                             'type' => '2285'
-                                                           }
-                                                  },
-                                      'Type' => 'Struct'
-                                    },
-                          '7856' => {
-                                      'Header' => undef,
-                                      'Line' => '2433',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'name' => '_empty1',
-                                                           'offset' => '0',
-                                                           'type' => '4917'
-                                                         },
-                                                  '1' => {
-                                                           'name' => '_value',
-                                                           'offset' => '0',
-                                                           'type' => '7890'
-                                                         }
-                                                },
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
-                                      'Size' => '8',
-                                      'Type' => 'Union'
-                                    },
-                          '7890' => {
-                                      'BaseType' => '6080',
-                                      'Header' => undef,
-                                      'Line' => '2430',
-                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>::_value_type_',
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
-                                      'Size' => '4',
-                                      'Type' => 'Typedef'
-                                    },
-                          '7902' => {
-                                      'Header' => undef,
-                                      'Line' => '2439',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'name' => '_empty2',
-                                                           'offset' => '0',
-                                                           'type' => '4917'
-                                                         },
-                                                  '1' => {
-                                                           'name' => '_error',
-                                                           'offset' => '0',
-                                                           'type' => '7936'
-                                                         }
-                                                },
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
-                                      'Size' => '8',
-                                      'Type' => 'Union'
-                                    },
-                          '7936' => {
-                                      'BaseType' => '6080',
-                                      'Header' => undef,
-                                      'Line' => '2431',
-                                      'Name' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>::_error_type_',
-                                      'NameSpace' => 'outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>',
-                                      'Size' => '4',
-                                      'Type' => 'Typedef'
-                                    },
-                          '8241' => {
-                                      'BaseType' => '7843',
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long>const',
-                                      'Size' => '24',
-                                      'Type' => 'Const'
-                                    },
-                          '8246' => {
-                                      'Base' => {
-                                                  '7843' => {
-                                                              'pos' => '0'
-                                                            }
-                                                },
-                                      'Header' => undef,
-                                      'Line' => '2847',
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'Base',
-                                                             'type' => '7843'
-                                                           }
-                                                  },
-                                      'Type' => 'Struct'
-                                    },
-                          '8437' => {
-                                      'BaseType' => '8246',
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> >const',
-                                      'Size' => '24',
-                                      'Type' => 'Const'
-                                    },
-                          '8442' => {
-                                      'Base' => {
-                                                  '8246' => {
-                                                              'pos' => '0'
-                                                            }
-                                                },
-                                      'Header' => undef,
-                                      'Line' => '2945',
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'Base',
-                                                             'type' => '8246'
-                                                           }
-                                                  },
-                                      'Type' => 'Struct'
-                                    },
-                          '8633' => {
-                                      'BaseType' => '8442',
-                                      'Name' => 'struct outcome_v2::detail::value_storage_nontrivial_copy_assignment<outcome_v2::detail::value_storage_nontrivial_move_assignment<outcome_v2::detail::value_storage_nontrivial<NonTrivialType, long> > >const',
-                                      'Size' => '24',
-                                      'Type' => 'Const'
-                                    },
-                          '8638' => {
-                                      'Header' => undef,
-                                      'Line' => '3119',
-                                      'Memb' => {
-                                                  '0' => {
-                                                           'access' => 'protected',
-                                                           'name' => '_state',
-                                                           'offset' => '0',
-                                                           'type' => '8651'
-                                                         }
-                                                },
-                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'R',
-                                                             'type' => '13752'
-                                                           },
-                                                    '1' => {
-                                                             'key' => 'EC',
-                                                             'type' => '2285'
-                                                           },
-                                                    '2' => {
-                                                             'key' => 'NoValuePolicy',
-                                                             'type' => '11333'
-                                                           }
-                                                  },
-                                      'Type' => 'Class'
-                                    },
-                          '8651' => {
-                                      'BaseType' => '6104',
-                                      'Header' => undef,
-                                      'Line' => '3140',
-                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>::_state_type',
-                                      'NameSpace' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>',
-                                      'Protected' => 1,
-                                      'Size' => '4',
-                                      'Type' => 'Typedef'
-                                    },
-                          '8971' => {
-                                      'BaseType' => '8638',
-                                      'Name' => 'outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>const',
-                                      'Size' => '24',
-                                      'Type' => 'Const'
-                                    },
-                          '9000' => {
-                                      'Base' => {
-                                                  '8638' => {
-                                                              'pos' => '0'
-                                                            }
-                                                },
-                                      'Header' => undef,
-                                      'Line' => '3489',
-                                      'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'Base',
-                                                             'type' => '8638'
-                                                           },
-                                                    '1' => {
-                                                             'key' => 'R',
-                                                             'type' => '13752'
-                                                           },
-                                                    '2' => {
-                                                             'key' => 'NoValuePolicy',
-                                                             'type' => '11333'
-                                                           }
-                                                  },
-                                      'Type' => 'Class'
-                                    },
-                          '9341' => {
-                                      'BaseType' => '9000',
-                                      'Name' => 'outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>const',
-                                      'Size' => '24',
-                                      'Type' => 'Const'
-                                    },
-                          '9346' => {
-                                      'Base' => {
-                                                  '9000' => {
-                                                              'pos' => '0'
-                                                            }
-                                                },
-                                      'Header' => undef,
-                                      'Line' => '3405',
-                                      'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'Base',
-                                                             'type' => '9000'
-                                                           },
-                                                    '1' => {
-                                                             'key' => 'EC',
-                                                             'type' => '2285'
-                                                           },
-                                                    '2' => {
-                                                             'key' => 'NoValuePolicy',
-                                                             'type' => '11333'
-                                                           }
-                                                  },
-                                      'Type' => 'Class'
-                                    },
-                          '9688' => {
-                                      'BaseType' => '9346',
-                                      'Name' => 'outcome_v2::detail::basic_result_error_observers<outcome_v2::detail::basic_result_value_observers<outcome_v2::detail::basic_result_storage<NonTrivialType, long, outcome_v2::policy::terminate>, NonTrivialType, outcome_v2::policy::terminate>, long, outcome_v2::policy::terminate>const',
-                                      'Size' => '24',
-                                      'Type' => 'Const'
-                                    },
-                          '9693' => {
-                                      'Base' => {
-                                                  '9346' => {
-                                                              'pos' => '0'
-                                                            }
-                                                },
-                                      'Header' => undef,
-                                      'Line' => '3550',
-                                      'Name' => 'outcome_v2::detail::basic_result_final<NonTrivialType, long, outcome_v2::policy::terminate>',
-                                      'NameSpace' => 'outcome_v2::detail',
-                                      'Size' => '24',
-                                      'TParam' => {
-                                                    '0' => {
-                                                             'key' => 'R',
-                                                             'type' => '13752'
-                                                           },
-                                                    '1' => {
-                                                             'key' => 'S',
-                                                             'type' => '2285'
-                                                           },
-                                                    '2' => {
-                                                             'key' => 'NoValuePolicy',
-                                                             'type' => '11333'
-                                                           }
-                                                  },
-                                      'Type' => 'Class'
                                     }
                         },
           'UndefinedSymbols' => {
-                                  'liboutcome-abi-lib-gcc7-cxx14.so' => {
+                                  'liboutcome-abi-lib-gcc9-cxx17.so' => {
                                                                           '_ITM_deregisterTMCloneTable' => 0,
                                                                           '_ITM_registerTMCloneTable' => 0,
                                                                           '__cxa_finalize@GLIBC_2.2.5' => 0,

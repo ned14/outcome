@@ -16,6 +16,6 @@ else
   DUMPFILE=$1
 fi
 RETCODE=0
-abi-dumper -o abi_dumps/Outcome/$DUMPFILE-gcc7-cxx14/binary_only.dump -vnum $DUMPFILE-gcc7-cxx14 build-gcc7-cxx14/liboutcome-abi-lib-gcc7-cxx14.so || RETCODE=1
-abi-dumper -o abi_dumps/Outcome/$DUMPFILE-gcc9-cxx17/binary_only.dump -vnum $DUMPFILE-gcc9-cxx17 build-gcc9-cxx17/liboutcome-abi-lib-gcc9-cxx17.so || RETCODE=1
+abidw --stats --no-show-locs --out-file abi_dumps/Outcome/$DUMPFILE-gcc7-cxx14/abigail.xml --headers-dir ../single-header/abi.hpp build-gcc7-cxx14/liboutcome-abi-lib-gcc7-cxx14.so || RETCODE=1
+abidw --stats --no-show-locs --out-file abi_dumps/Outcome/$DUMPFILE-gcc9-cxx17/abigail.xml --headers-dir ../single-header/abi.hpp build-gcc9-cxx17/liboutcome-abi-lib-gcc9-cxx17.so || RETCODE=1
 exit $RETCODE

@@ -1,0 +1,57 @@
+name: ABIStability
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  abi_stability:
+    name: "ABI stability"
+    runs-on: ubuntu-20.04
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install abi-compliance-checker and abigail tools
+      shell: bash
+      run: |
+       sudo apt-get -y install abi-dumper abi-compliance-checker abigail-tools g++-7 g++-9
+
+    - name: Validate ABI compatibility (abi-dumper)
+      if: success() || failure()
+      shell: bash
+      run: |
+       cd abi-compliance
+       ./check-abi.sh 2.2
+       
+    - name: Validate ABI compatibility (abigail)
+      if: success() || failure()
+      shell: bash
+      run: |
+       cd abi-compliance
+       ./check-abigail.sh 2.2
+       
+#    - name: Validate API + ABI compatibility (abi-compliance-checker)
+#      if: success() || failure()
+#      shell: bash
+#      run: |
+#       cd abi-compliance
+#       ./check-api-abi.sh 2.2
+       
+    - name: Upload ABI stability reports
+      if: success() || failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: ABI stability report (GCC 7 with C++ 14)
+        path: abi-compliance/compat-reports/Outcome/2.2-gcc7-cxx14_to_test-gcc7-cxx14/compat_report.html
+      with:
+        name: ABI stability report (GCC 9 with C++ 17)
+        path: abi-compliance/compat-reports/Outcome/2.2-gcc9-cxx17_to_test-gcc9-cxx17/compat_report.html
+#      with:
+#        name: API + ABI stability report (GCC 9 with C++ 17)
+#        path: abi-compliance/compat-reports/Outcome/2.2-gcc7-cxx14_to_X/compat_report.html
