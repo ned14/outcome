@@ -27,6 +27,7 @@ jobs:
       shell: bash
       run: |
        cd abi-compliance
+       chmod +x check-abi.sh
        ./check-abi.sh 2.2
        
     - name: Validate ABI compatibility (abigail)
@@ -34,6 +35,7 @@ jobs:
       shell: bash
       run: |
        cd abi-compliance
+       chmod +x check-abigail.sh
        ./check-abigail.sh 2.2
        
 #    - name: Validate API + ABI compatibility (abi-compliance-checker)
