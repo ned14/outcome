@@ -43,15 +43,21 @@ jobs:
 #       cd abi-compliance
 #       ./check-api-abi.sh 2.2
        
-    - name: Upload ABI stability reports
+    - name: Upload ABI stability reports 1
       if: success() || failure()
       uses: actions/upload-artifact@v2
       with:
         name: ABI stability report (GCC 7 with C++ 14)
         path: abi-compliance/compat-reports/Outcome/2.2-gcc7-cxx14_to_test-gcc7-cxx14/compat_report.html
+
+
+    - name: Upload ABI stability reports 2
+      if: success() || failure()
+      uses: actions/upload-artifact@v2
       with:
         name: ABI stability report (GCC 9 with C++ 17)
         path: abi-compliance/compat-reports/Outcome/2.2-gcc9-cxx17_to_test-gcc9-cxx17/compat_report.html
+
 #      with:
 #        name: API + ABI stability report (GCC 9 with C++ 17)
 #        path: abi-compliance/compat-reports/Outcome/2.2-gcc7-cxx14_to_X/compat_report.html
