@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Alternatives to Outcome on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/alternatives/</link>
+    <description>Recent content in Alternatives to Outcome on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Wed, 15 Dec 2021 11:47:12 +0000</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/alternatives/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>C&#43;&#43; exception throws</title>
+      <link>https://ned14.github.io/outcome/alternatives/exceptions/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/exceptions/</guid>
+      <description>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets)
+Pros:
+ Zero runtime overhead on the happy path.  Cons:
+ Unpredictable runtime overhead on the sad path.  </description>
+    </item>
+    
+  </channel>
+</rss>

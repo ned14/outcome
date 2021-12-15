@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-12-12T23:29:06 UTC">
+<meta name="revised" content="2021-12-15T12:06:18 UTC">
 <title>History :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -125,6 +125,27 @@
         </div>
     </li>
         </ul>
+    </li>
+    <li data-nav-id="/outcome/alternatives/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/alternatives/">Alternatives to Outcome</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/exceptions/">
+            C++ exception throws
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/abi-stability/" class="dd-item
+        ">
+      <div>
+      <a href="/outcome/abi-stability/">Future ABI stability guarantees</a>
+      </div>
     </li>
     <li data-nav-id="/outcome/tutorial/" class="dd-item haschildren
         ">
@@ -2735,6 +2756,10 @@
    Build and install</option>
     <option value="/outcome/motivation/" >
    Motivation</option>
+    <option value="/outcome/alternatives/" >
+   Alternatives to Outcome</option>
+    <option value="/outcome/abi-stability/" >
+   Future ABI stability guarantees</option>
     <option value="/outcome/tutorial/" >
    Tutorial</option>
     <option value="/outcome/recipes/" >
@@ -2798,7 +2823,7 @@ gantt
   Outcome v2 (complete redesign based on first review feedback): done, des3, after des2, 2018-01
   Boost peer review of v2: done, des4, after des3, 30d
   Outcome v2.1 (changes from second review): active, des5, 2018-03, 2021-04 
-  Outcome v2.2 (changes from user feedback on v2.1): des6, after des5, 2022-04 
+  Outcome v2.2 (changes from user feedback on v2.1): des6, after des5, 2023-04 
   section Events
   Separated from AFIO v1: crit, done, 2014-06,4d
   Boost.Expected added: crit, done, 2014-10,4d
@@ -2812,12 +2837,13 @@ gantt
   Outcome v2.1 feature complete, maturation begins: crit, done, 2018-04,4d
   Boost.Outcome docs gain BoostDoc theming: crit, done, 2018-12,4d
   Release of v2.1 into Boost 1.70: crit, active, 2019-04,4d
-  Planned release of v2.2 into Boost 1.76: crit, active, 2021-04,4d
+  Release of v2.2 into Boost 1.76: crit, active, 2021-04,4d
+  Outcome goes ABI stable: crit, active, 2022-04,4d
 </div>
 
 <noscript><center><img src="/history/graph.png"></center></noscript>
 
-<h2 id="the-genesis-of-outcome-v1">The genesis of Outcome v1</h2>
+<h2 id="the-genesis-of-outcome-v1-2014-2017">The genesis of Outcome v1 (2014 - 2017)</h2>
 
 <p>The git repo began life as a &ldquo;Boost.Spinlock&rdquo; in June 2014 hived out of Boost.AFIO v1 where it had existed
 for some time as an internal library. In October 2014 I added in the original prototype
@@ -2876,7 +2902,7 @@ in May 2017 which turned into one of the longest and most detailed peer reviews 
 done in recent years, with over 800 pieces of review feedback submitted. It was by consensus
 rejected, <a href="https://lists.boost.org/boost-announce/2017/06/0510.php">with substantial feedback on what to do instead</a>.</p>
 
-<h2 id="outcome-v2">Outcome v2</h2>
+<h2 id="outcome-v2-2018">Outcome v2 (2018)</h2>
 
 <p>During the very lengthy peer review, roughly three groups of opinion emerged as to what
 a <code>value|error</code> transporting class ought to look like:</p>
@@ -2913,7 +2939,7 @@ available.</p>
 documentation. This took four months to write (same time as to write the library itself!),
 and in January 2018 Outcome had its second Boost peer review, which it passed!</p>
 
-<h2 id="outcome-v2-1">Outcome v2.1</h2>
+<h2 id="outcome-v2-1-2019-2020">Outcome v2.1 (2019 - 2020)</h2>
 
 <p>The changes requsted during the review of v2.0 were fairly modest: <code>result</code> and <code>outcome</code> would
 be renamed to <code>basic_result</code> and <code>basic_outcome</code>, and a clean separation of concerns between the
@@ -2950,7 +2976,7 @@ part before moving further. The covid pandemic then ceased face to face meetings
 deeply impacted WG21 productivity, so everything large which was not yet approved for
 entry into C++ 23 went on pause.</p>
 
-<h2 id="outcome-v2-2">Outcome v2.2</h2>
+<h2 id="outcome-v2-2-2021">Outcome v2.2 (2021)</h2>
 
 <p>Outcome was sufficiently popular, and widely known as the closest simulacrum of deterministic
 exceptions currently available in C++, that it was regularly benchmarked as such on an &lsquo;as if&rsquo;
@@ -2975,6 +3001,18 @@ emulation of <a href="https://wg21.link/P1029">P1029 <em>move = bitcopies</em></
 enhancement which can treat some move-only types as bags of bits. This very significantly
 improves the appearance in assembler of experimental Outcome based code.</p>
 
+<h2 id="outcome-v2-2-3-2022">Outcome v2.2.3 (2022)</h2>
+
+<p>Outcome v2.2 saw much popularity and very few issues reported after a year in the wild,
+so the decision was taken <a href="/outcome/abi-stability/">to write the v2.2.3 Outcome ABI into stone</a> going forward.
+This is the guarantee that binaries compiled with the v2.2.3 release will link and work
+without issue with binaries compiled with any later version of Outcome.</p>
+
+<p>This pretty much draws a line under further significant development of Outcome &ndash; it
+has now effectively entered &lsquo;sustaining&rsquo;, as big multinationals would term it i.e.
+only small bug fixes and maintainence for future toolchains and languages etc would
+be expected going forth from now.</p>
+
 
 
     
@@ -2997,7 +3035,7 @@ improves the appearance in assembler of experimental Outcome based code.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/09/2020
+        <i class='fa fa-calendar'></i> Last update on 15/12/2021
     </div>
     
 

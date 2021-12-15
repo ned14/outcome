@@ -38,6 +38,16 @@
   </url>
   
   <url>
+    <loc>https://ned14.github.io/outcome/alternatives/</loc>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/abi-stability/</loc>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/no-value/custom/</loc>
     <lastmod>2019-02-08T22:18:08+00:00</lastmod>
   </url>
@@ -45,6 +55,11 @@
   <url>
     <loc>https://ned14.github.io/outcome/experimental/map/</loc>
     <lastmod>2020-12-16T14:14:42+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/alternatives/exceptions/</loc>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
   </url>
   
   <url>
@@ -459,7 +474,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/</loc>
-    <lastmod>2021-12-08T12:57:10+00:00</lastmod>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
   </url>
   
   <url>
@@ -484,7 +499,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/history/</loc>
-    <lastmod>2020-09-16T11:58:04+01:00</lastmod>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
   </url>
   
   <url>
@@ -1513,7 +1528,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2021-02-12T20:25:43+00:00</lastmod>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
   </url>
   
   <url>

@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 12 Feb 2021 20:25:43 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 15 Dec 2021 11:47:12 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -69,6 +69,18 @@ struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt;
       <guid>https://ned14.github.io/outcome/experimental/map/</guid>
       <description>Much of the design of Boost.System (which went on to become &amp;lt;system_error&amp;gt;) has been retained in proposed &amp;lt;system_error2&amp;gt;, so an approximate map between &amp;lt;system_error2&amp;gt; and &amp;lt;system_error&amp;gt; and Boost.System can be given:
   C++ 17 &amp;lt;system_error&amp;gt;Boost.SystemProposed &amp;lt;system_error2&amp;gt;  std::errc boost::system::errc experimental::errc (almost identical)  std::error_category boost::system::error_category experimental::status_code_domain  std::generic_category boost::system::generic_category experimental::generic_code_domain  std::system_category boost::system::system_category One of: experimental::posix_code_domain (POSIX systems) experimental::win32_code_domain (Microsoft Windows) experimental::nt_code_domain (Microsoft Windows)  Note that there are more precanned code categories though they require additional header inclusions: com_code, getaddrinfo_code.</description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43; exception throws</title>
+      <link>https://ned14.github.io/outcome/alternatives/exceptions/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/exceptions/</guid>
+      <description>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets)
+Pros:
+ Zero runtime overhead on the happy path.  Cons:
+ Unpredictable runtime overhead on the sad path.  </description>
     </item>
     
     <item>
@@ -2666,7 +2678,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1383 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1384 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>
