@@ -7,9 +7,9 @@ title = "Home"
 {{% boost-copyright %}}
 
 {{% notice note %}}
-At the end of December 2020, Outcome v2.2 replaced v2.1 in develop branch. This is a breaking
-change and all Outcome v2.1 code will need to be upgraded using [the v2.1 => v2.2 upgrade guide]({{% relref "/changelog/upgrade_v21_v22" %}}). See also
-[the list of v2.2 major changes]({{% relref "/changelog/v22" %}}).
+At the end of December 2021, Standalone Outcome
+<a href="{{% relref "/abi-stability" %}}">went guaranteed future ABI stable</a>.
+From v2.2.3 onwards, you get ABI compatibilty guarantees across Outcome releases.
 {{% /notice %}}
 
 Outcome is a set of tools for reporting and handling function failures in contexts where *directly* using C++ exception handling is unsuitable. Such contexts include:

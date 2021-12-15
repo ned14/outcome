@@ -18,4 +18,9 @@ fi
 RETCODE=0
 abidw --stats --no-show-locs --out-file abi_dumps/Outcome/$DUMPFILE-gcc7-cxx14/abigail.xml --headers-dir ../single-header/abi.hpp build-gcc7-cxx14/liboutcome-abi-lib-gcc7-cxx14.so || RETCODE=1
 abidw --stats --no-show-locs --out-file abi_dumps/Outcome/$DUMPFILE-gcc9-cxx17/abigail.xml --headers-dir ../single-header/abi.hpp build-gcc9-cxx17/liboutcome-abi-lib-gcc9-cxx17.so || RETCODE=1
+if [ $RETCODE -eq 0 ]; then
+  cd abi_dumps/Outcome
+  tar jcf $DUMPFILE.tar.bz2 $DUMPFILE-gcc7-cxx14 $DUMPFILE-gcc9-cxx17 || true
+  cd ../..
+fi
 exit $RETCODE

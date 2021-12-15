@@ -59,16 +59,16 @@ if(NOT PROJECT_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
   UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp")
   # Need to also possibly update the .natvis file
-  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp" namespace_permuter REGEX "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
-  if(NOT namespace_permuter MATCHES "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
-    indented_message(FATAL_ERROR "FATAL: ${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp was not parseable")
-  endif()
-  set(namespace_permuter "${CMAKE_MATCH_1}")
-  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/outcome.natvis" natvis_contents)
-  string(REGEX REPLACE "outcome_v2_([0-9a-f]+)" "outcome_v2_${namespace_permuter}" new_natvis_contents "${natvis_contents}")
-  if(NOT natvis_contents STREQUAL new_natvis_contents)
-    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/outcome.natvis" "${new_natvis_contents}")
-  endif()
+#  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp" namespace_permuter REGEX "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
+#  if(NOT namespace_permuter MATCHES "OUTCOME_PREVIOUS_COMMIT_UNIQUE (.+)")
+#    indented_message(FATAL_ERROR "FATAL: ${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp was not parseable")
+#  endif()
+#  set(namespace_permuter "${CMAKE_MATCH_1}")
+#  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/outcome.natvis" natvis_contents)
+#  string(REGEX REPLACE "outcome_v2_([0-9a-f]+)" "outcome_v2_${namespace_permuter}" new_natvis_contents "${natvis_contents}")
+#  if(NOT natvis_contents STREQUAL new_natvis_contents)
+#    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/outcome.natvis" "${new_natvis_contents}")
+#  endif()
 endif()
 # Find my library dependencies
 if(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB AND CTEST_QUICKCPPLIB_CLONE_DIR)
@@ -112,6 +112,8 @@ if(NOT PROJECT_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
                             -U QUICKCPPLIB_ENABLE_VALGRIND
                             -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
                             -U STANDARDESE_IS_IN_THE_HOUSE
+                            -U OUTCOME_UNSTABLE_VERSION -U OUTCOME_ENABLE_ABI_PERMUTATION
+                            -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
                             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                             )
       if(NOT CMAKE_VERSION VERSION_LESS 3.3)
@@ -129,12 +131,6 @@ if(NOT PROJECT_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
                        "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-experimental.hpp"
                        "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status_outcome.hpp"
                        "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
-    make_single_header(outcome_hl-pp-abi
-                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
-                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/basic_outcome.hpp"
-                       -D OUTCOME_DISABLE_ABI_PERMUTATION=1
-                       -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
-                       -U OUTCOME_UNSTABLE_VERSION)
   endif()
 endif()
 

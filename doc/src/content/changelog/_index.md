@@ -4,6 +4,22 @@ weight = 80
 +++
 
 ---
+## v2.2.3 ? 2022 (Boost 1.79) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
+
+### Enhancements:
+
+Standalone Outcome permanently locks ABI to v2.2.3 release
+: From this release onwards, you are guaranteed that any code compiled with v2.2.3 Outcome
+or newer will link without issue with any code compiled with a different version of Outcome
+after v2.2.3. As a result, `OUTCOME_UNSTABLE_VERSION` is no longer defined by default, and
+therefore `OUTCOME_V2_NAMESPACE` is now hard coded to `outcome_v2` rather than a namespace
+which permutes per commit.
+
+### Bug fixes:
+
+- None.
+
+---
 ## v2.2.2 8th December 2021 (Boost 1.78) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
 
 ### Enhancements:

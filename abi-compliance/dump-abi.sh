@@ -18,4 +18,9 @@ fi
 RETCODE=0
 abi-dumper -o abi_dumps/Outcome/$DUMPFILE-gcc7-cxx14/binary_only.dump -vnum $DUMPFILE-gcc7-cxx14 build-gcc7-cxx14/liboutcome-abi-lib-gcc7-cxx14.so || RETCODE=1
 abi-dumper -o abi_dumps/Outcome/$DUMPFILE-gcc9-cxx17/binary_only.dump -vnum $DUMPFILE-gcc9-cxx17 build-gcc9-cxx17/liboutcome-abi-lib-gcc9-cxx17.so || RETCODE=1
+if [ $RETCODE -eq 0 ]; then
+  cd abi_dumps/Outcome
+  tar jcf $DUMPFILE.tar.bz2 $DUMPFILE-gcc7-cxx14 $DUMPFILE-gcc9-cxx17 || true
+  cd ../..
+fi
 exit $RETCODE

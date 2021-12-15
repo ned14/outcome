@@ -17,7 +17,7 @@ gantt
   Outcome v2 (complete redesign based on first review feedback): done, des3, after des2, 2018-01
   Boost peer review of v2: done, des4, after des3, 30d
   Outcome v2.1 (changes from second review): active, des5, 2018-03, 2021-04 
-  Outcome v2.2 (changes from user feedback on v2.1): des6, after des5, 2022-04 
+  Outcome v2.2 (changes from user feedback on v2.1): des6, after des5, 2023-04 
   section Events
   Separated from AFIO v1: crit, done, 2014-06,4d
   Boost.Expected added: crit, done, 2014-10,4d
@@ -31,11 +31,12 @@ gantt
   Outcome v2.1 feature complete, maturation begins: crit, done, 2018-04,4d
   Boost.Outcome docs gain BoostDoc theming: crit, done, 2018-12,4d
   Release of v2.1 into Boost 1.70: crit, active, 2019-04,4d
-  Planned release of v2.2 into Boost 1.76: crit, active, 2021-04,4d
+  Release of v2.2 into Boost 1.76: crit, active, 2021-04,4d
+  Outcome goes ABI stable: crit, active, 2022-04,4d
 {{</mermaid>}}
 {{</if_boost>}}
 
-## The genesis of Outcome v1
+## The genesis of Outcome v1 (2014 - 2017)
 
 The git repo began life as a "Boost.Spinlock" in June 2014 hived out of Boost.AFIO v1 where it had existed
 for some time as an internal library. In October 2014 I added in the original prototype
@@ -94,7 +95,7 @@ in May 2017 which turned into one of the longest and most detailed peer reviews 
 done in recent years, with over 800 pieces of review feedback submitted. It was by consensus
 rejected, [with substantial feedback on what to do instead](https://lists.boost.org/boost-announce/2017/06/0510.php).
 
-## Outcome v2
+## Outcome v2 (2018)
 
 During the very lengthy peer review, roughly three groups of opinion emerged as to what
 a `value|error` transporting class ought to look like:
@@ -131,7 +132,7 @@ All that remained before it was ready for a second Boost peer review was the
 documentation. This took four months to write (same time as to write the library itself!),
 and in January 2018 Outcome had its second Boost peer review, which it passed!
 
-## Outcome v2.1
+## Outcome v2.1 (2019 - 2020)
 
 The changes requsted during the review of v2.0 were fairly modest: `result` and `outcome` would
 be renamed to `basic_result` and `basic_outcome`, and a clean separation of concerns between the
@@ -168,7 +169,7 @@ part before moving further. The covid pandemic then ceased face to face meetings
 deeply impacted WG21 productivity, so everything large which was not yet approved for
 entry into C++ 23 went on pause.
 
-## Outcome v2.2
+## Outcome v2.2 (2021)
 
 Outcome was sufficiently popular, and widely known as the closest simulacrum of deterministic
 exceptions currently available in C++, that it was regularly benchmarked as such on an 'as if'
@@ -192,3 +193,15 @@ In terms of codegen benefits for proposed `std::error` based code (i.e. code usi
 emulation of [P1029 *move = bitcopies*](https://wg21.link/P1029), a proposed compiler
 enhancement which can treat some move-only types as bags of bits. This very significantly
 improves the appearance in assembler of experimental Outcome based code.
+
+## Outcome v2.2.3 (2022)
+
+Outcome v2.2 saw much popularity and very few issues reported after a year in the wild,
+so the decision was taken [to write the v2.2.3 Outcome ABI into stone]({{% relref "/abi-stability" %}}) going forward.
+This is the guarantee that binaries compiled with the v2.2.3 release will link and work
+without issue with binaries compiled with any later version of Outcome.
+
+This pretty much draws a line under further significant development of Outcome -- it
+has now effectively entered 'sustaining', as big multinationals would term it i.e.
+only small bug fixes and maintainence for future toolchains and languages etc would
+be expected going forth from now.
