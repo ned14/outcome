@@ -77,10 +77,8 @@ struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt;
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/alternatives/exceptions/</guid>
-      <description>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets)
-Pros:
- Zero runtime overhead on the happy path.  Cons:
- Unpredictable runtime overhead on the sad path.  </description>
+      <description>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets).
+C++ exception throws came in the original C++ 98 standard &amp;ndash; at that time, not all the major compilers implemented them yet, and several of those who did did not have efficient implementations, plus in the original days some compiler vendors still patented things like EH implementation techniques to try and maintain a competitive advantage over rival compilers.</description>
     </item>
     
     <item>
@@ -209,6 +207,18 @@ As bad as this may sound, it generates the most optimal code, and such hard UB i
     </item>
     
     <item>
+      <title>C&#43;&#43; error codes</title>
+      <link>https://ned14.github.io/outcome/alternatives/error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/error_code/</guid>
+      <description>std::error_code came originally from boost::error_code which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. You can read more about how std::error_code works here. They were standardised in the C++ 11 standard.
+Pros:
+ Predictable runtime overhead on the happy path.
+ Unbiased syntax equal for both success and failure requiring explicit code written to handle both.</description>
+    </item>
+    
+    <item>
       <title>Coroutine awaitables</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -316,6 +326,16 @@ int readValue(const char * filename) { FILE* f = fopen(filename, &amp;#34;r&amp;
       <guid>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file3/</guid>
       <description>Something not mentioned at all until now (and properly described in the next section, Default actions) is that Outcome can be programmed take various actions when the user tries to observe .value() when there is no value, and so on for the other possible state observations.
 Seeing as we are replacing the throwing overload of copy_file() in the Filesystem TS with a result returning edition instead, it would make sense if an attempt to observe the value of an unsuccessful fs_result threw the exact same filesystem_error as the Filesystem TS does.</description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43; expected</title>
+      <link>https://ned14.github.io/outcome/alternatives/expected/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/expected/</guid>
+      <description>std::expected&amp;lt;T, E&amp;gt; came originally from an experimental monadic and generic programming library outside of Boost written by Boost and WG21 developers around 2013. Before Outcome v1, I deployed the then Expected into a large codebase and I was dismayed with the results, especially on build times. You can read here how those experiences led me to develop Outcome v1.
+std::expected&amp;lt;T, E&amp;gt; is a constrained variant type with a strong preference for the successful type T which it models like a std::optional&amp;lt;T&amp;gt;.</description>
     </item>
     
     <item>
@@ -2678,7 +2698,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1384 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1385 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>

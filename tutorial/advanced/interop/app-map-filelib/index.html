@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-12-15T12:06:17 UTC">
+<meta name="revised" content="2021-12-16T11:45:13 UTC">
 <title>Mapping the File I/O library into the Application :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -69,6 +69,35 @@
       <a href="/outcome/build/">Build and install</a>
       </div>
     </li>
+    <li data-nav-id="/outcome/alternatives/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/alternatives/">Review of Outcome Alternatives</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/exceptions/">
+            C++ exception throws
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/error_code/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/error_code/">
+            C++ error codes
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/expected/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/expected/">
+            C++ expected
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
     <li data-nav-id="/outcome/motivation/" class="dd-item haschildren
         ">
       <div>
@@ -121,21 +150,6 @@
         <div>
           <a href="/outcome/motivation/narrow_contract/">
             Narrow contracts
-          </a>
-        </div>
-    </li>
-        </ul>
-    </li>
-    <li data-nav-id="/outcome/alternatives/" class="dd-item haschildren
-        ">
-      <div>
-      <a href="/outcome/alternatives/">Alternatives to Outcome</a><i class="fa fa-angle-right fa-lg category-icon"></i>
-      </div>
-        <ul>
-      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
-        <div>
-          <a href="/outcome/alternatives/exceptions/">
-            C++ exception throws
           </a>
         </div>
     </li>
@@ -2538,6 +2552,48 @@
       <a href="/outcome/reference/functions/iostream/">Iostream</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_print/">
+            <code>std::string print(const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_print/">
+            <code>std::string print(const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/functions/policy/" class="dd-item haschildren
@@ -2715,10 +2771,10 @@
    Prerequisites</option>
     <option value="/outcome/build/" >
    Build and install</option>
+    <option value="/outcome/alternatives/" >
+   Review of Outcome Alternatives</option>
     <option value="/outcome/motivation/" >
    Motivation</option>
-    <option value="/outcome/alternatives/" >
-   Alternatives to Outcome</option>
     <option value="/outcome/abi-stability/" >
    Future ABI stability guarantees</option>
     <option value="/outcome/tutorial/" >

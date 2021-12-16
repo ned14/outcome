@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-12-15T12:06:15 UTC">
-<title>Alternatives to Outcome :: Outcome documentation</title>
+<meta name="revised" content="2021-12-16T11:45:11 UTC">
+<title>Review of Outcome Alternatives :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -69,6 +69,36 @@
       <a href="/outcome/build/">Build and install</a>
       </div>
     </li>
+    <li data-nav-id="/outcome/alternatives/" class="dd-item parent active haschildren
+        ">
+      <div>
+      <a href="/outcome/alternatives/">Review of Outcome Alternatives</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/exceptions/">
+            C++ exception throws
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/error_code/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/error_code/">
+            C++ error codes
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/expected/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/expected/">
+            C++ expected
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
     <li data-nav-id="/outcome/motivation/" class="dd-item haschildren
         ">
       <div>
@@ -121,22 +151,6 @@
         <div>
           <a href="/outcome/motivation/narrow_contract/">
             Narrow contracts
-          </a>
-        </div>
-    </li>
-        </ul>
-    </li>
-    <li data-nav-id="/outcome/alternatives/" class="dd-item parent active haschildren
-        ">
-      <div>
-      <a href="/outcome/alternatives/">Alternatives to Outcome</a>
-            <i class="fa fa-angle-down fa-lg category-icon"></i>
-      </div>
-        <ul>
-      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
-        <div>
-          <a href="/outcome/alternatives/exceptions/">
-            C++ exception throws
           </a>
         </div>
     </li>
@@ -2755,12 +2769,14 @@
    Prerequisites</option>
     <option value="/outcome/build/" >
    Build and install</option>
+    <option value="/outcome/alternatives/"  selected>
+   Review of Outcome Alternatives</option> 
+      <option value="/outcome/alternatives/exceptions/" >- C&#43;&#43; exception throws</option>
+      <option value="/outcome/alternatives/error_code/" >- C&#43;&#43; error codes</option>
+      <option value="/outcome/alternatives/expected/" >- C&#43;&#43; expected</option>
+  
     <option value="/outcome/motivation/" >
    Motivation</option>
-    <option value="/outcome/alternatives/"  selected>
-   Alternatives to Outcome</option> 
-      <option value="/outcome/alternatives/exceptions/" >- C&#43;&#43; exception throws</option>
-  
     <option value="/outcome/abi-stability/" >
    Future ABI stability guarantees</option>
     <option value="/outcome/tutorial/" >
@@ -2801,16 +2817,22 @@
       </div>
     
 
-    <h1>Alternatives to Outcome</h1>
+    <h1>Review of Outcome Alternatives</h1>
     
     
     
 
 <p>Outcome <a href="/outcome/history/">started life in 2014</a>, entered Boost as Boost.Outcome in 2018, and therefore was amongst the very first of the major alternative error handling frameworks to C++ exception throws in C++. Since then, and sometimes in reaction to Outcome&rsquo;s choice of design, alternative frameworks have appeared. This page tries to give a fairly even handed summary of those alternatives, and how they compare to Outcome in this author&rsquo;s opinion.</p>
 
+<p>These are listed in order of approximate availability to the C++ ecosystem.</p>
+
 <ol class="children children-li"><li>
 	<a href="/outcome/alternatives/exceptions/" >C++ exception throws</a>
-<p>How C++ exception throws compare to Outcome</p></li></ol>
+<p>How C++ exception throws compare to Outcome</p><li>
+	<a href="/outcome/alternatives/error_code/" >C++ error codes</a>
+<p>How <code>std::error_code</code> compares to Outcome</p><li>
+	<a href="/outcome/alternatives/expected/" >C++ expected</a>
+<p>How <code>std::expected&lt;T, E&gt;</code> compares to Outcome</p></li></ol>
 
 
 
@@ -2823,7 +2845,7 @@
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/motivation/narrow_contract/" title="Narrow contracts"> <i class="fa fa-chevron-left"></i><label>Narrow contracts</label></a>
+<a class="nav nav-prev" href="/outcome/build/" title="Build and install"> <i class="fa fa-chevron-left"></i><label>Build and install</label></a>
     <a class="nav nav-next" href="/outcome/alternatives/exceptions/" title="C&#43;&#43; exception throws" style="margin-right: 0px;"><label>C++ exception throws</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
@@ -2839,7 +2861,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/12/2021
+        <i class='fa fa-calendar'></i> Last update on 16/12/2021
     </div>
     
 

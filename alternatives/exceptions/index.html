@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2021-12-15T12:06:15 UTC">
+<meta name="revised" content="2021-12-16T11:45:11 UTC">
 <title>C&#43;&#43; exception throws :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -69,6 +69,36 @@
       <a href="/outcome/build/">Build and install</a>
       </div>
     </li>
+    <li data-nav-id="/outcome/alternatives/" class="dd-item parent haschildren
+        ">
+      <div>
+      <a href="/outcome/alternatives/">Review of Outcome Alternatives</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item active">
+        <div>
+          <a href="/outcome/alternatives/exceptions/">
+            C++ exception throws
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/error_code/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/error_code/">
+            C++ error codes
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/expected/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/expected/">
+            C++ expected
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
     <li data-nav-id="/outcome/motivation/" class="dd-item haschildren
         ">
       <div>
@@ -121,22 +151,6 @@
         <div>
           <a href="/outcome/motivation/narrow_contract/">
             Narrow contracts
-          </a>
-        </div>
-    </li>
-        </ul>
-    </li>
-    <li data-nav-id="/outcome/alternatives/" class="dd-item parent haschildren
-        ">
-      <div>
-      <a href="/outcome/alternatives/">Alternatives to Outcome</a>
-            <i class="fa fa-angle-down fa-lg category-icon"></i>
-      </div>
-        <ul>
-      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item active">
-        <div>
-          <a href="/outcome/alternatives/exceptions/">
-            C++ exception throws
           </a>
         </div>
     </li>
@@ -2755,12 +2769,14 @@
    Prerequisites</option>
     <option value="/outcome/build/" >
    Build and install</option>
+    <option value="/outcome/alternatives/" >
+   Review of Outcome Alternatives</option> 
+      <option value="/outcome/alternatives/exceptions/"  selected>- C&#43;&#43; exception throws</option>
+      <option value="/outcome/alternatives/error_code/" >- C&#43;&#43; error codes</option>
+      <option value="/outcome/alternatives/expected/" >- C&#43;&#43; expected</option>
+  
     <option value="/outcome/motivation/" >
    Motivation</option>
-    <option value="/outcome/alternatives/" >
-   Alternatives to Outcome</option> 
-      <option value="/outcome/alternatives/exceptions/"  selected>- C&#43;&#43; exception throws</option>
-  
     <option value="/outcome/abi-stability/" >
    Future ABI stability guarantees</option>
     <option value="/outcome/tutorial/" >
@@ -2805,18 +2821,34 @@
     
     
     
-    <p>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets)</p>
+    <p>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets).</p>
+
+<p>C++ exception throws came in the original C++ 98 standard &ndash; at that time, not all the major compilers implemented them yet, and several of those who did did not have efficient implementations, plus in the original days some compiler vendors still patented things like EH implementation techniques to try and maintain a competitive advantage over rival compilers. Unlike other C++ features, enabling C++ exceptions on a code base not written with them in mind is not safe, so this led to the C++ ecosystem becoming bifurcated into exceptions-enabled and exceptions-disabled camps.</p>
 
 <p>Pros:</p>
 
 <ul>
-<li>Zero runtime overhead on the happy path.</li>
+<li><p>Zero runtime overhead on the happy path.</p></li>
+
+<li><p>Success-orientated syntax declutters code of failure control flow paths.</p></li>
+
+<li><p>As a built-in language feature, probably has the least impact on optimisation of any failure handling mechanism here.</p></li>
 </ul>
 
 <p>Cons:</p>
 
 <ul>
-<li>Unpredictable runtime overhead on the sad path.</li>
+<li><p>Unpredictable runtime overhead on the sad path.</p></li>
+
+<li><p>Unacceptable runtime overhead on the sad path for real time applications.</p></li>
+
+<li><p>Adds considerable bloat to produced binaries, which can be unacceptable for some use cases (embedded).</p></li>
+
+<li><p>Requires RTTI to be enabled or non-standard behaviour results (which is further binary bloat).</p></li>
+
+<li><p>Not available in several major parts of the C++ ecosystem (embedded, games, audio, to a lesser extent financial).</p></li>
+
+<li><p>Most codebases do not invest in adequate correctness testing of the silent proliferation of failure control flow paths which result in C++ exception throwing code.</p></li>
 </ul>
 
 
@@ -2824,8 +2856,8 @@
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/alternatives/" title="Alternatives to Outcome"> <i class="fa fa-chevron-left"></i><label>Alternatives to Outcome</label></a>
-    <a class="nav nav-next" href="/outcome/abi-stability/" title="Future ABI stability guarantees" style="margin-right: 0px;"><label>Future ABI stability guarantees</label><i class="fa fa-chevron-right"></i></a></div>
+<a class="nav nav-prev" href="/outcome/alternatives/" title="Review of Outcome Alternatives"> <i class="fa fa-chevron-left"></i><label>Review of Outcome Alternatives</label></a>
+    <a class="nav nav-next" href="/outcome/alternatives/error_code/" title="C&#43;&#43; error codes" style="margin-right: 0px;"><label>C++ error codes</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2840,7 +2872,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/12/2021
+        <i class='fa fa-calendar'></i> Last update on 16/12/2021
     </div>
     
 
