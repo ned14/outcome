@@ -203,5 +203,5 @@ without issue with binaries compiled with any later version of Outcome.
 
 This pretty much draws a line under further significant development of Outcome -- it
 has now effectively entered 'sustaining', as big multinationals would term it i.e.
-only small bug fixes and maintainence for future toolchains and languages etc would
+only small bug fixes and maintenance for future toolchains and languages etc would
 be expected going forth from now.
