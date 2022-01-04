@@ -72,16 +72,6 @@ struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt;
     </item>
     
     <item>
-      <title>C&#43;&#43; exception throws</title>
-      <link>https://ned14.github.io/outcome/alternatives/exceptions/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/alternatives/exceptions/</guid>
-      <description>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would be a lot more even with Outcome. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets).
-C++ exception throws came in the original C++ 98 standard &amp;ndash; at that time, not all the major compilers implemented them yet, and several of those who did did not have efficient implementations, plus in the original days some compiler vendors still patented things like EH implementation techniques to try and maintain a competitive advantage over rival compilers.</description>
-    </item>
-    
-    <item>
       <title>Coroutine TRY operation</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -165,6 +155,16 @@ Let us imagine that the HTTP library has the following public interface:
     </item>
     
     <item>
+      <title>std exception throws</title>
+      <link>https://ned14.github.io/outcome/alternatives/exceptions/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/exceptions/</guid>
+      <description>(Note that we assume a table-based EH implementation here, a SJLJ EH implementaton would have even happy and sad path runtime overhead. Table-based EH implementations are almost universal on x64, ARM and AArch64 targets).
+C++ exception throws came in the original C++ 98 standard &amp;ndash; at that time, not all the major compilers implemented them yet, and several of those who did did not have efficient implementations, plus in the original days some compiler vendors still patented things like EH implementation techniques to try and maintain a competitive advantage over rival compilers.</description>
+    </item>
+    
+    <item>
       <title>The HTMLTidy library</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/interop/tidylib/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -204,18 +204,6 @@ Here we do the same, but more directly by creating a thin clone of std::error_co
 &amp;nbsp;
 all_narrow If there is an observation of a value/error/exception which is not present, the program is put into a hard undefined behaviour situation. The compiler literally compiles no code for an invalid observation &amp;ndash; the CPU &amp;ldquo;runs off&amp;rdquo; into the unknown.
 As bad as this may sound, it generates the most optimal code, and such hard UB is very tool-friendly for detection e.</description>
-    </item>
-    
-    <item>
-      <title>C&#43;&#43; error codes</title>
-      <link>https://ned14.github.io/outcome/alternatives/error_code/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/alternatives/error_code/</guid>
-      <description>std::error_code came originally from boost::error_code which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. You can read more about how std::error_code works here. They were standardised in the C++ 11 standard.
-Pros:
- Predictable runtime overhead on the happy path.
- Unbiased syntax equal for both success and failure requiring explicit code written to handle both.</description>
     </item>
     
     <item>
@@ -309,6 +297,18 @@ int readValue(const char * filename) { FILE* f = fopen(filename, &amp;#34;r&amp;
     </item>
     
     <item>
+      <title>std error codes</title>
+      <link>https://ned14.github.io/outcome/alternatives/error_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/error_code/</guid>
+      <description>std::error_code came originally from boost::error_code which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. You can read more about how std::error_code works here. They were standardised in the C++ 11 standard.
+Pros:  Predictable runtime overhead on the happy path.
+ Predictable runtime overhead on the sad path.
+ Unbiased syntax equal for both success and failure requiring explicit code written to handle both.</description>
+    </item>
+    
+    <item>
       <title>The Application</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/interop/app/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -326,16 +326,6 @@ int readValue(const char * filename) { FILE* f = fopen(filename, &amp;#34;r&amp;
       <guid>https://ned14.github.io/outcome/tutorial/advanced/payload/copy_file3/</guid>
       <description>Something not mentioned at all until now (and properly described in the next section, Default actions) is that Outcome can be programmed take various actions when the user tries to observe .value() when there is no value, and so on for the other possible state observations.
 Seeing as we are replacing the throwing overload of copy_file() in the Filesystem TS with a result returning edition instead, it would make sense if an attempt to observe the value of an unsuccessful fs_result threw the exact same filesystem_error as the Filesystem TS does.</description>
-    </item>
-    
-    <item>
-      <title>C&#43;&#43; expected</title>
-      <link>https://ned14.github.io/outcome/alternatives/expected/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/alternatives/expected/</guid>
-      <description>std::expected&amp;lt;T, E&amp;gt; came originally from an experimental monadic and generic programming library outside of Boost written by Boost and WG21 developers around 2013. Before Outcome v1, I deployed the then Expected into a large codebase and I was dismayed with the results, especially on build times. You can read here how those experiences led me to develop Outcome v1.
-std::expected&amp;lt;T, E&amp;gt; is a constrained variant type with a strong preference for the successful type T which it models like a std::optional&amp;lt;T&amp;gt;.</description>
     </item>
     
     <item>
@@ -431,6 +421,16 @@ Unfortunately it also means that it must be possible for each domain to be insta
     </item>
     
     <item>
+      <title>std expected</title>
+      <link>https://ned14.github.io/outcome/alternatives/expected/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/expected/</guid>
+      <description>std::expected&amp;lt;T, E&amp;gt; came originally from an experimental monadic and generic programming library outside of Boost written by Boost and WG21 developers around 2013. Before Outcome v1, I deployed the then Expected into a large codebase and I was dismayed with the results, especially on build times. You can read here how those experiences led me to develop Outcome v1.
+std::expected&amp;lt;T, E&amp;gt; is a constrained variant type with a strong preference for the successful type T which it models like a std::optional&amp;lt;T&amp;gt;.</description>
+    </item>
+    
+    <item>
       <title>v2.2 major changes</title>
       <link>https://ned14.github.io/outcome/changelog/v22/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -468,6 +468,16 @@ But let&amp;rsquo;s keep going by intercepting any construction of our localised
       <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-map-filelib/</guid>
       <description>To handle the File I/O library, once again we turn to custom ValueOrError converters:
 // Inject custom ValueOrError conversion OUTCOME_V2_NAMESPACE_BEGIN namespace convert { // Provide custom ValueOrError conversion from filelib::result&amp;lt;U&amp;gt;  // into any app::outcome&amp;lt;T&amp;gt;  template &amp;lt;classT, classU&amp;gt; //  struct value_or_error&amp;lt;app::outcome&amp;lt;T&amp;gt;, filelib::result&amp;lt;U&amp;gt;&amp;gt; { // True to indicate that this converter wants `result`/`outcome`  // to NOT reject all other `result`  static constexpr bool enable_result_inputs = true; // False to indicate that this converter wants `outcome` to NOT  // reject all other `outcome`  static constexpr bool enable_outcome_inputs = true; template &amp;lt;classX, //  typename = std::enable_if_t&amp;lt;std::is_same&amp;lt;filelib::result&amp;lt;U&amp;gt;, std::decay_t&amp;lt;X&amp;gt;&amp;gt;::value //  &amp;amp;&amp;amp; std::is_constructible&amp;lt;T, U&amp;gt;::value&amp;gt;&amp;gt; //  constexpr app::outcome&amp;lt;T&amp;gt; operator()(X &amp;amp;&amp;amp;src) { // Forward any successful value  if(src.</description>
+    </item>
+    
+    <item>
+      <title>Outcome (proposed std result)</title>
+      <link>https://ned14.github.io/outcome/alternatives/outcome/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/outcome/</guid>
+      <description>Outcome (the library described by this documentation) originated in a negative reaction to then originally proposed std::expected&amp;lt;T, E&amp;gt;, though what got eventually standardised as std::expected&amp;lt;T, E&amp;gt; looks much more like Outcome&amp;rsquo;s result&amp;lt;T, E&amp;gt; than the original Expected. You can read here how those experiences led me to develop Outcome v1. Outcome comes in both standalone and Boost editions, and its current design was completed in 2018.
+Outcome&amp;rsquo;s core is two workhorse types and a macro:</description>
     </item>
     
     <item>
@@ -573,6 +583,17 @@ You ought to be very careful that the noexcept-ness of these matches the noexcep
       <guid>https://ned14.github.io/outcome/tutorial/advanced/interop/app-go/</guid>
       <description>This is how you might now write application code using these three libraries:
 namespace app { // A markup function to indicate when we are ValueOrError converting  template &amp;lt;classT&amp;gt; inline outcome&amp;lt;typename T::value_type&amp;gt; ext(T &amp;amp;&amp;amp;v) { //  return outcome&amp;lt;typename T::value_type&amp;gt;(std::move(v)); } outcome&amp;lt;void&amp;gt; go() // NOT noexcept, this can throw STL exceptions e.g. bad_alloc  { // Note that explicit construction is required when converting between differing types  // of outcome and result.</description>
+    </item>
+    
+    <item>
+      <title>LEAF</title>
+      <link>https://ned14.github.io/outcome/alternatives/leaf/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/alternatives/leaf/</guid>
+      <description>As much as Outcome originated in a negative reaction to the then originally proposed std::expected&amp;lt;T, E&amp;gt;, LEAF originated in a negative reaction to Outcome. Some of the perceived issues with Outcome were (LEAF&amp;rsquo;s own rendition of this can be viewed here):
+ Outcome based code is visually cluttered, as both happy and sad paths appear in code.
+ Outcome based code generates branchy code at runtime, which impacts low end CPUs and first time code execution.</description>
     </item>
     
     <item>
@@ -2698,7 +2719,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1386 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1388 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @ecatmur 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>

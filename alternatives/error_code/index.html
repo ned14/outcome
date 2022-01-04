@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-01-01T01:01:18 UTC">
-<title>C&#43;&#43; error codes :: Outcome documentation</title>
+<meta name="revised" content="2022-01-04T12:17:52 UTC">
+<title>std error codes :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -72,28 +72,42 @@
     <li data-nav-id="/outcome/alternatives/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/alternatives/">Review of Outcome Alternatives</a>
+      <a href="/outcome/alternatives/">Review of Error Handling Frameworks</a>
             <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
         <div>
           <a href="/outcome/alternatives/exceptions/">
-            C++ exception throws
+            std exception throws
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/alternatives/error_code/" class="dd-item active">
         <div>
           <a href="/outcome/alternatives/error_code/">
-            C++ error codes
+            std error codes
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/alternatives/expected/" class="dd-item">
         <div>
           <a href="/outcome/alternatives/expected/">
-            C++ expected
+            std expected
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/outcome/">
+            Outcome (proposed std result)
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/leaf/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/leaf/">
+            LEAF
           </a>
         </div>
     </li>
@@ -304,6 +318,220 @@
       <a href="/outcome/tutorial/advanced/">Advanced</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+    <li data-nav-id="/outcome/tutorial/advanced/payload/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/advanced/payload/">Custom payloads</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/payload/copy_file/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/payload/copy_file/">
+            The Filesystem TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/payload/copy_file2/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/payload/copy_file2/">
+            Upgrading the Filesystem TS
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/payload/copy_file3/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/payload/copy_file3/">
+            Auto-throwing filesystem_error
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/advanced/constructors/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/advanced/constructors/">Result returning constructors</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/two-phase-init/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/two-phase-init/">
+            Two phase construction
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/file_handle/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/file_handle/">
+            A file handle
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/static-constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/static-constructor/">
+            Phase 2 construction
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/metaprogrammg1/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/metaprogrammg1/">
+            Phase 3
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/metaprogrammg2/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/metaprogrammg2/">
+            construct<T>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/metaprogrammg3/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/metaprogrammg3/">
+            Alternatives
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/advanced/hooks/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/advanced/hooks/">Hooking events</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/keeping_state/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/keeping_state/">
+            Keeping state
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/adl_bridging/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/adl_bridging/">
+            ADL bridging
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_result/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/hook_result/">
+            Hook result
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/poke_exception/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/poke_exception/">
+            Custom exception ptr
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/hook_outcome/">
+            Hook outcome
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/outcome/tutorial/advanced/interop/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/outcome/tutorial/advanced/interop/">Interoperation</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/problem/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/problem/">
+            Incommensurate E types
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/value-or-error/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/value-or-error/">
+            value_or_error Concept
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/httplib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/httplib/">
+            The HTTP library
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/tidylib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/tidylib/">
+            The HTMLTidy library
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/filelib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/filelib/">
+            The File I/O library
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app/">
+            The Application
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib1/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-httplib1/">
+            Mapping the HTTP library into the Application <code>1/2</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-httplib2/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-httplib2/">
+            Mapping the HTTP library into the Application <code>2/2</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-filelib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-filelib/">
+            Mapping the File I/O library into the Application
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-map-tidylib/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-map-tidylib/">
+            Mapping the HTMLTidy library into the Application
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/app-go/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/app-go/">
+            In use
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/interop/conclusion/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/interop/conclusion/">
+            Conclusion
+          </a>
+        </div>
+    </li>
+        </ul>
+    </li>
         </ul>
     </li>
         </ul>
@@ -2556,10 +2784,12 @@
     <option value="/outcome/build/" >
    Build and install</option>
     <option value="/outcome/alternatives/" >
-   Review of Outcome Alternatives</option> 
-      <option value="/outcome/alternatives/exceptions/" >- C&#43;&#43; exception throws</option>
-      <option value="/outcome/alternatives/error_code/"  selected>- C&#43;&#43; error codes</option>
-      <option value="/outcome/alternatives/expected/" >- C&#43;&#43; expected</option>
+   Review of Error Handling Frameworks</option> 
+      <option value="/outcome/alternatives/exceptions/" >- std exception throws</option>
+      <option value="/outcome/alternatives/error_code/"  selected>- std error codes</option>
+      <option value="/outcome/alternatives/expected/" >- std expected</option>
+      <option value="/outcome/alternatives/outcome/" >- Outcome (proposed std result)</option>
+      <option value="/outcome/alternatives/leaf/" >- LEAF</option>
   
     <option value="/outcome/motivation/" >
    Motivation</option>
@@ -2603,16 +2833,20 @@
       </div>
     
 
-    <h1>C++ error codes</h1>
+    <h1>std error codes</h1>
     
     
     
-    <p><code>std::error_code</code> came originally from <code>boost::error_code</code> which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. <a href="/outcome/motivation/std_error_code/">You can read more about how <code>std::error_code</code> works here</a>. They were standardised in the C++ 11 standard.</p>
+    
 
-<p>Pros:</p>
+<p><code>std::error_code</code> came originally from <code>boost::error_code</code> which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. <a href="/outcome/motivation/std_error_code/">You can read more about how <code>std::error_code</code> works here</a>. They were standardised in the C++ 11 standard.</p>
+
+<h4 id="pros">Pros:</h4>
 
 <ul>
 <li><p>Predictable runtime overhead on the happy path.</p></li>
+
+<li><p>Predictable runtime overhead on the sad path.</p></li>
 
 <li><p>Unbiased syntax equal for both success and failure requiring explicit code written to handle both.</p></li>
 
@@ -2621,13 +2855,15 @@
 <li><p>Once constructed, passing around <code>std::error_code</code> instances optimises well, often being passed in CPU registers.</p></li>
 
 <li><p>Works well in all configurations of C++, including C++ exceptions and RTTI globally disabled.</p></li>
+
+<li><p>Works well on all niche architectures, such as HPC, GPUs, DSPs and microcontrollers.</p></li>
+
+<li><p>Ships with every standard library since C++ 11.</p></li>
 </ul>
 
-<p>Cons:</p>
+<h4 id="cons">Cons:</h4>
 
 <ul>
-<li><p>Predictable runtime overhead on the sad path.</p></li>
-
 <li><p>Failure to write handling code for failure means failures get silently dropped. This is disturbingly easy to do.</p></li>
 
 <li><p>Results in branchy code, which is slow &ndash; though predictably so &ndash; for embedded controller CPUs.</p></li>
@@ -2648,8 +2884,8 @@
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/alternatives/exceptions/" title="C&#43;&#43; exception throws"> <i class="fa fa-chevron-left"></i><label>C++ exception throws</label></a>
-    <a class="nav nav-next" href="/outcome/alternatives/expected/" title="C&#43;&#43; expected" style="margin-right: 0px;"><label>C++ expected</label><i class="fa fa-chevron-right"></i></a></div>
+<a class="nav nav-prev" href="/outcome/alternatives/exceptions/" title="std exception throws"> <i class="fa fa-chevron-left"></i><label>std exception throws</label></a>
+    <a class="nav nav-next" href="/outcome/alternatives/expected/" title="std expected" style="margin-right: 0px;"><label>std expected</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2664,7 +2900,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/12/2021
+        <i class='fa fa-calendar'></i> Last update on 04/01/2022
     </div>
     
 

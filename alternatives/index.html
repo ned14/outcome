@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-01-01T01:01:17 UTC">
-<title>Review of Outcome Alternatives :: Outcome documentation</title>
+<meta name="revised" content="2022-01-04T12:17:51 UTC">
+<title>Review of Error Handling Frameworks :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -72,28 +72,42 @@
     <li data-nav-id="/outcome/alternatives/" class="dd-item parent active haschildren
         ">
       <div>
-      <a href="/outcome/alternatives/">Review of Outcome Alternatives</a>
+      <a href="/outcome/alternatives/">Review of Error Handling Frameworks</a>
             <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
         <div>
           <a href="/outcome/alternatives/exceptions/">
-            C++ exception throws
+            std exception throws
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/alternatives/error_code/" class="dd-item">
         <div>
           <a href="/outcome/alternatives/error_code/">
-            C++ error codes
+            std error codes
           </a>
         </div>
     </li>
       <li data-nav-id="/outcome/alternatives/expected/" class="dd-item">
         <div>
           <a href="/outcome/alternatives/expected/">
-            C++ expected
+            std expected
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/outcome/">
+            Outcome (proposed std result)
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/alternatives/leaf/" class="dd-item">
+        <div>
+          <a href="/outcome/alternatives/leaf/">
+            LEAF
           </a>
         </div>
     </li>
@@ -2770,10 +2784,12 @@
     <option value="/outcome/build/" >
    Build and install</option>
     <option value="/outcome/alternatives/"  selected>
-   Review of Outcome Alternatives</option> 
-      <option value="/outcome/alternatives/exceptions/" >- C&#43;&#43; exception throws</option>
-      <option value="/outcome/alternatives/error_code/" >- C&#43;&#43; error codes</option>
-      <option value="/outcome/alternatives/expected/" >- C&#43;&#43; expected</option>
+   Review of Error Handling Frameworks</option> 
+      <option value="/outcome/alternatives/exceptions/" >- std exception throws</option>
+      <option value="/outcome/alternatives/error_code/" >- std error codes</option>
+      <option value="/outcome/alternatives/expected/" >- std expected</option>
+      <option value="/outcome/alternatives/outcome/" >- Outcome (proposed std result)</option>
+      <option value="/outcome/alternatives/leaf/" >- LEAF</option>
   
     <option value="/outcome/motivation/" >
    Motivation</option>
@@ -2817,22 +2833,26 @@
       </div>
     
 
-    <h1>Review of Outcome Alternatives</h1>
+    <h1>Review of Error Handling Frameworks</h1>
     
     
     
 
-<p>Outcome <a href="/outcome/history/">started life in 2014</a>, entered Boost as Boost.Outcome in 2018, and therefore was amongst the very first of the major alternative error handling frameworks to C++ exception throws in C++. Since then, and sometimes in reaction to Outcome&rsquo;s choice of design, alternative frameworks have appeared. This page tries to give a fairly even handed summary of those alternatives, and how they compare to Outcome in this author&rsquo;s opinion.</p>
+<p>Outcome <a href="/outcome/history/">started life in 2014</a>, entered Boost as Boost.Outcome in 2018, and therefore was amongst the very first of the major alternative error handling frameworks to standard exception throws in C++. Since then, and sometimes in reaction to Outcome&rsquo;s choice of design, alternative frameworks have appeared. This page tries to give a fairly even handed summary of those alternatives, and how they compare to Outcome in this author&rsquo;s opinion.</p>
 
-<p>These are listed in order of approximate availability to the C++ ecosystem.</p>
+<p>These are listed in order of approximate availability to the C++ ecosystem i.e. in order of appearance.</p>
 
 <ol class="children children-li"><li>
-	<a href="/outcome/alternatives/exceptions/" >C++ exception throws</a>
-<p>How C++ exception throws compare to Outcome</p><li>
-	<a href="/outcome/alternatives/error_code/" >C++ error codes</a>
-<p>How <code>std::error_code</code> compares to Outcome</p><li>
-	<a href="/outcome/alternatives/expected/" >C++ expected</a>
-<p>How <code>std::expected&lt;T, E&gt;</code> compares to Outcome</p></li></ol>
+	<a href="/outcome/alternatives/exceptions/" >std exception throws</a>
+<p>Advantages and disadvantages of C++ exception throws</p><li>
+	<a href="/outcome/alternatives/error_code/" >std error codes</a>
+<p>Advantages and disadvantages of <code>std::error_code</code></p><li>
+	<a href="/outcome/alternatives/expected/" >std expected</a>
+<p>Advantages and disadvantages of <code>std::expected&lt;T, E&gt;</code></p><li>
+	<a href="/outcome/alternatives/outcome/" >Outcome (proposed std result)</a>
+<p>Advantages and disadvantages of Outcome and its proposed <code>std::result&lt;T&gt;</code></p><li>
+	<a href="/outcome/alternatives/leaf/" >LEAF</a>
+<p>Advantages and disadvantages of Lightweight Error Augmentation Framework</p></li></ol>
 
 
 
@@ -2846,7 +2866,7 @@
         <div class="chevrons">
     <div id="navigation">
 <a class="nav nav-prev" href="/outcome/build/" title="Build and install"> <i class="fa fa-chevron-left"></i><label>Build and install</label></a>
-    <a class="nav nav-next" href="/outcome/alternatives/exceptions/" title="C&#43;&#43; exception throws" style="margin-right: 0px;"><label>C++ exception throws</label><i class="fa fa-chevron-right"></i></a></div>
+    <a class="nav nav-next" href="/outcome/alternatives/exceptions/" title="std exception throws" style="margin-right: 0px;"><label>std exception throws</label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -2861,7 +2881,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/12/2021
+        <i class='fa fa-calendar'></i> Last update on 04/01/2022
     </div>
     
 
