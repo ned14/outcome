@@ -1,14 +1,16 @@
 +++
-title = "C++ error codes"
-description = "How `std::error_code` compares to Outcome"
+title = "std error codes"
+description = "Advantages and disadvantages of `std::error_code`"
 weight = 20
 +++
 
 `std::error_code` came originally from `boost::error_code` which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. [You can read more about how `std::error_code` works here]({{% relref "/motivation/std_error_code" %}}). They were standardised in the C++ 11 standard.
 
-Pros:
+#### Pros:
 
 - Predictable runtime overhead on the happy path.
+
+- Predictable runtime overhead on the sad path.
 
 - Unbiased syntax equal for both success and failure requiring explicit code written to handle both.
 
@@ -18,9 +20,11 @@ Pros:
 
 - Works well in all configurations of C++, including C++ exceptions and RTTI globally disabled.
 
-Cons:
+- Works well on all niche architectures, such as HPC, GPUs, DSPs and microcontrollers.
 
-- Predictable runtime overhead on the sad path.
+- Ships with every standard library since C++ 11.
+
+#### Cons:
 
 - Failure to write handling code for failure means failures get silently dropped. This is disturbingly easy to do.
 
