@@ -28,8 +28,8 @@ C++ exception throws came in the original C++ 98 standard -- at that time, not a
 
 - Requires RTTI to be enabled or non-standard behaviour results (which is further binary bloat).
 
-- Not available in several major parts of the C++ ecosystem (embedded, games, audio, to a lesser extent financial).
+- Not available by tradition or convention in several major parts of the C++ ecosystem (embedded, games, audio, to a lesser extent financial).
 
 - Not available in many niche architectures such as HPC, GPUs, DSPs and microcontrollers.
 
-- Most codebases do not invest in adequate correctness testing of the silent proliferation of failure control flow paths which result in C++ exception throwing code.
+- Most codebases do not invest in adequate correctness testing of the silent proliferation of failure control flow paths which result in C++ exception throwing code (exception throws silently generate multitudes of slight variations of sad path control flows).

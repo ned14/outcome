@@ -4,7 +4,7 @@ description = "Advantages and disadvantages of `std::error_code`"
 weight = 20
 +++
 
-`std::error_code` came originally from `boost::error_code` which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. [You can read more about how `std::error_code` works here]({{% relref "/motivation/std_error_code" %}}). They were standardised in the C++ 11 standard.
+`std::error_code` came originally from `boost::error_code` which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. [You can read more about how `std::error_code` works here]({{% relref "/motivation/std_error_code" %}}). They were standardised in the C++ 11 standard, and have been available in Boost since 2008.
 
 #### Pros:
 
@@ -14,7 +14,7 @@ weight = 20
 
 - Unbiased syntax equal for both success and failure requiring explicit code written to handle both.
 
-- Very little bloat added to binaries.
+- Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries).
 
 - Once constructed, passing around `std::error_code` instances optimises well, often being passed in CPU registers.
 
@@ -30,7 +30,7 @@ weight = 20
 
 - Results in branchy code, which is slow -- though predictably so -- for embedded controller CPUs.
 
-- Because the `std::error_category` instance used in construction comes from a magic static, the compiler inserts an atomic operation around every `std::error_code` construction. This can impact optimisation on compilers with poor optimisation of atomics.
+- Because the `std::error_category` instance used in construction comes from a magic static, the compiler inserts an atomic operation around every `std::error_code` construction (e.g. https://godbolt.org/z/oGaf4qe8a). This can impact optimisation on compilers with poor optimisation of atomics.
 
 - The payload of type `int` is incredibly constraining sometimes, especially on 64-bit platforms. It would have been much better if it were `intptr_t` instead of `int`.
 

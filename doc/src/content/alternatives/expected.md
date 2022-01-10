@@ -23,7 +23,7 @@ Outcome recognises Expected-like types and will construct from them, which aids 
 
 - Predictable runtime overhead on the sad path.
 
-- Very little bloat added to binaries.
+- Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries).
 
 - Variant storage means storage overhead is minimal, except when either `T` or `E` has a throwing move constructor which typically causes storage blowup.
 

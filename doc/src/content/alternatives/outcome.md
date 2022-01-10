@@ -29,7 +29,7 @@ Outcome recognises Expected-like types and will construct from them, which aids 
 
 - Predictable runtime overhead on the sad path.
 
-- Very little bloat added to binaries.
+- Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries if you use Outcome's bundled error types).
 
 - Neither success nor failure is prioritised during use -- types will implicitly construct from both `T` and `E` if it is unambiguous, so no clunky added markup needed to return an `E`.
 

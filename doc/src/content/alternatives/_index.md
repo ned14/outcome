@@ -8,3 +8,5 @@ Outcome [started life in 2014]({{% relref "/history" %}}), entered Boost as Boos
 These are listed in order of approximate availability to the C++ ecosystem i.e. in order of appearance.
 
 {{% children description="true" depth="2" %}}
+
+My thanks to Emil Dotchevski for reviewing this summary and providing notes.

@@ -12,9 +12,9 @@ As much as Outcome originated in a negative reaction to the then originally prop
 
 - Outcome's Result type encodes the type of the error in the function signature, which could be considered as more brittle and problematic for large scale code refactoring[^1].
 
-- Outcome is intended to be the ultimate error handling framework in a program (i.e. all third party custom error handling flows into Outcome via customisation point adapters), whereas LEAF is intended to be used ad hoc as needed.
+- Outcome is more strongly opinionated about being the ultimate error handling framework in a program (i.e. all third party custom error handling is assumed to flow into Outcome via customisation point adapters), whereas LEAF is less strongly opinionated, and yet provides equivalent functionality.
 
-LEAF therefore looks a lot more like standard C++ exception handling, but without the non-deterministic sad path at the cost of a slight impact on happy path runtime performance. LEAF's current design was completed in 2020.
+LEAF therefore looks more like standard C++ exception handling, but without the non-deterministic sad path at the cost of a slight impact on happy path runtime performance. LEAF's current design was completed in 2020.
 
 If you need an error handling framework which has predictable sad path overhead unlike C++ exceptions, but you otherwise want similar syntax and use experience to C++ exceptions, LEAF is a very solid choice.
 
@@ -27,9 +27,7 @@ If you need an error handling framework which has predictable sad path overhead 
 
 - Does not cause branchy code to the same extent as Outcome, and the sad path is deterministic unlike with C++ exceptions.
 
-- Very little bloat added to binaries.
-
-- Sad path control flow is implied in code, same as with C++ exceptions, so code only shows the happy path. This reduces visual code clutter, and eliminates any need for a `try` operator.
+- Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries, most of which can be compiled out using a macro if desired).
 
 - Unlike with any of the preceding options, failures nor successes cannot get unintentionally dropped. This is the same strength of guarantee as with C++ exceptions.
 
@@ -37,9 +35,7 @@ If you need an error handling framework which has predictable sad path overhead 
 
 #### Cons:
 
-- Sad path control flow is implied which suits code which almost never fails, but is less suited for code where sad path control flow is not uncommon and/or where auditing during code review of sad path logic is particularly important.
-
-- Requires out of band storage for state e.g. thread local storage, or a global synchronised ring buffer.
+- Requires out of band storage for state e.g. thread local storage, or a global synchronised ring buffer[^2].
 
     - If thread local storage is chosen as the out of band storage, transporting LEAF state across threads requires manual intervention.
 
@@ -47,8 +43,10 @@ If you need an error handling framework which has predictable sad path overhead 
 
 - Thread local storage can be problematic or even a showstopper in many niche architectures such as HPC, GPUs, DSPs and microcontrollers. Global synchronised state can introduce an unacceptable performance impact on those architectures.
 
-- Current compilers at the time of writing do not react well to use of thread local storage, it would seem that elision of code generation is inhibited if thread local state gets touched due to pessimistic assumptions about escape analysis. Given that this impacts all of C and C++ due to the same problem with `errno`, it is hoped that future compilers will improve this. Until then, any code which touches thread local storage or magic statics[^2] will not optimise as well as code which does neither.
+- Current compilers at the time of writing do not react well to use of thread local storage, it would seem that elision of code generation is inhibited if thread local state gets touched due to pessimistic assumptions about escape analysis. Given that this impacts all of C and C++ due to the same problem with `errno`, it is hoped that future compilers will improve this. Until then, any code which touches thread local storage or magic statics[^3] will not optimise as well as code which does neither.
 
-[^1]: In Outcome, it is strongly recommended that one chooses a single universal error type for all public APIs such as `std::error_code` or `error` from Experimental.Outcome, so if the programmer is disciplined then the function signature does not expose internal error types. Such single universal error types type erase the original error object, but still allow the original error object to be inspected. This avoids 'exception specifications' which are well known to not scale well.
+[^1]: In Outcome, it is strongly recommended that one chooses a single universal error type for all public APIs such as `std::error_code` or `error` from Experimental.Outcome, so if the programmer is disciplined then the function signature does not expose internal error types. Such single universal error types type erase the original error object, but still allow the original error object to be inspected. This avoids 'exception specifications' which are widely known to not scale well.
 
-[^2]: `std::error_code` construction touches a magic static, and therefore Outcome when combined with `std::error_code` also sees a codegen pessimisation. Experimental Outcome's `error` fixes this historical oversight.
+[^2]: A global synchronised ring buffer implementation does not ship with LEAF, however LEAF exposes customisation points for a bespoke thread local storage implementation which makes implementing one very straightforward.
+
+[^3]: `std::error_code` construction touches a magic static or calls an extern function, and therefore Outcome when combined with `std::error_code` also sees a codegen pessimisation. Experimental Outcome's `error` fixes this historical oversight.
