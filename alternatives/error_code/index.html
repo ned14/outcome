@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-01-04T15:53:44 UTC">
+<meta name="revised" content="2022-01-10T14:32:05 UTC">
 <title>std error codes :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2839,7 +2839,7 @@
     
     
 
-<p><code>std::error_code</code> came originally from <code>boost::error_code</code> which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. <a href="/outcome/motivation/std_error_code/">You can read more about how <code>std::error_code</code> works here</a>. They were standardised in the C++ 11 standard.</p>
+<p><code>std::error_code</code> came originally from <code>boost::error_code</code> which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. <a href="/outcome/motivation/std_error_code/">You can read more about how <code>std::error_code</code> works here</a>. They were standardised in the C++ 11 standard, and have been available in Boost since 2008.</p>
 
 <h4 id="pros">Pros:</h4>
 
@@ -2850,7 +2850,7 @@
 
 <li><p>Unbiased syntax equal for both success and failure requiring explicit code written to handle both.</p></li>
 
-<li><p>Very little bloat added to binaries.</p></li>
+<li><p>Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries).</p></li>
 
 <li><p>Once constructed, passing around <code>std::error_code</code> instances optimises well, often being passed in CPU registers.</p></li>
 
@@ -2868,7 +2868,7 @@
 
 <li><p>Results in branchy code, which is slow &ndash; though predictably so &ndash; for embedded controller CPUs.</p></li>
 
-<li><p>Because the <code>std::error_category</code> instance used in construction comes from a magic static, the compiler inserts an atomic operation around every <code>std::error_code</code> construction. This can impact optimisation on compilers with poor optimisation of atomics.</p></li>
+<li><p>Because the <code>std::error_category</code> instance used in construction comes from a magic static, the compiler inserts an atomic operation around every <code>std::error_code</code> construction (e.g. <a href="https://godbolt.org/z/oGaf4qe8a">https://godbolt.org/z/oGaf4qe8a</a>). This can impact optimisation on compilers with poor optimisation of atomics.</p></li>
 
 <li><p>The payload of type <code>int</code> is incredibly constraining sometimes, especially on 64-bit platforms. It would have been much better if it were <code>intptr_t</code> instead of <code>int</code>.</p></li>
 
@@ -2900,7 +2900,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/01/2022
+        <i class='fa fa-calendar'></i> Last update on 10/01/2022
     </div>
     
 

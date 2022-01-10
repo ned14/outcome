@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-01-04T15:53:45 UTC">
+<meta name="revised" content="2022-01-10T14:32:05 UTC">
 <title>std expected :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2860,7 +2860,7 @@
 
 <li><p>Predictable runtime overhead on the sad path.</p></li>
 
-<li><p>Very little bloat added to binaries.</p></li>
+<li><p>Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries).</p></li>
 
 <li><p>Variant storage means storage overhead is minimal, except when either <code>T</code> or <code>E</code> has a throwing move constructor which typically causes storage blowup.</p></li>
 
@@ -2906,7 +2906,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/01/2022
+        <i class='fa fa-calendar'></i> Last update on 10/01/2022
     </div>
     
 

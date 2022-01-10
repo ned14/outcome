@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/alternatives/</link>
     <description>Recent content in Review of Error Handling Frameworks on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Tue, 04 Jan 2022 12:13:55 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 10 Jan 2022 14:29:13 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/alternatives/index.xml" rel="self" type="application/rss+xml" />
     
@@ -26,10 +26,9 @@ C++ exception throws came in the original C++ 98 standard &amp;ndash; at that ti
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/alternatives/error_code/</guid>
-      <description>std::error_code came originally from boost::error_code which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. You can read more about how std::error_code works here. They were standardised in the C++ 11 standard.
+      <description>std::error_code came originally from boost::error_code which was designed around 2008 as part of implementing Filesystem and Networking. They are a simple trivially copyable type offering improved type safety and functionality over C enumerations. You can read more about how std::error_code works here. They were standardised in the C++ 11 standard, and have been available in Boost since 2008.
 Pros:  Predictable runtime overhead on the happy path.
- Predictable runtime overhead on the sad path.
- Unbiased syntax equal for both success and failure requiring explicit code written to handle both.</description>
+ Predictable runtime overhead on the sad path.</description>
     </item>
     
     <item>

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-01-04T15:53:46 UTC">
+<meta name="revised" content="2022-01-10T14:32:06 UTC">
 <title>LEAF :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2848,10 +2848,10 @@
 
 <li><p>Outcome&rsquo;s Result type encodes the type of the error in the function signature, which could be considered as more brittle and problematic for large scale code refactoring<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>.</p></li>
 
-<li><p>Outcome is intended to be the ultimate error handling framework in a program (i.e. all third party custom error handling flows into Outcome via customisation point adapters), whereas LEAF is intended to be used ad hoc as needed.</p></li>
+<li><p>Outcome is more strongly opinionated about being the ultimate error handling framework in a program (i.e. all third party custom error handling is assumed to flow into Outcome via customisation point adapters), whereas LEAF is less strongly opinionated, and yet provides equivalent functionality.</p></li>
 </ul>
 
-<p>LEAF therefore looks a lot more like standard C++ exception handling, but without the non-deterministic sad path at the cost of a slight impact on happy path runtime performance. LEAF&rsquo;s current design was completed in 2020.</p>
+<p>LEAF therefore looks more like standard C++ exception handling, but without the non-deterministic sad path at the cost of a slight impact on happy path runtime performance. LEAF&rsquo;s current design was completed in 2020.</p>
 
 <p>If you need an error handling framework which has predictable sad path overhead unlike C++ exceptions, but you otherwise want similar syntax and use experience to C++ exceptions, LEAF is a very solid choice.</p>
 
@@ -2864,9 +2864,7 @@
 
 <li><p>Does not cause branchy code to the same extent as Outcome, and the sad path is deterministic unlike with C++ exceptions.</p></li>
 
-<li><p>Very little bloat added to binaries.</p></li>
-
-<li><p>Sad path control flow is implied in code, same as with C++ exceptions, so code only shows the happy path. This reduces visual code clutter, and eliminates any need for a <code>try</code> operator.</p></li>
+<li><p>Very little codegen bloat added to binaries (though there is a fixed absolute overhead for support libraries, most of which can be compiled out using a macro if desired).</p></li>
 
 <li><p>Unlike with any of the preceding options, failures nor successes cannot get unintentionally dropped. This is the same strength of guarantee as with C++ exceptions.</p></li>
 
@@ -2876,9 +2874,7 @@
 <h4 id="cons">Cons:</h4>
 
 <ul>
-<li><p>Sad path control flow is implied which suits code which almost never fails, but is less suited for code where sad path control flow is not uncommon and/or where auditing during code review of sad path logic is particularly important.</p></li>
-
-<li><p>Requires out of band storage for state e.g. thread local storage, or a global synchronised ring buffer.</p>
+<li><p>Requires out of band storage for state e.g. thread local storage, or a global synchronised ring buffer<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>.</p>
 
 <ul>
 <li><p>If thread local storage is chosen as the out of band storage, transporting LEAF state across threads requires manual intervention.</p></li>
@@ -2888,17 +2884,19 @@
 
 <li><p>Thread local storage can be problematic or even a showstopper in many niche architectures such as HPC, GPUs, DSPs and microcontrollers. Global synchronised state can introduce an unacceptable performance impact on those architectures.</p></li>
 
-<li><p>Current compilers at the time of writing do not react well to use of thread local storage, it would seem that elision of code generation is inhibited if thread local state gets touched due to pessimistic assumptions about escape analysis. Given that this impacts all of C and C++ due to the same problem with <code>errno</code>, it is hoped that future compilers will improve this. Until then, any code which touches thread local storage or magic statics<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup> will not optimise as well as code which does neither.</p></li>
+<li><p>Current compilers at the time of writing do not react well to use of thread local storage, it would seem that elision of code generation is inhibited if thread local state gets touched due to pessimistic assumptions about escape analysis. Given that this impacts all of C and C++ due to the same problem with <code>errno</code>, it is hoped that future compilers will improve this. Until then, any code which touches thread local storage or magic statics<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup> will not optimise as well as code which does neither.</p></li>
 </ul>
 <div class="footnotes">
 
 <hr />
 
 <ol>
-<li id="fn:1">In Outcome, it is strongly recommended that one chooses a single universal error type for all public APIs such as <code>std::error_code</code> or <code>error</code> from Experimental.Outcome, so if the programmer is disciplined then the function signature does not expose internal error types. Such single universal error types type erase the original error object, but still allow the original error object to be inspected. This avoids &lsquo;exception specifications&rsquo; which are well known to not scale well.
+<li id="fn:1">In Outcome, it is strongly recommended that one chooses a single universal error type for all public APIs such as <code>std::error_code</code> or <code>error</code> from Experimental.Outcome, so if the programmer is disciplined then the function signature does not expose internal error types. Such single universal error types type erase the original error object, but still allow the original error object to be inspected. This avoids &lsquo;exception specifications&rsquo; which are widely known to not scale well.
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
-<li id="fn:2"><code>std::error_code</code> construction touches a magic static, and therefore Outcome when combined with <code>std::error_code</code> also sees a codegen pessimisation. Experimental Outcome&rsquo;s <code>error</code> fixes this historical oversight.
+<li id="fn:2">A global synchronised ring buffer implementation does not ship with LEAF, however LEAF exposes customisation points for a bespoke thread local storage implementation which makes implementing one very straightforward.
  <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
+<li id="fn:3"><code>std::error_code</code> construction touches a magic static or calls an extern function, and therefore Outcome when combined with <code>std::error_code</code> also sees a codegen pessimisation. Experimental Outcome&rsquo;s <code>error</code> fixes this historical oversight.
+ <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
 </ol>
 </div>
 
@@ -2923,7 +2921,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/01/2022
+        <i class='fa fa-calendar'></i> Last update on 10/01/2022
     </div>
     
 

@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-01-04T15:53:44 UTC">
+<meta name="revised" content="2022-01-10T14:32:04 UTC">
 <title>std exception throws :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2866,11 +2866,11 @@
 
 <li><p>Requires RTTI to be enabled or non-standard behaviour results (which is further binary bloat).</p></li>
 
-<li><p>Not available in several major parts of the C++ ecosystem (embedded, games, audio, to a lesser extent financial).</p></li>
+<li><p>Not available by tradition or convention in several major parts of the C++ ecosystem (embedded, games, audio, to a lesser extent financial).</p></li>
 
 <li><p>Not available in many niche architectures such as HPC, GPUs, DSPs and microcontrollers.</p></li>
 
-<li><p>Most codebases do not invest in adequate correctness testing of the silent proliferation of failure control flow paths which result in C++ exception throwing code.</p></li>
+<li><p>Most codebases do not invest in adequate correctness testing of the silent proliferation of failure control flow paths which result in C++ exception throwing code (exception throws silently generate multitudes of slight variations of sad path control flows).</p></li>
 </ul>
 
 
@@ -2894,7 +2894,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 04/01/2022
+        <i class='fa fa-calendar'></i> Last update on 10/01/2022
     </div>
     
 
