@@ -362,6 +362,14 @@ endif()
 # Cache this library's auto scanned sources for later reuse
 include(QuickCppLibCacheLibrarySources)
 
+# Dependencies needed to consume our cmake package
+if(TARGET quickcpplib::hl)
+  set(PROJECT_PACKAGE_DEPENDENCIES [=[
+include(CMakeFindDependencyMacro)
+find_dependency(quickcpplib)
+]=])
+endif()
+
 # Make available this library for install and export
 include(QuickCppLibMakeInstall)
 include(QuickCppLibMakeExport)
