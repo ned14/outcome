@@ -21,7 +21,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 set(OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
 if(NOT OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
@@ -32,13 +32,24 @@ if(NOT OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
     set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib-bootstrap")
   endif()
 endif()
+set(OUTCOME_DEPENDENCY_STATUS_CODE_GIT_TAG "master" CACHE STRING "Which git tag to use for the status-code dependency")
+option(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE "Whether to bundle an embedded copy of SG14 status-code with Outcome. Used by various package managers such as vcpkg." ON)
 
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
-ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status-code/include" "https://github.com/ned14/status-code.git")
+if(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE)
+  ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status-code/include" "https://github.com/ned14/status-code.git")
+else()
+  find_quickcpplib_library(status-code
+    GIT_REPOSITORY "https://github.com/ned14/status-code.git"
+    GIT_TAG "${OUTCOME_DEPENDENCY_STATUS_CODE_GIT_TAG}"
+    REQUIRED
+    IS_HEADER_ONLY
+  )
+endif()
 
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/version.hpp" VERSIONSTRING)
@@ -87,6 +98,9 @@ else()
     REQUIRED
     IS_HEADER_ONLY
   )
+endif()
+if (NOT OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE)
+  list_filter(${PROJECT_NAME}_HEADERS EXCLUDE REGEX /status-code/include/)
 endif()
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
@@ -154,6 +168,10 @@ endif()
 # Set the library dependencies this library has
 if(TARGET quickcpplib::hl)
   target_link_libraries(outcome_hl INTERFACE quickcpplib::hl)
+endif()
+if(TARGET status-code::hl)
+  target_link_libraries(outcome_hl INTERFACE status-code::hl)
+  all_compile_definitions(PUBLIC OUTCOME_USE_SYSTEM_STATUS_CODE=1)
 endif()
 
 if(OUTCOME_ENABLE_CXX_MODULES)
@@ -363,11 +381,12 @@ endif()
 include(QuickCppLibCacheLibrarySources)
 
 # Dependencies needed to consume our cmake package
+set(PROJECT_PACKAGE_DEPENDENCIES "include(CMakeFindDependencyMacro)")
 if(TARGET quickcpplib::hl)
-  set(PROJECT_PACKAGE_DEPENDENCIES [=[
-include(CMakeFindDependencyMacro)
-find_dependency(quickcpplib)
-]=])
+  string(APPEND PROJECT_PACKAGE_DEPENDENCIES "\nfind_dependency(quickcpplib)")
+endif()
+if(TARGET status-code::hl)
+  string(APPEND PROJECT_PACKAGE_DEPENDENCIES "\nfind_dependency(status-code)")
 endif()
 
 # Make available this library for install and export
