@@ -80,7 +80,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_VERSION_REVISION 0 // Revision version for cmake and DLL version stamping
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#if defined(__MINGW32__) && !0
+#if defined(__MINGW32__) && !0L
 #include <_mingw.h>
 #endif
 /* Configure QuickCppLib
@@ -132,7 +132,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-#if __cplusplus >= 201103
+#if __cplusplus >= 201103L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -193,7 +193,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_attributes 190000
 #endif
 #if !defined(__cpp_constexpr)
-#if __cplusplus >= 201402
+#if __cplusplus >= 201402L
 #define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
@@ -248,7 +248,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 #endif
-#if __cplusplus >= 201402
+#if __cplusplus >= 201402L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -671,7 +671,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -718,7 +718,7 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
-#elif __cplusplus >= 201103
+#elif __cplusplus >= 201103L
 #if __GNUC__ >= 5 && !defined(__clang__)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif defined(__has_feature)
@@ -956,6 +956,32 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_ENABLE_LEGACY_SUPPORT_FOR
 #define OUTCOME_ENABLE_LEGACY_SUPPORT_FOR 220 // the v2.2 Outcome release
 #endif
+/* UPDATED BY SCRIPT
+(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (225 commits)
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+// Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
+#define OUTCOME_PREVIOUS_COMMIT_REF 05ed97720204ff734475c2b47e600d382e7e3a70
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-01-27 18:46:58 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 05ed9772
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -1017,7 +1043,7 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
-#if 0 || __clang_major__ >= 7
+#if 0L || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -1142,7 +1168,7 @@ namespace detail
 #endif
 #endif
 // True if type is nothrow swappable
-#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if !0L && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   template <class T> struct is_nothrow_swappable
@@ -1194,7 +1220,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
-#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
+#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
 #define EXECINFO_DECL inline
 #elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
@@ -1212,7 +1238,7 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 #ifdef __cplusplus
 }
-#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
+#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -2440,7 +2466,7 @@ namespace detail
       empty_type _empty2;
       _error_type_ _error;
     };
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial() noexcept
@@ -2450,7 +2476,7 @@ namespace detail
     }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
     value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // NOLINT if reaches here, move assignment is trivial
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(
@@ -2467,7 +2493,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(
@@ -2483,7 +2509,7 @@ namespace detail
       }
       _status = o._status;
     }
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     explicit value_storage_nontrivial(status_bitfield_type status)
@@ -2643,7 +2669,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<_value_type_>::value &&std::is_nothrow_destructible<_error_type_>::value)
@@ -2665,7 +2691,7 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     void
@@ -2853,7 +2879,7 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default; // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_move_assignment &
@@ -2951,7 +2977,7 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default; // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default; // NOLINT
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if __cplusplus >= 202000L || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_copy_assignment &
@@ -5747,7 +5773,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000 && !_HAS_CXX20
+#if __cplusplus < 202000L && !_HAS_CXX20
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -6052,7 +6078,7 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY_IF
-#if (__cplusplus >= 202000 || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
+#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
 #elif defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
