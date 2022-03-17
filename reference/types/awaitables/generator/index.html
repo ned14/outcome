@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-03-17T20:15:56 UTC">
-<title>Extending `OUTCOME_TRY` :: Outcome documentation</title>
+<meta name="revised" content="2022-03-17T20:15:58 UTC">
+<title>`generator&lt;T&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 
     
   </head>
-  <body data-url="/outcome/recipes/foreign-try/">
+  <body data-url="/outcome/reference/types/awaitables/generator/">
     
       <header>
   <div class="logo">
@@ -535,11 +535,10 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/recipes/" class="dd-item parent haschildren
+    <li data-nav-id="/outcome/recipes/" class="dd-item haschildren
         ">
       <div>
-      <a href="/outcome/recipes/">Recipes</a>
-            <i class="fa fa-angle-down fa-lg category-icon"></i>
+      <a href="/outcome/recipes/">Recipes</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
       <li data-nav-id="/outcome/recipes/asio-integration/" class="dd-item">
@@ -556,7 +555,7 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item active">
+      <li data-nav-id="/outcome/recipes/foreign-try/" class="dd-item">
         <div>
           <a href="/outcome/recipes/foreign-try/">
             Extending <code>OUTCOME_TRY</code>
@@ -701,10 +700,11 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/reference/" class="dd-item haschildren
+    <li data-nav-id="/outcome/reference/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/reference/">API reference</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/reference/">API reference</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
     <li data-nav-id="/outcome/reference/macros/" class="dd-item haschildren
@@ -1287,10 +1287,11 @@
     </li>
         </ul>
     </li>
-    <li data-nav-id="/outcome/reference/types/" class="dd-item haschildren
+    <li data-nav-id="/outcome/reference/types/" class="dd-item parent haschildren
         ">
       <div>
-      <a href="/outcome/reference/types/">Types</a><i class="fa fa-angle-right fa-lg category-icon"></i>
+      <a href="/outcome/reference/types/">Types</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i>
       </div>
         <ul>
     <li data-nav-id="/outcome/reference/types/basic_outcome/" class="dd-item haschildren
@@ -2324,7 +2325,7 @@
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
+      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item active">
         <div>
           <a href="/outcome/reference/types/awaitables/generator/">
             <code>generator&lt;T&gt;</code>
@@ -2799,15 +2800,52 @@
     <option value="/outcome/tutorial/" >
    Tutorial</option>
     <option value="/outcome/recipes/" >
-   Recipes</option> 
-      <option value="/outcome/recipes/asio-integration/" >- ASIO/Networking TS : Boost &lt; 1.70</option>
-      <option value="/outcome/recipes/asio-integration-1-70/" >- ASIO/Networking TS: Boost &gt;= 1.70</option>
-      <option value="/outcome/recipes/foreign-try/"  selected>- Extending `OUTCOME_TRY`</option>
-  
+   Recipes</option>
     <option value="/outcome/experimental/" >
    Experimental</option>
     <option value="/outcome/reference/" >
-   API reference</option>
+   API reference</option> 
+    <option value="/outcome/reference/macros/" >
+  - 
+   Macros</option>
+    <option value="/outcome/reference/concepts/" >
+  - 
+   Concepts</option>
+    <option value="/outcome/reference/converters/" >
+  - 
+   Converters</option>
+    <option value="/outcome/reference/traits/" >
+  - 
+   Traits</option>
+    <option value="/outcome/reference/policies/" >
+  - 
+   Policies</option>
+    <option value="/outcome/reference/types/" >
+  - 
+   Types</option> 
+    <option value="/outcome/reference/types/basic_outcome/" >
+  -- 
+   `basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;`</option>
+    <option value="/outcome/reference/types/basic_result/" >
+  -- 
+   `basic_result&lt;T, E, NoValuePolicy&gt;`</option>
+      <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
+      <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
+      <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
+      <option value="/outcome/reference/types/awaitables/eager/" >-- `eager&lt;T&gt;/atomic_eager&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/failure_type/" >-- `failure_type&lt;EC, EP = void&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/generator/"  selected>-- `generator&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/in_place_type_t/" >-- `in_place_type_t&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/lazy/" >-- `lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/success_type/" >-- `success_type&lt;T&gt;`</option>
+  
+    <option value="/outcome/reference/aliases/" >
+  - 
+   Aliases</option>
+    <option value="/outcome/reference/functions/" >
+  - 
+   Functions</option>
+  
     <option value="/outcome/faq/" >
    Frequently asked questions</option>
     <option value="/outcome/videos/" >
@@ -2838,174 +2876,63 @@
       </div>
     
 
-    <h1>Extending <code>OUTCOME_TRY</code></h1>
+    <h1><code>generator&lt;T&gt;</code></h1>
     
     
     
-    
+    <p>This is a classic coroutine generator whereby the coroutine is resumed to calculate
+the next value, and is suspended upon yielding that value. If the value being
+yielded is an Outcome type, special semantics are used if the coroutine throws
+an exception (see below).</p>
 
-<p>Outcome&rsquo;s <a href="/outcome/reference/macros/try/" class="api-reference"><code>OUTCOME_TRY(var, expr)</code></a>
- operation is fully extensible
-to accept as input any foreign types.
-It already recognises types matching the
-<a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="api-reference"><code>concepts::value_or_error&lt;T, E&gt;</code></a>
- concept, which is to say all types which have:</p>
-
-<ul>
-<li>A public <code>.has_value()</code> member function which returns a <code>bool</code>.</li>
-<li>In order of preference, a public <code>.assume_value()</code>/<code>.value()</code> member
-function.</li>
-<li>In order of preference, a public <code>.as_failure()</code>/<code>.assume_error()</code>/<code>.error()</code>
-member function.</li>
-</ul>
-
-<p>This should automatically handle inputs of <code>std::expected&lt;T, E&gt;</code>, and many others,
-including intermixing Boost.Outcome and standalone Outcome within the same
-translation unit.</p>
-
-<p><code>OUTCOME_TRY</code> has the following free function customisation points:</p>
-
-<dl>
-<dt><code>OUTCOME_V2_NAMESPACE::</code><a href="/outcome/reference/functions/try_operation_has_value/" class="api-reference"><code>try_operation_has_value(X)</code></a>
-
-<dd>Returns a `bool` which is true if the input to TRY has a value.
-<dt><code>OUTCOME_V2_NAMESPACE::</code><a href="/outcome/reference/functions/try_operation_return_as/" class="api-reference"><code>try_operation_return_as(X)</code></a>
-
-<dd>Returns a suitable <a href="/outcome/reference/types/failure_type/" class="api-reference"><code>failure_type&lt;EC, EP = void&gt;</code></a>
- which
-is returned immediately to cause stack unwind. Ought to preserve rvalue
-semantics (i.e. if passed an rvalue, move the error state into the failure
-type).
-<dt><code>OUTCOME_V2_NAMESPACE::</code><a href="/outcome/reference/functions/try_operation_extract_value/" class="api-reference"><code>try_operation_extract_value(X)</code></a>
-
-<dd>Extracts a value type from the input for the `TRY` to set its variable.
-Ought to preserve rvalue semantics (i.e. if passed an rvalue, move the value).
-</dl>
-
-<p>New overloads of these to support additional input types must be injected into
-the <code>OUTCOME_V2_NAMESPACE</code> namespace before the compiler parses the relevant
-<code>OUTCOME_TRY</code> in order to be found. This is called &lsquo;early binding&rsquo; in the two
-phase name lookup model in C++. This was chosen over &lsquo;late binding&rsquo;, where an
-<code>OUTCOME_TRY</code> in a templated piece of code could look up overloads introduced after
-parsing the template containing the <code>OUTCOME_TRY</code>, because it has much lower
-impact on build times, as binding is done once at the point of parse, instead
-of on every occasion at the point of instantiation. If you are careful to ensure
-that you inject the overloads which you need early in the parse of the
-translation unit, all will be well.</p>
-
-<p>Let us work through an applied example.</p>
-
-<hr />
-
-<h2 id="a-very-foreign-pseudo-expected-type">A very foreign pseudo-Expected type</h2>
-
-<p>This is a paraphrase of a poorly written pseudo-Expected type which I once
-encountered in the production codebase of a large multinational. Lots
-of the code was already using it, and it was weird enough that it couldn&rsquo;t
-be swapped out for something better easily.</p>
-
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">enum</span> <span class="n">Errc</span>
+<p>Example of use:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">generator</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="n">kBadValue</span>
-<span class="p">};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">E</span> <span class="o">=</span> <span class="n">Errc</span><span class="o">&gt;</span> <span class="k">struct</span> <span class="n">ForeignExpected</span>
-<span class="p">{</span>
-  <span class="n">T</span> <span class="n">Value</span><span class="p">;</span>
-  <span class="n">E</span> <span class="n">Error</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">IsErrored</span><span class="p">;</span>
-
-  <span class="n">ForeignExpected</span><span class="p">(</span><span class="n">T</span> <span class="n">v</span><span class="p">)</span>
-      <span class="o">:</span> <span class="n">Value</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-      <span class="p">,</span> <span class="n">Error</span><span class="p">()</span>
-      <span class="p">,</span> <span class="n">IsErrored</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="k">while</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
   <span class="p">{</span>
+    <span class="n">co_yield</span> <span class="n">x</span><span class="o">--</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="n">ForeignExpected</span><span class="p">(</span><span class="n">E</span> <span class="n">e</span><span class="p">)</span>
-      <span class="o">:</span> <span class="n">Value</span><span class="p">()</span>
-      <span class="p">,</span> <span class="n">Error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-      <span class="p">,</span> <span class="n">IsErrored</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-  <span class="p">{</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/foreign_try.cpp#L31" class="code-snippet-url" target="_blank">View this code on Github</a></div>
-
-
-<p>What we would like is for new code to be written using Outcome, but be able
-to transparently call old code, like this:</p>
-
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">ForeignExpected</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">old_code</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>  <span class="c1">// old code
-</span><span class="c1"></span><span class="p">{</span>
-  <span class="k">if</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">kBadValue</span><span class="p">;</span>
-  <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
 <span class="p">}</span>
-
-<span class="n">outcome</span><span class="o">::</span><span class="n">result</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">new_code</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span>  <span class="c1">// new code
-</span><span class="c1"></span><span class="p">{</span>
-  <span class="n">OUTCOME_TRY</span><span class="p">(</span><span class="k">auto</span> <span class="n">x</span><span class="p">,</span> <span class="n">old_code</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
-  <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/foreign_try.cpp#L82" class="code-snippet-url" target="_blank">View this code on Github</a></div>
-
-
-<p>Telling Outcome about this weird foreign Expected is straightforward:</p>
-
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">OUTCOME_V2_NAMESPACE_BEGIN</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">E</span><span class="o">&gt;</span>  <span class="c1">//
-</span><span class="c1"></span><span class="kr">inline</span> <span class="kt">bool</span> <span class="n">try_operation_has_value</span><span class="p">(</span><span class="k">const</span> <span class="n">ForeignExpected</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span>
+<span class="p">...</span>
+<span class="c1">// Creates the coroutine, immediately suspending it.
+</span><span class="c1"></span><span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="c1">// If the coroutine has another value to yield ...
+</span><span class="c1"></span><span class="k">while</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="k">return</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">v</span><span class="p">.</span><span class="n">IsErrored</span><span class="p">;</span>
+  <span class="c1">// Get the next value from the coroutine
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span>
+  <span class="p">...</span>
 <span class="p">}</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">E</span><span class="o">&gt;</span>  <span class="c1">//
-</span><span class="c1"></span><span class="kr">inline</span> <span class="k">auto</span> <span class="n">try_operation_return_as</span><span class="p">(</span><span class="k">const</span> <span class="n">ForeignExpected</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">switch</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span>
-  <span class="p">{</span>
-  <span class="k">case</span> <span class="nl">kBadValue</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">failure</span><span class="p">(</span><span class="n">make_error_code</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">argument_out_of_domain</span><span class="p">));</span>
-  <span class="p">}</span>
-  <span class="n">abort</span><span class="p">();</span>
-<span class="p">}</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">E</span><span class="o">&gt;</span>  <span class="c1">//
-</span><span class="c1"></span><span class="kr">inline</span> <span class="k">auto</span> <span class="n">try_operation_extract_value</span><span class="p">(</span><span class="k">const</span> <span class="n">ForeignExpected</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">return</span> <span class="n">v</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="n">OUTCOME_V2_NAMESPACE_END</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/foreign_try.cpp#L57" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div>
+<p><code>generator&lt;T&gt;</code> has special semantics if <code>T</code> is a type capable of constructing from
+an <code>exception_ptr</code> or <code>error_code</code> &ndash; any exceptions thrown during the function&rsquo;s body
+are sent via <code>T</code>, preferably via the error code route if <a href="/outcome/reference/functions/error_from_exception/" class="api-reference"><code>error_from_exception(</code></a>
+<code>)</code>
+successfully matches the exception throw. This means that a
+<a href="/outcome/reference/types/basic_result/" class="api-reference"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a>
+ or <a href="/outcome/reference/types/basic_outcome/" class="api-reference"><code>basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;</code></a>
+ where one of its types is
+is compatible will have its <code>.error()</code> or <code>.exception()</code> set.</p>
 
+<p>Note that <code>generator&lt;T&gt;</code> does not otherwise transport exception throws, and rethrows
+any exceptions thrown within the coroutine body through the coroutine machinery.
+This does not produce reliable consequences in current C++ compilers. You should
+therefore wrap the coroutine body in a <code>try...catch</code> if <code>T</code> is not able to transport
+exceptions on its own.</p>
 
-<p>And now <code>OUTCOME_TRY</code> works exactly as expected:</p>
+<p><em>Requires</em>: C++ coroutines to be available in your compiler.</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++">  <span class="k">auto</span> <span class="n">printresult</span> <span class="o">=</span> <span class="p">[](</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">desc</span><span class="p">,</span> <span class="k">auto</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">desc</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; returns successful &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">desc</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; returns failure &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">error</span><span class="p">().</span><span class="n">message</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-  <span class="n">printresult</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">new_code(5)&#34;</span><span class="p">,</span> <span class="n">new_code</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
-  <span class="n">printresult</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">new_code(0)&#34;</span><span class="p">,</span> <span class="n">new_code</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/foreign_try.cpp#L99" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+<p><em>Namespace</em>: <code>OUTCOME_V2_NAMESPACE::awaitables</code></p>
 
-
-<p>&hellip; which outputs:</p>
-
-<pre><code>new_code(5) returns successful 5
-
-new_code(0) returns failure argument out of domain
-</code></pre>
+<p><em>Header</em>: <code>&lt;outcome/coroutine_support.hpp&gt;</code></p>
 
 
     
     
         <div class="chevrons">
     <div id="navigation">
-<a class="nav nav-prev" href="/outcome/recipes/asio-integration-1-70/" title="ASIO/Networking TS: Boost &gt;= 1.70"> <i class="fa fa-chevron-left"></i><label>ASIO/Networking TS: Boost &gt;= 1.70</label></a>
-    <a class="nav nav-next" href="/outcome/experimental/" title="Experimental" style="margin-right: 0px;"><label>Experimental</label><i class="fa fa-chevron-right"></i></a></div>
+<a class="nav nav-prev" href="/outcome/reference/types/failure_type/" title="`failure_type&lt;EC, EP = void&gt;`"> <i class="fa fa-chevron-left"></i><label><code>failure_type&lt;EC, EP = void&gt;</code></label></a>
+    <a class="nav nav-next" href="/outcome/reference/types/in_place_type_t/" title="`in_place_type_t&lt;T&gt;`" style="margin-right: 0px;"><label><code>in_place_type_t&lt;T&gt;</code></label><i class="fa fa-chevron-right"></i></a></div>
   </div>
 
   </section>
@@ -3015,24 +2942,18 @@ new_code(0) returns failure argument out of domain
 
 <div class="footline">
     
-    <div class="tags"> 
-      
-        <a class="label label-default" href="https://ned14.github.io/outcome/tags/try">TRY</a>
-      
-    </div>
-    
 
     
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/12/2020
+        <i class='fa fa-calendar'></i> Last update on 17/03/2022
     </div>
     
 
     
     <div class="github-link">
-      <a href="https://github.com/ned14/outcome/edit/develop/doc/src/content/recipes/foreign-try.md" target="blank"><i class="fa fa-code-fork"></i>
+      <a href="https://github.com/ned14/outcome/edit/develop/doc/src/content/reference/types/awaitables/generator.md" target="blank"><i class="fa fa-code-fork"></i>
         Improve this page</a>
     </div>
     

@@ -494,7 +494,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/</loc>
-    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
+    <lastmod>2022-03-17T19:36:18+00:00</lastmod>
   </url>
   
   <url>
@@ -1548,7 +1548,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
+    <lastmod>2022-03-17T19:36:18+00:00</lastmod>
   </url>
   
   <url>
@@ -1985,6 +1985,11 @@
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/failure_type/</loc>
     <lastmod>2021-02-23T17:37:27+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ned14.github.io/outcome/reference/types/awaitables/generator/</loc>
+    <lastmod>2022-03-17T19:36:18+00:00</lastmod>
   </url>
   
   <url>

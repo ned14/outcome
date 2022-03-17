@@ -69,6 +69,17 @@ There is an explicit initialising constructor taking any types U and V which wil
     </item>
     
     <item>
+      <title>`generator&lt;T&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/awaitables/generator/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/awaitables/generator/</guid>
+      <description>This is a classic coroutine generator whereby the coroutine is resumed to calculate the next value, and is suspended upon yielding that value. If the value being yielded is an Outcome type, special semantics are used if the coroutine throws an exception (see below).
+Example of use:
+generator&amp;lt;int&amp;gt; func(int x) { while(x &amp;gt;= 0) { co_yield x--; } } ... // Creates the coroutine, immediately suspending it. auto f = func(5); // If the coroutine has another value to yield .</description>
+    </item>
+    
+    <item>
       <title>`in_place_type_t&lt;T&gt;`</title>
       <link>https://ned14.github.io/outcome/reference/types/in_place_type_t/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
