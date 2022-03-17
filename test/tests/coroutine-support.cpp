@@ -147,7 +147,9 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / coroutine / generator, "Tests that results 
   using namespace coroutines;
   auto check_generator = [](auto t) -> OUTCOME_V2_NAMESPACE::outcome<int>
   {
+#ifdef __cpp_exceptions
     try
+#endif
     {
       int count = 0, ret = 0;
       while(t)
@@ -167,11 +169,13 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / coroutine / generator, "Tests that results 
       }
       return ret;
     }
+#ifdef __cpp_exceptions
     catch(...)
     {
       BOOST_CHECK(false);  // exception must be put into outcome, nothing must throw here
       throw;
     }
+#endif
   };
   BOOST_CHECK(check_generator(generator_int(5)).value() == 7);
   BOOST_CHECK(check_generator(generator_error(5)).error() == std::errc::not_enough_memory);
