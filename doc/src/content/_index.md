@@ -41,8 +41,8 @@ thus making it suitable for use in the global headers of really large codebases.
 guaranteed and is C-compatible for `result<T, E>`[^1], thus making Outcome based code long term ABI-stable.
 
 Fully deterministic all-`noexcept` C++ Coroutine support in Outcome is particularly strong, and we
-supply Outcome-optimising {{< api "eager<T>/atomic_eager<T>" >}} and {{< api "lazy<T>/atomic_lazy<T>" >}}
-awaitables which work for any user type.
+supply Outcome-optimising {{< api "eager<T>/atomic_eager<T>" >}}, {{< api "lazy<T>/atomic_lazy<T>" >}}
+and {{<api "generator<T>" >}} awaitables which work for any user type.
 
 ## Sample usage
 

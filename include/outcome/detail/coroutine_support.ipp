@@ -348,6 +348,188 @@ namespace awaitables
       }
 #endif
     };
+
+    template <class ContType, bool suspend_initial, bool use_atomic> class generator
+    {
+      using container_type = ContType;
+
+    public:
+      class promise_type
+      {
+        friend class generator;
+        using result_set_type = std::conditional_t<use_atomic, std::atomic<int8_t>, fake_atomic<int8_t>>;
+        union
+        {
+          OUTCOME_V2_NAMESPACE::detail::empty_type _default{};
+          container_type result;
+        };
+        result_set_type result_set{0};
+        coroutine_handle<> continuation;
+
+      public:
+        promise_type() {}
+        promise_type(const promise_type &) = delete;
+        promise_type(promise_type &&) = delete;
+        promise_type &operator=(const promise_type &) = delete;
+        promise_type &operator=(promise_type &&) = delete;
+        ~promise_type()
+        {
+          if(result_set.load(std::memory_order_acquire) == 1)
+          {
+            result.~container_type();  // could throw
+          }
+        }
+
+        auto get_return_object()
+        {
+          return generator{*this};  // could throw bad_alloc
+        }
+        void return_void() noexcept
+        {
+          assert(result_set.load(std::memory_order_acquire) >= 0);
+          if(result_set.load(std::memory_order_acquire) == 1)
+          {
+            result.~container_type();  // could throw
+          }
+          result_set.store(-1, std::memory_order_release);
+        }
+        suspend_always yield_value(container_type &&value)
+        {
+          assert(result_set.load(std::memory_order_acquire) >= 0);
+          if(result_set.load(std::memory_order_acquire) == 1)
+          {
+            result.~container_type();  // could throw
+          }
+          new(&result) container_type(static_cast<container_type &&>(value));  // could throw
+          result_set.store(1, std::memory_order_release);
+          return {};
+        }
+        suspend_always yield_value(const container_type &value)
+        {
+          assert(result_set.load(std::memory_order_acquire) >= 0);
+          if(result_set.load(std::memory_order_acquire) == 1)
+          {
+            result.~container_type();  // could throw
+          }
+          new(&result) container_type(value);  // could throw
+          result_set.store(1, std::memory_order_release);
+          return {};
+        }
+        void unhandled_exception()
+        {
+          assert(result_set.load(std::memory_order_acquire) >= 0);
+          if(result_set.load(std::memory_order_acquire) == 1)
+          {
+            result.~container_type();
+          }
+#ifdef __cpp_exceptions
+          auto e = std::current_exception();
+          auto ec = detail::error_from_exception(static_cast<decltype(e) &&>(e), {});
+          // Try to set error code first
+          if(!detail::error_is_set(ec) || !detail::try_set_error(static_cast<decltype(ec) &&>(ec), &result))
+          {
+            detail::set_or_rethrow(e, &result);  // could throw
+          }
+#else
+          std::terminate();
+#endif
+          result_set.store(1, std::memory_order_release);
+        }
+        auto initial_suspend() noexcept
+        {
+          struct awaiter
+          {
+            bool await_ready() noexcept { return !suspend_initial; }
+            void await_resume() noexcept {}
+            void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
+          };
+          return awaiter{};
+        }
+        auto final_suspend() noexcept
+        {
+          struct awaiter
+          {
+            bool await_ready() noexcept { return false; }
+            void await_resume() noexcept {}
+#if OUTCOME_HAVE_NOOP_COROUTINE
+            coroutine_handle<> await_suspend(coroutine_handle<promise_type> self) noexcept
+            {
+              return self.promise().continuation ? self.promise().continuation : noop_coroutine();
+            }
+#else
+            void await_suspend(coroutine_handle<promise_type> self)
+            {
+              if(self.promise().continuation)
+              {
+                return self.promise().continuation.resume();
+              }
+            }
+#endif
+          };
+          return awaiter{};
+        }
+      };
+      coroutine_handle<promise_type> _h;
+
+      generator(generator &&o) noexcept
+          : _h(static_cast<coroutine_handle<promise_type> &&>(o._h))
+      {
+        o._h = nullptr;
+      }
+      generator(const generator &o) = delete;
+      generator &operator=(generator &&) = delete;  // as per P1056
+      generator &operator=(const generator &) = delete;
+      ~generator()
+      {
+        if(_h)
+        {
+          _h.destroy();
+        }
+      }
+      explicit generator(promise_type &p)  // could throw
+          : _h(coroutine_handle<promise_type>::from_promise(p))
+      {
+      }
+      explicit operator bool()  // could throw
+      {
+        auto &p = _h.promise();
+        if(p.result_set.load(std::memory_order_acquire) == 0)
+        {
+          _h();
+        }
+        return p.result_set.load(std::memory_order_acquire) >= 0;
+      }
+      container_type operator()()  // could throw
+      {
+        auto &p = _h.promise();
+        if(p.result_set.load(std::memory_order_acquire) == 0)
+        {
+          _h();
+        }
+        assert(p.result_set.load(std::memory_order_acquire) >= 0);
+        if(p.result_set.load(std::memory_order_acquire) < 0)
+        {
+          std::terminate();
+        }
+        container_type ret(static_cast<container_type &&>(p.result));
+        p.result.~container_type();  // could throw
+        p.result_set.store(0, std::memory_order_release);
+        return ret;
+      }
+#if OUTCOME_HAVE_NOOP_COROUTINE
+      coroutine_handle<> await_suspend(coroutine_handle<> cont) noexcept
+      {
+        _h.promise().continuation = cont;
+        return _h;
+      }
+#else
+      void await_suspend(coroutine_handle<> cont)
+      {
+        _h.promise().continuation = cont;
+        _h.resume();
+      }
+#endif
+    };
 #endif
   }  // namespace detail
 
@@ -378,6 +560,11 @@ template <class T> using lazy = OUTCOME_V2_NAMESPACE::awaitables::detail::awaita
 SIGNATURE NOT RECOGNISED
 */
 template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::awaitables::detail::awaitable<T, true, true>;
+
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+template <class T> using generator = OUTCOME_V2_NAMESPACE::awaitables::detail::generator<T, true, false>;
 
 OUTCOME_COROUTINE_SUPPORT_NAMESPACE_END
 #endif

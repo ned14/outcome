@@ -1004,9 +1004,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 05ed97720204ff734475c2b47e600d382e7e3a70
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-01-27 18:46:58 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 05ed9772
+#define OUTCOME_PREVIOUS_COMMIT_REF 10d202be3059f73f8671569b7221c0c2978f96d1
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-02-18 19:57:06 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 10d202be
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -6222,7 +6222,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_GENERIC_CODE_HPP
 #define SYSTEM_ERROR2_GENERIC_CODE_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2021 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2022 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -7665,6 +7665,35 @@ public:
   //! Returns a reference to the code
   status_code_type &&code() && { return _code; }
 };
+/*! Exception type representing a thrown erased status_code
+ */
+template <class ErasedType> class status_error<erased<ErasedType>> : public status_error<void>
+{
+  status_code<erased<ErasedType>> _code;
+  typename status_code_domain::string_ref _msgref;
+  virtual const status_code<erased<ErasedType>> &_do_code() const noexcept override final { return _code; }
+public:
+  //! The type of the status domain
+  using domain_type = void;
+  //! The type of the status code
+  using status_code_type = status_code<erased<ErasedType>>;
+  //! Constructs an instance
+  explicit status_error(status_code<erased<ErasedType>> code)
+      : _code(static_cast<status_code<erased<ErasedType>> &&>(code))
+      , _msgref(_code.message())
+  {
+  }
+  //! Return an explanatory string
+  virtual const char *what() const noexcept override { return _msgref.c_str(); } // NOLINT
+  //! Returns a reference to the code
+  const status_code_type &code() const & { return _code; }
+  //! Returns a reference to the code
+  status_code_type &code() & { return _code; }
+  //! Returns a reference to the code
+  const status_code_type &&code() const && { return _code; }
+  //! Returns a reference to the code
+  status_code_type &&code() && { return _code; }
+};
 SYSTEM_ERROR2_NAMESPACE_END
 #endif
 #include <cerrno> // for error constants
@@ -9050,9 +9079,9 @@ namespace win32
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPEBXKKPEA_WKPEAX@Z=FormatMessageW")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
 #elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
-#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=__imp__GetLastError@0")
-#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=__imp__FormatMessageW@28")
-#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
+#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=_GetLastError@0")
+#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=_FormatMessageW@28")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=_WideCharToMultiByte@32")
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YAKXZ=GetLastError")
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPBXKKPA_WKPAX@Z=FormatMessageW")
@@ -9297,7 +9326,7 @@ namespace win32
 #if (defined(__x86_64__) || defined(_M_X64)) || (defined(__aarch64__) || defined(_M_ARM64))
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPEAXPEB_W@Z=GetModuleHandleW")
 #elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
-#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=__imp__GetModuleHandleW@4")
+#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=_GetModuleHandleW@4")
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPAXPB_W@Z=GetModuleHandleW")
 #else

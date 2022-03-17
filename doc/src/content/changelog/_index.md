@@ -4,7 +4,21 @@ weight = 80
 +++
 
 ---
-## v2.2.3 ? 2022 (Boost 1.79) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
+## v2.2.4 ? 2022 (Boost 1.80) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.4)
+
+### Enhancements:
+
+- Update to latest `status-code` in Experimental.Outcome, which has some breaking changes and important
+bug fixes.
+
+- Add {{<api "generator<T>" >}} to coroutine awaitables.
+
+### Bug fixes:
+
+- None.
+
+---
+## v2.2.3 17th March 2022 (Boost 1.79) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.3)
 
 ### Enhancements:
 
