@@ -1,5 +1,5 @@
 +++
-title = "`generator<T>`"
+title = "`generator<T, Executor = void>`"
 description = "A lazily evaluated coroutine generator with Outcome customisation."
 +++
 
@@ -7,6 +7,10 @@ This is a classic coroutine generator whereby the coroutine is resumed to calcul
 the next value, and is suspended upon yielding that value. If the value being
 yielded is an Outcome type, special semantics are used if the coroutine throws
 an exception (see below).
+
+The `Executor` template parameter is purely for compatibility with third party software
+such as [ASIO](https://think-async.com/Asio/), and this awaitable can be directly used
+by ASIO.
 
 Example of use:
 

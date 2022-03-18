@@ -29,7 +29,7 @@ AWAITABLE<int> function_name(Args ...)
 
 The type `AWAITABLE<T>` is any type which publishes the Coroutine protocol telling
 C++ how to suspend and resume execution of a coroutine which returns a `T`. It is out of scope of
-this page to document how to do this, however note that the `eager<T>` and `lazy<T>`
+this page to document how to do this, however note that the `eager<T, Executor = void>` and `lazy<T, Executor = void>`
 types below are completely generic awaitables suitable for use in ANY code.
 They **only** behave differently if `T`, the type being returned by the awaitable,
 is an Outcome type e.g. `outcome::basic_result` or `outcome::basic_outcome`.

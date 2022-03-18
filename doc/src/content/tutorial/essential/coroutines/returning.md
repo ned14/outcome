@@ -4,7 +4,7 @@ weight = 30
 tags = [ "coroutines" ]
 +++
 
-`eager<T>` and `lazy<T>` and their atomic editions are completely standard
+`eager<T, Executor = void>` and `lazy<T, Executor = void>` and their atomic editions are completely standard
 awaitables with no special behaviours, **except** if `T` is a `basic_result`
 or `basic_outcome`. In that situation, the following occurs:
 

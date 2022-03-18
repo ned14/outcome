@@ -11,7 +11,10 @@ weight = 80
 - Update to latest `status-code` in Experimental.Outcome, which has some breaking changes and important
 bug fixes.
 
-- Add {{<api "generator<T>" >}} to coroutine awaitables.
+- Add {{<api "generator<T, Executor = void>" >}} to coroutine awaitables.
+
+- Add optional `Executor` template parameter to all Outcome awaitable types for improved compatibility
+with third party software such as [ASIO](https://think-async.com/Asio/).
 
 ### Bug fixes:
 
