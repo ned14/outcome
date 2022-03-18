@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-03-17T20:15:48 UTC">
+<meta name="revised" content="2022-03-18T14:48:37 UTC">
 <title>API reference :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2313,7 +2313,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2327,7 +2327,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/generator/">
-            <code>generator&lt;T&gt;</code>
+            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2341,7 +2341,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
+            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2981,15 +2981,15 @@
 <p>Exception type publicly inheriting from <code>bad_result_access</code> indicating an incorrect observation of value occurred, supplying the error value.</p><li>
 	<a href="/outcome/reference/types/bad_result_access/" ><code>bad_result_access</code></a>
 <p>Exception type publicly inheriting from <code>std::logic_error</code> indicating an incorrect observation of value or error occurred.</p><li>
-	<a href="/outcome/reference/types/awaitables/eager/" ><code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code></a>
+	<a href="/outcome/reference/types/awaitables/eager/" ><code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code></a>
 <p>An eagerly evaluated coroutine awaitable with Outcome customisation.</p><li>
 	<a href="/outcome/reference/types/failure_type/" ><code>failure_type&lt;EC, EP = void&gt;</code></a>
 <p>Type sugar for constructing an unsuccessful result or outcome.</p><li>
-	<a href="/outcome/reference/types/awaitables/generator/" ><code>generator&lt;T&gt;</code></a>
+	<a href="/outcome/reference/types/awaitables/generator/" ><code>generator&lt;T, Executor = void&gt;</code></a>
 <p>A lazily evaluated coroutine generator with Outcome customisation.</p><li>
 	<a href="/outcome/reference/types/in_place_type_t/" ><code>in_place_type_t&lt;T&gt;</code></a>
 <p>Either <code>std::in_place_type_t&lt;T&gt;</code> or a local emulation, depending on the <code>OUTCOME_USE_STD_IN_PLACE_TYPE</code> macro.</p><li>
-	<a href="/outcome/reference/types/awaitables/lazy/" ><code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code></a>
+	<a href="/outcome/reference/types/awaitables/lazy/" ><code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code></a>
 <p>A lazily evaluated coroutine awaitable with Outcome customisation.</p><li>
 	<a href="/outcome/reference/types/success_type/" ><code>success_type&lt;T&gt;</code></a>
 <p>Type sugar for constructing a successful result or outcome.</p></li></ol><li>

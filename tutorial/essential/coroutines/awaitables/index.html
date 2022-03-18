@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-03-17T20:15:48 UTC">
+<meta name="revised" content="2022-03-18T14:48:38 UTC">
 <title>Coroutine awaitables :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2315,7 +2315,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2329,7 +2329,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/generator/">
-            <code>generator&lt;T&gt;</code>
+            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2343,7 +2343,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
+            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2876,14 +2876,14 @@ Experimental Outcome). This adds into namespace <code>OUTCOME_V2_NAMESPACE::awai
 for returning from a Coroutinised function:</p>
 
 <ul>
-<li><a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T&gt;</code></a>
+<li><a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T, Executor = void&gt;</code></a>
 
 
 <p>An eagerly evaluated Coroutine: invoking <code>co_await</code> upon a function returning one
 of these immediately begins the execution of the function now. If the function never
 suspends, the overhead is similar to calling an ordinary function.</p></li>
 
-<li><a href="/outcome/reference/types/awaitables/lazy/" class="api-reference"><code>lazy&lt;T&gt;</code></a>
+<li><a href="/outcome/reference/types/awaitables/lazy/" class="api-reference"><code>lazy&lt;T, Executor = void&gt;</code></a>
 
 
 <p>A lazily evaluated Coroutine (often named <code>task&lt;T&gt;</code> in most C++ Coroutine
@@ -2891,7 +2891,13 @@ literature): invoking <code>co_await</code> upon a function returning one of the
 function to be immediately suspended as soon as execution begins. Only resuming
 the execution of the coroutine proceeds execution.</p></li>
 
-<li><p><code>atomic_eager&lt;T&gt;</code></p>
+<li><a href="/outcome/reference/types/awaitables/generator/" class="api-reference"><code>generator&lt;T, Executor = void&gt;</code></a>
+
+
+<p>A lazily evaluated generator of values: the coroutine is resumed to generate
+the next value, upon which it is suspended until the next iteration.</p></li>
+
+<li><p><code>atomic_eager&lt;T, Executor = void&gt;</code></p>
 
 <p><code>eager&lt;T&gt;</code> does not employ thread synchronisation during resumption of dependent
 coroutines which is fine if you do not traverse kernel threads during a
@@ -2899,7 +2905,7 @@ suspend-resume cycle. If you do however potentially traverse kernel threads
 during suspend-resume, you ought to use <code>atomic_eager&lt;T&gt;</code> instead &ndash; this uses
 atomics to synchronise the setting and checking of state to ensure correctness.</p></li>
 
-<li><p><code>atomic_lazy&lt;T&gt;</code></p>
+<li><p><code>atomic_lazy&lt;T, Executor = void&gt;</code></p>
 
 <p>Same for <code>lazy&lt;T&gt;</code> as <code>atomic_eager&lt;T&gt;</code> is for <code>eager&lt;T&gt;</code>.</p></li>
 </ul>
@@ -2937,7 +2943,7 @@ atomics to synchronise the setting and checking of state to ensure correctness.<
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 07/04/2020
+        <i class='fa fa-calendar'></i> Last update on 18/03/2022
     </div>
     
 

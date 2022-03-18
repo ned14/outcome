@@ -169,7 +169,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -249,7 +249,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -294,7 +294,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -494,7 +494,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/</loc>
-    <lastmod>2022-03-17T19:36:18+00:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -1400,7 +1400,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/awaitables/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1477,7 +1477,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/coroutines/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1513,7 +1513,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/eager/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1548,7 +1548,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2022-03-17T19:36:18+00:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -1577,7 +1577,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/lazy/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1954,7 +1954,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/awaitables/eager/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -1989,7 +1989,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/awaitables/generator/</loc>
-    <lastmod>2022-03-17T19:36:18+00:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -2044,7 +2044,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/awaitables/lazy/</loc>
-    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
