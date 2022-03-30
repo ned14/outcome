@@ -34,7 +34,8 @@ which permutes per commit.
 
 ### Bug fixes:
 
-- None.
+[#255](https://github.com/ned14/outcome/issues/259)
+: Fix enabling of move assignable was not calculated correctly.
 
 ---
 ## v2.2.2 8th December 2021 (Boost 1.78) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.2)
