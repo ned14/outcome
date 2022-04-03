@@ -3,24 +3,6 @@ title = "Changelog"
 weight = 80
 +++
 
----
-## v2.2.4 ? 2022 (Boost 1.80) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.4)
-
-### Enhancements:
-
-- Update to latest `status-code` in Experimental.Outcome, which has some breaking changes and important
-bug fixes.
-
-- Add {{<api "generator<T, Executor = void>" >}} to coroutine awaitables.
-
-- Add optional `Executor` template parameter to all Outcome awaitable types for improved compatibility
-with third party software such as [ASIO](https://think-async.com/Asio/).
-
-### Bug fixes:
-
-- None.
-
----
 ## v2.2.3 1st April 2022 (Boost 1.79) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.3)
 
 ### Enhancements:
