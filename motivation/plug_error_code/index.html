@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-04-03T22:31:58 UTC">
+<meta name="revised" content="2022-04-03T22:35:25 UTC">
 <title>Plugging a library into `std::error_code` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -403,6 +403,41 @@
       <a href="/outcome/tutorial/advanced/hooks/">Hooking events</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/keeping_state/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/keeping_state/">
+            Keeping state
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/adl_bridging/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/adl_bridging/">
+            ADL bridging
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_result/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/hook_result/">
+            Hook result
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/poke_exception/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/poke_exception/">
+            Custom exception ptr
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/hooks/hook_outcome/">
+            Hook outcome
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/tutorial/advanced/interop/" class="dd-item haschildren
@@ -2278,7 +2313,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2286,6 +2321,13 @@
         <div>
           <a href="/outcome/reference/types/failure_type/">
             <code>failure_type&lt;EC, EP = void&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/generator/">
+            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2299,7 +2341,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
+            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
