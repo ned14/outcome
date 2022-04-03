@@ -169,7 +169,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
   </url>
   
   <url>
@@ -249,7 +249,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
   </url>
   
   <url>
@@ -294,7 +294,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
   </url>
   
   <url>
@@ -494,7 +494,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/</loc>
-    <lastmod>2022-03-30T13:01:11+01:00</lastmod>
+    <lastmod>2022-04-03T22:50:27+01:00</lastmod>
   </url>
   
   <url>
@@ -1400,7 +1400,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/awaitables/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1440,14 +1440,14 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/tags/constructors/</loc>
-    <lastmod>2019-06-24T21:48:18+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/categories/constructors/</loc>
+    <lastmod>2020-12-17T11:27:06+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/categories/constructors/</loc>
-    <lastmod>2020-12-17T11:27:06+00:00</lastmod>
+    <loc>https://ned14.github.io/outcome/tags/constructors/</loc>
+    <lastmod>2019-06-24T21:48:18+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1477,7 +1477,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/coroutines/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1513,7 +1513,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/eager/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1548,7 +1548,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2021-12-15T11:47:12+00:00</lastmod>
   </url>
   
   <url>
@@ -1577,7 +1577,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/tags/lazy/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -1954,7 +1954,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/awaitables/eager/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
   </url>
   
   <url>
@@ -1985,11 +1985,6 @@
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/failure_type/</loc>
     <lastmod>2021-02-23T17:37:27+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/reference/types/awaitables/generator/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
@@ -2044,7 +2039,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/types/awaitables/lazy/</loc>
-    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
+    <lastmod>2020-04-07T10:22:38+01:00</lastmod>
   </url>
   
   <url>

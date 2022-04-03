@@ -5,8 +5,8 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-04-01T08:14:23 UTC">
-<title>`lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;` :: Outcome documentation</title>
+<meta name="revised" content="2022-04-03T21:53:22 UTC">
+<title>`lazy&lt;T&gt;/atomic_lazy&lt;T&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
 <link href="/outcome/css/nucleus.css" rel="stylesheet">
@@ -2314,7 +2314,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2322,13 +2322,6 @@
         <div>
           <a href="/outcome/reference/types/failure_type/">
             <code>failure_type&lt;EC, EP = void&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/awaitables/generator/">
-            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2342,7 +2335,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item active">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2832,11 +2825,10 @@
       <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
       <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
       <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
-      <option value="/outcome/reference/types/awaitables/eager/" >-- `eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/eager/" >-- `eager&lt;T&gt;/atomic_eager&lt;T&gt;`</option>
       <option value="/outcome/reference/types/failure_type/" >-- `failure_type&lt;EC, EP = void&gt;`</option>
-      <option value="/outcome/reference/types/awaitables/generator/" >-- `generator&lt;T, Executor = void&gt;`</option>
       <option value="/outcome/reference/types/in_place_type_t/" >-- `in_place_type_t&lt;T&gt;`</option>
-      <option value="/outcome/reference/types/awaitables/lazy/"  selected>-- `lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/lazy/"  selected>-- `lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</option>
       <option value="/outcome/reference/types/success_type/" >-- `success_type&lt;T&gt;`</option>
   
     <option value="/outcome/reference/aliases/" >
@@ -2876,11 +2868,11 @@
       </div>
     
 
-    <h1><code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code></h1>
+    <h1><code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code></h1>
     
     
     
-    <p>This is very similar to <a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T, Executor = void&gt;</code></a>
+    <p>This is very similar to <a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T&gt;</code></a>
 , except that execution of the
 <code>lazy&lt;T&gt;</code> returning function suspends immediately. Functions which return <code>lazy&lt;T&gt;</code>
 are therefore suitable for tasks which you need to instantiate right now, but whose
@@ -2894,10 +2886,6 @@ is an atomic acquire.</p>
 
 <p><code>lazy&lt;T&gt;</code> has similar semantics to <code>std::lazy&lt;T&gt;</code>, which is being standardised. See
 <a href="https://wg21.link/P1056">https://wg21.link/P1056</a> <em>Add lazy coroutine (coroutine task) type</em>.</p>
-
-<p>The <code>Executor</code> template parameter is purely for compatibility with third party software
-such as <a href="https://think-async.com/Asio/">ASIO</a>, and this awaitable can be directly used
-by ASIO.</p>
 
 <p>Example of use (must be called from within a coroutinised function):</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">lazy</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
@@ -2951,7 +2939,7 @@ exceptions on its own.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 18/03/2022
+        <i class='fa fa-calendar'></i> Last update on 07/04/2020
     </div>
     
 
