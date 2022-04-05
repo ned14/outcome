@@ -105,7 +105,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_VERSION_REVISION 0 // Revision version for cmake and DLL version stamping
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#if defined(__MINGW32__) && !0L
+#if defined(__MINGW32__) && !0
 #include <_mingw.h>
 #endif
 /* Configure QuickCppLib
@@ -157,7 +157,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -218,7 +218,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_attributes 190000
 #endif
 #if !defined(__cpp_constexpr)
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402
 #define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
@@ -273,7 +273,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 #endif
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -696,7 +696,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -743,7 +743,7 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
-#elif __cplusplus >= 201103L
+#elif __cplusplus >= 201103
 #if __GNUC__ >= 5 && !defined(__clang__)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif defined(__has_feature)
@@ -1068,7 +1068,7 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
-#if 0L || __clang_major__ >= 7
+#if 0 || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -1193,7 +1193,7 @@ namespace detail
 #endif
 #endif
 // True if type is nothrow swappable
-#if !0L && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   template <class T> struct is_nothrow_swappable
@@ -1245,7 +1245,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
-#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
+#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define EXECINFO_DECL inline
 #elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
@@ -1263,7 +1263,7 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 #ifdef __cplusplus
 }
-#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
+#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -2009,7 +2009,7 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* Essentially an internal optional implementation :)
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2017
 
 
@@ -2037,6 +2037,77 @@ Distributed under the Boost Software License, Version 1.0.
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace detail
 {
+  // Helpers for move assigning to empty storage
+  template <class T, bool isCopyOrMoveConstructible = std::is_copy_constructible<T>::value || std::is_move_constructible<T>::value,
+            bool isDefaultConstructibleAndCopyOrMoveAssignable =
+            std::is_default_constructible<T>::value && (std::is_copy_assignable<T>::value || std::is_move_assignable<T>::value)>
+  struct move_assign_to_empty;
+  // Prefer to use move or copy construction
+  template <class T> struct move_assign_to_empty<T, true, false>
+  {
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(*o)); }
+  };
+  template <class T> struct move_assign_to_empty<T, true, true>
+  {
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(*o)); }
+  };
+  // But fall back on default construction and move assign if necessary
+  template <class T> struct move_assign_to_empty<T, false, true>
+  {
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_move_assignable<T>::value)
+    {
+      new(dest) T;
+      *dest = static_cast<T &&>(*o);
+    }
+  };
+  // Void does nothing
+  template <> struct move_assign_to_empty<void, false, false>
+  {
+    move_assign_to_empty(void *, void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  template <> struct move_assign_to_empty<const void, false, false>
+  {
+    move_assign_to_empty(const void *, const void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  // Helpers for copy assigning to empty storage
+  template <class T, bool isCopyConstructible = std::is_copy_constructible<T>::value,
+            bool isDefaultConstructibleAndCopyAssignable = std::is_default_constructible<T>::value &&std::is_copy_assignable<T>::value>
+  struct copy_assign_to_empty;
+  // Prefer to use copy construction
+  template <class T> struct copy_assign_to_empty<T, true, false>
+  {
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(*o); }
+  };
+  template <class T> struct copy_assign_to_empty<T, true, true>
+  {
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(*o); }
+  };
+  // But fall back on default construction and copy assign if necessary
+  template <class T> struct copy_assign_to_empty<T, false, true>
+  {
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_copy_assignable<T>::value)
+    {
+      new(dest) T;
+      *dest = *o;
+    }
+  };
+  // Void does nothing
+  template <> struct copy_assign_to_empty<void, false, false>
+  {
+    copy_assign_to_empty(void *, void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  template <> struct copy_assign_to_empty<const void, false, false>
+  {
+    copy_assign_to_empty(const void *, const void *) noexcept
+    { /* nothing to assign */
+    }
+  };
   template <class T, bool nothrow> struct strong_swap_impl
   {
     constexpr strong_swap_impl(bool &allgood, T &a, T &b)
@@ -2491,7 +2562,7 @@ namespace detail
       empty_type _empty2;
       _error_type_ _error;
     };
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial() noexcept
@@ -2501,7 +2572,7 @@ namespace detail
     }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
     value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // NOLINT if reaches here, move assignment is trivial
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(
@@ -2518,7 +2589,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(
@@ -2534,7 +2605,7 @@ namespace detail
       }
       _status = o._status;
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     explicit value_storage_nontrivial(status_bitfield_type status)
@@ -2694,7 +2765,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<_value_type_>::value &&std::is_nothrow_destructible<_error_type_>::value)
@@ -2716,7 +2787,7 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     void
@@ -2863,6 +2934,9 @@ namespace detail
     value_storage_delete_copy_constructor() = default;
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
     value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default; // NOLINT
+    value_storage_delete_copy_constructor &operator=(const value_storage_delete_copy_constructor &o) = default;
+    value_storage_delete_copy_constructor &operator=(value_storage_delete_copy_constructor &&o) = default; // NOLINT
+    ~value_storage_delete_copy_constructor() = default;
   };
   template <class Base> struct value_storage_delete_copy_assignment : Base // NOLINT
   {
@@ -2874,6 +2948,7 @@ namespace detail
     value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default; // NOLINT
     value_storage_delete_copy_assignment &operator=(const value_storage_delete_copy_assignment &o) = delete;
     value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default; // NOLINT
+    ~value_storage_delete_copy_assignment() = default;
   };
   template <class Base> struct value_storage_delete_move_assignment : Base // NOLINT
   {
@@ -2885,6 +2960,7 @@ namespace detail
     value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default; // NOLINT
     value_storage_delete_move_assignment &operator=(const value_storage_delete_move_assignment &o) = default;
     value_storage_delete_move_assignment &operator=(value_storage_delete_move_assignment &&o) = delete;
+    ~value_storage_delete_move_assignment() = default;
   };
   template <class Base> struct value_storage_delete_move_constructor : Base // NOLINT
   {
@@ -2894,6 +2970,9 @@ namespace detail
     value_storage_delete_move_constructor() = default;
     value_storage_delete_move_constructor(const value_storage_delete_move_constructor &) = default;
     value_storage_delete_move_constructor(value_storage_delete_move_constructor &&) = delete;
+    value_storage_delete_move_constructor &operator=(const value_storage_delete_move_constructor &o) = default;
+    value_storage_delete_move_constructor &operator=(value_storage_delete_move_constructor &&o) = default;
+    ~value_storage_delete_move_constructor() = default;
   };
   template <class Base> struct value_storage_nontrivial_move_assignment : Base // NOLINT
   {
@@ -2904,12 +2983,16 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default; // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-#if __cplusplus >= 202000L || _HAS_CXX20
+    ~value_storage_nontrivial_move_assignment() = default;
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_move_assignment &
     operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
-    std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value) // NOLINT
+    std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value &&noexcept(move_assign_to_empty<value_type>(
+    static_cast<value_type *>(nullptr),
+    static_cast<value_type *>(nullptr))) &&noexcept(move_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                     static_cast<error_type *>(nullptr)))) // NOLINT
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -2945,7 +3028,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2962,7 +3045,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2973,7 +3056,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        new(&this->_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2984,7 +3067,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        new(&this->_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3002,12 +3085,15 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default; // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default; // NOLINT
-#if __cplusplus >= 202000L || _HAS_CXX20
+    ~value_storage_nontrivial_copy_assignment() = default;
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_copy_assignment &
     operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
-    std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
+    std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value &&noexcept(copy_assign_to_empty<value_type>(
+    static_cast<value_type *>(nullptr), static_cast<value_type *>(nullptr))) &&noexcept(copy_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                                                         static_cast<error_type *>(nullptr))))
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -3039,7 +3125,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) _value_type_(o._value); // NOLINT
+        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         return *this;
       }
@@ -3054,7 +3140,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) _error_type_(o._error); // NOLINT
+        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         return *this;
       }
@@ -3064,7 +3150,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        new(&this->_error) _error_type_(o._error); // NOLINT
+        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         return *this;
       }
@@ -3074,7 +3160,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        new(&this->_value) _value_type_(o._value); // NOLINT
+        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         return *this;
       }
@@ -3099,6 +3185,16 @@ namespace detail
   {
     static constexpr bool value = true;
   };
+  // Ability to do copy assigns needs more than just copy assignment
+  template <class T> struct is_copy_assignable
+  {
+    static constexpr bool value = std::is_copy_assignable<T>::value && (std::is_copy_constructible<T>::value || std::is_default_constructible<T>::value);
+  };
+  // Ability to do move assigns needs more than just move assignment
+  template <class T> struct is_move_assignable
+  {
+    static constexpr bool value = std::is_move_assignable<T>::value && (std::is_move_constructible<T>::value || std::is_default_constructible<T>::value);
+  };
   template <class T, class E>
   using value_storage_select_trivality =
   std::conditional_t<is_storage_trivial<T>::value && is_storage_trivial<E>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
@@ -3114,14 +3210,14 @@ namespace detail
   using value_storage_select_move_assignment =
   std::conditional_t<std::is_trivially_move_assignable<devoid<T>>::value && std::is_trivially_move_assignable<devoid<E>>::value,
                      value_storage_select_copy_constructor<T, E>,
-                     std::conditional_t<std::is_move_assignable<devoid<T>>::value && std::is_move_assignable<devoid<E>>::value,
+                     std::conditional_t<is_move_assignable<devoid<T>>::value && is_move_assignable<devoid<E>>::value,
                                         value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T, E>>,
-                                        value_storage_delete_copy_assignment<value_storage_select_copy_constructor<T, E>>>>;
+                                        value_storage_delete_move_assignment<value_storage_select_copy_constructor<T, E>>>>;
   template <class T, class E>
   using value_storage_select_copy_assignment =
   std::conditional_t<std::is_trivially_copy_assignable<devoid<T>>::value && std::is_trivially_copy_assignable<devoid<E>>::value,
                      value_storage_select_move_assignment<T, E>,
-                     std::conditional_t<std::is_copy_assignable<devoid<T>>::value && std::is_copy_assignable<devoid<E>>::value,
+                     std::conditional_t<is_copy_assignable<devoid<T>>::value && is_copy_assignable<devoid<E>>::value,
                                         value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T, E>>,
                                         value_storage_delete_copy_assignment<value_storage_select_move_assignment<T, E>>>>;
   template <class T, class E> using value_storage_select_impl = value_storage_select_copy_assignment<T, E>;
@@ -5798,7 +5894,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000L && !_HAS_CXX20
+#if __cplusplus < 202000 && !_HAS_CXX20
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -6222,7 +6318,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_GENERIC_CODE_HPP
 #define SYSTEM_ERROR2_GENERIC_CODE_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2022 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2021 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6337,10 +6433,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <initializer_list>
 #ifndef SYSTEM_ERROR2_HAVE_BIT_CAST
 #ifdef __has_include
-#if __has_include(<bit>) && (__cplusplus >= 202002L || _HAS_CXX20)
+#if __has_include(<bit>) && (__cplusplus >= 202002 || _HAS_CXX20)
 #define SYSTEM_ERROR2_HAVE_BIT_CAST 1
 #endif
-#elif __cplusplus >= 202002L
+#elif __cplusplus >= 202002
 #define SYSTEM_ERROR2_HAVE_BIT_CAST 1
 #endif
 #ifndef SYSTEM_ERROR2_HAVE_BIT_CAST
@@ -6349,13 +6445,13 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #if SYSTEM_ERROR2_HAVE_BIT_CAST
 #include <bit>
-#if __cpp_lib_bit_cast < 201806L
+#if __cpp_lib_bit_cast < 201806
 #undef SYSTEM_ERROR2_HAVE_BIT_CAST
 #define SYSTEM_ERROR2_HAVE_BIT_CAST 0
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_CONSTEXPR14
-#if 0L || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
+#if 0 || __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
 //! Defined to be `constexpr` when on C++ 14 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR14 constexpr
 #else
@@ -6363,7 +6459,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_CONSTEXPR20
-#if 0L || __cplusplus >= 202000 || _HAS_CXX20
+#if 0 || __cplusplus >= 202000 || _HAS_CXX20
 //! Defined to be `constexpr` when on C++ 20 or better compilers. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_CONSTEXPR20 constexpr
 #else
@@ -6371,7 +6467,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #endif
 #ifndef SYSTEM_ERROR2_NORETURN
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NORETURN [[noreturn]]
 #endif
 #endif
@@ -6397,7 +6493,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NORETURN
 #endif
 #ifndef SYSTEM_ERROR2_NODISCARD
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define SYSTEM_ERROR2_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -6417,7 +6513,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_NODISCARD
 #endif
 #ifndef SYSTEM_ERROR2_TRIVIAL_ABI
-#if 0L || (__clang_major__ >= 7 && !defined(__APPLE__))
+#if 0 || (__clang_major__ >= 7 && !defined(__APPLE__))
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define SYSTEM_ERROR2_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -6712,7 +6808,7 @@ namespace detail
 #pragma GCC diagnostic pop
 #endif
   static constexpr unsigned long long test_uuid_parse = parse_uuid_from_array("430f1201-94fc-06c7-430f-120194fc06c7");
-  // static constexpr unsigned long long test_uuid_parse2 = parse_uuid_from_array("x30f1201-94fc-06c7-430f-120194fc06c7");
+  //static constexpr unsigned long long test_uuid_parse2 = parse_uuid_from_array("x30f1201-94fc-06c7-430f-120194fc06c7");
 } // namespace detail
 /*! Abstract base class for a coding domain of a status code.
  */
@@ -6891,8 +6987,8 @@ public:
     {
       mutable std::atomic<unsigned> count{1};
     };
-    _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
-    const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
+     _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
+     const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
     static SYSTEM_ERROR2_CONSTEXPR20 void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
     {
       auto dest = static_cast<atomic_refcounted_string_ref *>(_dest); // NOLINT
@@ -6998,22 +7094,6 @@ public:
   constexpr unique_id_type id() const noexcept { return _id; }
   //! Name of this category.
   SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref name() const noexcept = 0;
-  //! Information about the payload of the code for this domain
-  struct payload_info_t
-  {
-    size_t payload_size{0}; //!< The payload size in bytes
-    size_t total_size{0}; //!< The total status code size in bytes (includes domain pointer and mixins state)
-    size_t total_alignment{1}; //!< The total status code alignment in bytes
-    payload_info_t() = default;
-    constexpr payload_info_t(size_t _payload_size, size_t _total_size, size_t _total_alignment)
-        : payload_size(_payload_size)
-        , total_size(_total_size)
-        , total_alignment(_total_alignment)
-    {
-    }
-  };
-  //! Information about this domain's payload
-  SYSTEM_ERROR2_CONSTEXPR20 virtual payload_info_t payload_info() const noexcept = 0;
 protected:
   //! True if code means failure.
   SYSTEM_ERROR2_CONSTEXPR20 virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
@@ -7023,26 +7103,15 @@ protected:
   SYSTEM_ERROR2_CONSTEXPR20 virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
   //! Return a reference to a string textually representing a code.
   SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
   // Keep a vtable slot for binary compatibility
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
 #endif
-  // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`. You should return false here if your payload is not trivially copyable or would not fit.
-  virtual bool _do_erased_copy(status_code<void> &dst, const status_code<void> &src, payload_info_t dstinfo) const
-  {
-    // Note that dst may not have its domain set
-    const auto srcinfo = payload_info();
-    if(dstinfo.total_size < srcinfo.total_size)
-    {
-      return false;
-    }
-    const auto tocopy = (dstinfo.total_size > srcinfo.total_size) ? srcinfo.total_size : dstinfo.total_size;
-    memcpy(&dst, &src, tocopy);
-    return true;
-  } // NOLINT
+  // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
+  virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); } // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
   SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept // NOLINT
   {
@@ -7290,7 +7359,7 @@ public:
   for the equivalent generic code and those are compared.
   */
   template <class T> SYSTEM_ERROR2_CONSTEXPR14 inline bool equivalent(const status_code<T> &o) const noexcept;
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   //! Throw a code as a C++ exception.
   SYSTEM_ERROR2_NORETURN void throw_exception() const
   {
@@ -7533,10 +7602,7 @@ public:
       return {};
     }
     status_code x;
-    if(!this->_domain->_do_erased_copy(x, *this, this->_domain->payload_info()))
-    {
-      abort(); // should not be possible
-    }
+    this->_domain->_do_erased_copy(x, *this, sizeof(*this));
     return x;
   }
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
@@ -7574,20 +7640,6 @@ public:
   constexpr status_code(Enum &&v) noexcept(std::is_nothrow_constructible<status_code, QuickStatusCodeType>::value) // NOLINT
       : status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
-  }
-  //! Explicit copy construction from an unknown status code. Note that this will be empty if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
-  explicit SYSTEM_ERROR2_CONSTEXPR14 status_code(const status_code<void> &v) // NOLINT
-      : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), value_type{})
-  {
-    const auto info = this->_domain->payload_info();
-    if(info.total_size <= sizeof(*this))
-    {
-      if(this->_domain->_do_erased_copy(*this, v, info))
-      {
-        return;
-      }
-    }
-    this->_domain = nullptr;
   }
   /**** By rights ought to be removed in any formal standard ****/
   //! Reset the code to empty.
@@ -7651,35 +7703,6 @@ public:
   //! Constructs an instance
   explicit status_error(status_code<DomainType> code)
       : _code(static_cast<status_code<DomainType> &&>(code))
-      , _msgref(_code.message())
-  {
-  }
-  //! Return an explanatory string
-  virtual const char *what() const noexcept override { return _msgref.c_str(); } // NOLINT
-  //! Returns a reference to the code
-  const status_code_type &code() const & { return _code; }
-  //! Returns a reference to the code
-  status_code_type &code() & { return _code; }
-  //! Returns a reference to the code
-  const status_code_type &&code() const && { return _code; }
-  //! Returns a reference to the code
-  status_code_type &&code() && { return _code; }
-};
-/*! Exception type representing a thrown erased status_code
- */
-template <class ErasedType> class status_error<erased<ErasedType>> : public status_error<void>
-{
-  status_code<erased<ErasedType>> _code;
-  typename status_code_domain::string_ref _msgref;
-  virtual const status_code<erased<ErasedType>> &_do_code() const noexcept override final { return _code; }
-public:
-  //! The type of the status domain
-  using domain_type = void;
-  //! The type of the status code
-  using status_code_type = status_code<erased<ErasedType>>;
-  //! Constructs an instance
-  explicit status_error(status_code<erased<ErasedType>> code)
-      : _code(static_cast<status_code<erased<ErasedType>> &&>(code))
       , _msgref(_code.message())
   {
   }
@@ -7977,7 +8000,6 @@ public:
   //! Constexpr singleton getter. Returns the constexpr generic_code_domain variable.
   static inline constexpr const _generic_code_domain &get();
   virtual _base::string_ref name() const noexcept override { return string_ref("generic domain"); } // NOLINT
-  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -8006,7 +8028,7 @@ protected:
     const auto &c = static_cast<const generic_code &>(code); // NOLINT
     return string_ref(detail::generic_code_message(c.value()));
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this); // NOLINT
@@ -8179,7 +8201,7 @@ public:
   _quick_status_code_from_enum_domain &operator=(const _quick_status_code_from_enum_domain &) = default;
   _quick_status_code_from_enum_domain &operator=(_quick_status_code_from_enum_domain &&) = default;
   ~_quick_status_code_from_enum_domain() = default;
-#if __cplusplus < 201402L && !defined(_MSC_VER)
+#if __cplusplus < 201402 && !defined(_MSC_VER)
   static inline const _quick_status_code_from_enum_domain &get()
   {
     static _quick_status_code_from_enum_domain v;
@@ -8189,7 +8211,6 @@ public:
   static inline constexpr const _quick_status_code_from_enum_domain &get();
 #endif
   virtual string_ref name() const noexcept override { return string_ref(_src::domain_name); }
-  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   // Not sure if a hash table is worth it here, most enumerations won't be long enough to be worth it
   // Also, until C++ 20's consteval, the hash table would get emitted into the binary, bloating it
@@ -8274,7 +8295,7 @@ protected:
     }
     return string_ref("unknown");
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override
   {
     assert(code.domain() == *this); // NOLINT
@@ -8283,7 +8304,7 @@ protected:
   }
 #endif
 };
-#if __cplusplus >= 201402L || defined(_MSC_VER)
+#if __cplusplus >= 201402 || defined(_MSC_VER)
 template <class Enum> constexpr _quick_status_code_from_enum_domain<Enum> quick_status_code_from_enum_domain = {};
 template <class Enum> inline constexpr const _quick_status_code_from_enum_domain<Enum> &_quick_status_code_from_enum_domain<Enum>::get()
 {
@@ -8343,7 +8364,7 @@ namespace detail
     indirecting_domain &operator=(const indirecting_domain &) = default;
     indirecting_domain &operator=(indirecting_domain &&) = default; // NOLINT
     ~indirecting_domain() = default;
-#if __cplusplus < 201402L && !defined(_MSC_VER)
+#if __cplusplus < 201402 && !defined(_MSC_VER)
     static inline const indirecting_domain &get()
     {
       static indirecting_domain v;
@@ -8353,7 +8374,6 @@ namespace detail
     static inline constexpr const indirecting_domain &get();
 #endif
     virtual string_ref name() const noexcept override { return typename StatusCode::domain_type().name(); } // NOLINT
-    virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
   protected:
     using _mycode = status_code<indirecting_domain>;
     virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
@@ -8380,7 +8400,7 @@ namespace detail
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
       return typename StatusCode::domain_type()._do_message(*c.value());
     }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
     SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
     {
       assert(code.domain() == *this);
@@ -8389,20 +8409,14 @@ namespace detail
       abort(); // suppress buggy GCC warning
     }
 #endif
-    virtual bool _do_erased_copy(status_code<void> &dst, const status_code<void> &src, payload_info_t dstinfo) const override // NOLINT
+    virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t /*unused*/) const override // NOLINT
     {
-      // Note that dst may not have its domain set
-      const auto srcinfo = payload_info();
+      // Note that dst will not have its domain set
       assert(src.domain() == *this);
-      if(dstinfo.total_size < srcinfo.total_size)
-      {
-        return false;
-      }
       auto &d = static_cast<_mycode &>(dst); // NOLINT
       const auto &_s = static_cast<const _mycode &>(src); // NOLINT
       const StatusCode &s = *_s.value();
       new(&d) _mycode(in_place, new StatusCode(s));
-      return true;
     }
     virtual void _do_erased_destroy(status_code<void> &code, size_t /*unused*/) const noexcept override // NOLINT
     {
@@ -8411,7 +8425,7 @@ namespace detail
       delete c.value(); // NOLINT
     }
   };
-#if __cplusplus >= 201402L || defined(_MSC_VER)
+#if __cplusplus >= 201402 || defined(_MSC_VER)
   template <class StatusCode> constexpr indirecting_domain<StatusCode> _indirecting_domain{};
   template <class StatusCode> inline constexpr const indirecting_domain<StatusCode> &indirecting_domain<StatusCode>::get() { return _indirecting_domain<StatusCode>; }
 #endif
@@ -8687,12 +8701,6 @@ public:
   {
     _check();
   }
-  //! Explicit copy construction from an unknown status code. Note that this will be empty if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
-  explicit errored_status_code(const status_code<void> &v) // NOLINT
-      : _base(v)
-  {
-    _check();
-  }
   //! Always false (including at compile time), as errored status codes are never successful.
   constexpr bool success() const noexcept { return false; }
   //! Return the erased `value_type` by value.
@@ -8943,7 +8951,6 @@ public:
   //! Constexpr singleton getter. Returns constexpr posix_code_domain variable.
   static inline constexpr const _posix_code_domain &get();
   virtual string_ref name() const noexcept override { return string_ref("posix domain"); } // NOLINT
-  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -8981,7 +8988,7 @@ protected:
     const auto &c = static_cast<const posix_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this); // NOLINT
@@ -9004,7 +9011,7 @@ SYSTEM_ERROR2_NAMESPACE_END
 #endif
 #else
 #endif
-#if defined(_WIN32) || 0L
+#if defined(_WIN32) || 0
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -9030,7 +9037,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_NT_CODE_HPP
 #define SYSTEM_ERROR2_NT_CODE_HPP
-#if !defined(_WIN32) && !0L
+#if !defined(_WIN32) && !0
 #error This file should only be included on Windows
 #endif
 /* Proposed SG14 status_code
@@ -9058,7 +9065,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_WIN32_CODE_HPP
 #define SYSTEM_ERROR2_WIN32_CODE_HPP
-#if !defined(_WIN32) && !0L
+#if !defined(_WIN32) && !0
 #error This file should only be included on Windows
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
@@ -9079,9 +9086,9 @@ namespace win32
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPEBXKKPEA_WKPEAX@Z=FormatMessageW")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
 #elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
-#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=_GetLastError@0")
-#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=_FormatMessageW@28")
-#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=_WideCharToMultiByte@32")
+#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=__imp__GetLastError@0")
+#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=__imp__FormatMessageW@28")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YAKXZ=GetLastError")
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPBXKKPA_WKPAX@Z=FormatMessageW")
@@ -9253,7 +9260,6 @@ public:
   //! Constexpr singleton getter. Returns the constexpr win32_code_domain variable.
   static inline constexpr const _win32_code_domain &get();
   virtual string_ref name() const noexcept override { return string_ref("win32 domain"); } // NOLINT
-  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -9291,7 +9297,7 @@ protected:
     const auto &c = static_cast<const win32_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
@@ -9326,7 +9332,7 @@ namespace win32
 #if (defined(__x86_64__) || defined(_M_X64)) || (defined(__aarch64__) || defined(_M_ARM64))
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPEAXPEB_W@Z=GetModuleHandleW")
 #elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
-#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=_GetModuleHandleW@4")
+#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=__imp__GetModuleHandleW@4")
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPAXPB_W@Z=GetModuleHandleW")
 #else
@@ -10541,7 +10547,6 @@ public:
   //! Constexpr singleton getter. Returns the constexpr nt_code_domain variable.
   static inline constexpr const _nt_code_domain &get();
   virtual string_ref name() const noexcept override { return string_ref("NT domain"); } // NOLINT
-  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -10587,7 +10592,7 @@ protected:
     const auto &c = static_cast<const nt_code &>(code); // NOLINT
     return _make_string_ref(c.value());
   }
-#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
   {
     assert(code.domain() == *this);
@@ -10984,7 +10989,7 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY_IF
-#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
+#if (__cplusplus >= 202000 || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
 #elif defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))

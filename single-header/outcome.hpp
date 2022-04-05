@@ -21,7 +21,7 @@ Distributed under the Boost Software License, Version 1.0.
     (See accompanying file Licence.txt or copy at
           http://www.boost.org/LICENSE_1_0.txt)
 */
-#if !OUTCOME_ENABLE_CXX_MODULES || !0L || defined(GENERATING_OUTCOME_MODULE_INTERFACE) || OUTCOME_DISABLE_CXX_MODULES
+#if !OUTCOME_ENABLE_CXX_MODULES || !0 || defined(GENERATING_OUTCOME_MODULE_INTERFACE) || OUTCOME_DISABLE_CXX_MODULES
 /* Tells C++ coroutines about Outcome's result
 (C) 2019 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Oct 2019
@@ -104,7 +104,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_VERSION_REVISION 0 // Revision version for cmake and DLL version stamping
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 // Pull in detection of __MINGW64_VERSION_MAJOR
-#if defined(__MINGW32__) && !0L
+#if defined(__MINGW32__) && !0
 #include <_mingw.h>
 #endif
 /* Configure QuickCppLib
@@ -156,7 +156,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_alignas)
@@ -217,7 +217,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_attributes 190000
 #endif
 #if !defined(__cpp_constexpr)
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402
 #define __cpp_constexpr 201304 // relaxed constexpr
 #else
 #define __cpp_constexpr 190000
@@ -272,7 +272,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 #endif
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
 ////#if !defined(__cpp_contextual_conversions)
@@ -695,7 +695,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if 0L || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
+#if 0 || (_HAS_CXX17 && _MSC_VER >= 1911 /* VS2017.3 */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #endif
 #endif
@@ -742,7 +742,7 @@ extern "C" void _mm_pause();
 #ifndef QUICKCPPLIB_THREAD_LOCAL
 #if _MSC_VER >= 1800
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
-#elif __cplusplus >= 201103L
+#elif __cplusplus >= 201103
 #if __GNUC__ >= 5 && !defined(__clang__)
 #define QUICKCPPLIB_THREAD_LOCAL_IS_CXX11 1
 #elif defined(__has_feature)
@@ -1067,7 +1067,7 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
-#if 0L || __clang_major__ >= 7
+#if 0 || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
 #define OUTCOME_TRIVIAL_ABI [[clang::trivial_abi]]
 #else
@@ -1192,7 +1192,7 @@ namespace detail
 #endif
 #endif
 // True if type is nothrow swappable
-#if !0L && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
+#if !0 && OUTCOME_USE_STD_IS_NOTHROW_SWAPPABLE
   template <class T> using is_nothrow_swappable = std::is_nothrow_swappable<T>;
 #else
   template <class T> struct is_nothrow_swappable
@@ -1244,7 +1244,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef QUICKCPPLIB_EXPORTS
 #define EXECINFO_DECL extern __declspec(dllexport)
 #else
-#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
+#if defined(__cplusplus) && (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define EXECINFO_DECL inline
 #elif defined(QUICKCPPLIB_DYN_LINK) && !defined(QUICKCPPLIB_STATIC_LINK)
 #define EXECINFO_DECL extern __declspec(dllimport)
@@ -1262,7 +1262,7 @@ EXECINFO_DECL _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbol
 // extern void backtrace_symbols_fd(void *const *bt, size_t len, int fd);
 #ifdef __cplusplus
 }
-#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0L
+#if (!defined(QUICKCPPLIB_HEADERS_ONLY) || QUICKCPPLIB_HEADERS_ONLY == 1) && !0
 #define QUICKCPPLIB_INCLUDED_BY_HEADER 1
 /* Implements backtrace() et al from glibc on win64
 (C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
@@ -2808,7 +2808,7 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* Essentially an internal optional implementation :)
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2017
 
 
@@ -2836,6 +2836,77 @@ Distributed under the Boost Software License, Version 1.0.
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace detail
 {
+  // Helpers for move assigning to empty storage
+  template <class T, bool isCopyOrMoveConstructible = std::is_copy_constructible<T>::value || std::is_move_constructible<T>::value,
+            bool isDefaultConstructibleAndCopyOrMoveAssignable =
+            std::is_default_constructible<T>::value && (std::is_copy_assignable<T>::value || std::is_move_assignable<T>::value)>
+  struct move_assign_to_empty;
+  // Prefer to use move or copy construction
+  template <class T> struct move_assign_to_empty<T, true, false>
+  {
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(*o)); }
+  };
+  template <class T> struct move_assign_to_empty<T, true, true>
+  {
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(*o)); }
+  };
+  // But fall back on default construction and move assign if necessary
+  template <class T> struct move_assign_to_empty<T, false, true>
+  {
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_move_assignable<T>::value)
+    {
+      new(dest) T;
+      *dest = static_cast<T &&>(*o);
+    }
+  };
+  // Void does nothing
+  template <> struct move_assign_to_empty<void, false, false>
+  {
+    move_assign_to_empty(void *, void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  template <> struct move_assign_to_empty<const void, false, false>
+  {
+    move_assign_to_empty(const void *, const void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  // Helpers for copy assigning to empty storage
+  template <class T, bool isCopyConstructible = std::is_copy_constructible<T>::value,
+            bool isDefaultConstructibleAndCopyAssignable = std::is_default_constructible<T>::value &&std::is_copy_assignable<T>::value>
+  struct copy_assign_to_empty;
+  // Prefer to use copy construction
+  template <class T> struct copy_assign_to_empty<T, true, false>
+  {
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(*o); }
+  };
+  template <class T> struct copy_assign_to_empty<T, true, true>
+  {
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(*o); }
+  };
+  // But fall back on default construction and copy assign if necessary
+  template <class T> struct copy_assign_to_empty<T, false, true>
+  {
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_copy_assignable<T>::value)
+    {
+      new(dest) T;
+      *dest = *o;
+    }
+  };
+  // Void does nothing
+  template <> struct copy_assign_to_empty<void, false, false>
+  {
+    copy_assign_to_empty(void *, void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  template <> struct copy_assign_to_empty<const void, false, false>
+  {
+    copy_assign_to_empty(const void *, const void *) noexcept
+    { /* nothing to assign */
+    }
+  };
   template <class T, bool nothrow> struct strong_swap_impl
   {
     constexpr strong_swap_impl(bool &allgood, T &a, T &b)
@@ -3290,7 +3361,7 @@ namespace detail
       empty_type _empty2;
       _error_type_ _error;
     };
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial() noexcept
@@ -3300,7 +3371,7 @@ namespace detail
     }
     value_storage_nontrivial &operator=(const value_storage_nontrivial &) = default; // if reaches here, copy assignment is trivial
     value_storage_nontrivial &operator=(value_storage_nontrivial &&) = default; // NOLINT if reaches here, move assignment is trivial
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(value_storage_nontrivial &&o) noexcept(
@@ -3317,7 +3388,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial(const value_storage_nontrivial &o) noexcept(
@@ -3333,7 +3404,7 @@ namespace detail
       }
       _status = o._status;
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     explicit value_storage_nontrivial(status_bitfield_type status)
@@ -3493,7 +3564,7 @@ namespace detail
       _status = o._status;
       o._status.set_have_moved_from(true);
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     ~value_storage_nontrivial() noexcept(std::is_nothrow_destructible<_value_type_>::value &&std::is_nothrow_destructible<_error_type_>::value)
@@ -3515,7 +3586,7 @@ namespace detail
         this->_status.set_have_error(false);
       }
     }
-#if __cplusplus >= 202000L || _HAS_CXX20
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     void
@@ -3662,6 +3733,9 @@ namespace detail
     value_storage_delete_copy_constructor() = default;
     value_storage_delete_copy_constructor(const value_storage_delete_copy_constructor &) = delete;
     value_storage_delete_copy_constructor(value_storage_delete_copy_constructor &&) = default; // NOLINT
+    value_storage_delete_copy_constructor &operator=(const value_storage_delete_copy_constructor &o) = default;
+    value_storage_delete_copy_constructor &operator=(value_storage_delete_copy_constructor &&o) = default; // NOLINT
+    ~value_storage_delete_copy_constructor() = default;
   };
   template <class Base> struct value_storage_delete_copy_assignment : Base // NOLINT
   {
@@ -3673,6 +3747,7 @@ namespace detail
     value_storage_delete_copy_assignment(value_storage_delete_copy_assignment &&) = default; // NOLINT
     value_storage_delete_copy_assignment &operator=(const value_storage_delete_copy_assignment &o) = delete;
     value_storage_delete_copy_assignment &operator=(value_storage_delete_copy_assignment &&o) = default; // NOLINT
+    ~value_storage_delete_copy_assignment() = default;
   };
   template <class Base> struct value_storage_delete_move_assignment : Base // NOLINT
   {
@@ -3684,6 +3759,7 @@ namespace detail
     value_storage_delete_move_assignment(value_storage_delete_move_assignment &&) = default; // NOLINT
     value_storage_delete_move_assignment &operator=(const value_storage_delete_move_assignment &o) = default;
     value_storage_delete_move_assignment &operator=(value_storage_delete_move_assignment &&o) = delete;
+    ~value_storage_delete_move_assignment() = default;
   };
   template <class Base> struct value_storage_delete_move_constructor : Base // NOLINT
   {
@@ -3693,6 +3769,9 @@ namespace detail
     value_storage_delete_move_constructor() = default;
     value_storage_delete_move_constructor(const value_storage_delete_move_constructor &) = default;
     value_storage_delete_move_constructor(value_storage_delete_move_constructor &&) = delete;
+    value_storage_delete_move_constructor &operator=(const value_storage_delete_move_constructor &o) = default;
+    value_storage_delete_move_constructor &operator=(value_storage_delete_move_constructor &&o) = default;
+    ~value_storage_delete_move_constructor() = default;
   };
   template <class Base> struct value_storage_nontrivial_move_assignment : Base // NOLINT
   {
@@ -3703,12 +3782,16 @@ namespace detail
     value_storage_nontrivial_move_assignment(const value_storage_nontrivial_move_assignment &) = default;
     value_storage_nontrivial_move_assignment(value_storage_nontrivial_move_assignment &&) = default; // NOLINT
     value_storage_nontrivial_move_assignment &operator=(const value_storage_nontrivial_move_assignment &o) = default;
-#if __cplusplus >= 202000L || _HAS_CXX20
+    ~value_storage_nontrivial_move_assignment() = default;
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_move_assignment &
     operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
-    std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value) // NOLINT
+    std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value &&noexcept(move_assign_to_empty<value_type>(
+    static_cast<value_type *>(nullptr),
+    static_cast<value_type *>(nullptr))) &&noexcept(move_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                     static_cast<error_type *>(nullptr)))) // NOLINT
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -3744,7 +3827,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3761,7 +3844,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3772,7 +3855,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        new(&this->_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3783,7 +3866,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        new(&this->_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3801,12 +3884,15 @@ namespace detail
     value_storage_nontrivial_copy_assignment(const value_storage_nontrivial_copy_assignment &) = default;
     value_storage_nontrivial_copy_assignment(value_storage_nontrivial_copy_assignment &&) = default; // NOLINT
     value_storage_nontrivial_copy_assignment &operator=(value_storage_nontrivial_copy_assignment &&o) = default; // NOLINT
-#if __cplusplus >= 202000L || _HAS_CXX20
+    ~value_storage_nontrivial_copy_assignment() = default;
+#if __cplusplus >= 202000 || _HAS_CXX20
     constexpr
 #endif
     value_storage_nontrivial_copy_assignment &
     operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
-    std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value)
+    std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value &&noexcept(copy_assign_to_empty<value_type>(
+    static_cast<value_type *>(nullptr), static_cast<value_type *>(nullptr))) &&noexcept(copy_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                                                         static_cast<error_type *>(nullptr))))
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -3838,7 +3924,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        new(&this->_value) _value_type_(o._value); // NOLINT
+        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         return *this;
       }
@@ -3853,7 +3939,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        new(&this->_error) _error_type_(o._error); // NOLINT
+        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         return *this;
       }
@@ -3863,7 +3949,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        new(&this->_error) _error_type_(o._error); // NOLINT
+        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         return *this;
       }
@@ -3873,7 +3959,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        new(&this->_value) _value_type_(o._value); // NOLINT
+        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         return *this;
       }
@@ -3898,6 +3984,16 @@ namespace detail
   {
     static constexpr bool value = true;
   };
+  // Ability to do copy assigns needs more than just copy assignment
+  template <class T> struct is_copy_assignable
+  {
+    static constexpr bool value = std::is_copy_assignable<T>::value && (std::is_copy_constructible<T>::value || std::is_default_constructible<T>::value);
+  };
+  // Ability to do move assigns needs more than just move assignment
+  template <class T> struct is_move_assignable
+  {
+    static constexpr bool value = std::is_move_assignable<T>::value && (std::is_move_constructible<T>::value || std::is_default_constructible<T>::value);
+  };
   template <class T, class E>
   using value_storage_select_trivality =
   std::conditional_t<is_storage_trivial<T>::value && is_storage_trivial<E>::value, value_storage_trivial<T, E>, value_storage_nontrivial<T, E>>;
@@ -3913,14 +4009,14 @@ namespace detail
   using value_storage_select_move_assignment =
   std::conditional_t<std::is_trivially_move_assignable<devoid<T>>::value && std::is_trivially_move_assignable<devoid<E>>::value,
                      value_storage_select_copy_constructor<T, E>,
-                     std::conditional_t<std::is_move_assignable<devoid<T>>::value && std::is_move_assignable<devoid<E>>::value,
+                     std::conditional_t<is_move_assignable<devoid<T>>::value && is_move_assignable<devoid<E>>::value,
                                         value_storage_nontrivial_move_assignment<value_storage_select_copy_constructor<T, E>>,
-                                        value_storage_delete_copy_assignment<value_storage_select_copy_constructor<T, E>>>>;
+                                        value_storage_delete_move_assignment<value_storage_select_copy_constructor<T, E>>>>;
   template <class T, class E>
   using value_storage_select_copy_assignment =
   std::conditional_t<std::is_trivially_copy_assignable<devoid<T>>::value && std::is_trivially_copy_assignable<devoid<E>>::value,
                      value_storage_select_move_assignment<T, E>,
-                     std::conditional_t<std::is_copy_assignable<devoid<T>>::value && std::is_copy_assignable<devoid<E>>::value,
+                     std::conditional_t<is_copy_assignable<devoid<T>>::value && is_copy_assignable<devoid<E>>::value,
                                         value_storage_nontrivial_copy_assignment<value_storage_select_move_assignment<T, E>>,
                                         value_storage_delete_copy_assignment<value_storage_select_move_assignment<T, E>>>>;
   template <class T, class E> using value_storage_select_impl = value_storage_select_copy_assignment<T, E>;
@@ -7195,7 +7291,7 @@ SIGNATURE NOT RECOGNISED
 };
 // C++ 20 operator== rewriting should take care of this for us, indeed
 // if we don't disable it, we cause Concept recursion to infinity!
-#if __cplusplus < 202000L && !_HAS_CXX20
+#if __cplusplus < 202000 && !_HAS_CXX20
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
@@ -7928,7 +8024,7 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
 #ifndef OUTCOME_TRY_LIKELY_IF
-#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
+#if (__cplusplus >= 202000 || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
 #elif defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
