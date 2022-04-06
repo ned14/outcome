@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-04-06T09:28:20 UTC">
+<meta name="revised" content="2022-04-06T09:37:14 UTC">
 <title>`basic_result&lt;T, E, NoValuePolicy&gt;` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1045,185 +1045,38 @@
       <a href="/outcome/reference/policies/base/"><code>base</code></a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/policies/base/ub/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/keeping_state/" class="dd-item">
         <div>
-          <a href="/outcome/reference/policies/base/ub/">
-            <code>static void _ub(Impl &amp;&amp;)</code>
+          <a href="/outcome/tutorial/advanced/hooks/keeping_state/">
+            Keeping state
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/policies/base/has_value/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/adl_bridging/" class="dd-item">
         <div>
-          <a href="/outcome/reference/policies/base/has_value/">
-            <code>static bool _has_value(Impl &amp;&amp;) noexcept</code>
+          <a href="/outcome/tutorial/advanced/hooks/adl_bridging/">
+            ADL bridging
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/policies/base/has_error/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_result/" class="dd-item">
         <div>
-          <a href="/outcome/reference/policies/base/has_error/">
-            <code>static bool _has_error(Impl &amp;&amp;) noexcept</code>
+          <a href="/outcome/tutorial/advanced/hooks/hook_result/">
+            Hook result
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/policies/base/has_exception/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/poke_exception/" class="dd-item">
         <div>
-          <a href="/outcome/reference/policies/base/has_exception/">
-            <code>static bool _has_exception(Impl &amp;&amp;) noexcept</code>
+          <a href="/outcome/tutorial/advanced/hooks/poke_exception/">
+            Custom exception ptr
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/reference/policies/base/has_error_is_errno/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/hooks/hook_outcome/" class="dd-item">
         <div>
-          <a href="/outcome/reference/policies/base/has_error_is_errno/">
-            <code>static bool _has_error_is_errno(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/value/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/value/">
-            <code>static auto &amp;&amp;_value(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/error/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/error/">
-            <code>static auto &amp;&amp;_error(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/exception/">
-            <code>static auto &amp;&amp;_exception(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/set_has_value/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/set_has_value/">
-            <code>static void _set_has_value(Impl &amp;&amp;, bool) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/set_has_error/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/set_has_error/">
-            <code>static void _set_has_error(Impl &amp;&amp;, bool) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/set_has_exception/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/set_has_exception/">
-            <code>static void _set_has_exception(Impl &amp;&amp;, bool) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/set_has_error_is_errno/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/set_has_error_is_errno/">
-            <code>static void _set_has_exception(Impl &amp;&amp;, bool) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/narrow_value_check/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/narrow_value_check/">
-            <code>static void narrow_value_check(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/narrow_error_check/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/narrow_error_check/">
-            <code>static void narrow_error_check(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/narrow_exception_check/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/narrow_exception_check/">
-            <code>static void narrow_exception_check(Impl &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_construction/">
-            <code>static void on_outcome_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_construction2/">
-            <code>static void on_outcome_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_copy_construction/">
-            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_copy_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_copy_construction2/">
-            <code>static void on_outcome_copy_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_in_place_construction/">
-            <code>static void on_outcome_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_move_construction/">
-            <code>static void on_outcome_move_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_outcome_move_construction2/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_outcome_move_construction2/">
-            <code>static void on_outcome_move_construction(T *, U &amp;&amp;, V &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_result_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_result_construction/">
-            <code>static void on_result_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_result_copy_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_result_copy_construction/">
-            <code>static void on_result_copy_construction(T *, U &amp;&amp;) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_result_in_place_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_result_in_place_construction/">
-            <code>static void on_result_in_place_construction(T *, in_place_type_t&lt;U&gt;, Args &amp;&amp;...) noexcept</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/policies/base/on_result_move_construction/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/policies/base/on_result_move_construction/">
-            <code>static void on_result_move_construction(T *, U &amp;&amp;) noexcept</code>
+          <a href="/outcome/tutorial/advanced/hooks/hook_outcome/">
+            Hook outcome
           </a>
         </div>
     </li>
@@ -2315,7 +2168,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2323,6 +2176,13 @@
         <div>
           <a href="/outcome/reference/types/failure_type/">
             <code>failure_type&lt;EC, EP = void&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/generator/">
+            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2336,7 +2196,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
+            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2889,10 +2749,11 @@
       <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
       <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
       <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
-      <option value="/outcome/reference/types/awaitables/eager/" >-- `eager&lt;T&gt;/atomic_eager&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/eager/" >-- `eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;`</option>
       <option value="/outcome/reference/types/failure_type/" >-- `failure_type&lt;EC, EP = void&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/generator/" >-- `generator&lt;T, Executor = void&gt;`</option>
       <option value="/outcome/reference/types/in_place_type_t/" >-- `in_place_type_t&lt;T&gt;`</option>
-      <option value="/outcome/reference/types/awaitables/lazy/" >-- `lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</option>
+      <option value="/outcome/reference/types/awaitables/lazy/" >-- `lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;`</option>
       <option value="/outcome/reference/types/success_type/" >-- `success_type&lt;T&gt;`</option>
   
     <option value="/outcome/reference/aliases/" >

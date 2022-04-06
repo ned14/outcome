@@ -47,12 +47,12 @@ Header: &amp;lt;outcome/bad_access.hpp&amp;gt;</description>
     </item>
     
     <item>
-      <title>`eager&lt;T&gt;/atomic_eager&lt;T&gt;`</title>
+      <title>`eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;`</title>
       <link>https://ned14.github.io/outcome/reference/types/awaitables/eager/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/awaitables/eager/</guid>
-      <description>This is very similar to lazy&amp;lt;T&amp;gt; , except that execution of the eager&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return eager&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
+      <description>This is very similar to lazy&amp;lt;T, Executor = void&amp;gt; , except that execution of the eager&amp;lt;T&amp;gt; returning function begins immediately, and if the function never suspends during the course of its execution, no suspend-resume cycle occurs. Functions which return eager&amp;lt;T&amp;gt; are therefore suitable for tasks which may require suspension, but will often complete immediately.
 atomic_eager&amp;lt;T&amp;gt; is like eager&amp;lt;T&amp;gt;, except that the setting of the coroutine result performs an atomic release, whilst the checking of whether the coroutine has finished is an atomic acquire.</description>
     </item>
     
@@ -69,6 +69,17 @@ There is an explicit initialising constructor taking any types U and V which wil
     </item>
     
     <item>
+      <title>`generator&lt;T, Executor = void&gt;`</title>
+      <link>https://ned14.github.io/outcome/reference/types/awaitables/generator/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/reference/types/awaitables/generator/</guid>
+      <description>This is a classic coroutine generator whereby the coroutine is resumed to calculate the next value, and is suspended upon yielding that value. If the value being yielded is an Outcome type, special semantics are used if the coroutine throws an exception (see below).
+The Executor template parameter is purely for compatibility with third party software such as ASIO, and this awaitable can be directly used by ASIO.
+Example of use:</description>
+    </item>
+    
+    <item>
       <title>`in_place_type_t&lt;T&gt;`</title>
       <link>https://ned14.github.io/outcome/reference/types/in_place_type_t/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -82,12 +93,12 @@ Header: &amp;lt;outcome/config.hpp&amp;gt;</description>
     </item>
     
     <item>
-      <title>`lazy&lt;T&gt;/atomic_lazy&lt;T&gt;`</title>
+      <title>`lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;`</title>
       <link>https://ned14.github.io/outcome/reference/types/awaitables/lazy/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/reference/types/awaitables/lazy/</guid>
-      <description>This is very similar to eager&amp;lt;T&amp;gt; , except that execution of the lazy&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return lazy&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of lazily executed coroutines, most people will want to use atomic_lazy&amp;lt;T&amp;gt; instead of lazy&amp;lt;T&amp;gt;.</description>
+      <description>This is very similar to eager&amp;lt;T, Executor = void&amp;gt; , except that execution of the lazy&amp;lt;T&amp;gt; returning function suspends immediately. Functions which return lazy&amp;lt;T&amp;gt; are therefore suitable for tasks which you need to instantiate right now, but whose execution will occur elsewhere e.g. in a separate kernel thread. Because of the very common use case of using worker threads to execute the body of lazily executed coroutines, most people will want to use atomic_lazy&amp;lt;T&amp;gt; instead of lazy&amp;lt;T&amp;gt;.</description>
     </item>
     
     <item>

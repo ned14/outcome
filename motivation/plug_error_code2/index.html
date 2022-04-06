@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-04-06T09:28:12 UTC">
+<meta name="revised" content="2022-04-06T09:37:06 UTC">
 <title>Plugging a library into `boost::system::error_code` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2313,7 +2313,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2321,6 +2321,13 @@
         <div>
           <a href="/outcome/reference/types/failure_type/">
             <code>failure_type&lt;EC, EP = void&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/generator/">
+            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2334,7 +2341,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
+            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2353,6 +2360,97 @@
       <a href="/outcome/reference/aliases/">Aliases</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/reference/aliases/boost_checked/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/boost_checked/">
+            <code>boost_checked&lt;T, E = boost::system::error_code&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/boost_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/boost_outcome/">
+            <code>boost_outcome&lt;T, EC = boost::system::error_code, EP = boost::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/boost_result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/boost_result/">
+            <code>boost_result&lt;T, E = boost::system::error_code, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/boost_unchecked/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/boost_unchecked/">
+            <code>boost_unchecked&lt;T, E = boost::system::error_code&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/checked/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/checked/">
+            <code>checked&lt;T, E = varies&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/default_policy/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/default_policy/">
+            <code>default_policy&lt;T, EC, EP&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/outcome/">
+            <code>outcome&lt;T, EC = varies, EP = varies, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/result/">
+            <code>result&lt;T, E = varies, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/std_checked/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/std_checked/">
+            <code>std_checked&lt;T, E = std::error_code&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/std_outcome/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/std_outcome/">
+            <code>std_outcome&lt;T, EC = std::error_code, EP = std::exception_ptr, NoValuePolicy = policy::default_policy&lt;T, EC, EP&gt;&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/std_result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/std_result/">
+            <code>std_result&lt;T, E = std::error_code, NoValuePolicy = policy::default_policy&lt;T, E, void&gt;&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/std_unchecked/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/std_unchecked/">
+            <code>std_unchecked&lt;T, E = std::error_code&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/aliases/unchecked/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/aliases/unchecked/">
+            <code>unchecked&lt;T, E = varies&gt;</code>
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/functions/" class="dd-item haschildren

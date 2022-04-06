@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/tags/coroutines/</link>
     <description>Recent content in Coroutines on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Tue, 07 Apr 2020 10:22:38 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 18 Mar 2022 14:45:32 +0000</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/tags/coroutines/index.xml" rel="self" type="application/rss+xml" />
     
@@ -27,13 +27,13 @@ eager&amp;lt;result&amp;lt;std::string&amp;gt;&amp;gt; to_string(int x) { if(x &
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</guid>
       <description>The second part of the support is provided by header &amp;lt;outcome/coroutine_support.hpp&amp;gt; (or &amp;lt;outcome/experimental/coroutine_support.hpp&amp;gt; if you want Coroutine support for Experimental Outcome). This adds into namespace OUTCOME_V2_NAMESPACE::awaitables (or OUTCOME_V2_NAMESPACE::experimental::awaitables) these awaitable types suitable for returning from a Coroutinised function:
- eager&amp;lt;T&amp;gt; An eagerly evaluated Coroutine: invoking co_await upon a function returning one of these immediately begins the execution of the function now. If the function never suspends, the overhead is similar to calling an ordinary function.</description>
+ eager&amp;lt;T, Executor = void&amp;gt; An eagerly evaluated Coroutine: invoking co_await upon a function returning one of these immediately begins the execution of the function now. If the function never suspends, the overhead is similar to calling an ordinary function.</description>
     </item>
     
     <item>
       <title>Coroutines</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/</link>
-      <pubDate>Tue, 07 Apr 2020 10:22:38 +0100</pubDate>
+      <pubDate>Fri, 18 Mar 2022 14:45:32 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/</guid>
       <description>In v2.1.2 Outcome published official support for using Outcome within C++ coroutines. This page documents that support.
@@ -47,9 +47,8 @@ All standard C++ Coroutines have the following form:
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/returning/</guid>
-      <description>eager&amp;lt;T&amp;gt; and lazy&amp;lt;T&amp;gt; and their atomic editions are completely standard awaitables with no special behaviours, except if T is a basic_result or basic_outcome. In that situation, the following occurs:
-If the Coroutine throws a C++ exception which was not handled inside the Coroutine body, Outcome&amp;rsquo;s awaitable types try to convert it into a form which your Result or Outcome type being returned can transport. For example:
- If your Coroutine were returning a result&amp;lt;T, std::exception_ptr&amp;gt;, an errored Result with a pointer to the exception thrown would be returned.</description>
+      <description>eager&amp;lt;T, Executor = void&amp;gt; and lazy&amp;lt;T, Executor = void&amp;gt; and their atomic editions are completely standard awaitables with no special behaviours, except if T is a basic_result or basic_outcome. In that situation, the following occurs:
+If the Coroutine throws a C++ exception which was not handled inside the Coroutine body, Outcome&amp;rsquo;s awaitable types try to convert it into a form which your Result or Outcome type being returned can transport. For example:</description>
     </item>
     
     <item>

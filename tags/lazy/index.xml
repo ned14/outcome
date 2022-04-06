@@ -16,7 +16,7 @@
       
       <guid>https://ned14.github.io/outcome/tutorial/essential/coroutines/awaitables/</guid>
       <description>The second part of the support is provided by header &amp;lt;outcome/coroutine_support.hpp&amp;gt; (or &amp;lt;outcome/experimental/coroutine_support.hpp&amp;gt; if you want Coroutine support for Experimental Outcome). This adds into namespace OUTCOME_V2_NAMESPACE::awaitables (or OUTCOME_V2_NAMESPACE::experimental::awaitables) these awaitable types suitable for returning from a Coroutinised function:
- eager&amp;lt;T&amp;gt; An eagerly evaluated Coroutine: invoking co_await upon a function returning one of these immediately begins the execution of the function now. If the function never suspends, the overhead is similar to calling an ordinary function.</description>
+ eager&amp;lt;T, Executor = void&amp;gt; An eagerly evaluated Coroutine: invoking co_await upon a function returning one of these immediately begins the execution of the function now. If the function never suspends, the overhead is similar to calling an ordinary function.</description>
     </item>
     
   </channel>
