@@ -979,9 +979,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 147ec1e8673c34cb7cf431dfdbf211d8072d7656
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-03-17 19:38:05 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 147ec1e8
+#define OUTCOME_PREVIOUS_COMMIT_REF e454353c0e28656c84f4bae30b0acc22ddcd01b2
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-04-07 15:21:55 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e454353c
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -2020,19 +2020,32 @@ namespace detail
   // Prefer to use move or copy construction
   template <class T> struct move_assign_to_empty<T, true, false>
   {
-    move_assign_to_empty(T *dest, T &&o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(o)); }
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(*o)); }
   };
   template <class T> struct move_assign_to_empty<T, true, true>
   {
-    move_assign_to_empty(T *dest, T &&o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(o)); }
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_move_constructible<T>::value) { new(dest) T(static_cast<T &&>(*o)); }
   };
   // But fall back on default construction and move assign if necessary
   template <class T> struct move_assign_to_empty<T, false, true>
   {
-    move_assign_to_empty(T *dest, T &&o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_move_assignable<T>::value)
+    move_assign_to_empty(T *dest, T *o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_move_assignable<T>::value)
     {
       new(dest) T;
-      *dest = static_cast<T &&>(o);
+      *dest = static_cast<T &&>(*o);
+    }
+  };
+  // Void does nothing
+  template <> struct move_assign_to_empty<void, false, false>
+  {
+    move_assign_to_empty(void *, void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  template <> struct move_assign_to_empty<const void, false, false>
+  {
+    move_assign_to_empty(const void *, const void *) noexcept
+    { /* nothing to assign */
     }
   };
   // Helpers for copy assigning to empty storage
@@ -2042,19 +2055,32 @@ namespace detail
   // Prefer to use copy construction
   template <class T> struct copy_assign_to_empty<T, true, false>
   {
-    copy_assign_to_empty(T *dest, const T &o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(o); }
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(*o); }
   };
   template <class T> struct copy_assign_to_empty<T, true, true>
   {
-    copy_assign_to_empty(T *dest, const T &o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(o); }
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_copy_constructible<T>::value) { new(dest) T(*o); }
   };
   // But fall back on default construction and copy assign if necessary
   template <class T> struct copy_assign_to_empty<T, false, true>
   {
-    copy_assign_to_empty(T *dest, const T &o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_copy_assignable<T>::value)
+    copy_assign_to_empty(T *dest, const T *o) noexcept(std::is_nothrow_default_constructible<T>::value &&std::is_nothrow_copy_assignable<T>::value)
     {
       new(dest) T;
-      *dest = o;
+      *dest = *o;
+    }
+  };
+  // Void does nothing
+  template <> struct copy_assign_to_empty<void, false, false>
+  {
+    copy_assign_to_empty(void *, void *) noexcept
+    { /* nothing to assign */
+    }
+  };
+  template <> struct copy_assign_to_empty<const void, false, false>
+  {
+    copy_assign_to_empty(const void *, const void *) noexcept
+    { /* nothing to assign */
     }
   };
   template <class T, bool nothrow> struct strong_swap_impl
@@ -2939,8 +2965,9 @@ namespace detail
     value_storage_nontrivial_move_assignment &
     operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
     std::is_nothrow_move_assignable<value_type>::value &&std::is_nothrow_move_assignable<error_type>::value &&noexcept(move_assign_to_empty<value_type>(
-    static_cast<value_type *>(nullptr), std::declval<value_type>())) &&noexcept(move_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
-                                                                                                                      std::declval<error_type>()))) // NOLINT
+    static_cast<value_type *>(nullptr),
+    static_cast<value_type *>(nullptr))) &&noexcept(move_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                     static_cast<error_type *>(nullptr)))) // NOLINT
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -2976,7 +3003,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        move_assign_to_empty<_value_type_>(&this->_value, static_cast<_value_type_ &&>(o._value));
+        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -2993,7 +3020,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        move_assign_to_empty<_error_type_>(&this->_error, static_cast<_error_type_ &&>(o._error));
+        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3004,7 +3031,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        move_assign_to_empty<_error_type_>(&this->_error, static_cast<_error_type_ &&>(o._error));
+        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3015,7 +3042,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        move_assign_to_empty<_value_type_>(&this->_value, static_cast<_value_type_ &&>(o._value));
+        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3040,8 +3067,8 @@ namespace detail
     value_storage_nontrivial_copy_assignment &
     operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
     std::is_nothrow_copy_assignable<value_type>::value &&std::is_nothrow_copy_assignable<error_type>::value &&noexcept(copy_assign_to_empty<value_type>(
-    static_cast<value_type *>(nullptr), std::declval<value_type>())) &&noexcept(copy_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
-                                                                                                                      std::declval<error_type>())))
+    static_cast<value_type *>(nullptr), static_cast<value_type *>(nullptr))) &&noexcept(copy_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                                                         static_cast<error_type *>(nullptr))))
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -3073,7 +3100,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        copy_assign_to_empty<_value_type_>(&this->_value, o._value);
+        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         return *this;
       }
@@ -3088,7 +3115,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        copy_assign_to_empty<_error_type_>(&this->_error, o._error);
+        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         return *this;
       }
@@ -3098,7 +3125,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        copy_assign_to_empty<_error_type_>(&this->_error, o._error);
+        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
         this->_status = o._status;
         return *this;
       }
@@ -3108,7 +3135,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        copy_assign_to_empty<_value_type_>(&this->_value, o._value);
+        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
         this->_status = o._status;
         return *this;
       }
