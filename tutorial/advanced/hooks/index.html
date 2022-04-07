@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-04-06T09:37:06 UTC">
+<meta name="revised" content="2022-04-07T15:30:26 UTC">
 <title>Hooking events :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -354,38 +354,45 @@
       <a href="/outcome/tutorial/advanced/constructors/">Result returning constructors</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/experimental/advantages/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/two-phase-init/" class="dd-item">
         <div>
-          <a href="/outcome/experimental/advantages/">
-            The main advantages
+          <a href="/outcome/tutorial/advanced/constructors/two-phase-init/">
+            Two phase construction
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/experimental/map/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/file_handle/" class="dd-item">
         <div>
-          <a href="/outcome/experimental/map/">
-            Approximate map between error code designs
+          <a href="/outcome/tutorial/advanced/constructors/file_handle/">
+            A file handle
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/experimental/differences/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/static-constructor/" class="dd-item">
         <div>
-          <a href="/outcome/experimental/differences/">
-            Major differences
+          <a href="/outcome/tutorial/advanced/constructors/static-constructor/">
+            Phase 2 construction
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/experimental/status_result/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/metaprogrammg1/" class="dd-item">
         <div>
-          <a href="/outcome/experimental/status_result/">
-            <code>status_result</code> and <code>status_outcome</code>
+          <a href="/outcome/tutorial/advanced/constructors/metaprogrammg1/">
+            Phase 3
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/experimental/outcome/" class="dd-item">
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/metaprogrammg2/" class="dd-item">
         <div>
-          <a href="/outcome/experimental/outcome/">
-            Tying it all together
+          <a href="/outcome/tutorial/advanced/constructors/metaprogrammg2/">
+            construct<T>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/tutorial/advanced/constructors/metaprogrammg3/" class="dd-item">
+        <div>
+          <a href="/outcome/tutorial/advanced/constructors/metaprogrammg3/">
+            Alternatives
           </a>
         </div>
     </li>
@@ -2308,7 +2315,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
+            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
           </a>
         </div>
     </li>
@@ -2316,13 +2323,6 @@
         <div>
           <a href="/outcome/reference/types/failure_type/">
             <code>failure_type&lt;EC, EP = void&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/types/awaitables/generator/">
-            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2336,7 +2336,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
+            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
           </a>
         </div>
     </li>
