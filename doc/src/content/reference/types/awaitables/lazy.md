@@ -1,9 +1,9 @@
 +++
-title = "`lazy<T>/atomic_lazy<T>`"
+title = "`lazy<T, Executor = void>/atomic_lazy<T, Executor = void>`"
 description = "A lazily evaluated coroutine awaitable with Outcome customisation."
 +++
 
-This is very similar to {{% api "eager<T>" %}}, except that execution of the
+This is very similar to {{% api "eager<T, Executor = void>" %}}, except that execution of the
 `lazy<T>` returning function suspends immediately. Functions which return `lazy<T>`
 are therefore suitable for tasks which you need to instantiate right now, but whose
 execution will occur elsewhere e.g. in a separate kernel thread. Because of the very
@@ -16,6 +16,10 @@ is an atomic acquire.
 
 `lazy<T>` has similar semantics to `std::lazy<T>`, which is being standardised. See
 https://wg21.link/P1056 *Add lazy coroutine (coroutine task) type*.
+
+The `Executor` template parameter is purely for compatibility with third party software
+such as [ASIO](https://think-async.com/Asio/), and this awaitable can be directly used
+by ASIO.
 
 Example of use (must be called from within a coroutinised function):
 

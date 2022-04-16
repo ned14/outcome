@@ -1,9 +1,9 @@
 +++
-title = "`eager<T>/atomic_eager<T>`"
+title = "`eager<T, Executor = void>/atomic_eager<T, Executor = void>`"
 description = "An eagerly evaluated coroutine awaitable with Outcome customisation."
 +++
 
-This is very similar to {{% api "lazy<T>" %}}, except that execution of the `eager<T>`
+This is very similar to {{% api "lazy<T, Executor = void>" %}}, except that execution of the `eager<T>`
 returning function begins immediately, and if the function never suspends during the
 course of its execution, no suspend-resume cycle occurs. Functions which return `eager<T>`
 are therefore suitable for tasks which *may* require suspension, but will often complete
@@ -12,6 +12,10 @@ immediately.
 `atomic_eager<T>` is like `eager<T>`, except that the setting of the coroutine result
 performs an atomic release, whilst the checking of whether the coroutine has finished
 is an atomic acquire.
+
+The `Executor` template parameter is purely for compatibility with third party software
+such as [ASIO](https://think-async.com/Asio/), and this awaitable can be directly used
+by ASIO.
 
 Example of use (must be called from within a coroutinised function):
 

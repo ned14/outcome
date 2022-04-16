@@ -58,6 +58,12 @@ public:
     return v;  // NOLINT
   }
 
+  virtual payload_info_t payload_info() const noexcept override
+  {
+    return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type),
+            (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)};
+  }
+
 protected:
   virtual bool _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
   {

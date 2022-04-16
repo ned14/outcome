@@ -60,6 +60,8 @@ project
     [ run tests/issue0220.cpp ]
     [ run tests/issue0244.cpp ]
     [ run tests/issue0247.cpp ]
+    [ run tests/issue0255.cpp ]
+    [ run tests/issue0259.cpp ]
     [ run tests/noexcept-propagation.cpp ]
     [ run tests/propagate.cpp ]
     [ run tests/serialisation.cpp ]

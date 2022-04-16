@@ -1004,9 +1004,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF e454353c0e28656c84f4bae30b0acc22ddcd01b2
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-04-07 15:21:55 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e454353c
+#define OUTCOME_PREVIOUS_COMMIT_REF 30340e17c63b7bacc23c24666cf5e1648477fd85
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-04-13 17:49:02 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 30340e17
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -6318,7 +6318,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #ifndef SYSTEM_ERROR2_GENERIC_CODE_HPP
 #define SYSTEM_ERROR2_GENERIC_CODE_HPP
 /* Proposed SG14 status_code
-(C) 2018 - 2021 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2022 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -6808,7 +6808,7 @@ namespace detail
 #pragma GCC diagnostic pop
 #endif
   static constexpr unsigned long long test_uuid_parse = parse_uuid_from_array("430f1201-94fc-06c7-430f-120194fc06c7");
-  //static constexpr unsigned long long test_uuid_parse2 = parse_uuid_from_array("x30f1201-94fc-06c7-430f-120194fc06c7");
+  // static constexpr unsigned long long test_uuid_parse2 = parse_uuid_from_array("x30f1201-94fc-06c7-430f-120194fc06c7");
 } // namespace detail
 /*! Abstract base class for a coding domain of a status code.
  */
@@ -6987,8 +6987,8 @@ public:
     {
       mutable std::atomic<unsigned> count{1};
     };
-     _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
-     const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
+    _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); } // NOLINT
+    const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); } // NOLINT
     static SYSTEM_ERROR2_CONSTEXPR20 void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
     {
       auto dest = static_cast<atomic_refcounted_string_ref *>(_dest); // NOLINT
@@ -7094,6 +7094,22 @@ public:
   constexpr unique_id_type id() const noexcept { return _id; }
   //! Name of this category.
   SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref name() const noexcept = 0;
+  //! Information about the payload of the code for this domain
+  struct payload_info_t
+  {
+    size_t payload_size{0}; //!< The payload size in bytes
+    size_t total_size{0}; //!< The total status code size in bytes (includes domain pointer and mixins state)
+    size_t total_alignment{1}; //!< The total status code alignment in bytes
+    payload_info_t() = default;
+    constexpr payload_info_t(size_t _payload_size, size_t _total_size, size_t _total_alignment)
+        : payload_size(_payload_size)
+        , total_size(_total_size)
+        , total_alignment(_total_alignment)
+    {
+    }
+  };
+  //! Information about this domain's payload
+  SYSTEM_ERROR2_CONSTEXPR20 virtual payload_info_t payload_info() const noexcept = 0;
 protected:
   //! True if code means failure.
   SYSTEM_ERROR2_CONSTEXPR20 virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
@@ -7110,8 +7126,19 @@ protected:
   // Keep a vtable slot for binary compatibility
   SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
 #endif
-  // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
-  virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); } // NOLINT
+  // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`. You should return false here if your payload is not trivially copyable or would not fit.
+  virtual bool _do_erased_copy(status_code<void> &dst, const status_code<void> &src, payload_info_t dstinfo) const
+  {
+    // Note that dst may not have its domain set
+    const auto srcinfo = payload_info();
+    if(dstinfo.total_size < srcinfo.total_size)
+    {
+      return false;
+    }
+    const auto tocopy = (dstinfo.total_size > srcinfo.total_size) ? srcinfo.total_size : dstinfo.total_size;
+    memcpy(&dst, &src, tocopy);
+    return true;
+  } // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
   SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept // NOLINT
   {
@@ -7602,7 +7629,10 @@ public:
       return {};
     }
     status_code x;
-    this->_domain->_do_erased_copy(x, *this, sizeof(*this));
+    if(!this->_domain->_do_erased_copy(x, *this, this->_domain->payload_info()))
+    {
+      abort(); // should not be possible
+    }
     return x;
   }
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
@@ -7640,6 +7670,20 @@ public:
   constexpr status_code(Enum &&v) noexcept(std::is_nothrow_constructible<status_code, QuickStatusCodeType>::value) // NOLINT
       : status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
+  }
+  //! Explicit copy construction from an unknown status code. Note that this will be empty if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
+  explicit SYSTEM_ERROR2_CONSTEXPR14 status_code(const status_code<void> &v) // NOLINT
+      : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), value_type{})
+  {
+    const auto info = this->_domain->payload_info();
+    if(info.total_size <= sizeof(*this))
+    {
+      if(this->_domain->_do_erased_copy(*this, v, info))
+      {
+        return;
+      }
+    }
+    this->_domain = nullptr;
   }
   /**** By rights ought to be removed in any formal standard ****/
   //! Reset the code to empty.
@@ -7703,6 +7747,35 @@ public:
   //! Constructs an instance
   explicit status_error(status_code<DomainType> code)
       : _code(static_cast<status_code<DomainType> &&>(code))
+      , _msgref(_code.message())
+  {
+  }
+  //! Return an explanatory string
+  virtual const char *what() const noexcept override { return _msgref.c_str(); } // NOLINT
+  //! Returns a reference to the code
+  const status_code_type &code() const & { return _code; }
+  //! Returns a reference to the code
+  status_code_type &code() & { return _code; }
+  //! Returns a reference to the code
+  const status_code_type &&code() const && { return _code; }
+  //! Returns a reference to the code
+  status_code_type &&code() && { return _code; }
+};
+/*! Exception type representing a thrown erased status_code
+ */
+template <class ErasedType> class status_error<erased<ErasedType>> : public status_error<void>
+{
+  status_code<erased<ErasedType>> _code;
+  typename status_code_domain::string_ref _msgref;
+  virtual const status_code<erased<ErasedType>> &_do_code() const noexcept override final { return _code; }
+public:
+  //! The type of the status domain
+  using domain_type = void;
+  //! The type of the status code
+  using status_code_type = status_code<erased<ErasedType>>;
+  //! Constructs an instance
+  explicit status_error(status_code<erased<ErasedType>> code)
+      : _code(static_cast<status_code<erased<ErasedType>> &&>(code))
       , _msgref(_code.message())
   {
   }
@@ -8000,6 +8073,7 @@ public:
   //! Constexpr singleton getter. Returns the constexpr generic_code_domain variable.
   static inline constexpr const _generic_code_domain &get();
   virtual _base::string_ref name() const noexcept override { return string_ref("generic domain"); } // NOLINT
+  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -8211,6 +8285,7 @@ public:
   static inline constexpr const _quick_status_code_from_enum_domain &get();
 #endif
   virtual string_ref name() const noexcept override { return string_ref(_src::domain_name); }
+  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   // Not sure if a hash table is worth it here, most enumerations won't be long enough to be worth it
   // Also, until C++ 20's consteval, the hash table would get emitted into the binary, bloating it
@@ -8374,6 +8449,7 @@ namespace detail
     static inline constexpr const indirecting_domain &get();
 #endif
     virtual string_ref name() const noexcept override { return typename StatusCode::domain_type().name(); } // NOLINT
+    virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
   protected:
     using _mycode = status_code<indirecting_domain>;
     virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
@@ -8409,14 +8485,20 @@ namespace detail
       abort(); // suppress buggy GCC warning
     }
 #endif
-    virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t /*unused*/) const override // NOLINT
+    virtual bool _do_erased_copy(status_code<void> &dst, const status_code<void> &src, payload_info_t dstinfo) const override // NOLINT
     {
-      // Note that dst will not have its domain set
+      // Note that dst may not have its domain set
+      const auto srcinfo = payload_info();
       assert(src.domain() == *this);
+      if(dstinfo.total_size < srcinfo.total_size)
+      {
+        return false;
+      }
       auto &d = static_cast<_mycode &>(dst); // NOLINT
       const auto &_s = static_cast<const _mycode &>(src); // NOLINT
       const StatusCode &s = *_s.value();
       new(&d) _mycode(in_place, new StatusCode(s));
+      return true;
     }
     virtual void _do_erased_destroy(status_code<void> &code, size_t /*unused*/) const noexcept override // NOLINT
     {
@@ -8701,6 +8783,12 @@ public:
   {
     _check();
   }
+  //! Explicit copy construction from an unknown status code. Note that this will be empty if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
+  explicit errored_status_code(const status_code<void> &v) // NOLINT
+      : _base(v)
+  {
+    _check();
+  }
   //! Always false (including at compile time), as errored status codes are never successful.
   constexpr bool success() const noexcept { return false; }
   //! Return the erased `value_type` by value.
@@ -8951,6 +9039,7 @@ public:
   //! Constexpr singleton getter. Returns constexpr posix_code_domain variable.
   static inline constexpr const _posix_code_domain &get();
   virtual string_ref name() const noexcept override { return string_ref("posix domain"); } // NOLINT
+  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -9086,9 +9175,9 @@ namespace win32
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPEBXKKPEA_WKPEAX@Z=FormatMessageW")
 #pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YAHIKPEB_WHPEADHPEBDPEAH@Z=WideCharToMultiByte")
 #elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
-#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=__imp__GetLastError@0")
-#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=__imp__FormatMessageW@28")
-#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=__imp__WideCharToMultiByte@32")
+#pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YGKXZ=_GetLastError@0")
+#pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YGKKPBXKKPA_WKPAX@Z=_FormatMessageW@28")
+#pragma comment(linker, "/alternatename:?WideCharToMultiByte@win32@system_error2@@YGHIKPB_WHPADHPBDPAH@Z=_WideCharToMultiByte@32")
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma comment(linker, "/alternatename:?GetLastError@win32@system_error2@@YAKXZ=GetLastError")
 #pragma comment(linker, "/alternatename:?FormatMessageW@win32@system_error2@@YAKKPBXKKPA_WKPAX@Z=FormatMessageW")
@@ -9260,6 +9349,7 @@ public:
   //! Constexpr singleton getter. Returns the constexpr win32_code_domain variable.
   static inline constexpr const _win32_code_domain &get();
   virtual string_ref name() const noexcept override { return string_ref("win32 domain"); } // NOLINT
+  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
@@ -9332,7 +9422,7 @@ namespace win32
 #if (defined(__x86_64__) || defined(_M_X64)) || (defined(__aarch64__) || defined(_M_ARM64))
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPEAXPEB_W@Z=GetModuleHandleW")
 #elif defined(__x86__) || defined(_M_IX86) || defined(__i386__)
-#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=__imp__GetModuleHandleW@4")
+#pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YGPAXPB_W@Z=_GetModuleHandleW@4")
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma comment(linker, "/alternatename:?GetModuleHandleW@win32@system_error2@@YAPAXPB_W@Z=GetModuleHandleW")
 #else
@@ -10547,6 +10637,7 @@ public:
   //! Constexpr singleton getter. Returns the constexpr nt_code_domain variable.
   static inline constexpr const _nt_code_domain &get();
   virtual string_ref name() const noexcept override { return string_ref("NT domain"); } // NOLINT
+  virtual payload_info_t payload_info() const noexcept override { return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type), (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)}; }
 protected:
   virtual bool _do_failure(const status_code<void> &code) const noexcept override // NOLINT
   {
