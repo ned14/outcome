@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2022-04-13T17:52:33 UTC">
+<meta name="revised" content="2022-04-16T11:22:53 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2313,7 +2313,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/eager/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/eager/">
-            <code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code>
+            <code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2321,6 +2321,13 @@
         <div>
           <a href="/outcome/reference/types/failure_type/">
             <code>failure_type&lt;EC, EP = void&gt;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/awaitables/generator/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/awaitables/generator/">
+            <code>generator&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2334,7 +2341,7 @@
       <li data-nav-id="/outcome/reference/types/awaitables/lazy/" class="dd-item">
         <div>
           <a href="/outcome/reference/types/awaitables/lazy/">
-            <code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code>
+            <code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code>
           </a>
         </div>
     </li>
@@ -2878,10 +2885,11 @@ thus making it suitable for use in the global headers of really large codebases.
 guaranteed and is C-compatible for <code>result&lt;T, E&gt;</code><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>, thus making Outcome based code long term ABI-stable.</p>
 
 <p>Fully deterministic all-<code>noexcept</code> C++ Coroutine support in Outcome is particularly strong, and we
-supply Outcome-optimising <a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T&gt;/atomic_eager&lt;T&gt;</code></a>
- and <a href="/outcome/reference/types/awaitables/lazy/" class="api-reference"><code>lazy&lt;T&gt;/atomic_lazy&lt;T&gt;</code></a>
+supply Outcome-optimising <a href="/outcome/reference/types/awaitables/eager/" class="api-reference"><code>eager&lt;T, Executor = void&gt;/atomic_eager&lt;T, Executor = void&gt;</code></a>
+, <a href="/outcome/reference/types/awaitables/lazy/" class="api-reference"><code>lazy&lt;T, Executor = void&gt;/atomic_lazy&lt;T, Executor = void&gt;</code></a>
 
-awaitables which work for any user type.</p>
+and <a href="/outcome/reference/types/awaitables/generator/" class="api-reference"><code>generator&lt;T, Executor = void&gt;</code></a>
+ awaitables which work for any user type.</p>
 
 <h2 id="sample-usage">Sample usage</h2>
 
@@ -2953,7 +2961,7 @@ is available in scope.</p>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 15/12/2021
+        <i class='fa fa-calendar'></i> Last update on 18/03/2022
     </div>
     
 
