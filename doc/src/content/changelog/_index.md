@@ -16,9 +16,17 @@ bug fixes.
 - Add optional `Executor` template parameter to all Outcome awaitable types for improved compatibility
 with third party software such as [ASIO](https://think-async.com/Asio/).
 
+- To Experimental.Outcome add `clone()` for `basic_result` and `basic_outcome` types whose `EC` is
+a `status_code`. Erased status codes are move-only which makes the Result/Outcome type move-only, but
+they provide a cloning function, so this convenience function both clones the status code and propagates
+the spare storage so stack backtraces etc are also cloned.
+
+- Add type constraints to `success()` and `failure()` to disable them if they aren't available.
+
 ### Bug fixes:
 
-- None.
+[#261](https://github.com/ned14/outcome/issues/261)
+: Move assignable with move constructible not available did not work with `void`.
 
 ---
 ## v2.2.3 17th March 2022 (Boost 1.79) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.3)

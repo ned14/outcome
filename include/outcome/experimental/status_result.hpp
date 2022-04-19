@@ -155,6 +155,34 @@ SIGNATURE NOT RECOGNISED
             class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
   using status_result = basic_result<R, S, NoValuePolicy>;
 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class R, class S, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<R>::value && (is_status_code<S>::value || is_errored_status_code<S>::value)))
+  inline basic_result<R, S, NoValuePolicy> clone(const basic_result<R, S, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<R>(v.assume_value());
+    }
+    return failure_type<S>(v.assume_error().clone(), hooks::spare_storage(&v));
+  }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class S, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(is_status_code<S>::value || is_errored_status_code<S>::value))
+  inline basic_result<void, S, NoValuePolicy> clone(const basic_result<void, S, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success();
+    }
+    return failure_type<S>(v.assume_error().clone(), hooks::spare_storage(&v));
+  }
+
 }  // namespace experimental
 
 OUTCOME_V2_NAMESPACE_END

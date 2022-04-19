@@ -74,6 +74,51 @@ SIGNATURE NOT RECOGNISED
             class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class R, class S, class P, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<R>::value &&std::is_copy_constructible<P>::value &&
+                                  (is_status_code<S>::value || is_errored_status_code<S>::value)))
+  inline basic_outcome<R, S, P, NoValuePolicy> clone(const basic_outcome<R, S, P, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<R>(v.assume_value());
+    }
+    if(v.has_error() && v.has_exception())
+    {
+      return failure_type<S, P>(v.assume_error().clone(), v.assume_exception(), hooks::spare_storage(&v));
+    }
+    if(v.has_exception())
+    {
+      return failure_type<S, P>(in_place_type<P>, v.assume_exception(), hooks::spare_storage(&v));
+    }
+    return failure_type<S, P>(in_place_type<S>, v.assume_error().clone(), hooks::spare_storage(&v));
+  }
+
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class S, class P, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<P>::value && (is_status_code<S>::value || is_errored_status_code<S>::value)))
+  inline basic_outcome<void, S, P, NoValuePolicy> clone(const basic_outcome<void, S, P, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<void>();
+    }
+    if(v.has_error() && v.has_exception())
+    {
+      return failure_type<S, P>(v.assume_error().clone(), v.assume_exception(), hooks::spare_storage(&v));
+    }
+    if(v.has_exception())
+    {
+      return failure_type<S, P>(in_place_type<P>, v.assume_exception(), hooks::spare_storage(&v));
+    }
+    return failure_type<S, P>(in_place_type<S>, v.assume_error().clone(), hooks::spare_storage(&v));
+  }
+
   namespace policy
   {
     template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : base

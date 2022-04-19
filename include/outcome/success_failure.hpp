@@ -76,9 +76,20 @@ inline constexpr success_type<void> success() noexcept
   return success_type<void>{};
 }
 /*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
-\effects Copies or moves the successful state supplied into the returned type sugar.
+\effects Copies the successful state supplied into the returned type sugar.
 */
-template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v, uint16_t spare_storage = 0)
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<T>::value))
+inline constexpr success_type<std::decay_t<T>> success(const T &v, uint16_t spare_storage = 0)
+{
+  return success_type<std::decay_t<T>>{v, spare_storage};
+}
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
+\effects Moves the successful state supplied into the returned type sugar.
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<T>::value))
+inline constexpr success_type<std::decay_t<T>> success(T &&v, uint16_t spare_storage = 0)
 {
   return success_type<std::decay_t<T>>{static_cast<T &&>(v), spare_storage};
 }
@@ -218,14 +229,54 @@ public:
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v, uint16_t spare_storage = 0)
+OUTCOME_TEMPLATE(class EC)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<EC>::value))
+inline constexpr failure_type<std::decay_t<EC>> failure(const EC &v, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>>{v, spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<EC>::value))
+inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v, uint16_t spare_storage = 0)
 {
   return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v), spare_storage};
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w, uint16_t spare_storage = 0)
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<EC>::value &&std::is_copy_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(const EC &v, const E &w, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{v, w, spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<EC>::value &&std::is_move_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(const EC &v, E &&w, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{v, static_cast<E &&>(w), spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<EC>::value &&std::is_copy_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, const E &w, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), w, spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<EC>::value &&std::is_move_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w, uint16_t spare_storage = 0)
 {
   return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), static_cast<E &&>(w), spare_storage};
 }
