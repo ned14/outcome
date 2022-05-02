@@ -191,12 +191,19 @@ OUTCOME_V2_NAMESPACE_END
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
 #define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...)                                                                                               \
   OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__);                                                                                                     \
-  OUTCOME_TRY_LIKELY_IF(::OUTCOME_V2_NAMESPACE::try_operation_has_value(unique));                                                                                \
-  else retstmt ::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+  OUTCOME_TRY_LIKELY_IF(::OUTCOME_V2_NAMESPACE::try_operation_has_value(unique));                                                                              \
+  else                                                                                                                                                         \
+  { /* works around ICE in GCC's coroutines implementation */                                                                                                  \
+    auto unique##_f(::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique)));                                                \
+    retstmt unique##_f;                                                                                                                                        \
+  }
 #define OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, spec, ...)                                                                                               \
   OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__);                                                                                                     \
   OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique))                                                                                \
-  retstmt ::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+  { /* works around ICE in GCC's coroutines implementation */                                                                                                  \
+    auto unique##_f(::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique)));                                                \
+    retstmt unique##_f;                                                                                                                                        \
+  }
 
 #define OUTCOME_TRY2_VAR_SECOND2(x, var) var
 #define OUTCOME_TRY2_VAR_SECOND3(x, y, ...) x y
@@ -229,20 +236,20 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s,), __VA_ARGS__)
+#define OUTCOME_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s, ), __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s,), __VA_ARGS__)
+#define OUTCOME_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s, ), __VA_ARGS__)
 
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, (s,), __VA_ARGS__)
+#define OUTCOME_CO_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, (s, ), __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s(,), __VA_ARGS__)
+#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s(, ), __VA_ARGS__)
 
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -250,7 +257,7 @@ SIGNATURE NOT RECOGNISED
 #define OUTCOME_TRYX2(unique, retstmt, ...)                                                                                                                    \
   ({                                                                                                                                                           \
     OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, deduce, __VA_ARGS__);                                                                                        \
-    ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique));                                                               \
+    ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique));                                                             \
   })
 
 /*! AWAITING HUGO JSON CONVERSION TOOL

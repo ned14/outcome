@@ -23,6 +23,11 @@ the spare storage so stack backtraces etc are also cloned.
 
 - Add type constraints to `success()` and `failure()` to disable them if they aren't available.
 
+- Work around a bug in GCC's C++ Coroutines implementation whereby one gets an ICE from `gimplify_expr`
+in any `OUTCOME_CO_TRY` taking even a mildly complex expression, which obviously is a showstopper.
+The work around assigns the failure type to a stack temporary before `co_return`-ing that
+temporary. Thanks to RVO pre-17 and copy elision since, this should add no runtime overhead.
+
 ### Bug fixes:
 
 [#261](https://github.com/ned14/outcome/issues/261)
