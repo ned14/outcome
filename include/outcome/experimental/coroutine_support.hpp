@@ -45,7 +45,11 @@ Distributed under the Boost Software License, Version 1.0.
   OUTCOME_V2_NAMESPACE_END
 
 #ifdef __cpp_exceptions
+#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("status-code/include/status-code/system_code_from_exception.hpp")
 #include "status-code/include/status-code/system_code_from_exception.hpp"
+#else
+#include <status-code/system_code_from_exception.hpp>
+#endif
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace awaitables
 {
