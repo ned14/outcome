@@ -178,7 +178,7 @@ SIGNATURE NOT RECOGNISED
   {
     if(v)
     {
-      return success();
+      return success_type<void>();
     }
     return failure_type<S>(v.assume_error().clone(), hooks::spare_storage(&v));
   }
