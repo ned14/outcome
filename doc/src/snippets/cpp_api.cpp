@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <cstring>  // for memcpy
 #include <string>
 
-#include "../../../include/outcome/experimental/status-code/include/system_code_from_exception.hpp"
+#include "../../../include/outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp"
 #include "../../../include/outcome/experimental/status_result.hpp"
 
 //! [function]
