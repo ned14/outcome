@@ -765,6 +765,20 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #endif
+#ifndef QUICKCPPLIB_DISABLE_EXECINFO
+#if defined(__EMSCRIPTEN__)
+#define QUICKCPPLIB_DISABLE_EXECINFO 1
+#endif
+#endif
+#ifndef QUICKCPPLIB_PLATFORM_NATIVE_BITLENGTH
+#if defined(__SIZEOF_POINTER__)
+#define QUICKCPPLIB_PLATFORM_NATIVE_BITLENGTH (__SIZEOF_POINTER__ * __CHAR_BIT__)
+#elif defined(_WIN64) || defined(__x86_64__) || defined(_M_X64) || defined(__aarch64__) || defined(_M_ARM64) || defined(__ia64__) || defined(_M_IA64) || defined(__ppc64__)
+#define QUICKCPPLIB_PLATFORM_NATIVE_BITLENGTH (64)
+#else
+#define QUICKCPPLIB_PLATFORM_NATIVE_BITLENGTH (32)
+#endif
+#endif
 /* MSVC capable preprocessor macro overloading
 (C) 2014-2017 Niall Douglas <http://www.nedproductions.biz/> (3 commits)
 File Created: Aug 2014
@@ -1004,9 +1018,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 30340e17c63b7bacc23c24666cf5e1648477fd85
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-04-13 17:49:02 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 30340e17
+#define OUTCOME_PREVIOUS_COMMIT_REF 90032f99503b4620f21d8160dc3af06fa343541f
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-06-16 20:06:01 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 90032f99
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -1724,9 +1738,20 @@ inline constexpr success_type<void> success() noexcept
   return success_type<void>{};
 }
 /*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
-\effects Copies or moves the successful state supplied into the returned type sugar.
+\effects Copies the successful state supplied into the returned type sugar.
 */
-template <class T> inline constexpr success_type<std::decay_t<T>> success(T &&v, uint16_t spare_storage = 0)
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<T>::value))
+inline constexpr success_type<std::decay_t<T>> success(const T &v, uint16_t spare_storage = 0)
+{
+  return success_type<std::decay_t<T>>{v, spare_storage};
+}
+/*! Returns type sugar for implicitly constructing a `basic_result<T>` with a successful state.
+\effects Moves the successful state supplied into the returned type sugar.
+*/
+OUTCOME_TEMPLATE(class T)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<T>::value))
+inline constexpr success_type<std::decay_t<T>> success(T &&v, uint16_t spare_storage = 0)
 {
   return success_type<std::decay_t<T>>{static_cast<T &&>(v), spare_storage};
 }
@@ -1850,14 +1875,54 @@ public:
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class EC> inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v, uint16_t spare_storage = 0)
+OUTCOME_TEMPLATE(class EC)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<EC>::value))
+inline constexpr failure_type<std::decay_t<EC>> failure(const EC &v, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>>{v, spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<EC>::value))
+inline constexpr failure_type<std::decay_t<EC>> failure(EC &&v, uint16_t spare_storage = 0)
 {
   return failure_type<std::decay_t<EC>>{static_cast<EC &&>(v), spare_storage};
 }
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-template <class EC, class E> inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w, uint16_t spare_storage = 0)
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<EC>::value &&std::is_copy_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(const EC &v, const E &w, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{v, w, spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<EC>::value &&std::is_move_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(const EC &v, E &&w, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{v, static_cast<E &&>(w), spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<EC>::value &&std::is_copy_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, const E &w, uint16_t spare_storage = 0)
+{
+  return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), w, spare_storage};
+}
+/*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+OUTCOME_TEMPLATE(class EC, class E)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_move_constructible<EC>::value &&std::is_move_constructible<E>::value))
+inline constexpr failure_type<std::decay_t<EC>, std::decay_t<E>> failure(EC &&v, E &&w, uint16_t spare_storage = 0)
 {
   return failure_type<std::decay_t<EC>, std::decay_t<E>>{static_cast<EC &&>(v), static_cast<E &&>(w), spare_storage};
 }
@@ -6191,7 +6256,7 @@ namespace policy
 #undef OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE
 OUTCOME_V2_NAMESPACE_END
 #endif
-#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("status-code/include/system_error2.hpp")
+#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("status-code/include/status-code/system_error2.hpp")
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -10851,6 +10916,32 @@ SIGNATURE NOT RECOGNISED
   template <class R, class S = errored_status_code<erased<typename system_code::value_type>>,
             class NoValuePolicy = policy::default_status_result_policy<R, S>> //
   using status_result = basic_result<R, S, NoValuePolicy>;
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class R, class S, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<R>::value && (is_status_code<S>::value || is_errored_status_code<S>::value)))
+  inline basic_result<R, S, NoValuePolicy> clone(const basic_result<R, S, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<R>(v.assume_value());
+    }
+    return failure_type<S>(v.assume_error().clone(), hooks::spare_storage(&v));
+  }
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class S, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(is_status_code<S>::value || is_errored_status_code<S>::value))
+  inline basic_result<void, S, NoValuePolicy> clone(const basic_result<void, S, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<void>();
+    }
+    return failure_type<S>(v.assume_error().clone(), hooks::spare_storage(&v));
+  }
 } // namespace experimental
 OUTCOME_V2_NAMESPACE_END
 #endif
@@ -10893,6 +10984,49 @@ SIGNATURE NOT RECOGNISED
   template <class R, class S = errored_status_code<erased<typename system_code::value_type>>, class P = std::exception_ptr,
             class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>> //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class R, class S, class P, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<R>::value &&std::is_copy_constructible<P>::value &&
+                                  (is_status_code<S>::value || is_errored_status_code<S>::value)))
+  inline basic_outcome<R, S, P, NoValuePolicy> clone(const basic_outcome<R, S, P, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<R>(v.assume_value());
+    }
+    if(v.has_error() && v.has_exception())
+    {
+      return failure_type<S, P>(v.assume_error().clone(), v.assume_exception(), hooks::spare_storage(&v));
+    }
+    if(v.has_exception())
+    {
+      return failure_type<S, P>(in_place_type<P>, v.assume_exception(), hooks::spare_storage(&v));
+    }
+    return failure_type<S, P>(in_place_type<S>, v.assume_error().clone(), hooks::spare_storage(&v));
+  }
+  /*! AWAITING HUGO JSON CONVERSION TOOL
+SIGNATURE NOT RECOGNISED
+*/
+  OUTCOME_TEMPLATE(class S, class P, class NoValuePolicy)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_copy_constructible<P>::value && (is_status_code<S>::value || is_errored_status_code<S>::value)))
+  inline basic_outcome<void, S, P, NoValuePolicy> clone(const basic_outcome<void, S, P, NoValuePolicy> &v)
+  {
+    if(v)
+    {
+      return success_type<void>();
+    }
+    if(v.has_error() && v.has_exception())
+    {
+      return failure_type<S, P>(v.assume_error().clone(), v.assume_exception(), hooks::spare_storage(&v));
+    }
+    if(v.has_exception())
+    {
+      return failure_type<S, P>(in_place_type<P>, v.assume_exception(), hooks::spare_storage(&v));
+    }
+    return failure_type<S, P>(in_place_type<S>, v.assume_error().clone(), hooks::spare_storage(&v));
+  }
   namespace policy
   {
     template <class T, class DomainType, class E> struct status_code_throw<T, status_code<DomainType>, E> : base
@@ -11099,8 +11233,8 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_TRYV2_UNIQUE_STORAGE2(...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED
 #define OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, ...) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRYV2_UNIQUE_STORAGE, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec) (unique, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, __VA_ARGS__)
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
-#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(::OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)); else retstmt ::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
-#define OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)) retstmt ::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))
+#define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(::OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)); else { /* works around ICE in GCC's coroutines implementation */ auto unique##_f(::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))); retstmt unique##_f; }
+#define OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)) { /* works around ICE in GCC's coroutines implementation */ auto unique##_f(::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))); retstmt unique##_f; }
 #define OUTCOME_TRY2_VAR_SECOND2(x, var) var
 #define OUTCOME_TRY2_VAR_SECOND3(x, y, ...) x y
 #define OUTCOME_TRY2_VAR(spec) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY2_VAR_SECOND, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, spec)
@@ -11125,19 +11259,19 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s,), __VA_ARGS__)
+#define OUTCOME_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s, ), __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s,), __VA_ARGS__)
+#define OUTCOME_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, return, (s, ), __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, (s,), __VA_ARGS__)
+#define OUTCOME_CO_TRYV2(s, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, (s, ), __VA_ARGS__)
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s(,), __VA_ARGS__)
+#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s(, ), __VA_ARGS__)
 #if defined(__GNUC__) || defined(__clang__)
 #define OUTCOME_TRYX2(unique, retstmt, ...) ({ OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, deduce, __VA_ARGS__); ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
 /*! AWAITING HUGO JSON CONVERSION TOOL
