@@ -6309,6 +6309,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
 #define OUTCOME_BASIC_OUTCOME_FAILURE_OBSERVERS_HPP
+#include <exception>
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace detail
 {

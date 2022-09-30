@@ -27,6 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "basic_result_storage.hpp"
 
+#include <exception>
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
