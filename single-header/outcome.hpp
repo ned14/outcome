@@ -602,7 +602,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_RUNNING_ON_VALGRIND (0)
 #ifndef QUICKCPPLIB_IN_ADDRESS_SANITIZER
 #if defined(__has_feature)
-#if __has_feature(address_sanitizer)
+#if __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
 #define QUICKCPPLIB_IN_ADDRESS_SANITIZER 1
 #endif
 #elif defined(__SANITIZE_ADDRESS__)
@@ -614,7 +614,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_IN_THREAD_SANITIZER
 #if defined(__has_feature)
-#if __has_feature(thread_sanitizer)
+#if __has_feature(thread_sanitizer) || defined(__SANITIZE_THREAD__)
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 1
 #endif
 #elif defined(__SANITIZE_THREAD__)
@@ -626,7 +626,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_IN_UNDEFINED_SANITIZER
 #if defined(__has_feature)
-#if __has_feature(undefined_behavior_sanitizer)
+#if __has_feature(undefined_behavior_sanitizer) || defined(__SANITIZE_UNDEFINED__) || (__GNUC__ <= 9 && defined(__SANITIZE_ADDRESS__))
 #define QUICKCPPLIB_IN_UNDEFINED_SANITIZER 1
 #endif
 #elif defined(__SANITIZE_UNDEFINED__) || (__GNUC__ <= 9 && defined(__SANITIZE_ADDRESS__))
@@ -654,7 +654,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef QUICKCPPLIB_SMT_PAUSE
 #if !defined(__clang__) && defined(_MSC_VER) && _MSC_VER >= 1310 && (defined(_M_IX86) || defined(_M_X64))
 extern "C" void _mm_pause();
+#if !defined(_M_ARM64EC)
 #pragma intrinsic(_mm_pause)
+#endif
 #define QUICKCPPLIB_SMT_PAUSE _mm_pause();
 #elif !defined(__c2__) && defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #define QUICKCPPLIB_SMT_PAUSE __asm__ __volatile__("rep; nop" : : : "memory");
@@ -1017,9 +1019,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 90032f99503b4620f21d8160dc3af06fa343541f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-06-16 20:06:01 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 90032f99
+#define OUTCOME_PREVIOUS_COMMIT_REF 46ef3a877785a05b1423848b14549e53f66926ba
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-09-13 17:09:18 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 46ef3a87
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))

@@ -603,7 +603,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define QUICKCPPLIB_RUNNING_ON_VALGRIND (0)
 #ifndef QUICKCPPLIB_IN_ADDRESS_SANITIZER
 #if defined(__has_feature)
-#if __has_feature(address_sanitizer)
+#if __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
 #define QUICKCPPLIB_IN_ADDRESS_SANITIZER 1
 #endif
 #elif defined(__SANITIZE_ADDRESS__)
@@ -615,7 +615,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_IN_THREAD_SANITIZER
 #if defined(__has_feature)
-#if __has_feature(thread_sanitizer)
+#if __has_feature(thread_sanitizer) || defined(__SANITIZE_THREAD__)
 #define QUICKCPPLIB_IN_THREAD_SANITIZER 1
 #endif
 #elif defined(__SANITIZE_THREAD__)
@@ -627,7 +627,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #ifndef QUICKCPPLIB_IN_UNDEFINED_SANITIZER
 #if defined(__has_feature)
-#if __has_feature(undefined_behavior_sanitizer)
+#if __has_feature(undefined_behavior_sanitizer) || defined(__SANITIZE_UNDEFINED__) || (__GNUC__ <= 9 && defined(__SANITIZE_ADDRESS__))
 #define QUICKCPPLIB_IN_UNDEFINED_SANITIZER 1
 #endif
 #elif defined(__SANITIZE_UNDEFINED__) || (__GNUC__ <= 9 && defined(__SANITIZE_ADDRESS__))
@@ -655,7 +655,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef QUICKCPPLIB_SMT_PAUSE
 #if !defined(__clang__) && defined(_MSC_VER) && _MSC_VER >= 1310 && (defined(_M_IX86) || defined(_M_X64))
 extern "C" void _mm_pause();
+#if !defined(_M_ARM64EC)
 #pragma intrinsic(_mm_pause)
+#endif
 #define QUICKCPPLIB_SMT_PAUSE _mm_pause();
 #elif !defined(__c2__) && defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #define QUICKCPPLIB_SMT_PAUSE __asm__ __volatile__("rep; nop" : : : "memory");
@@ -1018,9 +1020,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 90032f99503b4620f21d8160dc3af06fa343541f
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-06-16 20:06:01 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 90032f99
+#define OUTCOME_PREVIOUS_COMMIT_REF 46ef3a877785a05b1423848b14549e53f66926ba
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-09-13 17:09:18 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 46ef3a87
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -6256,7 +6258,6 @@ namespace policy
 #undef OUTCOME_FAIL_TO_COMPILE_OBSERVERS_MESSAGE
 OUTCOME_V2_NAMESPACE_END
 #endif
-#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("status-code/include/status-code/system_error2.hpp")
 /* Proposed SG14 status_code
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -6663,6 +6664,14 @@ namespace detail
   inline constexpr size_t cstrlen_(const char *str, size_t acc) { return (str[0] == 0) ? acc : cstrlen_(str + 1, acc + 1); }
   inline constexpr size_t cstrlen(const char *str) { return cstrlen_(str, 0); }
 #endif
+#if (__cplusplus >= 202002L || _MSVC_LANG >= 202002L) && __cpp_lib_remove_cvref >= 201711L
+  template <class T> using remove_cvref = std::remove_cvref<T>;
+#else
+  template <class T> struct remove_cvref
+  {
+    using type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+  };
+#endif
   /* A partially compliant implementation of C++20's std::bit_cast function contributed
   by Jesse Towner.
 
@@ -6831,16 +6840,6 @@ using generic_code = status_code<_generic_code_domain>;
 namespace detail
 {
   template <class StatusCode> class indirecting_domain;
-  template <class T> struct status_code_sizer
-  {
-    void *a;
-    T b;
-  };
-  template <class To, class From> struct type_erasure_is_safe
-  {
-    static constexpr bool value = traits::is_move_bitcopying<From>::value //
-                                  && (sizeof(status_code_sizer<From>) <= sizeof(status_code_sizer<To>));
-  };
   /* We are severely limited by needing to retain C++ 11 compatibility when doing
   constexpr string parsing. MSVC lets you throw exceptions within a constexpr
   evaluation context when exceptions are globally disabled, but won't let you
@@ -7474,6 +7473,7 @@ namespace detail
   };
   template <class DomainType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code_storage : public status_code<void>
   {
+    static_assert(!std::is_void<DomainType>::value, "status_code_storage<void> should never occur!");
     using _base = status_code<void>;
   public:
     //! The type of the domain.
@@ -7490,7 +7490,10 @@ namespace detail
 #endif
     // Replace the type erased implementations with type aware implementations for better codegen
     //! Return the status code domain.
-    constexpr const domain_type &domain() const noexcept { return *static_cast<const domain_type *>(this->_domain); }
+    constexpr const domain_type &domain() const noexcept
+    {
+      return *static_cast<const domain_type *>(this->_domain);
+    }
     //! Reset the code to empty.
     SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept
     {
@@ -7500,14 +7503,26 @@ namespace detail
     }
 #if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
     //! Return a reference to the `value_type`.
-    constexpr value_type &value() &noexcept { return this->_value; }
+    constexpr value_type &value() &noexcept
+    {
+      return this->_value;
+    }
     //! Return a reference to the `value_type`.
-    constexpr value_type &&value() &&noexcept { return static_cast<value_type &&>(this->_value); }
+    constexpr value_type &&value() &&noexcept
+    {
+      return static_cast<value_type &&>(this->_value);
+    }
 #endif
     //! Return a reference to the `value_type`.
-    constexpr const value_type &value() const &noexcept { return this->_value; }
+    constexpr const value_type &value() const &noexcept
+    {
+      return this->_value;
+    }
     //! Return a reference to the `value_type`.
-    constexpr const value_type &&value() const &&noexcept { return static_cast<const value_type &&>(this->_value); }
+    constexpr const value_type &&value() const &&noexcept
+    {
+      return static_cast<const value_type &&>(this->_value);
+    }
   protected:
     status_code_storage() = default;
     status_code_storage(const status_code_storage &) = default;
@@ -7536,7 +7551,31 @@ namespace detail
     {
     }
   };
+  template <class DomainType> struct has_stateful_mixin
+  {
+    static constexpr bool value = (sizeof(status_code_storage<DomainType>) != sizeof(mixins::mixin<status_code_storage<DomainType>, DomainType>));
+  };
+  template <class ToDomain, class FromDomain> struct domain_value_type_erasure_is_safe
+  {
+    using to_value_type = typename get_domain_value_type<ToDomain>::value_type;
+    using from_value_type = typename get_domain_value_type<FromDomain>::value_type;
+    static constexpr bool value = traits::is_move_bitcopying<to_value_type>::value //
+                                  && traits::is_move_bitcopying<from_value_type>::value //
+                                  && sizeof(status_code_storage<FromDomain>) <= sizeof(status_code_storage<ToDomain>) //
+                                  && !has_stateful_mixin<FromDomain>::value;
+  };
+  template <class ToDomain> struct domain_value_type_erasure_is_safe<ToDomain, void>
+  {
+    static constexpr bool value = false;
+  };
 } // namespace detail
+namespace traits
+{
+  //! Determines whether the mixin contained in `StatusCode` contains non-static member variables.
+  template <class StatusCode> using has_stateful_mixin = detail::has_stateful_mixin<typename detail::remove_cvref<StatusCode>::type::value_type>;
+  //! Determines whether the status code `From` can be type erased into the status code `To`.
+  template <class To, class From> using is_type_erasable_to = detail::domain_value_type_erasure_is_safe<typename detail::remove_cvref<To>::type::domain_type, typename detail::remove_cvref<From>::type::domain_type>;
+} // namespace traits
 /*! A lightweight, typed, status code reflecting empty, success, or failure.
 This is the main workhorse of the system_error2 library. Its characteristics reflect the value type
 set by its domain type, so if that value type is move-only or trivial, so is this.
@@ -7546,7 +7585,9 @@ If it is found, and it generates a status code compatible with this status code,
 is made available.
 
 You may mix in custom member functions and member function overrides by injecting a specialisation of
-`mixins::mixin<Base, YourDomainType>`. Your mixin must inherit from `Base`.
+`mixins::mixin<Base, YourDomainType>`. Your mixin must inherit from `Base`. Your mixin can carry state,
+but if it does, it will no longer be possible to construct erased status codes from such unerased status
+codes.
 */
 template <class DomainType> class SYSTEM_ERROR2_TRIVIAL_ABI status_code : public mixins::mixin<detail::status_code_storage<DomainType>, DomainType>
 {
@@ -7622,7 +7663,7 @@ public:
   Does not check if domains are equal.
   */
   SYSTEM_ERROR2_TEMPLATE(class ErasedType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<ErasedType, value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<domain_type, erased<ErasedType>>::value))
   constexpr explicit status_code(const status_code<erased<ErasedType>> &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : status_code(detail::erasure_cast<value_type>(v.value()))
   {
@@ -7703,15 +7744,14 @@ public:
   /***** KEEP THESE IN SYNC WITH ERRORED_STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   SYSTEM_ERROR2_TEMPLATE(class DomainType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(std::is_trivially_copyable<typename DomainType::value_type>::value //
-                                              &&detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<erased<ErasedType>, DomainType>::value))
   constexpr status_code(const status_code<DomainType> &v) noexcept // NOLINT
       : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), detail::erasure_cast<value_type>(v.value()))
   {
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
   SYSTEM_ERROR2_TEMPLATE(class DomainType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<erased<ErasedType>, DomainType>::value))
   SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept // NOLINT
       : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), detail::erasure_cast<value_type>(v.value()))
   {
@@ -7736,25 +7776,56 @@ public:
       : status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
   }
-  //! Explicit copy construction from an unknown status code. Note that this will be empty if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+  //! Explicit copy construction from an unknown status code. Note that this will throw an exception if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
   explicit SYSTEM_ERROR2_CONSTEXPR14 status_code(const status_code<void> &v) // NOLINT
       : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), value_type{})
   {
-    const auto info = this->_domain->payload_info();
-    if(info.total_size <= sizeof(*this))
+    status_code_domain::payload_info_t info{sizeof(value_type), sizeof(status_code), alignof(status_code)};
+    if(this->_domain->_do_erased_copy(*this, v, info))
     {
+      return;
+    }
+    struct _ final : public std::exception
+    {
+      virtual const char *what() const noexcept override { return "status_code: source domain's erased copy function returned failure or refusal"; }
+    };
+    throw _{};
+  }
+#endif
+  //! Tagged copy construction from an unknown status code. Note that this will be empty if its value type is not trivially copyable or would not fit into our storage or the source domain's `_do_erased_copy()` refused the copy.
+  SYSTEM_ERROR2_CONSTEXPR20 status_code(std::nothrow_t, const status_code<void> &v) noexcept // NOLINT
+      : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), value_type{})
+  {
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+    try
+#endif
+    {
+      status_code_domain::payload_info_t info{sizeof(value_type), sizeof(status_code), alignof(status_code)};
       if(this->_domain->_do_erased_copy(*this, v, info))
       {
         return;
       }
+      this->_domain = nullptr;
     }
-    this->_domain = nullptr;
+#if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
+    catch(...)
+    {
+      this->_domain = nullptr;
+    }
+#endif
   }
   /**** By rights ought to be removed in any formal standard ****/
   //! Reset the code to empty.
-  SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept { *this = status_code(); }
+  SYSTEM_ERROR2_CONSTEXPR14 void clear() noexcept
+  {
+    *this = status_code();
+  }
   //! Return the erased `value_type` by value.
-  constexpr value_type value() const noexcept { return this->_value; }
+  constexpr value_type value() const noexcept
+  {
+    return this->_value;
+  }
 };
 namespace traits
 {
@@ -8656,7 +8727,9 @@ template <class DomainType> class errored_status_code : public status_code<Domai
     }
   }
 public:
-  //! The type of the erased error code.
+  //! The type of the domain.
+  using typename _base::domain_type;
+  //! The type of the error code.
   using typename _base::value_type;
   //! The type of a reference to a message string.
   using typename _base::string_ref;
@@ -8732,11 +8805,11 @@ public:
     _check();
   }
   /*! Explicit construction from an erased status code. Available only if
-  `value_type` is trivially destructible and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
+  `value_type` is trivially copyable or move bitcopying, and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
   Does not check if domains are equal.
   */
   SYSTEM_ERROR2_TEMPLATE(class ErasedType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<ErasedType, value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<domain_type, erased<ErasedType>>::value))
   explicit errored_status_code(const status_code<erased<ErasedType>> &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : errored_status_code(detail::erasure_cast<value_type>(v.value())) // NOLINT
   {
@@ -8767,6 +8840,7 @@ template <class ErasedType> class errored_status_code<erased<ErasedType>> : publ
     }
   }
 public:
+  using domain_type = typename _base::domain_type;
   using value_type = typename _base::value_type;
   using string_ref = typename _base::string_ref;
   //! Default construction to empty
@@ -8795,8 +8869,7 @@ public:
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   SYSTEM_ERROR2_TEMPLATE(class DomainType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(std::is_trivially_copyable<typename DomainType::value_type>::value //
-                                              &&detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<erased<ErasedType>, DomainType>::value))
   errored_status_code(const status_code<DomainType> &v) noexcept
       : _base(v) // NOLINT
   {
@@ -8804,8 +8877,7 @@ public:
   }
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
   SYSTEM_ERROR2_TEMPLATE(class DomainType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(std::is_trivially_copyable<typename DomainType::value_type>::value //
-                                              &&detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<erased<ErasedType>, DomainType>::value))
   errored_status_code(const errored_status_code<DomainType> &v) noexcept
       : _base(static_cast<const status_code<DomainType> &>(v)) // NOLINT
   {
@@ -8813,7 +8885,7 @@ public:
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
   SYSTEM_ERROR2_TEMPLATE(class DomainType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<erased<ErasedType>, DomainType>::value))
   errored_status_code(status_code<DomainType> &&v) noexcept
       : _base(static_cast<status_code<DomainType> &&>(v)) // NOLINT
   {
@@ -8821,7 +8893,7 @@ public:
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
   SYSTEM_ERROR2_TEMPLATE(class DomainType) //
-  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  SYSTEM_ERROR2_TREQUIRES(SYSTEM_ERROR2_TPRED(detail::domain_value_type_erasure_is_safe<erased<ErasedType>, DomainType>::value))
   errored_status_code(errored_status_code<DomainType> &&v) noexcept
       : _base(static_cast<status_code<DomainType> &&>(v)) // NOLINT
   {
@@ -9042,6 +9114,17 @@ http://www.boost.org/LICENSE_1_0.txt)
 #endif
 #include <cstring> // for strchr and strerror_r
 SYSTEM_ERROR2_NAMESPACE_BEGIN
+// Fix for issue #48 Issue compiling on arm-none-eabi (newlib) with GNU extensions off
+#if !defined(__APPLE__) && !defined(_MSC_VER)
+namespace detail
+{
+  namespace avoid_stdio_include
+  {
+    // This returns int for non-glibc strerror_r, but glibc's is particularly weird so we retain it
+    extern "C" char *strerror_r(int errnum, char *buf, size_t buflen);
+  } // namespace avoid_stdio_include
+} // namespace detail
+#endif
 class _posix_code_domain;
 //! A POSIX error code, those returned by `errno`.
 using posix_code = status_code<_posix_code_domain>;
@@ -9069,14 +9152,14 @@ class _posix_code_domain : public status_code_domain
 #ifdef _WIN32
     strerror_s(buffer, sizeof(buffer), c);
 #elif defined(__gnu_linux__) && !defined(__ANDROID__) // handle glibc's weird strerror_r()
-    char *s = strerror_r(c, buffer, sizeof(buffer)); // NOLINT
+    char *s = detail::avoid_stdio_include::strerror_r(c, buffer, sizeof(buffer)); // NOLINT
     if(s != nullptr)
     {
       strncpy(buffer, s, sizeof(buffer) - 1); // NOLINT
       buffer[1023] = 0;
     }
 #else
-    strerror_r(c, buffer, sizeof(buffer));
+    detail::avoid_stdio_include::strerror_r(c, buffer, sizeof(buffer));
 #endif
     size_t length = strlen(buffer); // NOLINT
     auto *p = static_cast<char *>(malloc(length + 1)); // NOLINT
@@ -10814,9 +10897,6 @@ static_assert(traits::is_move_bitcopying<error>::value, "error is not move bitco
 #endif
 SYSTEM_ERROR2_NAMESPACE_END
 #endif
-#endif
-#else
-#include <status-code/system_error2.hpp>
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace trait
