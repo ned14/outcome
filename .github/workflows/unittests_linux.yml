@@ -36,7 +36,7 @@ jobs:
        sudo apt-get autoremove
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-         sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main";
+         sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main";
          sudo apt update;
          sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
