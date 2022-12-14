@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <atomic>
 #include <cassert>
+#include <exception>
 
 #if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines) || (defined(__clang__) && __cpp_coroutines)
 #ifndef OUTCOME_HAVE_NOOP_COROUTINE
