@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-04-01T01:14:54 UTC">
+<meta name="revised" content="2023-04-18T20:00:49 UTC">
 <title>Prerequisites :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2857,19 +2857,28 @@ defined.</p>
 performance improvements. Any Concepts TS or Coroutines TS implemented
 by your compiler is automatically detected and used.</p>
 
-<p>Partially working compilers (this was last updated January 2019):</p>
+<p>Known compiler issues (this was last updated April 2023):</p>
 
 <ul>
-<li>clang 3.5 - 3.9 can compile varying degrees of the test suite, the
-problem is lack of complete and unbuggy C++ 14 language support.</li>
-<li>Older point releases of GCCs 7 and 8 have internal compiler error bugs
+<li><p>clang 3.5 - 3.9 can compile varying degrees of the test suite, the
+problem is lack of complete and unbuggy C++ 14 language support.</p></li>
+
+<li><p>Older point releases of GCCs 7 and 8 have internal compiler error bugs
 in their constexpr implementation which tend to be triggered by using
 Outcome in constexpr. If you don&rsquo;t use Outcome in constexpr, you won&rsquo;t
 see these problems. If you need your GCC to not ICE, upgrade to the
-very latest point release, the constexpr ICE has been since fixed.</li>
-<li>Early editions of Visual Studio 2017 have many corner case problems.
-The latest point release, VS2017.9, only has a few known problems,
-and should be relatively unsurprising for most use cases.</li>
+very latest point release, the constexpr ICE has been since fixed.</p></li>
+
+<li><p>Early editions of Visual Studio 2017 have many corner case problems.
+From VS2017.9 onwards there remain a number of usually untroublesome corner
+case issues, but use should be relatively unsurprising for most use cases.
+Be aware that only from Visual Studio 2022 onwards are almost all corner
+case problems fixed.</p></li>
+
+<li><p>Some point releases of GCC 10 with libstdc++ 10 can induce an infinite
+template instantiation, which fails the build for some rare use cases. Earlier
+or later GCCs or different point releases of the 10 series do not have
+this issue.</p></li>
 </ul>
 
 <hr />
@@ -2908,7 +2917,7 @@ not implement enough of the C++ 14 standard library for Outcome to compile.</li>
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 25/02/2020
+        <i class='fa fa-calendar'></i> Last update on 18/04/2023
     </div>
     
 
