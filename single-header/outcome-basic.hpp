@@ -657,12 +657,12 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifdef __has_cpp_attribute
-#define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr) __has_cpp_attribute(attr)
+#define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr, edition) (__has_cpp_attribute(attr) >= (edition) && __cplusplus >= (edition))
 #else
-#define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr) (0)
+#define QUICKCPPLIB_HAS_CPP_ATTRIBUTE(attr, edition) (0)
 #endif
 #if !defined(QUICKCPPLIB_NORETURN)
-#if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(noreturn)
+#if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(noreturn, 201100)
 #define QUICKCPPLIB_NORETURN [[noreturn]]
 #elif defined(_MSC_VER)
 #define QUICKCPPLIB_NORETURN __declspec(noreturn)
@@ -678,13 +678,14 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
-#if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(nodiscard)
+#if QUICKCPPLIB_HAS_CPP_ATTRIBUTE(nodiscard, 201700) && (!defined(__GNUC__) || __cpp_concepts >= 202000L /* -fconcepts-ts and [[nodiscard]] don't mix on GCC   \
+                                                                                                          */)
 #define QUICKCPPLIB_NODISCARD [[nodiscard]]
 #elif defined(__clang__) // deliberately not GCC
 #define QUICKCPPLIB_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this
-#define QUICKCPPLIB_NODISCARD __declspec("SAL_name" "(" "\"_Must_inspect_result_\"" "," "\"\"" "," "\"2\"" ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
+#define QUICKCPPLIB_NODISCARD __declspec( "SAL_name" "(" "\"_Must_inspect_result_\"" "," "\"\"" "," "\"2\"" ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
 #endif
 #endif
 #ifndef QUICKCPPLIB_NODISCARD
@@ -995,9 +996,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 46ef3a877785a05b1423848b14549e53f66926ba
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2022-09-13 17:09:18 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 46ef3a87
+#define OUTCOME_PREVIOUS_COMMIT_REF 91dcae155b2697d9992e956e503ff07f484dddfd
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-04-18 16:46:38 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 91dcae15
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -6241,10 +6242,13 @@ OUTCOME_V2_NAMESPACE_END
 #define _OUTCOME_TRY_OVERLOAD_MACRO(name, count) _OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
 #define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
 #define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
-#ifndef OUTCOME_TRY_LIKELY_IF
-#if (__cplusplus >= 202000L || _HAS_CXX20) && (!defined(__clang__) || __clang_major__ >= 12) && (!defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 9)
+#if !defined(OUTCOME_TRY_LIKELY_IF) && defined(__has_cpp_attribute)
+#if __has_cpp_attribute(likely)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
-#elif defined(__clang__) || defined(__GNUC__)
+#endif
+#endif
+#ifndef OUTCOME_TRY_LIKELY_IF
+#if defined(__clang__) || defined(__GNUC__)
 #define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
 #else
 #define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__)

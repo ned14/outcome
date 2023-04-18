@@ -4,6 +4,17 @@ weight = 80
 +++
 
 ---
+## v2.2.7 ??? 2023 (Boost 1.83) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.7)
+
+### Enhancements:
+
+- Update the list of known compiler issues in the docs.
+
+- Update Outcome.Experimental to match latest changes requested of `status_code` by WG21.
+
+### Bug fixes:
+
+---
 ## v2.2.6 24th March 2023 (Boost 1.82) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.6)
 
 ### Enhancements:

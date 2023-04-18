@@ -20,18 +20,27 @@ performance improvements. Any Concepts TS or Coroutines TS implemented
 by your compiler is automatically detected and used.
 
 
-Partially working compilers (this was last updated January 2019):
+Known compiler issues (this was last updated April 2023):
 
 - clang 3.5 - 3.9 can compile varying degrees of the test suite, the
 problem is lack of complete and unbuggy C++ 14 language support.
+
 - Older point releases of GCCs 7 and 8 have internal compiler error bugs
 in their constexpr implementation which tend to be triggered by using
 Outcome in constexpr. If you don't use Outcome in constexpr, you won't
 see these problems. If you need your GCC to not ICE, upgrade to the
 very latest point release, the constexpr ICE has been since fixed.
+
 - Early editions of Visual Studio 2017 have many corner case problems.
-The latest point release, VS2017.9, only has a few known problems,
-and should be relatively unsurprising for most use cases.
+From VS2017.9 onwards there remain a number of usually untroublesome corner
+case issues, but use should be relatively unsurprising for most use cases.
+Be aware that only from Visual Studio 2022 onwards are almost all corner
+case problems fixed.
+
+- Some point releases of GCC 10 with libstdc++ 10 can induce an infinite
+template instantiation, which fails the build for some rare use cases. Earlier
+or later GCCs or different point releases of the 10 series do not have
+this issue.
 
 ---
 

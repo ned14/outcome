@@ -153,7 +153,7 @@ namespace experimental
   /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = errored_status_code<erased<typename system_code::value_type>>,
+  template <class R, class S = erased_errored_status_code<typename system_code::value_type>,
             class NoValuePolicy = policy::default_status_result_policy<R, S>>  //
   using status_result = basic_result<R, S, NoValuePolicy>;
 
