@@ -33,7 +33,17 @@ Distributed under the Boost Software License, Version 1.0.
 #include <cassert>
 #include <exception>
 
-#if __cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines) || (defined(__clang__) && __cpp_coroutines)
+#ifndef OUTCOME_COROUTINE_HEADER_TYPE
+#if __has_include(<coroutine>)
+#define OUTCOME_COROUTINE_HEADER_TYPE 1
+#elif __has_include(<experimental/coroutine>)
+#define OUTCOME_COROUTINE_HEADER_TYPE 2
+#else
+#define OUTCOME_COROUTINE_HEADER_TYPE 0
+#endif
+#endif
+
+#if OUTCOME_COROUTINE_HEADER_TYPE && (__cpp_impl_coroutine || (defined(_MSC_VER) && __cpp_coroutines) || (defined(__clang__) && __cpp_coroutines))
 #ifndef OUTCOME_HAVE_NOOP_COROUTINE
 #if defined(__has_builtin)
 #if __has_builtin(__builtin_coro_noop) || (!defined(__clang__) && __GNUC__ >= 10)
@@ -48,7 +58,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_HAVE_NOOP_COROUTINE 0
 #endif
 #endif
-#if __has_include(<coroutine>)
+#if OUTCOME_COROUTINE_HEADER_TYPE == 1
 #include <coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace awaitables
@@ -63,7 +73,7 @@ namespace awaitables
 }  // namespace awaitables
 OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_FOUND_COROUTINE_HEADER 1
-#elif __has_include(<experimental/coroutine>)
+#elif OUTCOME_COROUTINE_HEADER_TYPE == 2
 #include <experimental/coroutine>
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace awaitables
