@@ -16,12 +16,12 @@
 // incorrect, but because the reference test suite is testing an Expected quite far away from
 // the latest WG21 proposal paper, and we're implementing that latest edition.
 
-#if defined(__clang__) || __GNUC__ >= 7 || !defined(BOOST_MSVC) || (BOOST_MSVC > 0 && _HAS_CXX17)
-
 #include <utility>
 
 #include "../include/outcome/iostream_support.hpp"
 #include "../include/outcome/std_result.hpp"
+
+#if defined(__clang__) || __GNUC__ >= 7 || !defined(BOOST_MSVC) || (BOOST_MSVC > 0 && _HAS_CXX17)
 
 #define QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED
 #include "quickcpplib/boost/test/unit_test.hpp"
