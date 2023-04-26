@@ -1288,11 +1288,11 @@ namespace detail
           bool all_good{false};
           ~_()
           {
-            if(!all_good)
+            if(!this->all_good)
             {
               // We lost one of the values
-              a.set_have_lost_consistency(true);
-              b.set_have_lost_consistency(true);
+              this->a.set_have_lost_consistency(true);
+              this->b.set_have_lost_consistency(true);
             }
           }
         } _{_status, o._status};
@@ -1309,11 +1309,11 @@ namespace detail
           bool all_good{false};
           ~_()
           {
-            if(!all_good)
+            if(!this->all_good)
             {
               // We lost one of the values
-              a.set_have_lost_consistency(true);
-              b.set_have_lost_consistency(true);
+              this->a.set_have_lost_consistency(true);
+              this->b.set_have_lost_consistency(true);
             }
           }
         } _{_status, o._status};
@@ -1375,11 +1375,11 @@ namespace detail
         bool all_good{true};
         ~_()
         {
-          if(!all_good)
+          if(!this->all_good)
           {
             // We lost one of the values
-            a.set_have_lost_consistency(true);
-            b.set_have_lost_consistency(true);
+            this->a.set_have_lost_consistency(true);
+            this->b.set_have_lost_consistency(true);
           }
         }
       } _{_status, o._status, &_value, &o._value, &_error, &o._error};
