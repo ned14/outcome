@@ -989,14 +989,14 @@ SIGNATURE NOT RECOGNISED
       bool all_good{false};
       ~_()
       {
-        if(!all_good)
+        if(!this->all_good)
         {
           // We lost one of the values
           a._state._status.set_have_lost_consistency(true);
           b._state._status.set_have_lost_consistency(true);
           return;
         }
-        if(exceptioned)
+        if(this->exceptioned)
         {
           // The value + error swap threw an exception. Try to swap back _ptr
           try
