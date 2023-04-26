@@ -38,7 +38,6 @@ namespace hook_test
   // Use the error_code type as the ADL bridge for the hooks by creating a type here
   struct error_code : public std::error_code
   {
-    using std::error_code::error_code;
     error_code() = default;
     error_code(std::error_code ec)  // NOLINT
     : std::error_code(ec)

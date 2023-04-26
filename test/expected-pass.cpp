@@ -16,7 +16,7 @@
 // incorrect, but because the reference test suite is testing an Expected quite far away from
 // the latest WG21 proposal paper, and we're implementing that latest edition.
 
-#if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
+#if defined(__clang__) || __GNUC__ >= 7 || !defined(BOOST_MSVC) || (BOOST_MSVC > 0 && _HAS_CXX17)
 
 #include <utility>
 
