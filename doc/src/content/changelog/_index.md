@@ -14,6 +14,17 @@ weight = 80
 
 ### Bug fixes:
 
+[#273](https://github.com/ned14/outcome/issues/273)
+- Changes to other Boost libraries had caused Boost.Outcome's test suite to fail to compile for some
+compiler and C++ language configurations in recent releases. Thanks to work contributed by @alandefreitas
+and @pdimov, Boost.Outcome now CI tests a wide range of compilers and configurations and it
+is believed all those corner case issues have been fixed or worked around, for the compilers
+and configurations within that CI matrix.
+
+ Standalone Outcome's test suite was never affected, as it did not have Boost changing underneath it.
+Nevertheless, a few of the compiler parse bug workarounds will have improved compatibility there
+too for atyical toolchain choices.
+
 ---
 ## v2.2.6 24th March 2023 (Boost 1.82) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.6)
 
