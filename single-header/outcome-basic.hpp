@@ -996,9 +996,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 91dcae155b2697d9992e956e503ff07f484dddfd
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-04-18 16:46:38 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 91dcae15
+#define OUTCOME_PREVIOUS_COMMIT_REF f3cbe84e366402a65263905c48bed1d44727da5c
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-04-27 12:49:35 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f3cbe84e
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -2852,11 +2852,11 @@ namespace detail
           bool all_good{false};
           ~_()
           {
-            if(!all_good)
+            if(!this->all_good)
             {
               // We lost one of the values
-              a.set_have_lost_consistency(true);
-              b.set_have_lost_consistency(true);
+              this->a.set_have_lost_consistency(true);
+              this->b.set_have_lost_consistency(true);
             }
           }
         } _{_status, o._status};
@@ -2873,11 +2873,11 @@ namespace detail
           bool all_good{false};
           ~_()
           {
-            if(!all_good)
+            if(!this->all_good)
             {
               // We lost one of the values
-              a.set_have_lost_consistency(true);
-              b.set_have_lost_consistency(true);
+              this->a.set_have_lost_consistency(true);
+              this->b.set_have_lost_consistency(true);
             }
           }
         } _{_status, o._status};
@@ -2939,11 +2939,11 @@ namespace detail
         bool all_good{true};
         ~_()
         {
-          if(!all_good)
+          if(!this->all_good)
           {
             // We lost one of the values
-            a.set_have_lost_consistency(true);
-            b.set_have_lost_consistency(true);
+            this->a.set_have_lost_consistency(true);
+            this->b.set_have_lost_consistency(true);
           }
         }
       } _{_status, o._status, &_value, &o._value, &_error, &o._error};
@@ -5848,25 +5848,25 @@ SIGNATURE NOT RECOGNISED
       bool all_good{false};
       ~_()
       {
-        if(!all_good)
+        if(!this->all_good)
         {
           // We lost one of the values
-          a._state._status.set_have_lost_consistency(true);
-          b._state._status.set_have_lost_consistency(true);
+          this->a._state._status.set_have_lost_consistency(true);
+          this->b._state._status.set_have_lost_consistency(true);
           return;
         }
-        if(exceptioned)
+        if(this->exceptioned)
         {
           // The value + error swap threw an exception. Try to swap back _ptr
           try
           {
-            strong_swap(all_good, a._ptr, b._ptr);
+            strong_swap(this->all_good, this->a._ptr, this->b._ptr);
           }
           catch(...)
           {
             // We lost one of the values
-            a._state._status.set_have_lost_consistency(true);
-            b._state._status.set_have_lost_consistency(true);
+            this->a._state._status.set_have_lost_consistency(true);
+            this->b._state._status.set_have_lost_consistency(true);
             // throw away second exception
           }
           // Prevent has_value() == has_error() or has_value() == has_exception()
@@ -5882,8 +5882,8 @@ SIGNATURE NOT RECOGNISED
               t->_state._status.set_have_error(true).set_have_lost_consistency(true);
             }
           };
-          check(&a);
-          check(&b);
+          check(&this->a);
+          check(&this->b);
         }
       }
     } _{*this, o};
