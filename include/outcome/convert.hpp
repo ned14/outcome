@@ -32,43 +32,55 @@ OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace concepts
 {
 #if defined(__cpp_concepts)
-#if (defined(_MSC_VER) || defined(__clang__) || (defined(__GNUC__) && __cpp_concepts >= 201707) || OUTCOME_FORCE_STD_CXX_CONCEPTS) && !OUTCOME_FORCE_LEGACY_GCC_CXX_CONCEPTS
+#if(defined(_MSC_VER) || defined(__clang__) || (defined(__GNUC__) && __cpp_concepts >= 201707) || OUTCOME_FORCE_STD_CXX_CONCEPTS) &&                           \
+!OUTCOME_FORCE_LEGACY_GCC_CXX_CONCEPTS
 #define OUTCOME_GCC6_CONCEPT_BOOL
 #else
+#ifndef OUTCOME_SUPPRESS_LEGACY_CONCEPTS_WARNING
+#warning "WARNING: Legacy GCC concepts are known to fail to compile in a number of important situations!"
+#endif
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #endif
   namespace detail
   {
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL convertible = std::is_convertible<T, U>::value;
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL base_of = std::is_base_of<T, U>::value;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> && detail::SameHelper<U, T>;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL convertible = std::is_convertible<T, U>::value;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL base_of = std::is_base_of<T, U>::value;
   }  // namespace detail
 
 
   /* The `value_or_none` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_none = requires(U a)
-  {
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL value_or_none = requires(U a) {
     {
       a.has_value()
-    }
-    ->detail::same_as<bool>;
-    {a.value()};
+    } -> detail::same_as<bool>;
+    {
+      a.value()
+    };
   };
   /* The `value_or_error` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_error = requires(U a)
-  {
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL value_or_error = requires(U a) {
     {
       a.has_value()
-    }
-    ->detail::same_as<bool>;
-    {a.value()};
-    {a.error()};
+    } -> detail::same_as<bool>;
+    {
+      a.value()
+    };
+    {
+      a.error()
+    };
   };
 
 #else
@@ -109,8 +121,10 @@ namespace convert
 {
 #if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
 #if defined(__cpp_concepts)
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = concepts::value_or_none<U>;
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = concepts::value_or_error<U>;
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = concepts::value_or_none<U>;
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = concepts::value_or_error<U>;
 #else
   template <class U> static constexpr bool ValueOrNone = concepts::value_or_none<U>;
   template <class U> static constexpr bool ValueOrError = concepts::value_or_error<U>;
@@ -142,8 +156,8 @@ type definition  value_or_error. Potential doc page: NOT FOUND
     static constexpr bool enable_outcome_inputs = false;
     OUTCOME_TEMPLATE(class X)
     OUTCOME_TREQUIRES(
-    OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value  //
-                  &&concepts::value_or_error<U>            //
+    OUTCOME_TPRED(std::is_same<U, std::decay_t<X>>::value                                                                                       //
+                  &&concepts::value_or_error<U>                                                                                                 //
                   && (std::is_void<typename std::decay_t<X>::value_type>::value ||
                       OUTCOME_V2_NAMESPACE::detail::is_explicitly_constructible<typename T::value_type, typename std::decay_t<X>::value_type>)  //
                   &&(std::is_void<typename std::decay_t<X>::error_type>::value ||

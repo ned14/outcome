@@ -1,5 +1,5 @@
 # Outcome cmake
-# (C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2023 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -103,8 +103,8 @@ endif()
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
 
-# If we have concepts, enable those for both myself and all inclusions
-apply_cxx_concepts_to(INTERFACE outcome_hl)
+# If we have standard concepts, enable those for both myself and all inclusions
+apply_cxx_concepts_to(INTERFACE outcome_hl REQUIRE_STD_CONCEPTS)
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)

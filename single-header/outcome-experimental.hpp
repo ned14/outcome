@@ -1021,9 +1021,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f3cbe84e366402a65263905c48bed1d44727da5c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-04-27 12:49:35 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f3cbe84e
+#define OUTCOME_PREVIOUS_COMMIT_REF 8131678356386003aa10b1cde2c0ff274579acdd
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-04-27 13:52:03 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 81316783
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -3449,38 +3449,49 @@ namespace concepts
 #if (defined(_MSC_VER) || defined(__clang__) || (defined(__GNUC__) && __cpp_concepts >= 201707) || OUTCOME_FORCE_STD_CXX_CONCEPTS) && !OUTCOME_FORCE_LEGACY_GCC_CXX_CONCEPTS
 #define OUTCOME_GCC6_CONCEPT_BOOL
 #else
+#ifndef OUTCOME_SUPPRESS_LEGACY_CONCEPTS_WARNING
+#warning "WARNING: Legacy GCC concepts are known to fail to compile in a number of important situations!"
+#endif
 #define OUTCOME_GCC6_CONCEPT_BOOL bool
 #endif
   namespace detail
   {
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> &&detail::SameHelper<U, T>;
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL convertible = std::is_convertible<T, U>::value;
-    template <class T, class U> concept OUTCOME_GCC6_CONCEPT_BOOL base_of = std::is_base_of<T, U>::value;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL SameHelper = std::is_same<T, U>::value;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL same_as = detail::SameHelper<T, U> && detail::SameHelper<U, T>;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL convertible = std::is_convertible<T, U>::value;
+    template <class T, class U>
+    concept OUTCOME_GCC6_CONCEPT_BOOL base_of = std::is_base_of<T, U>::value;
   } // namespace detail
   /* The `value_or_none` concept.
   \requires That `U::value_type` exists and that `std::declval<U>().has_value()` returns a `bool` and `std::declval<U>().value()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_none = requires(U a)
-  {
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL value_or_none = requires(U a) {
     {
       a.has_value()
-    }
-    ->detail::same_as<bool>;
-    {a.value()};
+    } -> detail::same_as<bool>;
+    {
+      a.value()
+    };
   };
   /* The `value_or_error` concept.
   \requires That `U::value_type` and `U::error_type` exist;
   that `std::declval<U>().has_value()` returns a `bool`, `std::declval<U>().value()` and  `std::declval<U>().error()` exists.
   */
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL value_or_error = requires(U a)
-  {
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL value_or_error = requires(U a) {
     {
       a.has_value()
-    }
-    ->detail::same_as<bool>;
-    {a.value()};
-    {a.error()};
+    } -> detail::same_as<bool>;
+    {
+      a.value()
+    };
+    {
+      a.error()
+    };
   };
 #else
   namespace detail
@@ -3518,8 +3529,10 @@ namespace convert
 {
 #if OUTCOME_ENABLE_LEGACY_SUPPORT_FOR < 220
 #if defined(__cpp_concepts)
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = concepts::value_or_none<U>;
-  template <class U> concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = concepts::value_or_error<U>;
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrNone = concepts::value_or_none<U>;
+  template <class U>
+  concept OUTCOME_GCC6_CONCEPT_BOOL ValueOrError = concepts::value_or_error<U>;
 #else
   template <class U> static constexpr bool ValueOrNone = concepts::value_or_none<U>;
   template <class U> static constexpr bool ValueOrError = concepts::value_or_error<U>;
@@ -7225,10 +7238,10 @@ protected:
     return true;
   } // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
-  SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept // NOLINT
+  SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_erased_destroy(status_code<void> &code, payload_info_t info) const noexcept // NOLINT
   {
     (void) code;
-    (void) bytes;
+    (void) info;
   }
 };
 SYSTEM_ERROR2_NAMESPACE_END
@@ -7526,18 +7539,18 @@ namespace detail
     {
       this->_value.~value_type();
       this->_domain = nullptr;
-      new(&this->_value) value_type();
+      new(std::addressof(this->_value)) value_type();
     }
 #if __cplusplus >= 201400 || _MSC_VER >= 1910 /* VS2017 */
     //! Return a reference to the `value_type`.
-    constexpr value_type &value() &noexcept { return this->_value; }
+    constexpr value_type &value() & noexcept { return this->_value; }
     //! Return a reference to the `value_type`.
-    constexpr value_type &&value() &&noexcept { return static_cast<value_type &&>(this->_value); }
+    constexpr value_type &&value() && noexcept { return static_cast<value_type &&>(this->_value); }
 #endif
     //! Return a reference to the `value_type`.
-    constexpr const value_type &value() const &noexcept { return this->_value; }
+    constexpr const value_type &value() const & noexcept { return this->_value; }
     //! Return a reference to the `value_type`.
-    constexpr const value_type &&value() const &&noexcept { return static_cast<const value_type &&>(this->_value); }
+    constexpr const value_type &&value() const && noexcept { return static_cast<const value_type &&>(this->_value); }
   protected:
     status_code_storage() = default;
     status_code_storage(const status_code_storage &) = default;
@@ -7746,7 +7759,8 @@ public:
   {
     if(nullptr != this->_domain)
     {
-      this->_domain->_do_erased_destroy(*this, sizeof(*this));
+      status_code_domain::payload_info_t info{sizeof(value_type), sizeof(status_code), alignof(status_code)};
+      this->_domain->_do_erased_destroy(*this, info);
     }
   }
   //! Return a copy of the erased code by asking the domain to perform the erased copy.
@@ -7779,6 +7793,13 @@ public:
   SYSTEM_ERROR2_CONSTEXPR14 status_code(status_code<DomainType> &&v) noexcept // NOLINT
       : _base(typename _base::_value_type_constructor{}, v._domain_ptr(), detail::erasure_cast<value_type>(v.value()))
   {
+    union
+    {
+      int a;
+      typename DomainType::value_type b;
+    };
+    new(std::addressof(b)) typename DomainType::value_type(static_cast<status_code<DomainType> &&>(v).value());
+    // deliberately do not destruct b
     v._domain = nullptr;
   }
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
