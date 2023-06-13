@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-06-08T16:53:40 UTC">
+<meta name="revised" content="2023-06-13T16:56:48 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2869,6 +2869,12 @@ and configurations within that CI matrix.</p>
 Nevertheless, a few of the compiler parse bug workarounds will have improved compatibility there
 too for atyical toolchain choices.</p>
 
+<ul>
+<li>Experimental.Outcome now supports big endian architectures. Implementation for them simply wasn&rsquo;t done
+before under the assumption that nobody would be using Experimental.Outcome on big endian architectures.
+Turns out that was a wrong assumption!</li>
+</ul>
+
 <hr />
 
 <h2 id="v2-2-6-24th-march-2023-boost-1-82-release-https-github-com-ned14-outcome-releases-tag-v2-2-6">v2.2.6 24th March 2023 (Boost 1.82) <a href="https://github.com/ned14/outcome/releases/tag/v2.2.6">[release]</a></h2>
@@ -3523,7 +3529,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 27/04/2023
+        <i class='fa fa-calendar'></i> Last update on 13/06/2023
     </div>
     
 
