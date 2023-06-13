@@ -25,6 +25,10 @@ and configurations within that CI matrix.
 Nevertheless, a few of the compiler parse bug workarounds will have improved compatibility there
 too for atyical toolchain choices.
 
+- Experimental.Outcome now supports big endian architectures. Implementation for them simply wasn't done
+before under the assumption that nobody would be using Experimental.Outcome on big endian architectures.
+Turns out that was a wrong assumption!
+
 ---
 ## v2.2.6 24th March 2023 (Boost 1.82) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.6)
 
