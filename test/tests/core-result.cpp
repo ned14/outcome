@@ -255,6 +255,42 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
       explicit udt3(int /*unused*/, const char * /*unused*/, std::nullptr_t /*unused*/) {}
       ~udt3() = default;
     };
+    // Trivial with custom operator&
+    struct udt4
+    {
+      int _v{0};
+      udt4() = default;
+      udt4(udt4 &&) = default;
+      udt4(const udt4 &) = default;
+      udt4 &operator=(udt4 &&) = default;
+      udt4 &operator=(const udt4 &) = default;
+      void operator&() {}
+      ~udt4() = default;
+    };
+    // Non-trivial with custom operator&
+    struct udt5
+    {
+      int _v{0};
+      udt5() = default;
+      udt5(int v) : _v(v) {}
+      udt5(udt5 &&o) noexcept : _v(o._v) {}
+      udt5(const udt5 &o)  // NOLINT
+      : _v(o._v)
+      {
+      }
+      udt5 &operator=(udt5 &&o) noexcept
+      {
+        _v = o._v;
+        return *this;
+      }
+      udt5 &operator=(const udt5 &o)  // NOLINT
+      {
+        _v = o._v;
+        return *this;
+      }
+      void operator&() {}
+      ~udt5() { _v = 0; }
+    };
 
 
     result<int> a(5);
@@ -334,6 +370,39 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / result, "Tests that the result works as int
     result<udt3> i(ENOMEM, std::generic_category());
     BOOST_CHECK(h.has_value());
     BOOST_CHECK(i.has_error());
+
+    // Test udt with custom operator&
+    udt4 j0;
+    result<udt4> j1(in_place_type<udt4>);
+    result<udt4> j2(j0);
+    result<udt4> j3(j1);
+    result<udt4> j4(std::move(j0));
+    result<udt4> j5(std::move(j1));
+    j2 = j0;
+    j2 = j1;
+    j2 = std::move(j0);
+    j2 = std::move(j1);
+    j1.swap(j2);
+
+    udt5 k0;
+    result<udt5> k1(in_place_type<udt5>);
+    result<udt5> k2(k0);
+    result<udt5> k3(k1);
+    result<udt5> k4(std::move(k0));
+    result<udt5> k5(std::move(k1));
+    k2 = k0;
+    k2 = k1;
+    k2 = std::move(k0);
+    k2 = std::move(k1);
+    k1.swap(k2);
+
+    result<void> k6(in_place_type<void>);
+    result<udt5> k7(k6);
+    result<udt5> k8(std::move(k6));
+
+    result<int, void> k9(in_place_type<int>);
+    result<udt5, int> k10(k9);
+    result<udt5, int> k11(std::move(k9));
   }
 
   // Test direct use of error code enum works
