@@ -11,6 +11,12 @@ weight = 80
 - Update the list of known compiler issues in the docs.
 
 - Update Outcome.Experimental to match latest changes requested of `status_code` by WG21.
+This as usual will cause minor breakage due to LEWG renaming of things.
+
+- Outcome previously took addresses of things not using `std::addressof()`, and until now
+nobody complained because custom `operator&` which doesn't return an address is an
+abomination not used in much modern C++. But finally someone did complain, so it is fixed
+for both normal Outcome and Experimental.Outcome.
 
 ### Bug fixes:
 

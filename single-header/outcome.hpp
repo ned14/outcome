@@ -1020,9 +1020,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 3aac409501c9ecc770d175aa7f4597fea9527b80
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-06-28 11:31:22 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 3aac4095
+#define OUTCOME_PREVIOUS_COMMIT_REF c8853a277f18f83ce3614e8774b2a30e46d7dbe7
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-06-28 11:36:53 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE c8853a27
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -3457,11 +3457,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        new(std::addressof(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        new(std::addressof(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -3474,11 +3474,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) _value_type_(o._value); // NOLINT
+        new(std::addressof(_value)) _value_type_(o._value); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) _error_type_(o._error); // NOLINT
+        new(std::addressof(_error)) _error_type_(o._error); // NOLINT
       }
       _status = o._status;
     }
@@ -3582,11 +3582,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) _value_type_(); // NOLINT
+        new(std::addressof(_value)) _value_type_(); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) _error_type_(o._error); // NOLINT
+        new(std::addressof(_error)) _error_type_(o._error); // NOLINT
       }
       _status = o._status;
     }
@@ -3597,11 +3597,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) _value_type_(); // NOLINT
+        new(std::addressof(_value)) _value_type_(); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        new(std::addressof(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -3618,11 +3618,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) _value_type_(o._value); // NOLINT
+        new(std::addressof(_value)) _value_type_(o._value); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) _error_type_(); // NOLINT
+        new(std::addressof(_error)) _error_type_(); // NOLINT
       }
       _status = o._status;
     }
@@ -3633,11 +3633,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        new(std::addressof(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(&_error) _error_type_(); // NOLINT
+        new(std::addressof(_error)) _error_type_(); // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -3723,7 +3723,7 @@ namespace detail
       if(_status.have_value() && !o._status.have_error())
       {
         // Move construct me into other
-        new(&o._value) _value_type_(static_cast<_value_type_ &&>(_value)); // NOLINT
+        new(std::addressof(o._value)) _value_type_(static_cast<_value_type_ &&>(_value)); // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           this->_value.~value_type(); // NOLINT
@@ -3734,7 +3734,7 @@ namespace detail
       if(o._status.have_value() && !_status.have_error())
       {
         // Move construct other into me
-        new(&_value) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        new(std::addressof(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           o._value.~value_type(); // NOLINT
@@ -3745,7 +3745,7 @@ namespace detail
       if(_status.have_error() && !o._status.have_value())
       {
         // Move construct me into other
-        new(&o._error) _error_type_(static_cast<_error_type_ &&>(_error)); // NOLINT
+        new(std::addressof(o._error)) _error_type_(static_cast<_error_type_ &&>(_error)); // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           this->_error.~error_type(); // NOLINT
@@ -3756,7 +3756,7 @@ namespace detail
       if(o._status.have_error() && !_status.have_value())
       {
         // Move construct other into me
-        new(&_error) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        new(std::addressof(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           o._error.~error_type(); // NOLINT
@@ -3780,7 +3780,7 @@ namespace detail
             this->b.set_have_lost_consistency(true);
           }
         }
-      } _{_status, o._status, &_value, &o._value, &_error, &o._error};
+      } _{_status, o._status, std::addressof(_value), std::addressof(o._value), std::addressof(_error), std::addressof(o._error)};
       if(_status.have_value() && o._status.have_error())
       {
         strong_placement(_.all_good, _.o_value, _.value, [&_] { //
@@ -3905,7 +3905,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
+        move_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3922,7 +3922,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
+        move_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3933,7 +3933,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        move_assign_to_empty<_error_type_>(&this->_error, &o._error);
+        move_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3944,7 +3944,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        move_assign_to_empty<_value_type_>(&this->_value, &o._value);
+        move_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -4002,7 +4002,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
+        copy_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
         this->_status = o._status;
         return *this;
       }
@@ -4017,7 +4017,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
+        copy_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
         this->_status = o._status;
         return *this;
       }
@@ -4027,7 +4027,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        copy_assign_to_empty<_error_type_>(&this->_error, &o._error);
+        copy_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
         this->_status = o._status;
         return *this;
       }
@@ -4037,7 +4037,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        copy_assign_to_empty<_value_type_>(&this->_value, &o._value);
+        copy_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
         this->_status = o._status;
         return *this;
       }
@@ -7744,12 +7744,12 @@ namespace detail
     v._status.spare_storage_value = y;
     if(v._status.have_value())
     {
-      new(&v._value) decltype(v._value)(); // NOLINT
+      new(std::addressof(v._value)) decltype(v._value)(); // NOLINT
       s >> v._value; // NOLINT
     }
     if(v._status.have_error())
     {
-      new(&v._error) decltype(v._error)(); // NOLINT
+      new(std::addressof(v._error)) decltype(v._error)(); // NOLINT
       s >> v._error; // NOLINT
     }
     return s;
@@ -7765,7 +7765,7 @@ namespace detail
     v._status.spare_storage_value = y;
     if(v._status.have_error())
     {
-      new(&v._error) decltype(v._error)(); // NOLINT
+      new(std::addressof(v._error)) decltype(v._error)(); // NOLINT
       s >> v._error; // NOLINT
     }
     return s;
@@ -7781,7 +7781,7 @@ namespace detail
     v._status.spare_storage_value = y;
     if(v._status.have_value())
     {
-      new(&v._value) decltype(v._value)(); // NOLINT
+      new(std::addressof(v._value)) decltype(v._value)(); // NOLINT
       s >> v._value; // NOLINT
     }
     return s;
