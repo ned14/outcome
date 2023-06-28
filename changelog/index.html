@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-06-28T12:11:07 UTC">
+<meta name="revised" content="2023-06-28T21:25:30 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2853,7 +2853,13 @@
 <ul>
 <li><p>Update the list of known compiler issues in the docs.</p></li>
 
-<li><p>Update Outcome.Experimental to match latest changes requested of <code>status_code</code> by WG21.</p></li>
+<li><p>Update Outcome.Experimental to match latest changes requested of <code>status_code</code> by WG21.
+This as usual will cause minor breakage due to LEWG renaming of things.</p></li>
+
+<li><p>Outcome previously took addresses of things not using <code>std::addressof()</code>, and until now
+nobody complained because custom <code>operator&amp;</code> which doesn&rsquo;t return an address is an
+abomination not used in much modern C++. But finally someone did complain, so it is fixed
+for both normal Outcome and Experimental.Outcome.</p></li>
 </ul>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
@@ -3529,7 +3535,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 13/06/2023
+        <i class='fa fa-calendar'></i> Last update on 28/06/2023
     </div>
     
 
