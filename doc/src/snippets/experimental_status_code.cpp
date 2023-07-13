@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__GNUC__) || __GNUC__ > 6  // GCC 6 chokes on this
 
 #include "../../../include/outcome/experimental/status_result.hpp"
+#include "../../../include/outcome/experimental/status-code/include/status-code/nested_status_code.hpp"
 
 /* Original note to WG21:
 
@@ -155,7 +156,7 @@ inline constexpr const _file_io_error_domain &_file_io_error_domain::get()
 // is guaranteed to do nothing.
 inline outcome_e::system_code make_status_code(file_io_error v)
 {
-  // `make_status_code_ptr()` dynamically allocates memory to store an
+  // `make_nested_status_code()` dynamically allocates memory to store an
   // instance of `file_io_error`, then returns a status code whose domain
   // specifies that its value type is a pointer to `file_io_error`. The
   // domain is a templated instance which indirects all observers of the
@@ -165,8 +166,8 @@ inline outcome_e::system_code make_status_code(file_io_error v)
   // by definition fits into `intptr_t` and is trivially copyable.
   // Therefore `system_code` (which is also a type alias to
   // `status_code<erased<intptr_t>>`) is happy to implicitly construct
-  // from the status code returned by `make_status_code_ptr()`.
-  return make_status_code_ptr(std::move(v));
+  // from the status code returned by `make_nested_status_code()`.
+  return make_nested_status_code(std::move(v));
 }
 //! [implicit_conversion]
 

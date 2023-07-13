@@ -141,6 +141,7 @@ if(NOT PROJECT_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
     make_single_header(outcome_hl-pp-experimental
                        "${CMAKE_CURRENT_SOURCE_DIR}/single-header/outcome-experimental.hpp"
                        "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status_outcome.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status-code/include/status-code/nested_status_code.hpp"
                        "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/try.hpp")
   endif()
 endif()
