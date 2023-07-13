@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-07-01T01:45:54 UTC">
+<meta name="revised" content="2023-07-13T12:35:07 UTC">
 <title>Implicit conversion :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2880,7 +2880,7 @@ custom status code as input, and returns an <code>error</code>:</p>
 </span><span class="c1">// is guaranteed to do nothing.
 </span><span class="c1"></span><span class="kr">inline</span> <span class="n">outcome_e</span><span class="o">::</span><span class="n">system_code</span> <span class="n">make_status_code</span><span class="p">(</span><span class="n">file_io_error</span> <span class="n">v</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="c1">// `make_status_code_ptr()` dynamically allocates memory to store an
+  <span class="c1">// `make_nested_status_code()` dynamically allocates memory to store an
 </span><span class="c1"></span>  <span class="c1">// instance of `file_io_error`, then returns a status code whose domain
 </span><span class="c1"></span>  <span class="c1">// specifies that its value type is a pointer to `file_io_error`. The
 </span><span class="c1"></span>  <span class="c1">// domain is a templated instance which indirects all observers of the
@@ -2890,10 +2890,10 @@ custom status code as input, and returns an <code>error</code>:</p>
 </span><span class="c1"></span>  <span class="c1">// by definition fits into `intptr_t` and is trivially copyable.
 </span><span class="c1"></span>  <span class="c1">// Therefore `system_code` (which is also a type alias to
 </span><span class="c1"></span>  <span class="c1">// `status_code&lt;erased&lt;intptr_t&gt;&gt;`) is happy to implicitly construct
-</span><span class="c1"></span>  <span class="c1">// from the status code returned by `make_status_code_ptr()`.
-</span><span class="c1"></span>  <span class="k">return</span> <span class="n">make_status_code_ptr</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>
+</span><span class="c1"></span>  <span class="c1">// from the status code returned by `make_nested_status_code()`.
+</span><span class="c1"></span>  <span class="k">return</span> <span class="n">make_nested_status_code</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>
 <span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L146" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L147" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>We are now ready to use Experimental Outcome!</p>
