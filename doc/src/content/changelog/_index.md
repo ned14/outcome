@@ -15,8 +15,9 @@ This as usual will cause minor breakage due to LEWG renaming of things.
 
 - Outcome previously took addresses of things not using `std::addressof()`, and until now
 nobody complained because custom `operator&` which doesn't return an address is an
-abomination not used in much modern C++. But finally someone did complain, so it is fixed
-for both normal Outcome and Experimental.Outcome.
+abomination not used in much modern C++. But finally someone did complain, so
+for both normal Outcome and Experimental.Outcome, if you set `OUTCOME_USE_STD_ADDRESSOF = 1`,
+Outcome will use `std::addressof()`
 
 ### Bug fixes:
 

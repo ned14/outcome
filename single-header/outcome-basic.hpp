@@ -996,9 +996,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 44da28c59d85f2245230931b6c25725b679b556c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-06-28 21:21:35 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 44da28c5
+#define OUTCOME_PREVIOUS_COMMIT_REF 06da8aa6452ede5600af3c4ed4781ebd631149f9
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-07-15 10:37:16 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 06da8aa6
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -1058,6 +1058,12 @@ SIGNATURE NOT RECOGNISED
 */
 template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
+#endif
+#if OUTCOME_USE_STD_ADDRESSOF
+#include <memory> // for std::addressof
+#define OUTCOME_ADDRESS_OF(...) std::addressof(__VA_ARGS__)
+#else
+#define OUTCOME_ADDRESS_OF(...) (&__VA_ARGS__)
 #endif
 #ifndef OUTCOME_TRIVIAL_ABI
 #if 0L || __clang_major__ >= 7
@@ -2623,11 +2629,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(std::addressof(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(std::addressof(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -2640,11 +2646,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(std::addressof(_value)) _value_type_(o._value); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(o._value); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(std::addressof(_error)) _error_type_(o._error); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(o._error); // NOLINT
       }
       _status = o._status;
     }
@@ -2748,11 +2754,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(std::addressof(_value)) _value_type_(); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(std::addressof(_error)) _error_type_(o._error); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(o._error); // NOLINT
       }
       _status = o._status;
     }
@@ -2763,11 +2769,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(std::addressof(_value)) _value_type_(); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(std::addressof(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -2784,11 +2790,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(std::addressof(_value)) _value_type_(o._value); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(o._value); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(std::addressof(_error)) _error_type_(); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(); // NOLINT
       }
       _status = o._status;
     }
@@ -2799,11 +2805,11 @@ namespace detail
     {
       if(o._status.have_value())
       {
-        new(std::addressof(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
       }
       else if(o._status.have_error())
       {
-        new(std::addressof(_error)) _error_type_(); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(); // NOLINT
       }
       _status = o._status;
       o._status.set_have_moved_from(true);
@@ -2889,7 +2895,7 @@ namespace detail
       if(_status.have_value() && !o._status.have_error())
       {
         // Move construct me into other
-        new(std::addressof(o._value)) _value_type_(static_cast<_value_type_ &&>(_value)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(o._value)) _value_type_(static_cast<_value_type_ &&>(_value)); // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           this->_value.~value_type(); // NOLINT
@@ -2900,7 +2906,7 @@ namespace detail
       if(o._status.have_value() && !_status.have_error())
       {
         // Move construct other into me
-        new(std::addressof(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_value)) _value_type_(static_cast<_value_type_ &&>(o._value)); // NOLINT
         if(!trait::is_move_bitcopying<value_type>::value)
         {
           o._value.~value_type(); // NOLINT
@@ -2911,7 +2917,7 @@ namespace detail
       if(_status.have_error() && !o._status.have_value())
       {
         // Move construct me into other
-        new(std::addressof(o._error)) _error_type_(static_cast<_error_type_ &&>(_error)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(o._error)) _error_type_(static_cast<_error_type_ &&>(_error)); // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           this->_error.~error_type(); // NOLINT
@@ -2922,7 +2928,7 @@ namespace detail
       if(o._status.have_error() && !_status.have_value())
       {
         // Move construct other into me
-        new(std::addressof(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
+        new(OUTCOME_ADDRESS_OF(_error)) _error_type_(static_cast<_error_type_ &&>(o._error)); // NOLINT
         if(!trait::is_move_bitcopying<error_type>::value)
         {
           o._error.~error_type(); // NOLINT
@@ -2946,7 +2952,7 @@ namespace detail
             this->b.set_have_lost_consistency(true);
           }
         }
-      } _{_status, o._status, std::addressof(_value), std::addressof(o._value), std::addressof(_error), std::addressof(o._error)};
+      } _{_status, o._status, OUTCOME_ADDRESS_OF(_value), OUTCOME_ADDRESS_OF(o._value), OUTCOME_ADDRESS_OF(_error), OUTCOME_ADDRESS_OF(o._error)};
       if(_status.have_value() && o._status.have_error())
       {
         strong_placement(_.all_good, _.o_value, _.value, [&_] { //
@@ -3071,7 +3077,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        move_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
+        move_assign_to_empty<_value_type_>(OUTCOME_ADDRESS_OF(this->_value), OUTCOME_ADDRESS_OF(o._value));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3088,7 +3094,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        move_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
+        move_assign_to_empty<_error_type_>(OUTCOME_ADDRESS_OF(this->_error), OUTCOME_ADDRESS_OF(o._error));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3099,7 +3105,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        move_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
+        move_assign_to_empty<_error_type_>(OUTCOME_ADDRESS_OF(this->_error), OUTCOME_ADDRESS_OF(o._error));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3110,7 +3116,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        move_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
+        move_assign_to_empty<_value_type_>(OUTCOME_ADDRESS_OF(this->_value), OUTCOME_ADDRESS_OF(o._value));
         this->_status = o._status;
         o._status.set_have_moved_from(true);
         return *this;
@@ -3168,7 +3174,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_value())
       {
-        copy_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
+        copy_assign_to_empty<_value_type_>(OUTCOME_ADDRESS_OF(this->_value), OUTCOME_ADDRESS_OF(o._value));
         this->_status = o._status;
         return *this;
       }
@@ -3183,7 +3189,7 @@ namespace detail
       }
       if(!this->_status.have_value() && !this->_status.have_error() && o._status.have_error())
       {
-        copy_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
+        copy_assign_to_empty<_error_type_>(OUTCOME_ADDRESS_OF(this->_error), OUTCOME_ADDRESS_OF(o._error));
         this->_status = o._status;
         return *this;
       }
@@ -3193,7 +3199,7 @@ namespace detail
         {
           this->_value.~_value_type_(); // NOLINT
         }
-        copy_assign_to_empty<_error_type_>(std::addressof(this->_error), std::addressof(o._error));
+        copy_assign_to_empty<_error_type_>(OUTCOME_ADDRESS_OF(this->_error), OUTCOME_ADDRESS_OF(o._error));
         this->_status = o._status;
         return *this;
       }
@@ -3203,7 +3209,7 @@ namespace detail
         {
           this->_error.~_error_type_(); // NOLINT
         }
-        copy_assign_to_empty<_value_type_>(std::addressof(this->_value), std::addressof(o._value));
+        copy_assign_to_empty<_value_type_>(OUTCOME_ADDRESS_OF(this->_value), OUTCOME_ADDRESS_OF(o._value));
         this->_status = o._status;
         return *this;
       }

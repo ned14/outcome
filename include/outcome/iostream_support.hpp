@@ -82,12 +82,12 @@ namespace detail
     v._status.spare_storage_value = y;
     if(v._status.have_value())
     {
-      new(std::addressof(v._value)) decltype(v._value)();  // NOLINT
+      new(OUTCOME_ADDRESS_OF(v._value)) decltype(v._value)();  // NOLINT
       s >> v._value;                                       // NOLINT
     }
     if(v._status.have_error())
     {
-      new(std::addressof(v._error)) decltype(v._error)();  // NOLINT
+      new(OUTCOME_ADDRESS_OF(v._error)) decltype(v._error)();  // NOLINT
       s >> v._error;                                       // NOLINT
     }
     return s;
@@ -103,7 +103,7 @@ namespace detail
     v._status.spare_storage_value = y;
     if(v._status.have_error())
     {
-      new(std::addressof(v._error)) decltype(v._error)();  // NOLINT
+      new(OUTCOME_ADDRESS_OF(v._error)) decltype(v._error)();  // NOLINT
       s >> v._error;                                       // NOLINT
     }
     return s;
@@ -119,7 +119,7 @@ namespace detail
     v._status.spare_storage_value = y;
     if(v._status.have_value())
     {
-      new(std::addressof(v._value)) decltype(v._value)();  // NOLINT
+      new(OUTCOME_ADDRESS_OF(v._value)) decltype(v._value)();  // NOLINT
       s >> v._value;                                       // NOLINT
     }
     return s;
