@@ -28,6 +28,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../basic_result.hpp"
 #include "../policy/fail_to_compile_observers.hpp"
 
+#ifndef SYSTEM_ERROR2_USE_STD_ADDRESSOF
+#if OUTCOME_USE_STD_ADDRESSOF
+#define SYSTEM_ERROR2_USE_STD_ADDRESSOF 1
+#endif
+#endif
+
 #if __PCPP_ALWAYS_TRUE__
 #include "status-code/include/status-code/system_error2.hpp"
 #elif !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("status-code/include/status-code/system_error2.hpp")
