@@ -171,6 +171,13 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 OUTCOME_V2_NAMESPACE_END
 #endif
 
+#if OUTCOME_USE_STD_ADDRESSOF
+#include <memory>  // for std::addressof
+#define OUTCOME_ADDRESS_OF(...) std::addressof(__VA_ARGS__)
+#else
+#define OUTCOME_ADDRESS_OF(...) (&__VA_ARGS__)
+#endif
+
 #ifndef OUTCOME_TRIVIAL_ABI
 #if defined(STANDARDESE_IS_IN_THE_HOUSE) || __clang_major__ >= 7
 //! Defined to be `[[clang::trivial_abi]]` when on a new enough clang compiler. Usually automatic, can be overriden.
