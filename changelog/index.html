@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-07-13T13:19:11 UTC">
+<meta name="revised" content="2023-07-15T10:48:28 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2858,8 +2858,9 @@ This as usual will cause minor breakage due to LEWG renaming of things.</p></li>
 
 <li><p>Outcome previously took addresses of things not using <code>std::addressof()</code>, and until now
 nobody complained because custom <code>operator&amp;</code> which doesn&rsquo;t return an address is an
-abomination not used in much modern C++. But finally someone did complain, so it is fixed
-for both normal Outcome and Experimental.Outcome.</p></li>
+abomination not used in much modern C++. But finally someone did complain, so
+for both normal Outcome and Experimental.Outcome, if you set <code>OUTCOME_USE_STD_ADDRESSOF = 1</code>,
+Outcome will use <code>std::addressof()</code></p></li>
 </ul>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
@@ -3535,7 +3536,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 28/06/2023
+        <i class='fa fa-calendar'></i> Last update on 15/07/2023
     </div>
     
 
