@@ -1021,9 +1021,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 06da8aa6452ede5600af3c4ed4781ebd631149f9
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-07-15 10:37:16 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 06da8aa6
+#define OUTCOME_PREVIOUS_COMMIT_REF 0bedf671c04467d66219454bd9a61d0bfbb99242
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-07-20 08:20:32 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0bedf671
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -9070,8 +9070,12 @@ namespace detail
 {
   namespace avoid_string_include
   {
+#if defined(__GLIBC__) && !defined(__UCLIBC__)
     // This returns int for non-glibc strerror_r, but glibc's is particularly weird so we retain it
     extern "C" char *strerror_r(int errnum, char *buf, size_t buflen);
+#else
+    extern "C" int strerror_r(int errnum, char *buf, size_t buflen);
+#endif
   } // namespace avoid_string_include
 } // namespace detail
 #endif
@@ -9101,7 +9105,7 @@ class _posix_code_domain : public status_code_domain
     char buffer[1024] = "";
 #ifdef _WIN32
     strerror_s(buffer, sizeof(buffer), c);
-#elif defined(__gnu_linux__) && !defined(__ANDROID__) // handle glibc's weird strerror_r()
+#elif defined(__GLIBC__) && !defined(__UCLIBC__) // handle glibc's weird strerror_r()
     char *s = detail::avoid_string_include::strerror_r(c, buffer, sizeof(buffer)); // NOLINT
     if(s != nullptr)
     {

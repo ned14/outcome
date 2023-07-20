@@ -332,7 +332,7 @@ use cases.
 Precompiled headers are automatically enabled on new enough cmake's for standalone Outcome
 : If on cmake 3.16 or later, its new precompiled headers build support is used
 to tell consumers of the `outcome::hl` cmake target to precompile Outcome, **if
-and only if** `PROJECT_IS_DEPENDENCY` is false. `PROJECT_IS_DEPENDENCY` is set
+and only if** `outcome_IS_DEPENDENCY` is false. `outcome_IS_DEPENDENCY` is set
 by Outcome's CMakeLists.txt if it detects that it was included using
 `add_subdirectory()`, so for the vast majority of Outcome end users, the use
 of precompiled headers will NOT be enabled.

@@ -55,7 +55,7 @@ option(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which 
 option(OUTCOME_ENABLE_CXX_MODULES "Whether to enable the building of an Outcome C++ module" OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
 
-if(NOT PROJECT_IS_DEPENDENCY)
+if(NOT outcome_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
   UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/detail/revision.hpp")
   # Need to also possibly update the .natvis file
@@ -107,7 +107,7 @@ include(QuickCppLibMakeHeaderOnlyLibrary)
 apply_cxx_concepts_to(INTERFACE outcome_hl REQUIRE_STD_CONCEPTS)
 
 # Make preprocessed edition of this library target
-if(NOT PROJECT_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
+if(NOT outcome_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   else()
@@ -182,7 +182,7 @@ if(OUTCOME_ENABLE_CXX_MODULES)
   )
 endif()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT PROJECT_IS_DEPENDENCY)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
   # For all possible configurations of this library, add each test
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS
