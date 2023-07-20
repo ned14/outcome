@@ -193,11 +193,11 @@ template <class T> constexpr in_place_type_t<T> in_place_type{};
 BOOST_OUTCOME_V2_NAMESPACE_END
 #endif
 
-#if BOOST_OUTCOME_USE_STD_ADDRESSOF
-#include <memory>  // for std::addressof
-#define BOOST_OUTCOME_USE_STD_ADDRESSOF(...) std::addressof(__VA_ARGS__)
+#if defined(BOOST_OUTCOME_USE_STD_ADDRESSOF) && !BOOST_OUTCOME_USE_STD_ADDRESSOF
+#define BOOST_OUTCOME_ADDRESS_OF(...) (&__VA_ARGS__)
 #else
-#define BOOST_OUTCOME_USE_STD_ADDRESSOF(...) (&__VA_ARGS__)
+#include <memory>  // for std::addressof
+#define BOOST_OUTCOME_ADDRESS_OF(...) std::addressof(__VA_ARGS__)
 #endif
 
 #ifndef BOOST_OUTCOME_TRIVIAL_ABI
