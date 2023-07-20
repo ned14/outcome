@@ -63,15 +63,16 @@ Distributed under the Boost Software License, Version 1.0.
 #define BOOST_OUTCOME_NODISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 // _Must_inspect_result_ expands into this
-#define BOOST_OUTCOME_NODISCARD                                                                                                                                                                                                                                                                                                \
-  __declspec("SAL_name"                                                                                                                                                                                                                                                                                                        \
-             "("                                                                                                                                                                                                                                                                                                               \
-             "\"_Must_inspect_result_\""                                                                                                                                                                                                                                                                                       \
-             ","                                                                                                                                                                                                                                                                                                               \
-             "\"\""                                                                                                                                                                                                                                                                                                            \
-             ","                                                                                                                                                                                                                                                                                                               \
-             "\"2\""                                                                                                                                                                                                                                                                                                           \
-             ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
+#define BOOST_OUTCOME_NODISCARD                                                                                                                                \
+  __declspec(                                                                                                                                                  \
+  "SAL_name"                                                                                                                                                   \
+  "("                                                                                                                                                          \
+  "\"_Must_inspect_result_\""                                                                                                                                  \
+  ","                                                                                                                                                          \
+  "\"\""                                                                                                                                                       \
+  ","                                                                                                                                                          \
+  "\"2\""                                                                                                                                                      \
+  ")") __declspec("SAL_begin") __declspec("SAL_post") __declspec("SAL_mustInspect") __declspec("SAL_post") __declspec("SAL_checkReturn") __declspec("SAL_end")
 #endif
 #endif
 #ifndef BOOST_OUTCOME_NODISCARD
@@ -124,34 +125,34 @@ namespace boost
   }
 }
 /*! The namespace of this Boost.Outcome v2.
-*/
+ */
 #define BOOST_OUTCOME_V2_NAMESPACE boost::outcome_v2
 /*! Expands into the appropriate namespace markup to enter the Boost.Outcome v2 namespace.
-*/
-#define BOOST_OUTCOME_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                       \
-  namespace boost                                                                                                                                                                                                                                                                                                              \
-  {                                                                                                                                                                                                                                                                                                                            \
-    namespace outcome_v2                                                                                                                                                                                                                                                                                                       \
+ */
+#define BOOST_OUTCOME_V2_NAMESPACE_BEGIN                                                                                                                       \
+  namespace boost                                                                                                                                              \
+  {                                                                                                                                                            \
+    namespace outcome_v2                                                                                                                                       \
     {
 /*! Expands into the appropriate namespace markup to enter the C++ module
 exported Boost.Outcome v2 namespace.
 */
-#define BOOST_OUTCOME_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                \
-  namespace boost                                                                                                                                                                                                                                                                                                              \
-  {                                                                                                                                                                                                                                                                                                                            \
-    namespace outcome_v2                                                                                                                                                                                                                                                                                                       \
+#define BOOST_OUTCOME_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                \
+  namespace boost                                                                                                                                              \
+  {                                                                                                                                                            \
+    namespace outcome_v2                                                                                                                                       \
     {
 /*! \brief Expands into the appropriate namespace markup to exit the Boost.Outcome v2 namespace.
 \ingroup config
 */
-#define BOOST_OUTCOME_V2_NAMESPACE_END                                                                                                                                                                                                                                                                                         \
-  }                                                                                                                                                                                                                                                                                                                            \
+#define BOOST_OUTCOME_V2_NAMESPACE_END                                                                                                                         \
+  }                                                                                                                                                            \
   }
 
 #include <cstdint>  // for uint32_t etc
 #include <initializer_list>
-#include <iosfwd>  // for future serialisation
-#include <new>     // for placement in moves etc
+#include <iosfwd>   // for future serialisation
+#include <new>      // for placement in moves etc
 #include <type_traits>
 
 #ifndef BOOST_OUTCOME_USE_STD_IN_PLACE_TYPE
@@ -190,6 +191,13 @@ template <class T> struct in_place_type_t
 //! Aliases `std::in_place_type<T>` if on C++ 17 or later, else defined locally.
 template <class T> constexpr in_place_type_t<T> in_place_type{};
 BOOST_OUTCOME_V2_NAMESPACE_END
+#endif
+
+#if BOOST_OUTCOME_USE_STD_ADDRESSOF
+#include <memory>  // for std::addressof
+#define BOOST_OUTCOME_USE_STD_ADDRESSOF(...) std::addressof(__VA_ARGS__)
+#else
+#define BOOST_OUTCOME_USE_STD_ADDRESSOF(...) (&__VA_ARGS__)
 #endif
 
 #ifndef BOOST_OUTCOME_TRIVIAL_ABI
