@@ -25,7 +25,7 @@ jobs:
         operating_system: freebsd
         version: '13.2'
         run: |
-          ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
+          ctest -S .ci.cmake -VV --timeout 900
 
     - name: Upload Test Results
       if: always()
