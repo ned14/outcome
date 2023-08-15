@@ -1,0 +1,54 @@
+name: Unit tests FreeBSD
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  FreeBSD:
+    name: FreeBSD 13
+    runs-on: macos-latest
+    env:
+      NAME: FreeBSD
+          
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: CMake tests FreeBSD
+      uses: cross-platform-actions/action@v0.15.0
+      with:
+        operating_system: freebsd
+        version: '13.2'
+        run: |
+          ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: FreeBSD test results
+        path: prebuilt/merged_junit_results.xml
+
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: [FreeBSD]
+    runs-on: ubuntu-latest
+    if: success() || failure()
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: '**/merged_junit_results.xml'
