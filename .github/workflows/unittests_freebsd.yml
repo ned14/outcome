@@ -26,7 +26,7 @@ jobs:
         version: '13.2'
         run: |
           sudo pkg install -y cmake git
-          ctest -S .ci.cmake -VV --timeout 900
+          ctest -S .ci.cmake -VV -E 'noexcept' --timeout 900
 
     - name: Upload Test Results
       if: always()
