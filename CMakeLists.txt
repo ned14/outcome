@@ -187,6 +187,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
   list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
   set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS
     "outcome_hl--coroutine-support"
+    "outcome_hl--core-result"
     "outcome_hl--fileopen"
     "outcome_hl--hooks"
     "outcome_hl--outcome-int-int-1"
