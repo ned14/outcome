@@ -25,7 +25,7 @@ jobs:
         operating_system: freebsd
         version: '13.2'
         run: |
-          pkg install -y cmake ctest
+          sudo pkg install -y cmake ctest
           ctest -S .ci.cmake -VV --timeout 900
 
     - name: Upload Test Results
