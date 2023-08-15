@@ -369,6 +369,7 @@ if(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST)
     target_link_libraries(${target} PRIVATE outcome::hl)
     set_target_properties(${target} PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+      DISABLE_PRECOMPILE_HEADERS On
     )
     add_test(NAME ${target} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
       COMMAND $<TARGET_FILE:${target}> --reporter junit --out $<TARGET_FILE:${target}>.junit.xml
