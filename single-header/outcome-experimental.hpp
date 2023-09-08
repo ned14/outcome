@@ -100,7 +100,7 @@ Distributed under the Boost Software License, Version 1.0.
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MINOR 2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_PATCH 3
+#define OUTCOME_VERSION_PATCH 8
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_REVISION 0 // Revision version for cmake and DLL version stamping
 /*! AWAITING HUGO JSON CONVERSION TOOL */
@@ -1021,9 +1021,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 0c5b66518c843fabba9925e8750e80a5724f0918
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-08-15 14:26:16 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 0c5b6651
+#define OUTCOME_PREVIOUS_COMMIT_REF 1407d02d60c604e642ae202dbbd721e8c9851fbb
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-08-15 19:19:42 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 1407d02d
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -6384,6 +6384,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_HPP
 #define SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_HPP
+#ifndef SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES
+#define SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES 1
+#endif
 /* Proposed SG14 status_code
 (C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
@@ -6950,7 +6953,7 @@ namespace detail
 class status_code_domain
 {
   template <class DomainType> friend class status_code;
-  template <class StatusCode, class Allocator> friend class indirecting_domain;
+  template <class StatusCode, class Allocator> friend class detail::indirecting_domain;
 public:
   //! Type of the unique id for this domain.
   using unique_id_type = unsigned long long;
@@ -8272,7 +8275,6 @@ namespace detail
 class _generic_code_domain : public status_code_domain
 {
   template <class> friend class status_code;
-  template <class StatusCode, class Allocator> friend class detail::indirecting_domain;
   using _base = status_code_domain;
 public:
   //! The value type of the generic code, which is an `errc` as per POSIX.
@@ -8488,7 +8490,6 @@ template <class Enum> struct quick_status_code_from_enum_defaults
 template <class Enum> class _quick_status_code_from_enum_domain : public status_code_domain
 {
   template <class DomainType> friend class status_code;
-  template <class StatusCode, class Allocator> friend class detail::indirecting_domain;
   using _base = status_code_domain;
   using _src = quick_status_code_from_enum<Enum>;
 public:
@@ -8538,7 +8539,9 @@ protected:
     assert(code.domain() == *this); // NOLINT
     // If `errc::success` is in the generic code mapping, it is not a failure
     const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_enum_code<value_type> &>(code).value());
-    assert(mapping != nullptr);
+#if SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES
+    assert(mapping != nullptr); // if this fires, you forgot to add the enum to the mapping table
+#endif
     if(mapping != nullptr)
     {
       for(errc ec : mapping->code_mappings)
@@ -8564,7 +8567,9 @@ protected:
     {
       const auto &c2 = static_cast<const generic_code &>(code2); // NOLINT
       const auto *mapping = _find_mapping(c1.value());
-      assert(mapping != nullptr);
+#if SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES
+      assert(mapping != nullptr); // if this fires, you forgot to add the enum to the mapping table
+#endif
       if(mapping != nullptr)
       {
         for(errc ec : mapping->code_mappings)
@@ -8582,7 +8587,9 @@ protected:
   {
     assert(code.domain() == *this); // NOLINT
     const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_enum_code<value_type> &>(code).value());
-    assert(mapping != nullptr);
+#if SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES
+    assert(mapping != nullptr); // if this fires, you forgot to add the enum to the mapping table
+#endif
     if(mapping != nullptr)
     {
       if(mapping->code_mappings.size() > 0)
@@ -8596,7 +8603,9 @@ protected:
   {
     assert(code.domain() == *this); // NOLINT
     const auto *mapping = _find_mapping(static_cast<const quick_status_code_from_enum_code<value_type> &>(code).value());
-    assert(mapping != nullptr);
+#if SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES
+    assert(mapping != nullptr); // if this fires, you forgot to add the enum to the mapping table
+#endif
     if(mapping != nullptr)
     {
       return string_ref(mapping->message);
@@ -9063,9 +9072,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <cstring> // for strchr and strerror_r
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 // Fix for issue #48 Issue compiling on arm-none-eabi (newlib) with GNU extensions off
-#ifdef __APPLE__
-#include <cstring>
-#elif !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined(__APPLE__)
 namespace detail
 {
   namespace avoid_string_include
@@ -9098,7 +9105,6 @@ namespace mixins
 class _posix_code_domain : public status_code_domain
 {
   template <class DomainType> friend class status_code;
-  template <class StatusCode, class Allocator> friend class detail::indirecting_domain;
   using _base = status_code_domain;
   static _base::string_ref _make_string_ref(int c) noexcept
   {
@@ -9319,7 +9325,6 @@ namespace mixins
 class _win32_code_domain : public status_code_domain
 {
   template <class DomainType> friend class status_code;
-  template <class StatusCode, class Allocator> friend class detail::indirecting_domain;
   friend class _com_code_domain;
   using _base = status_code_domain;
   static int _win32_code_to_errno(win32::DWORD c)
@@ -9560,7 +9565,6 @@ using nt_error = status_error<_nt_code_domain>;
 class _nt_code_domain : public status_code_domain
 {
   template <class DomainType> friend class status_code;
-  template <class StatusCode, class Allocator> friend class detail::indirecting_domain;
   friend class _com_code_domain;
   using _base = status_code_domain;
   static int _nt_code_to_errno(win32::NTSTATUS c)
@@ -11208,32 +11212,32 @@ namespace detail
     {
       assert(code.domain() == *this);
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
-      return typename StatusCode::domain_type()._do_failure(c.value()->sc);
+      return static_cast<status_code_domain &&>(typename StatusCode::domain_type())._do_failure(c.value()->sc);
     }
     virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept override // NOLINT
     {
       assert(code1.domain() == *this);
       const auto &c1 = static_cast<const _mycode &>(code1); // NOLINT
-      return typename StatusCode::domain_type()._do_equivalent(c1.value()->sc, code2);
+      return static_cast<status_code_domain &&>(typename StatusCode::domain_type())._do_equivalent(c1.value()->sc, code2);
     }
     virtual generic_code _generic_code(const status_code<void> &code) const noexcept override // NOLINT
     {
       assert(code.domain() == *this);
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
-      return typename StatusCode::domain_type()._generic_code(c.value()->sc);
+      return static_cast<status_code_domain &&>(typename StatusCode::domain_type())._generic_code(c.value()->sc);
     }
     virtual string_ref _do_message(const status_code<void> &code) const noexcept override // NOLINT
     {
       assert(code.domain() == *this);
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
-      return typename StatusCode::domain_type()._do_message(c.value()->sc);
+      return static_cast<status_code_domain &&>(typename StatusCode::domain_type())._do_message(c.value()->sc);
     }
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || 0L
     SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const override // NOLINT
     {
       assert(code.domain() == *this);
       const auto &c = static_cast<const _mycode &>(code); // NOLINT
-      typename StatusCode::domain_type()._do_throw_exception(c.value()->sc);
+      static_cast<status_code_domain &&>(typename StatusCode::domain_type())._do_throw_exception(c.value()->sc);
       abort(); // suppress buggy GCC warning
     }
 #endif
