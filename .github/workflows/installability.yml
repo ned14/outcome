@@ -39,7 +39,7 @@ jobs:
        git config --global core.longpaths true
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
-       python quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome develop
+       python quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome develop ""
        cd test_cpp-pm_install
        mkdir build
        cd build
