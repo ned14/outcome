@@ -1,5 +1,5 @@
 /* Tells C++ coroutines about Outcome's result
-(C) 2019-2020 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+(C) 2019-2023 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: Oct 2019
 
 
@@ -91,6 +91,12 @@ OUTCOME_V2_NAMESPACE_END
 #endif
 #endif
 
+#ifndef OUTCOME_V2_AWAITABLES_DEBUG_PRINTER
+// #include <iostream>
+// #define OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(...) std::cout << __VA_ARGS__ << std::endl;
+#define OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(...)
+#endif
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 namespace awaitables
 {
@@ -106,10 +112,22 @@ namespace awaitables
     {
       using type = T;
     };
-    template <class T, class U = typename T::error_type> constexpr inline type_found<U> extract_error_type(int /*unused*/) { return {}; }
-    template <class T> constexpr inline type_found<error_type_not_found> extract_error_type(...) { return {}; }
-    template <class T, class U = typename T::exception_type> constexpr inline type_found<U> extract_exception_type(int /*unused*/) { return {}; }
-    template <class T> constexpr inline type_found<exception_type_not_found> extract_exception_type(...) { return {}; }
+    template <class T, class U = typename T::error_type> constexpr inline type_found<U> extract_error_type(int /*unused*/)
+    {
+      return {};
+    }
+    template <class T> constexpr inline type_found<error_type_not_found> extract_error_type(...)
+    {
+      return {};
+    }
+    template <class T, class U = typename T::exception_type> constexpr inline type_found<U> extract_exception_type(int /*unused*/)
+    {
+      return {};
+    }
+    template <class T> constexpr inline type_found<exception_type_not_found> extract_exception_type(...)
+    {
+      return {};
+    }
 
     OUTCOME_TEMPLATE(class T, class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
@@ -118,11 +136,20 @@ namespace awaitables
       new(result) U(static_cast<T &&>(e));
       return true;
     }
-    template <class T> inline bool try_set_error(T && /*unused*/, ...) { return false; }
+    template <class T> inline bool try_set_error(T && /*unused*/, ...)
+    {
+      return false;
+    }
     OUTCOME_TEMPLATE(class T, class U)
     OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::detail::is_constructible<U, T>))
-    inline void set_or_rethrow(T &e, U *result) { new(result) U(e); }
-    template <class T> inline void set_or_rethrow(T &e, ...) { rethrow_exception(e); }
+    inline void set_or_rethrow(T &e, U *result)
+    {
+      new(result) U(e);
+    }
+    template <class T> inline void set_or_rethrow(T &e, ...)
+    {
+      rethrow_exception(e);
+    }
     template <class T> class fake_atomic
     {
       T _v;
@@ -134,6 +161,15 @@ namespace awaitables
       }
       T load(std::memory_order /*unused*/) { return _v; }
       void store(T v, std::memory_order /*unused*/) { _v = v; }
+      bool compare_exchange_strong(T &expected, T v, std::memory_order /*unused*/, std::memory_order /*unused*/)
+      {
+        if(_v == expected)
+        {
+          _v = v;
+          return true;
+        }
+        return false;
+      }
     };
 
 #ifdef OUTCOME_FOUND_COROUTINE_HEADER
@@ -146,16 +182,20 @@ namespace awaitables
         OUTCOME_V2_NAMESPACE::detail::empty_type _default{};
         container_type result;
       };
-      result_set_type result_set{false};
+      result_set_type result_set{false}, pending_first_resumption{is_initially_suspended};
       coroutine_handle<> continuation;
 
-      outcome_promise_type() noexcept {}
+      static constexpr bool is_initially_suspended = suspend_initial;
+      static constexpr bool is_using_atomics = use_atomic;
+
+      outcome_promise_type() noexcept { OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise constructed"); }
       outcome_promise_type(const outcome_promise_type &) = delete;
       outcome_promise_type(outcome_promise_type &&) = delete;
       outcome_promise_type &operator=(const outcome_promise_type &) = delete;
       outcome_promise_type &operator=(outcome_promise_type &&) = delete;
       ~outcome_promise_type()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise destructs");
         if(result_set.load(std::memory_order_acquire))
         {
           result.~container_type();  // could throw
@@ -163,10 +203,12 @@ namespace awaitables
       }
       auto get_return_object()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns awaitable");
         return Awaitable{*this};  // could throw bad_alloc
       }
       void return_value(container_type &&value)
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns value");
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
@@ -177,6 +219,7 @@ namespace awaitables
       }
       void return_value(const container_type &value)
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns value");
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
@@ -187,6 +230,7 @@ namespace awaitables
       }
       void unhandled_exception()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise unhandled exception");
         assert(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
@@ -207,9 +251,10 @@ namespace awaitables
       }
       auto initial_suspend() noexcept
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise initial suspend = " << suspend_initial);
         struct awaiter
         {
-          bool await_ready() noexcept { return !suspend_initial; }
+          constexpr bool await_ready() noexcept { return !suspend_initial; }
           void await_resume() noexcept {}
           void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
         };
@@ -219,11 +264,21 @@ namespace awaitables
       {
         struct awaiter
         {
-          bool await_ready() noexcept { return false; }
+          // If we don't force a final suspend, promise will get deleted before awaitable
+          // TODO: Implement detachable awaitables
+          constexpr bool await_ready() noexcept { return false; }
           void await_resume() noexcept {}
 #if OUTCOME_HAVE_NOOP_COROUTINE
           coroutine_handle<> await_suspend(coroutine_handle<outcome_promise_type> self) noexcept
           {
+            if(self.promise().continuation)
+            {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will resume coroutine " << self.promise().continuation.address());
+            }
+            else
+            {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will exit");
+            }
             return self.promise().continuation ? self.promise().continuation : noop_coroutine();
           }
 #else
@@ -231,7 +286,12 @@ namespace awaitables
           {
             if(self.promise().continuation)
             {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will resume coroutine " << self.promise().continuation.address());
               return self.promise().continuation.resume();
+            }
+            else
+            {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will exit");
             }
           }
 #endif
@@ -243,10 +303,13 @@ namespace awaitables
     {
       using container_type = void;
       using result_set_type = std::conditional_t<use_atomic, std::atomic<bool>, fake_atomic<bool>>;
-      result_set_type result_set{false};
+      result_set_type result_set{false}, pending_first_resumption{is_initially_suspended};
       coroutine_handle<> continuation;
 
-      outcome_promise_type() {}
+      static constexpr bool is_initially_suspended = suspend_initial;
+      static constexpr bool is_using_atomics = use_atomic;
+
+      outcome_promise_type() { OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise constructed"); }
       outcome_promise_type(const outcome_promise_type &) = delete;
       outcome_promise_type(outcome_promise_type &&) = delete;
       outcome_promise_type &operator=(const outcome_promise_type &) = delete;
@@ -254,23 +317,27 @@ namespace awaitables
       ~outcome_promise_type() = default;
       auto get_return_object()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns awaitable");
         return Awaitable{*this};  // could throw bad_alloc
       }
       void return_void() noexcept
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns void");
         assert(!result_set.load(std::memory_order_acquire));
         result_set.store(true, std::memory_order_release);
       }
       void unhandled_exception()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise unhandled exception");
         assert(!result_set.load(std::memory_order_acquire));
         std::rethrow_exception(std::current_exception());  // throws
       }
       auto initial_suspend() noexcept
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise initial suspend = " << suspend_initial);
         struct awaiter
         {
-          bool await_ready() noexcept { return !suspend_initial; }
+          constexpr bool await_ready() noexcept { return !suspend_initial; }
           void await_resume() noexcept {}
           void await_suspend(coroutine_handle<> /*unused*/) noexcept {}
         };
@@ -280,11 +347,21 @@ namespace awaitables
       {
         struct awaiter
         {
-          bool await_ready() noexcept { return false; }
+          // If we don't force a final suspend, promise will get deleted before awaitable
+          // TODO: Implement detachable awaitables
+          constexpr bool await_ready() noexcept { return false; }
           void await_resume() noexcept {}
 #if OUTCOME_HAVE_NOOP_COROUTINE
           coroutine_handle<> await_suspend(coroutine_handle<outcome_promise_type> self) noexcept
           {
+            if(self.promise().continuation)
+            {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will resume coroutine " << self.promise().continuation.address());
+            }
+            else
+            {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will exit");
+            }
             return self.promise().continuation ? self.promise().continuation : noop_coroutine();
           }
 #else
@@ -292,7 +369,12 @@ namespace awaitables
           {
             if(self.promise().continuation)
             {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will resume coroutine " << self.promise().continuation.address());
               return self.promise().continuation.resume();
+            }
+            else
+            {
+              OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&self.promise() << " promise final suspend will exit");
             }
           }
 #endif
@@ -328,6 +410,7 @@ namespace awaitables
       awaitable &operator=(const awaitable &) = delete;
       ~awaitable()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " awaitable destructs");
         if(_h)
         {
           _h.destroy();
@@ -336,11 +419,18 @@ namespace awaitables
       explicit awaitable(promise_type &p)  // could throw
           : _h(coroutine_handle<promise_type>::from_promise(p))
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " awaitable constructs for coroutine " << _h.address()
+                                                          << " shall resume on first suspend = " << promise_type::is_initially_suspended);
       }
       bool valid() const noexcept { return _h != nullptr; }
-      bool await_ready() noexcept { return _h.promise().result_set.load(std::memory_order_acquire); }
+      bool await_ready() noexcept
+      {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " await_ready = " << _h.promise().result_set.load(std::memory_order_acquire));
+        return _h.promise().result_set.load(std::memory_order_acquire);
+      }
       container_type await_resume()
       {
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " await_resume");
         assert(_h.promise().result_set.load(std::memory_order_acquire));
         if(!_h.promise().result_set.load(std::memory_order_acquire))
         {
@@ -351,14 +441,31 @@ namespace awaitables
 #if OUTCOME_HAVE_NOOP_COROUTINE
       coroutine_handle<> await_suspend(coroutine_handle<> cont) noexcept
       {
-        _h.promise().continuation = cont;
-        return _h;
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " await_suspend suspends coroutine " << cont.address());
+        auto &p = _h.promise();
+        p.continuation = cont;
+        bool expected = true;
+        if(p.pending_first_resumption.compare_exchange_strong(expected, false, std::memory_order_acq_rel, std::memory_order_relaxed))
+        {
+          OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise()
+                                              << " await_suspend does one time first resumption of initially suspended coroutine " << _h.address());
+          return _h;
+        }
+        return noop_coroutine();
       }
 #else
       void await_suspend(coroutine_handle<> cont)
       {
-        _h.promise().continuation = cont;
-        _h.resume();
+        OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " await_suspend suspends coroutine " << cont.address());
+        auto &p = _h.promise();
+        p.continuation = cont;
+        bool expected = true;
+        if(p.pending_first_resumption.compare_exchange_strong(expected, false, std::memory_order_acq_rel, std::memory_order_relaxed))
+        {
+          OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise()
+                                              << " await_suspend does one time first resumption of initially suspended coroutine " << _h.address());
+          _h.resume();
+        }
       }
 #endif
     };

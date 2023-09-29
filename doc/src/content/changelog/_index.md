@@ -4,6 +4,20 @@ weight = 80
 +++
 
 ---
+## v2.2.8 ? 2023 (Boost 1.84) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.8)
+
+### Enhancements:
+
+
+### Bug fixes:
+
+- There was a bug in the Outcome C++ coroutine awaitables whereby we were over eagerly resuming
+execution of coroutines which return one of our awaitables. It is surprising how many years have
+passed before this was noticed, but it is now fixed. It is believed that this has been fixed
+without affecting ABI stability, however mixing old Outcome and new Outcome in the same binary
+without recompiling all the C++ coroutine code to use new Outcome will not fix the bug.
+
+---
 ## v2.2.7 13th August 2023 (Boost 1.83) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.7)
 
 ### Enhancements:
