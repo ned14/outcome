@@ -22,17 +22,17 @@ jobs:
           - { name: "clang-cl 14.3 - C++14,20", os: windows-2022, cxxstd: '14,20', cmake_args: -G "Visual Studio 17 2022" -T ClangCL -A x64, }
           - { name: "MSVC 14.2 - C++14-17", os: windows-2019, cxxstd: '14,17', cmake_args: -G "Visual Studio 16 2019" -A x64, }
 
-          - { name: "GCC 12 - C++17-20", os: ubuntu-22.04, cc: gcc-12, cxx: g++-12, cxxstd: '17,20', }
-          - { name: "GCC 11 - C++14,20",    os: ubuntu-22.04, cc: gcc-11, cxx: g++-11, cxxstd: '14,20', }
+          - { name: "GCC 12 - C++17-20", os: ubuntu-22.04, cc: gcc-12, cxx: g++-12, cxxstd: '17,20', install: g++-12, }
+          - { name: "GCC 11 - C++14,20",    os: ubuntu-22.04, cc: gcc-11, cxx: g++-11, cxxstd: '14,20', install: g++-11, }
 # The GCC 10 this runner has is broken
 #          - { name: "GCC 10 - C++17-20",    os: ubuntu-22.04, cc: gcc-10, cxx: g++-10, cxxstd: '17,20', }
-          - { name: "GCC 9  - C++17-20",    os: ubuntu-22.04, cc: gcc-9,  cxx: g++-9,  cxxstd: '17,20', }
+          - { name: "GCC 9  - C++17-20",    os: ubuntu-22.04, cc: gcc-9,  cxx: g++-9,  cxxstd: '17,20', install: g++-9, }
           - { name: "GCC 8  - C++14-17",    os: ubuntu-20.04, cc: gcc-8,  cxx: g++-8,  cxxstd: '14,17', install: g++-8, }
           - { name: "GCC 7  - C++14",    os: ubuntu-20.04, cc: gcc-7,  cxx: g++-7,  cxxstd: 14, install: g++-7, }
 
-          - { name: "Clang 14 - C++17-20",  os: ubuntu-22.04, cc: clang-14, cxx: clang++-14, cxxstd: '17,20', }
-          - { name: "Clang 13 - C++14,20",  os: ubuntu-22.04, cc: clang-13, cxx: clang++-13, cxxstd: '14,20', }
-          - { name: "Clang 12 - C++17-20",  os: ubuntu-22.04, cc: clang-12, cxx: clang++-12, cxxstd: '17,20', }
+          - { name: "Clang 14 - C++17-20",  os: ubuntu-22.04, cc: clang-14, cxx: clang++-14, cxxstd: '17,20', install: clang-14, }
+          - { name: "Clang 13 - C++14,20",  os: ubuntu-22.04, cc: clang-13, cxx: clang++-13, cxxstd: '14,20', install: clang-13, }
+          - { name: "Clang 12 - C++17-20",  os: ubuntu-22.04, cc: clang-12, cxx: clang++-12, cxxstd: '17,20', install: clang-12, }
           - { name: "Clang 11 - C++14-17",  os: ubuntu-20.04, cc: clang-11, cxx: clang++-11, cxxstd: '14,17', install: clang-11, }
 
           - { name: "AppleClang 13",     os: macos-12,     cxxstd: 17 }
