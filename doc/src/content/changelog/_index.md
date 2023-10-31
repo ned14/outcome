@@ -8,6 +8,9 @@ weight = 80
 
 ### Enhancements:
 
+- cmake 3.9 is now the minimum required for standalone Outcome. This fixes a long standing
+cmake issue with probing for standard library facilities. cmake 3.9 is what RHEL7 ships with,
+when RHEL7 EOLs we may raise the minimum cmake version at that point.
 
 ### Bug fixes:
 
