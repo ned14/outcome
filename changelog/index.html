@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-10-31T21:08:39 UTC">
+<meta name="revised" content="2023-10-31T21:56:55 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2850,6 +2850,12 @@
 
 <h3 id="enhancements">Enhancements:</h3>
 
+<ul>
+<li>cmake 3.9 is now the minimum required for standalone Outcome. This fixes a long standing
+cmake issue with probing for standard library facilities. cmake 3.9 is what RHEL7 ships with,
+when RHEL7 EOLs we may raise the minimum cmake version at that point.</li>
+</ul>
+
 <h3 id="bug-fixes">Bug fixes:</h3>
 
 <ul>
@@ -3552,7 +3558,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 29/09/2023
+        <i class='fa fa-calendar'></i> Last update on 31/10/2023
     </div>
     
 
