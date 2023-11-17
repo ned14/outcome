@@ -20,6 +20,12 @@ passed before this was noticed, but it is now fixed. It is believed that this ha
 without affecting ABI stability, however mixing old Outcome and new Outcome in the same binary
 without recompiling all the C++ coroutine code to use new Outcome will not fix the bug.
 
+[#291](https://github.com/ned14/outcome/issues/291)
+- A Result or Outcome with `void` value type and move-only non-value type was only usable in
+const use cases, due to the lack of provision of non-const member functions in relevant observers
+injection layers for the `void` specialisation. The missing non-const member functions have now
+been added.
+
 ---
 ## v2.2.7 13th August 2023 (Boost 1.83) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.7)
 
