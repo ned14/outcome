@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-11-01T01:07:52 UTC">
+<meta name="revised" content="2023-11-17T09:01:03 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2866,6 +2866,12 @@ without affecting ABI stability, however mixing old Outcome and new Outcome in t
 without recompiling all the C++ coroutine code to use new Outcome will not fix the bug.</li>
 </ul>
 
+<p><a href="https://github.com/ned14/outcome/issues/291">#291</a>
+- A Result or Outcome with <code>void</code> value type and move-only non-value type was only usable in
+const use cases, due to the lack of provision of non-const member functions in relevant observers
+injection layers for the <code>void</code> specialisation. The missing non-const member functions have now
+been added.</p>
+
 <hr />
 
 <h2 id="v2-2-7-13th-august-2023-boost-1-83-release-https-github-com-ned14-outcome-releases-tag-v2-2-7">v2.2.7 13th August 2023 (Boost 1.83) <a href="https://github.com/ned14/outcome/releases/tag/v2.2.7">[release]</a></h2>
@@ -3558,7 +3564,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 31/10/2023
+        <i class='fa fa-calendar'></i> Last update on 17/11/2023
     </div>
     
 
