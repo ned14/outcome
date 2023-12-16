@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2023-12-16T20:54:54 UTC">
+<meta name="revised" content="2023-12-16T20:55:19 UTC">
 <title>`static void _ub(Impl &amp;&amp;)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2908,7 +2908,7 @@
 
 <p>This may seem highly undesirable. However, it also means that the optimiser can optimise more strongly, and so long as you never actually do execute this branch, you do get higher quality code generation.</p>
 
-<p>If the <code>NDEBUG</code> macro is not defined, an <code>assert(false)</code> is present. This will cause attempts to execute this function to fail in a very obvious way, but it also generates runtime code to trigger the obvious failure.</p>
+<p>If the <code>NDEBUG</code> macro is not defined, an <code>OUTCOME_ASSERT(false)</code> is present. This will cause attempts to execute this function to fail in a very obvious way, but it also generates runtime code to trigger the obvious failure.</p>
 
 <p>If the <code>NDEBUG</code> macro is defined, and the program is compiled with the undefined behaviour sanitiser, attempts to execute this function will trigger an undefined behaviour sanitiser action.</p>
 
@@ -2939,7 +2939,7 @@
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 22/01/2019
+        <i class='fa fa-calendar'></i> Last update on 16/12/2023
     </div>
     
 
