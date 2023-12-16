@@ -4,6 +4,29 @@ weight = 80
 +++
 
 ---
+## v2.2.9 ? (Boost 1.85) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.9)
+
+### Enhancements:
+
+[#293](https://github.com/ned14/outcome/issues/293)
+- Some users wished that Outcome would be clean with `-Wpedantic`, this is now turned on for
+the test suite.
+
+[#294](https://github.com/ned14/outcome/issues/294)
+- All use of `assert()` has been replaced with `OUTCOME_ASSERT`, which can be user overridden
+at compile time.
+
+[#295](https://github.com/ned14/outcome/issues/295)
+- In git commit 12b14e1533848e9a0f7f3c38e41da0ee4e819770 (Aug 11 2022) status code had its
+paths changed due to its headers not previously having the right path convention. It was not
+realised at the time that in Boost.Outcome this resulted in
+`<boost/outcome/experimental/status-code/status-code/headers.hpp>` which is not desirable.
+This has now been remedied to remove the double `status-code`, which will obviously break
+any Boost.Outcome code which relies on the double `status-code`. Standalone Outcome is unaffected.
+
+### Bug fixes:
+
+---
 ## v2.2.8 13th December 2023 (Boost 1.84) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.8)
 
 ### Enhancements:

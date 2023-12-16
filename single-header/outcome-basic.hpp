@@ -1019,9 +1019,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF f7892ac2e8ef0a236f324a9111e75824ae55690a
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-11-17 08:58:53 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE f7892ac2
+#define OUTCOME_PREVIOUS_COMMIT_REF 645500fe31c7ffc14299af9651b2ae1c9d6741c9
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2023-12-16 20:11:33 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 645500fe
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -6199,30 +6199,60 @@ namespace detail
   struct value_overload
   {
   };
-  //#ifdef __APPLE__
-  //  OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
-  //#else
+  // #ifdef __APPLE__
+  //   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>()._xcode_workaround_as_failure()))
+  // #else
   OUTCOME_TEMPLATE(class T, class R = decltype(std::declval<T>().as_failure()))
-  //#endif
+  // #endif
   OUTCOME_TREQUIRES(OUTCOME_TPRED(OUTCOME_V2_NAMESPACE::is_failure_type<R>))
-  constexpr inline bool has_as_failure(int /*unused */) { return true; }
-  template <class T> constexpr inline bool has_as_failure(...) { return false; }
+  constexpr inline bool has_as_failure(int /*unused */)
+  {
+    return true;
+  }
+  template <class T> constexpr inline bool has_as_failure(...)
+  {
+    return false;
+  }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_error()))
-  constexpr inline bool has_assume_error(int /*unused */) { return true; }
-  template <class T> constexpr inline bool has_assume_error(...) { return false; }
+  constexpr inline bool has_assume_error(int /*unused */)
+  {
+    return true;
+  }
+  template <class T> constexpr inline bool has_assume_error(...)
+  {
+    return false;
+  }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().error()))
-  constexpr inline bool has_error(int /*unused */) { return true; }
-  template <class T> constexpr inline bool has_error(...) { return false; }
+  constexpr inline bool has_error(int /*unused */)
+  {
+    return true;
+  }
+  template <class T> constexpr inline bool has_error(...)
+  {
+    return false;
+  }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().assume_value()))
-  constexpr inline bool has_assume_value(int /*unused */) { return true; }
-  template <class T> constexpr inline bool has_assume_value(...) { return false; }
+  constexpr inline bool has_assume_value(int /*unused */)
+  {
+    return true;
+  }
+  template <class T> constexpr inline bool has_assume_value(...)
+  {
+    return false;
+  }
   OUTCOME_TEMPLATE(class T)
   OUTCOME_TREQUIRES(OUTCOME_TEXPR(std::declval<T>().value()))
-  constexpr inline bool has_value(int /*unused */) { return true; }
-  template <class T> constexpr inline bool has_value(...) { return false; }
+  constexpr inline bool has_value(int /*unused */)
+  {
+    return true;
+  }
+  template <class T> constexpr inline bool has_value(...)
+  {
+    return false;
+  }
 } // namespace detail
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED

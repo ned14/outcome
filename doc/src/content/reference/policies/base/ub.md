@@ -9,7 +9,7 @@ This is a special function which does compiler-specific stuff to tell the compil
 
 This may seem highly undesirable. However, it also means that the optimiser can optimise more strongly, and so long as you never actually do execute this branch, you do get higher quality code generation.
 
-If the `NDEBUG` macro is not defined, an `assert(false)` is present. This will cause attempts to execute this function to fail in a very obvious way, but it also generates runtime code to trigger the obvious failure.
+If the `NDEBUG` macro is not defined, an `OUTCOME_ASSERT(false)` is present. This will cause attempts to execute this function to fail in a very obvious way, but it also generates runtime code to trigger the obvious failure.
 
 If the `NDEBUG` macro is defined, and the program is compiled with the undefined behaviour sanitiser, attempts to execute this function will trigger an undefined behaviour sanitiser action.
 

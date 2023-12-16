@@ -25,6 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "quickcpplib/boost/test/unit_test.hpp"
 
+#pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
+
 namespace
 {
   namespace outcome = OUTCOME_V2_NAMESPACE;

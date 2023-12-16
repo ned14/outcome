@@ -55,7 +55,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_TEXPR(...) typename = decltype(__VA_ARGS__)
 #define OUTCOME_TPRED(...) typename = std::enable_if_t<__VA_ARGS__>
 #define OUTCOME_REQUIRES(...) requires __VA_ARGS__
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 #endif
@@ -157,14 +157,14 @@ using std::in_place_type;
 OUTCOME_V2_NAMESPACE_END
 #else
 OUTCOME_V2_NAMESPACE_BEGIN
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 type definition template <class T> in_place_type_t. Potential doc page: `in_place_type_t<T>`
 */
 template <class T> struct in_place_type_t
 {
   explicit in_place_type_t() = default;
 };
-/*! AWAITING HUGO JSON CONVERSION TOOL 
+/*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
 template <class T> constexpr in_place_type_t<T> in_place_type{};
@@ -176,6 +176,11 @@ OUTCOME_V2_NAMESPACE_END
 #define OUTCOME_ADDRESS_OF(...) std::addressof(__VA_ARGS__)
 #else
 #define OUTCOME_ADDRESS_OF(...) (&__VA_ARGS__)
+#endif
+
+#ifndef OUTCOME_ASSERT
+#include <cassert>
+#define OUTCOME_ASSERT(...) assert(__VA_ARGS__)
 #endif
 
 #ifndef OUTCOME_TRIVIAL_ABI
@@ -353,11 +358,11 @@ namespace detail
   {
 #if !defined(OUTCOME_DISABLE_EXECINFO)
     void *bt[16];
-    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));                                // NOLINT
+    size_t btlen = backtrace(bt, sizeof(bt) / sizeof(bt[0]));  // NOLINT
 #endif
     fprintf(stderr, "FATAL: Outcome throws exception %s with exceptions disabled\n", expr);  // NOLINT
 #if !defined(OUTCOME_DISABLE_EXECINFO)
-    char **bts = backtrace_symbols(bt, btlen);                                               // NOLINT
+    char **bts = backtrace_symbols(bt, btlen);  // NOLINT
     if(bts != nullptr)
     {
       for(size_t n = 0; n < btlen; n++)

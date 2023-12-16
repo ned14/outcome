@@ -1,6 +1,6 @@
 # Files to copy over
 include_files = [
-    (r'include/outcome/experimental/status-code/include/(.*)', r'include/boost/outcome/experimental/status-code/\1'),
+    (r'include/outcome/experimental/status-code/include/(.*)', r'include/boost/outcome/experimental/\1'),
     (r'include/(.*)', r'include/boost/\1'),
     r'^doc/src/.*$',
     r'^test/.*$',
@@ -47,7 +47,7 @@ core_macros = {
     r'^SYSTEM_ERROR2_': r'BOOST_OUTCOME_SYSTEM_ERROR2_',
     r'([^_])SYSTEM_ERROR2_': r'\1BOOST_OUTCOME_SYSTEM_ERROR2_',
     r'<outcome/([^>]+)': r'<boost/outcome/\1',
-    r'status-code/include/': r'status-code/',
+    r'status-code/include/': r'/',
     r'// Boost.Outcome ' : r'',
     r'CXX_': r'BOOST_OUTCOME_C_',
 }

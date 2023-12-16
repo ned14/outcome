@@ -359,6 +359,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
   endforeach()
 endif()
 
+# Turn on pedantic warnings for all tests, examples and snippets
+if(NOT MSVC)
+  foreach(target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS} ${example_bins})
+    target_compile_options(${target} PUBLIC "-Wpedantic")
+  endforeach()
+endif()
+
 if(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST)
   set(OUTCOME_SMOKE_TESTS)
   add_executable(outcome-dependency-smoke-test_1 "test/tests/core-result.cpp")

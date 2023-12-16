@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0009 / test, "Alternative TRY macros?")
 {
 #ifdef OUTCOME_TRYX
+#pragma GCC diagnostic ignored "-Wpedantic"
   using namespace OUTCOME_V2_NAMESPACE;
   struct udt  // NOLINT
   {
@@ -36,7 +37,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0009 / test, "Alternative TRY macros?")
     udt(const udt &) = default;
     udt(udt &&) = default;
   };
-  auto f = []() -> result<udt> {
+  auto f = []() -> result<udt>
+  {
     auto g = [] { return result<int>(5); };
     return udt(OUTCOME_TRYX(g()));
   };

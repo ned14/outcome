@@ -30,7 +30,6 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_DETAIL_COROUTINE_SUPPORT_HPP
 
 #include <atomic>
-#include <cassert>
 #include <exception>
 
 #ifndef OUTCOME_COROUTINE_HEADER_TYPE
@@ -209,7 +208,7 @@ namespace awaitables
       void return_value(container_type &&value)
       {
         OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns value");
-        assert(!result_set.load(std::memory_order_acquire));
+        OUTCOME_ASSERT(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
           result.~container_type();  // could throw
@@ -220,7 +219,7 @@ namespace awaitables
       void return_value(const container_type &value)
       {
         OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns value");
-        assert(!result_set.load(std::memory_order_acquire));
+        OUTCOME_ASSERT(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
           result.~container_type();  // could throw
@@ -231,7 +230,7 @@ namespace awaitables
       void unhandled_exception()
       {
         OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise unhandled exception");
-        assert(!result_set.load(std::memory_order_acquire));
+        OUTCOME_ASSERT(!result_set.load(std::memory_order_acquire));
         if(result_set.load(std::memory_order_acquire))
         {
           result.~container_type();
@@ -323,13 +322,13 @@ namespace awaitables
       void return_void() noexcept
       {
         OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise returns void");
-        assert(!result_set.load(std::memory_order_acquire));
+        OUTCOME_ASSERT(!result_set.load(std::memory_order_acquire));
         result_set.store(true, std::memory_order_release);
       }
       void unhandled_exception()
       {
         OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(this << " promise unhandled exception");
-        assert(!result_set.load(std::memory_order_acquire));
+        OUTCOME_ASSERT(!result_set.load(std::memory_order_acquire));
         std::rethrow_exception(std::current_exception());  // throws
       }
       auto initial_suspend() noexcept
@@ -431,7 +430,7 @@ namespace awaitables
       container_type await_resume()
       {
         OUTCOME_V2_AWAITABLES_DEBUG_PRINTER(&_h.promise() << " await_resume");
-        assert(_h.promise().result_set.load(std::memory_order_acquire));
+        OUTCOME_ASSERT(_h.promise().result_set.load(std::memory_order_acquire));
         if(!_h.promise().result_set.load(std::memory_order_acquire))
         {
           std::terminate();
@@ -507,7 +506,7 @@ namespace awaitables
         }
         void return_void() noexcept
         {
-          assert(result_set.load(std::memory_order_acquire) >= 0);
+          OUTCOME_ASSERT(result_set.load(std::memory_order_acquire) >= 0);
           if(result_set.load(std::memory_order_acquire) == 1)
           {
             result.~container_type();  // could throw
@@ -516,7 +515,7 @@ namespace awaitables
         }
         suspend_always yield_value(container_type &&value)
         {
-          assert(result_set.load(std::memory_order_acquire) >= 0);
+          OUTCOME_ASSERT(result_set.load(std::memory_order_acquire) >= 0);
           if(result_set.load(std::memory_order_acquire) == 1)
           {
             result.~container_type();  // could throw
@@ -527,7 +526,7 @@ namespace awaitables
         }
         suspend_always yield_value(const container_type &value)
         {
-          assert(result_set.load(std::memory_order_acquire) >= 0);
+          OUTCOME_ASSERT(result_set.load(std::memory_order_acquire) >= 0);
           if(result_set.load(std::memory_order_acquire) == 1)
           {
             result.~container_type();  // could throw
@@ -538,7 +537,7 @@ namespace awaitables
         }
         void unhandled_exception()
         {
-          assert(result_set.load(std::memory_order_acquire) >= 0);
+          OUTCOME_ASSERT(result_set.load(std::memory_order_acquire) >= 0);
           if(result_set.load(std::memory_order_acquire) == 1)
           {
             result.~container_type();
@@ -631,7 +630,7 @@ namespace awaitables
         {
           _h();
         }
-        assert(p.result_set.load(std::memory_order_acquire) >= 0);
+        OUTCOME_ASSERT(p.result_set.load(std::memory_order_acquire) >= 0);
         if(p.result_set.load(std::memory_order_acquire) < 0)
         {
           std::terminate();
