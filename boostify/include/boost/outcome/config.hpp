@@ -201,8 +201,8 @@ BOOST_OUTCOME_V2_NAMESPACE_END
 #endif
 
 #ifndef BOOST_OUTCOME_ASSERT
-#include <cassert>
-#define BOOST_OUTCOME_ASSERT(...) assert(__VA_ARGS__)
+#include <boost/assert.hpp>
+#define BOOST_OUTCOME_ASSERT(...) BOOST_ASSERT(__VA_ARGS__)
 #endif
 
 #ifndef BOOST_OUTCOME_TRIVIAL_ABI
