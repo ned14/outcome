@@ -4,7 +4,22 @@ weight = 80
 +++
 
 ---
-## v2.2.9 ? (Boost 1.85) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.9)
+## v2.2.10 ? (Boost 1.86) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.10)
+
+### Enhancements:
+
+- Something I've been meaning to do for far too long now is make the GDB pretty printers
+auto-loading so you don't have to set up `.gdbinit`. This is now done. I also improved
+the pretty printers to also pretty print the C result type which can be very useful if
+working with that type, as it will print the error message in GDB.
+
+ Experimental Outcome's `status_code` has also gained its own auto-loading GDB pretty printer
+with display of `strerror()` if the code domain is POSIX or generic.
+
+### Bug fixes:
+
+---
+## v2.2.9 15th April 2024 (Boost 1.85) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.9)
 
 ### Enhancements:
 
@@ -23,8 +38,6 @@ realised at the time that in Boost.Outcome this resulted in
 `<boost/outcome/experimental/status-code/status-code/headers.hpp>` which is not desirable.
 This has now been remedied to remove the double `status-code`, which will obviously break
 any Boost.Outcome code which relies on the double `status-code`. Standalone Outcome is unaffected.
-
-### Bug fixes:
 
 ---
 ## v2.2.8 13th December 2023 (Boost 1.84) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.8)

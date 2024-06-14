@@ -1,5 +1,5 @@
 /* C interface for result
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+(C) 2017-2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Aug 2017
 
 
@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_EXPERIMENTAL_RESULT_H
 
 #include <stdint.h>  // for intptr_t
+
+#include "../outcome_gdb.h"
 
 #ifdef __cplusplus
 extern "C"
