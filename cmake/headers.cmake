@@ -55,6 +55,7 @@ set(outcome_HEADERS
   "include/outcome/iostream_support.hpp"
   "include/outcome/outcome.hpp"
   "include/outcome/outcome.natvis"
+  "include/outcome/outcome_gdb.h"
   "include/outcome/policy/all_narrow.hpp"
   "include/outcome/policy/base.hpp"
   "include/outcome/policy/fail_to_compile_observers.hpp"
