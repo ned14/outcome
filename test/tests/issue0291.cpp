@@ -25,7 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "quickcpplib/boost/test/unit_test.hpp"
 
+#ifdef __clang__
 #pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
+#endif
 
 namespace
 {

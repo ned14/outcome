@@ -989,12 +989,12 @@ SIGNATURE NOT RECOGNISED
       swap(this->_ptr, o._ptr);
       return;
     }
-    struct _
+    struct some_type
     {
       basic_outcome &a, &b;
       bool exceptioned{false};
       bool all_good{false};
-      ~_()
+      ~some_type()
       {
         if(!this->all_good)
         {
@@ -1036,11 +1036,11 @@ SIGNATURE NOT RECOGNISED
           check(&this->b);
         }
       }
-    } _{*this, o};
-    strong_swap(_.all_good, this->_ptr, o._ptr);
-    _.exceptioned = true;
+    } some_type_value{*this, o};
+    strong_swap(some_type_value.all_good, this->_ptr, o._ptr);
+    some_type_value.exceptioned = true;
     this->_state.swap(o._state);
-    _.exceptioned = false;
+    some_type_value.exceptioned = false;
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
