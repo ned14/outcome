@@ -28,6 +28,9 @@ and the dual target source code, being written to tighter discipline,
 is faster and more deterministic in the default target than it was before
 the (non-trivial) port to `<outcome/experimental>`.
 
+5. If you want 'official' C support, experimental Outcome is able to
+provide that in a way not possible for default Outcome which cannot make
+sufficiently strong C compatibility assumptions about `std::error_code`.
 
 If you are building a codebase on top of Outcome expecting long term
 maintenance, the author's personal recommendation is that you design, write, test and

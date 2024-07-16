@@ -20,6 +20,7 @@ set(outcome_HEADERS
   "include/outcome/detail/revision.hpp"
   "include/outcome/detail/trait_std_error_code.hpp"
   "include/outcome/detail/trait_std_exception.hpp"
+  "include/outcome/detail/try.h"
   "include/outcome/detail/value_storage.hpp"
   "include/outcome/detail/version.hpp"
   "include/outcome/experimental/coroutine_support.hpp"

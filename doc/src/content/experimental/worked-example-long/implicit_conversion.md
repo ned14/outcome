@@ -3,7 +3,7 @@ title = "Implicit conversion"
 weight = 70
 +++
 
-Back in [The payload]({{< relref "/experimental/worked-example/value_type" >}}), we
+Back in [The payload]({{< relref "value_type" >}}), we
 mentioned that there was no default implicit conversion of `file_io_error`
 (`status_code<_file_io_error_domain>`) to `error`, as `error` is too small
 to hold `_file_io_error_domain::value_type`.

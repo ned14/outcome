@@ -1,7 +1,7 @@
 +++
-title = "Limitations"
+title = "Calling C++ from C"
 description = ""
-weight = 10
+weight = 20
 +++
 
 C++ has excellent two-way compatibility with the C ABI, but there are some

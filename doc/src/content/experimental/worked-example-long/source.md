@@ -3,7 +3,7 @@ title = "Constexpr domain source"
 weight = 60
 +++
 
-Back in [The constructor]({{< relref "/experimental/worked-example/constructor" >}}), we
+Back in [The constructor]({{< relref "constructor" >}}), we
 declared but did not implement a `.get()` function which returns a constexpr static
 instance of the domain. We implement this now:
 

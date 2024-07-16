@@ -4,7 +4,27 @@ weight = 80
 +++
 
 ---
-## v2.2.10 ? (Boost 1.86) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.10)
+## v2.2.11 ? (Boost 1.87) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.11)
+
+### Enhancements:
+
+- Outcome.Experimental has had C representation support since the beginning, however it had
+been mainly intended that C++ would originate Results, they would pass through C, and back
+into C++. It hadn't really been expected that C would want to do much with Results other than
+inspect them for happy or sad path.
+
+ It turns out there is more demand than expected for a more functional Result from within C,
+so this release adds the power to create Results in success and two types of failure, semantic
+comparison of Results, and printing of Result messages. You can also wrap a C enum into a
+quick status code from enum, allowing easy custom C error coding from 100% within C.
+
+ [The documentation for the C support]({{% relref "../experimental/c-api" %}}) has been updated
+to reflect the new facilities.
+
+### Bug fixes:
+
+---
+## v2.2.10 14th August 2024 (Boost 1.86) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.10)
 
 ### Enhancements:
 
@@ -15,8 +35,6 @@ working with that type, as it will print the error message in GDB.
 
  Experimental Outcome's `status_code` has also gained its own auto-loading GDB pretty printer
 with display of `strerror()` if the code domain is POSIX or generic.
-
-### Bug fixes:
 
 ---
 ## v2.2.9 15th April 2024 (Boost 1.85) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.9)
