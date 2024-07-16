@@ -5,7 +5,7 @@
     <link>https://ned14.github.io/outcome/</link>
     <description>Recent content in Home on Outcome documentation</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 18 Mar 2022 14:45:32 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 16 Jul 2024 21:33:35 +0100</lastBuildDate>
     
 	<atom:link href="https://ned14.github.io/outcome/index.xml" rel="self" type="application/rss+xml" />
     
@@ -72,6 +72,16 @@ struct abort_policy : outcome::policy::base { template &amp;lt;classImpl&amp;gt;
     </item>
     
     <item>
+      <title>C system error results</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/system_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/system_code/</guid>
+      <description>In v2.2.11, C Result support went from second tier to first tier status, and now you can create, query and manipulate a subset of Result types entirely from within C by including &amp;lt;outcome/experimental/result.h&amp;gt;.
+The subset supported are those result&amp;lt;T, E&amp;gt; which are a status_result&amp;lt;T&amp;gt; i.e. the E is hardcoded to experimental::error which is the type erased runtime polymorphic holder for any errored status_code whose payload is not bigger than an intptr_t.</description>
+    </item>
+    
+    <item>
       <title>Coroutine TRY operation</title>
       <link>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -83,10 +93,10 @@ eager&amp;lt;result&amp;lt;std::string&amp;gt;&amp;gt; to_string(int x) { if(x &
     
     <item>
       <title>Define a custom code domain</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/preamble/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/preamble/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/preamble/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/preamble/</guid>
       <description>Firstly let&amp;rsquo;s alias the experimental Outcome namespace into something less tedious to type, declare our custom status code type, and get started on defining the custom status code domain implementation.
 namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental; // To define a `file_io_error` which participates in the P1028 world // of `std::error`, we must first declare, then define, a custom code // domain which extends `posix_code` (the std error coding for POSIX // failures). The following is fairly standard boilerplate for defining // a custom code domain.</description>
     </item>
@@ -102,6 +112,16 @@ int a() { f(); g(); // don&amp;#39;t call g() and further if f() fails  return h
     </item>
     
     <item>
+      <title>Implicit construction</title>
+      <link>https://ned14.github.io/outcome/experimental/worked-example/implicit-construction/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/worked-example/implicit-construction/</guid>
+      <description>The preceding code had the compiler stamp out a custom status code domain for a user supplied enum. You now get the following types:
+// This is the status code generated for your custom enum type. It will implicitly construct from // values of enum custom_failure. using custom_failure_code = SYSTEM_ERROR2_NAMESPACE::quick_status_code_from_enum_code&amp;lt;custom_failure&amp;gt;; namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental; // You don&amp;#39;t usually need to use the status code type explicitly, because this &amp;#34;just works&amp;#34;: outcome_e::status_result&amp;lt;int&amp;gt; positive_only(int x) { if(x &amp;lt; 0) { // Outcome&amp;#39;s result sees that status_code will implicitly construct from this enum,  // and it returns an errored result  return custom_failure::bad_argument; } return x; } // Semantic comparisons work bool test(int x) { if(auto r = positive_only(x); !</description>
+    </item>
+    
+    <item>
       <title>Keeping state</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -109,17 +129,6 @@ int a() { f(); g(); // don&amp;#39;t call g() and further if f() fails  return h
       <guid>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</guid>
       <description>The first thing we are going to need is somewhere to store the stack backtrace. We could take the easier route and simply store it into an allocated block and keep the pointer as a custom payload in a result&amp;lt;T, std::pair&amp;lt;error_code, std::unique_ptr&amp;lt;stack_backtrace&amp;gt;&amp;gt;&amp;gt; (see previous section on Custom payloads). But let us assume that we care so deeply about bounded execution times that ever calling malloc is unacceptable.
 We therefore are going to need some completely static and trivially typed storage perhaps kept per-thread to avoid the need to keep mutexes.</description>
-    </item>
-    
-    <item>
-      <title>Limitations</title>
-      <link>https://ned14.github.io/outcome/experimental/c-api/limitations/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/experimental/c-api/limitations/</guid>
-      <description>C++ has excellent two-way compatibility with the C ABI, but there are some limitations you must observe to write C++ code which C code can call without marshalling at the ABI boundary:
- A C++ function may not throw exceptions if it is safe to call from C, and so should always be marked noexcept.
- A C++ function should be annotated with extern &amp;quot;C&amp;quot; to prevent its symbol being mangled, and thus give it the C rather than C++ ABI.</description>
     </item>
     
     <item>
@@ -217,11 +226,20 @@ As bad as this may sound, it generates the most optimal code, and such hard UB i
     </item>
     
     <item>
-      <title>Example C&#43;&#43; function</title>
-      <link>https://ned14.github.io/outcome/experimental/c-api/example/</link>
+      <title>Declare a Result</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/declare/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/c-api/example/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/declare/</guid>
+      <description>// Declare to C a Result with a happy value of intptr_t CXX_DECLARE_RESULT_SYSTEM(result_int, intptr_t) // Save oneself typing out CXX_RESULT_SYSTEM(result_int) all the time typedef CXX_RESULT_SYSTEM(result_int) result; // Our custom C enum enum c_enum { c_enum_not_found, c_enum_bad_argument }; // Make a custom status code domain for this C enum CXX_DECLARE_RESULT_SYSTEM_FROM_ENUM(result_int, // The C Result type declared above  c_enum, // The C enum we wish to wrap  &amp;#34;{74ceb994-7622-3a21-07f0-b016aa705585}&amp;#34;, // Unique UUID for this domain  // Mappings of C enum values to textual description and semantic equivalances to generic codes  {c_enum::c_enum_not_found, &amp;#34;item not found&amp;#34;, {errc::no_such_file_or_directory}}, {c_enum::c_enum_bad_argument, &amp;#34;invoked wrong&amp;#34;, {errc::invalid_argument}}) // Make helper macros #define SUCCESS(v) CXX_MAKE_RESULT_SYSTEM_SUCCESS(result_int, (v)) #define FAILURE(v) CXX_MAKE_RESULT_SYSTEM_FROM_ENUM(result_int, c_enum, (v)) View this code on Github The key to making C programming easy is to alias the long complex things into short easy thing.</description>
+    </item>
+    
+    <item>
+      <title>Example C&#43;&#43; function</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-cxx/example/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-cxx/example/</guid>
       <description>Let us start with a simple C++ function which we wish to make available to C code:
 namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental; // Fill the supplied buffer with the integer v converted to a string, // returning length of string minus null terminator outcome_e::status_result&amp;lt;size_t&amp;gt; to_string(char *buffer, size_t bufferlen, int v) noexcept { try { // Could throw an exception!  std::string temp(std::to_string(v)); // Will this string exceed the supplied buffer?  if(temp.</description>
     </item>
@@ -259,10 +277,10 @@ outcome::result&amp;lt;void&amp;gt; print_half(const std::string&amp;amp; text);
     
     <item>
       <title>The payload</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/value_type/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/value_type/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/value_type/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/value_type/</guid>
       <description>We define the code domain&amp;rsquo;s value_type &amp;ndash; the payload to be transported by status codes using this code domain &amp;ndash; to be a POSIX errno value, an integer line number and a const char pointer.
 public: // This is the value type for `file_io_error`. We add line number and source file path.  struct value_type { typename outcome_e::posix_code::value_type errcode; // from POSIX, as we inherit from _posix_code_domain  // Our additional payload  int lineno; // from __LINE__  const char *file; // from __FILE__  // Could also place a backtrace of void *[16] here .</description>
     </item>
@@ -329,12 +347,12 @@ Seeing as we are replacing the throwing overload of copy_file() in the Filesyste
     
     <item>
       <title>Calling it from C</title>
-      <link>https://ned14.github.io/outcome/experimental/c-api/example2/</link>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-cxx/example2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/c-api/example2/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-cxx/example2/</guid>
       <description>Firstly we need to declare to C our result returning C++ function:
-// Declare our C++ function&amp;#39;s returning result type. Only needs to be done once. // This declares an `status_result&amp;lt;size_t, system_code&amp;gt;` which is an alias to // `basic_result&amp;lt;size_t, status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt;&amp;gt;`. // // The first parameter is some unique identifier for this type which will be used // whenever we reference this type in the future. CXX_DECLARE_RESULT_SYSTEM(to_string_rettype, size_t); // Tell C about our extern C++ function `to_string()` extern CXX_RESULT_SYSTEM(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v); View this code on Github Now let&amp;rsquo;s call the C++ function from C:</description>
+// Declare our C++ function&amp;#39;s returning result type. Only needs to be done once. // This declares an `status_result&amp;lt;size_t, system_code&amp;gt;` which is an alias to // `basic_result&amp;lt;size_t, status_code&amp;lt;erased&amp;lt;intptr_t&amp;gt;&amp;gt;&amp;gt;`. // // The first parameter is some unique identifier for this type which will be used // whenever we reference this type in the future. CXX_DECLARE_RESULT_SYSTEM(to_string_rettype, size_t) // Tell C about our extern C++ function `to_string()` extern CXX_RESULT_SYSTEM(to_string_rettype) _Z9to_stringPcmi(char *buffer, size_t bufferlen, int v); View this code on Github Now let&amp;rsquo;s call the C++ function from C:</description>
     </item>
     
     <item>
@@ -410,12 +428,22 @@ auto __result = BigInt::fromString(text); if (!__result) return __result.as_fail
     
     <item>
       <title>The constructor</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/constructor/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/constructor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/constructor/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/constructor/</guid>
       <description>Code domains are 100% constexpr to construct and destruct, as are status codes. This enables the compiler to 100% instantiate both only in its mind, and to emit zero code and thus zero overhead.
 Unfortunately it also means that it must be possible for each domain to be instantiated an infinite number of times, and being 100% in constexpr, any instances never have a unique address in memory either. Thus we cannot compare domains for equivalence using their address in memory, as  std::error_category does.</description>
+    </item>
+    
+    <item>
+      <title>Using a Result</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/use/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/use/</guid>
+      <description>This models the earlier C++ example of use, and its C equivalent isn&amp;rsquo;t much more verbose thanks to our helper typedefs and macros:
+result positive_only(int x) { if(x &amp;lt; 0) { return FAILURE(c_enum_bad_argument); } return SUCCESS(x); } bool test(int x) { result r = positive_only(x); if(CXX_RESULT_HAS_ERROR(r)) { if(outcome_status_code_equal_generic(&amp;amp;r.error, EINVAL)) { fprintf(stderr, &amp;#34;Positive numbers only!\n&amp;#34;); return false; } } return true; } View this code on Github For this to link, the CXX_DECLARE_RESULT_SYSTEM_FROM_ENUM macro needs to be compiled at least once within C++ within the final binary to emit the extern functions needed by C.</description>
     </item>
     
     <item>
@@ -492,12 +520,22 @@ outcome::result&amp;lt;file_handle&amp;gt; fh2 = make&amp;lt;file_handle&amp;gt;
     
     <item>
       <title>String refs</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/string_ref/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/string_ref/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/string_ref/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/string_ref/</guid>
       <description>&amp;lt;system_error2&amp;gt; does not use std::string to return possibly statically or dynamically allocated strings, and thus avoids dragging in a lot of the standard library which impacts build times.
 Instead status code domains have a string_ref, which has a polymorphic implementation which may or may not manage a dynamic memory allocation using an atomic reference counter. Due to this polymorphism, you don&amp;rsquo;t need to worry which implementation is actually in use under the bonnet when you pass around string_ref instances.</description>
+    </item>
+    
+    <item>
+      <title>TRY a C Result</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/try/</guid>
+      <description>Thanks to much of the magic of OUTCOME_TRY(var, expr) being implemented using C preprocessor metaprogramming, we can offer a very similar experience for the C try operation and without needing anything compiled in C++ as support functions:
+result test2(int x) { CXX_RESULT_SYSTEM_TRY(int v, // what to set to value if successful  fprintf(stderr, &amp;#34;Positive numbers only!\n&amp;#34;), // what cleanup to run if unsuccessful  positive_only(x)); return SUCCESS(v + 1); } View this code on Github The principle difference is that you can specify a cleanup routine to perform if failure is encountered.</description>
     </item>
     
     <item>
@@ -554,16 +592,6 @@ namespace app { // Specialise an exception type for tidylib errors  struct tidyl
     </item>
     
     <item>
-      <title>C Macro API Reference</title>
-      <link>https://ned14.github.io/outcome/experimental/c-api/reference/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://ned14.github.io/outcome/experimental/c-api/reference/</guid>
-      <description>The C macro API header &amp;lt;outcome/experimental/result.h&amp;gt; consists of these macros:
- CXX_DECLARE_RESULT(ident, T, E) Declares to C a basic_result type uniquely identified by ident. T is available at the member variable .value, and E is available at the member variable .error. CXX_RESULT(ident) A reference to a previously declared result type with unique ident. CXX_RESULT_HAS_VALUE(r) Evaluates to 1 (true) if the input result has a value. CXX_RESULT_HAS_ERROR(r) Evaluates to 1 (true) if the input result has an error.</description>
-    </item>
-    
-    <item>
       <title>Hook outcome</title>
       <link>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -606,10 +634,10 @@ This section illustrates how you can hook into the std::error_code system from t
     
     <item>
       <title>Redefining `message()`</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/message/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/message/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/message/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/message/</guid>
       <description>You may remember that our custom _file_io_error_domain inherits from outcome_e::posix_code::domain_type, and thus does not have to implement the many pure virtual functions required by outcome_e::status_code_domain.
 What we do need to do is reimplement _do_message() to append the file and line information to the POSIX error description string returned by outcome_e::posix_code::domain_type. This causes the status code&amp;rsquo;s .message() observer to return a string with the extra payload information represented in text.
 // Return a string describing a specific code.</description>
@@ -671,10 +699,10 @@ template&amp;lt;class... Args&amp;gt; inline outcome::result&amp;lt;file_handle&
     
     <item>
       <title>Constexpr domain source</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/source/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/source/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/source/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/source/</guid>
       <description>Back in The constructor, we declared but did not implement a .get() function which returns a constexpr static instance of the domain. We implement this now:
 // 100% constexpr instantiation constexpr _file_io_error_domain file_io_error_domain; inline constexpr const _file_io_error_domain &amp;amp;_file_io_error_domain::get() { return file_io_error_domain; } View this code on Github As this is 100% constexpr, it can be (and is under optimisation) implemented entirely in the mind of the compiler with no run time representation.</description>
     </item>
@@ -691,10 +719,10 @@ template&amp;lt;class... Args&amp;gt; inline outcome::result&amp;lt;file_handle&
     
     <item>
       <title>Implicit conversion</title>
-      <link>https://ned14.github.io/outcome/experimental/worked-example/implicit_conversion/</link>
+      <link>https://ned14.github.io/outcome/experimental/worked-example-long/implicit_conversion/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://ned14.github.io/outcome/experimental/worked-example/implicit_conversion/</guid>
+      <guid>https://ned14.github.io/outcome/experimental/worked-example-long/implicit_conversion/</guid>
       <description>Back in The payload, we mentioned that there was no default implicit conversion of file_io_error (status_code&amp;lt;_file_io_error_domain&amp;gt;) to error, as error is too small to hold _file_io_error_domain::value_type.
 We can tell the framework about available implicit conversions by defining an ADL discovered free function make_status_code() which takes our custom status code as input, and returns an error:
 // Now tell `error` how it can implicitly construct from `file_io_error`. // This is done by us defining a free function called `make_status_code()` // which is discovered using ADL.</description>
@@ -2717,7 +2745,7 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://ned14.github.io/outcome/credits/</guid>
-      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1495 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @BurningEnlightenment 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @amerry 1 commits   @ecatmur 1 commits   @gix 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @alandefreitas 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
+      <description>github contributors .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @ned14 1496 commits   @akrzemi1 45 commits   @cstratopoulos 9 commits   @hazelnusse 7 commits   @BurningEnlightenment 7 commits   @libbooze 2 commits   @johnthagen 2 commits   @menuet 2 commits   @amerry 1 commits   @ecatmur 1 commits   @gix 1 commits   @norbertwenzel 1 commits   @vinipsmaker 1 commits   @alandefreitas 1 commits   @andoks 1 commits   @catskul 1 commits   @hyeongyukim 1 commits   @jenkins-nedprod 1 commits   @sdarwin 1 commits   This pretty, modern C++ documentation  Hugo - static website generator of this documentation.</description>
     </item>
     
     <item>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C Results on Outcome documentation</title>
+    <link>https://ned14.github.io/outcome/experimental/c-api/from-c/</link>
+    <description>Recent content in C Results on Outcome documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 16 Jul 2024 21:33:35 +0100</lastBuildDate>
+    
+	<atom:link href="https://ned14.github.io/outcome/experimental/c-api/from-c/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>C system error results</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/system_code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/system_code/</guid>
+      <description>In v2.2.11, C Result support went from second tier to first tier status, and now you can create, query and manipulate a subset of Result types entirely from within C by including &amp;lt;outcome/experimental/result.h&amp;gt;.
+The subset supported are those result&amp;lt;T, E&amp;gt; which are a status_result&amp;lt;T&amp;gt; i.e. the E is hardcoded to experimental::error which is the type erased runtime polymorphic holder for any errored status_code whose payload is not bigger than an intptr_t.</description>
+    </item>
+    
+    <item>
+      <title>Declare a Result</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/declare/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/declare/</guid>
+      <description>// Declare to C a Result with a happy value of intptr_t CXX_DECLARE_RESULT_SYSTEM(result_int, intptr_t) // Save oneself typing out CXX_RESULT_SYSTEM(result_int) all the time typedef CXX_RESULT_SYSTEM(result_int) result; // Our custom C enum enum c_enum { c_enum_not_found, c_enum_bad_argument }; // Make a custom status code domain for this C enum CXX_DECLARE_RESULT_SYSTEM_FROM_ENUM(result_int, // The C Result type declared above  c_enum, // The C enum we wish to wrap  &amp;#34;{74ceb994-7622-3a21-07f0-b016aa705585}&amp;#34;, // Unique UUID for this domain  // Mappings of C enum values to textual description and semantic equivalances to generic codes  {c_enum::c_enum_not_found, &amp;#34;item not found&amp;#34;, {errc::no_such_file_or_directory}}, {c_enum::c_enum_bad_argument, &amp;#34;invoked wrong&amp;#34;, {errc::invalid_argument}}) // Make helper macros #define SUCCESS(v) CXX_MAKE_RESULT_SYSTEM_SUCCESS(result_int, (v)) #define FAILURE(v) CXX_MAKE_RESULT_SYSTEM_FROM_ENUM(result_int, c_enum, (v)) View this code on Github The key to making C programming easy is to alias the long complex things into short easy thing.</description>
+    </item>
+    
+    <item>
+      <title>Using a Result</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/use/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/use/</guid>
+      <description>This models the earlier C++ example of use, and its C equivalent isn&amp;rsquo;t much more verbose thanks to our helper typedefs and macros:
+result positive_only(int x) { if(x &amp;lt; 0) { return FAILURE(c_enum_bad_argument); } return SUCCESS(x); } bool test(int x) { result r = positive_only(x); if(CXX_RESULT_HAS_ERROR(r)) { if(outcome_status_code_equal_generic(&amp;amp;r.error, EINVAL)) { fprintf(stderr, &amp;#34;Positive numbers only!\n&amp;#34;); return false; } } return true; } View this code on Github For this to link, the CXX_DECLARE_RESULT_SYSTEM_FROM_ENUM macro needs to be compiled at least once within C++ within the final binary to emit the extern functions needed by C.</description>
+    </item>
+    
+    <item>
+      <title>TRY a C Result</title>
+      <link>https://ned14.github.io/outcome/experimental/c-api/from-c/try/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/experimental/c-api/from-c/try/</guid>
+      <description>Thanks to much of the magic of OUTCOME_TRY(var, expr) being implemented using C preprocessor metaprogramming, we can offer a very similar experience for the C try operation and without needing anything compiled in C++ as support functions:
+result test2(int x) { CXX_RESULT_SYSTEM_TRY(int v, // what to set to value if successful  fprintf(stderr, &amp;#34;Positive numbers only!\n&amp;#34;), // what cleanup to run if unsuccessful  positive_only(x)); return SUCCESS(v + 1); } View this code on Github The principle difference is that you can specify a cleanup routine to perform if failure is encountered.</description>
+    </item>
+    
+  </channel>
+</rss>
