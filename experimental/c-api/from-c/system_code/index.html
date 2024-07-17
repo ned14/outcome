@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-07-17T18:55:05 UTC">
+<meta name="revised" content="2024-07-17T20:57:28 UTC">
 <title>C system error results :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2933,7 +2933,8 @@ identified by <code>ident</code>. <code>T</code> is available at the
 member variable <code>.value</code>, and <code>struct cxx_status_code_system</code>
 is available at the member variable <code>.error</code>. If in C++,
 implements C extern functions for making successful and failure results
-of this type.
+of this type. If you call this from within
+C++, make SURE it is not within a <code>extern "C"</code> block!
 
 <dt><code>CXX_RESULT_SYSTEM(ident)</code>
 <dd>A reference to a previously declared <code>status_result</code> type with

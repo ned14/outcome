@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-07-17T18:55:06 UTC">
+<meta name="revised" content="2024-07-17T20:57:29 UTC">
 <title>C Results :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2920,7 +2920,8 @@
 <dd>Declares to C a <code>basic_result<T, E></code> type uniquely
 identified by <code>ident</code>. <code>T</code> is available at the
 member variable <code>.value</code>, and <code>E</code> is available
-at the member variable <code>.error</code>.
+at the member variable <code>.error</code>. If you call this from within
+C++, make SURE it is not within a <code>extern "C"</code> block!
 
 <dt><code>CXX_RESULT(ident)</code>
 <dd>A reference to a previously declared <code>result</code> type with
@@ -2975,7 +2976,7 @@ as the C++ <code>result</code> has a different layout if <code>E</code> is a sta
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 16/07/2024
+        <i class='fa fa-calendar'></i> Last update on 17/07/2024
     </div>
     
 
