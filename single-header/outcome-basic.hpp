@@ -1019,9 +1019,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 5bcd0f32f28659a0eab62f1d643d878c2220788d
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-07-15 17:46:44 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 5bcd0f32
+#define OUTCOME_PREVIOUS_COMMIT_REF b01ac71096775daf18d9a57a69be5e129f421a67
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-07-17 20:54:50 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b01ac710
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -3927,6 +3927,10 @@ Distributed under the Boost Software License, Version 1.0.
 #define OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 #ifndef OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS
 #if defined(__ELF__)
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverlength-strings"
+#endif
 __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
         ".byte 4 /* Python Text */\n"
         ".ascii \"gdb.inlined-script\\n\"\n"
@@ -4028,6 +4032,9 @@ __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
         ".ascii \"register_printers(gdb.current_objfile())\\n\"\n"
         ".byte 0\n"
         ".popsection\n");
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 #endif
 #endif
 #endif
@@ -6334,6 +6341,88 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef OUTCOME_TRY_HPP
 #define OUTCOME_TRY_HPP
+/* Try operation macros
+(C) 2017-2024 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+File Created: July 2017
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+#ifndef OUTCOME_TRY_H
+#define OUTCOME_TRY_H
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+#define OUTCOME_TRY_GLUE2(x, y) x##y
+#define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
+#define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(_outcome_try_unique_name_temporary, __COUNTER__)
+#define OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
+#define OUTCOME_TRY_EXPAND_ARGS(args) OUTCOME_TRY_RETURN_ARG_COUNT args
+#define OUTCOME_TRY_COUNT_ARGS_MAX8(...) OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
+#define OUTCOME_TRY_OVERLOAD_MACRO2(name, count) name##count
+#define OUTCOME_TRY_OVERLOAD_MACRO1(name, count) OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
+#define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
+#define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
+#define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
+#define _OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
+#define _OUTCOME_TRY_EXPAND_ARGS(args) _OUTCOME_TRY_RETURN_ARG_COUNT args
+#define _OUTCOME_TRY_COUNT_ARGS_MAX8(...) _OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
+#define _OUTCOME_TRY_OVERLOAD_MACRO2(name, count) name##count
+#define _OUTCOME_TRY_OVERLOAD_MACRO1(name, count) _OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
+#define _OUTCOME_TRY_OVERLOAD_MACRO(name, count) _OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
+#define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
+#define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
+#if !defined(OUTCOME_TRY_LIKELY_IF) && defined(__has_cpp_attribute)
+#if __has_cpp_attribute(likely)
+#define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
+#endif
+#endif
+#ifndef OUTCOME_TRY_LIKELY_IF
+#if defined(__clang__) || defined(__GNUC__)
+#define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), 1))
+#else
+#define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__)
+#endif
+#endif
+#ifdef __cplusplus
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_AUTO(...) auto
+#else
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_AUTO(...) __typeof__(__VA_ARGS__)
+#endif
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK(...) __VA_ARGS__
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_AUTO(__VA_ARGS__) unique = (__VA_ARGS__)
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(x) x
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE(unique, x, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, __VA_ARGS__))
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, x, y, ...) x unique = (__VA_ARGS__)
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED2(x) x
+#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED(unique, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED2(OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, __VA_ARGS__))
+#define OUTCOME_TRYV2_UNIQUE_STORAGE1(...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE
+#define OUTCOME_TRYV2_UNIQUE_STORAGE2(...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED
+#define OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, ...) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRYV2_UNIQUE_STORAGE, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec) (unique, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, __VA_ARGS__)
+#define OUTCOME_TRY2_VAR_SECOND2(x, var) var
+#define OUTCOME_TRY2_VAR_SECOND3(x, y, ...) x y
+#define OUTCOME_TRY2_VAR(spec) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY2_VAR_SECOND, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, spec)
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
+#endif
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace detail
 {
@@ -6469,53 +6558,9 @@ OUTCOME_V2_NAMESPACE_END
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
-#define OUTCOME_TRY_GLUE2(x, y) x##y
-#define OUTCOME_TRY_GLUE(x, y) OUTCOME_TRY_GLUE2(x, y)
-#define OUTCOME_TRY_UNIQUE_NAME OUTCOME_TRY_GLUE(_outcome_try_unique_name_temporary, __COUNTER__)
-#define OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
-#define OUTCOME_TRY_EXPAND_ARGS(args) OUTCOME_TRY_RETURN_ARG_COUNT args
-#define OUTCOME_TRY_COUNT_ARGS_MAX8(...) OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-#define OUTCOME_TRY_OVERLOAD_MACRO2(name, count) name##count
-#define OUTCOME_TRY_OVERLOAD_MACRO1(name, count) OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
-#define OUTCOME_TRY_OVERLOAD_MACRO(name, count) OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
-#define OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
-#define OUTCOME_TRY_CALL_OVERLOAD(name, ...) OUTCOME_TRY_OVERLOAD_GLUE(OUTCOME_TRY_OVERLOAD_MACRO(name, OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
-#define _OUTCOME_TRY_RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, count, ...) count
-#define _OUTCOME_TRY_EXPAND_ARGS(args) _OUTCOME_TRY_RETURN_ARG_COUNT args
-#define _OUTCOME_TRY_COUNT_ARGS_MAX8(...) _OUTCOME_TRY_EXPAND_ARGS((__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-#define _OUTCOME_TRY_OVERLOAD_MACRO2(name, count) name##count
-#define _OUTCOME_TRY_OVERLOAD_MACRO1(name, count) _OUTCOME_TRY_OVERLOAD_MACRO2(name, count)
-#define _OUTCOME_TRY_OVERLOAD_MACRO(name, count) _OUTCOME_TRY_OVERLOAD_MACRO1(name, count)
-#define _OUTCOME_TRY_OVERLOAD_GLUE(x, y) x y
-#define _OUTCOME_TRY_CALL_OVERLOAD(name, ...) _OUTCOME_TRY_OVERLOAD_GLUE(_OUTCOME_TRY_OVERLOAD_MACRO(name, _OUTCOME_TRY_COUNT_ARGS_MAX8(__VA_ARGS__)), (__VA_ARGS__))
-#if !defined(OUTCOME_TRY_LIKELY_IF) && defined(__has_cpp_attribute)
-#if __has_cpp_attribute(likely)
-#define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__) [[likely]]
-#endif
-#endif
-#ifndef OUTCOME_TRY_LIKELY_IF
-#if defined(__clang__) || defined(__GNUC__)
-#define OUTCOME_TRY_LIKELY_IF(...) if(__builtin_expect(!!(__VA_ARGS__), true))
-#else
-#define OUTCOME_TRY_LIKELY_IF(...) if(__VA_ARGS__)
-#endif
-#endif
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK(...) __VA_ARGS__
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, ...) auto unique = (__VA_ARGS__)
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(x) x
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE(unique, x, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE2(OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE3(unique, __VA_ARGS__))
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, x, y, ...) x unique = (__VA_ARGS__)
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED2(x) x
-#define OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED(unique, ...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED2(OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED3(unique, __VA_ARGS__))
-#define OUTCOME_TRYV2_UNIQUE_STORAGE1(...) OUTCOME_TRYV2_UNIQUE_STORAGE_DEDUCE
-#define OUTCOME_TRYV2_UNIQUE_STORAGE2(...) OUTCOME_TRYV2_UNIQUE_STORAGE_SPECIFIED
-#define OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, ...) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRYV2_UNIQUE_STORAGE, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec) (unique, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, __VA_ARGS__)
 // Use if(!expr); else as some compilers assume else clauses are always unlikely
 #define OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(::OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)); else { /* works around ICE in GCC's coroutines implementation */ auto unique##_f(::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))); retstmt unique##_f; }
 #define OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, spec, ...) OUTCOME_TRYV2_UNIQUE_STORAGE(unique, spec, __VA_ARGS__); OUTCOME_TRY_LIKELY_IF(!OUTCOME_V2_NAMESPACE::try_operation_has_value(unique)) { /* works around ICE in GCC's coroutines implementation */ auto unique##_f(::OUTCOME_V2_NAMESPACE::try_operation_return_as(static_cast<decltype(unique) &&>(unique))); retstmt unique##_f; }
-#define OUTCOME_TRY2_VAR_SECOND2(x, var) var
-#define OUTCOME_TRY2_VAR_SECOND3(x, y, ...) x y
-#define OUTCOME_TRY2_VAR(spec) _OUTCOME_TRY_CALL_OVERLOAD(OUTCOME_TRY2_VAR_SECOND, OUTCOME_TRYV2_UNIQUE_STORAGE_UNPACK spec, spec)
 #define OUTCOME_TRY2_SUCCESS_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 #define OUTCOME_TRY2_FAILURE_LIKELY(unique, retstmt, var, ...) OUTCOME_TRYV3_FAILURE_LIKELY(unique, retstmt, var, __VA_ARGS__); OUTCOME_TRY2_VAR(var) = ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique))
 /*! AWAITING HUGO JSON CONVERSION TOOL

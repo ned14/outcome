@@ -11,7 +11,8 @@ The C macro API header `<outcome/experimental/result.h>` has some macros for wor
 <dd>Declares to C a <code>basic_result<T, E></code> type uniquely
 identified by <code>ident</code>. <code>T</code> is available at the
 member variable <code>.value</code>, and <code>E</code> is available
-at the member variable <code>.error</code>.
+at the member variable <code>.error</code>. If you call this from within
+C++, make SURE it is not within a <code>extern "C"</code> block!
 
 <dt><code>CXX_RESULT(ident)</code>
 <dd>A reference to a previously declared <code>result</code> type with

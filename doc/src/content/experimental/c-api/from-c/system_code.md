@@ -25,7 +25,8 @@ identified by <code>ident</code>. <code>T</code> is available at the
 member variable <code>.value</code>, and <code>struct cxx_status_code_system</code>
 is available at the member variable <code>.error</code>. If in C++,
 implements C extern functions for making successful and failure results
-of this type.
+of this type. If you call this from within
+C++, make SURE it is not within a <code>extern "C"</code> block!
 
 <dt><code>CXX_RESULT_SYSTEM(ident)</code>
 <dd>A reference to a previously declared <code>status_result</code> type with
