@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-07-17T14:19:10 UTC">
+<meta name="revised" content="2024-07-17T14:28:12 UTC">
 <title>C system error results :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2994,7 +2994,7 @@ from a C enum.
 
 <dl>
 <dt><code>CXX_TO_RESULT_SYSTEM_CODE(ident, status_code&lt;T&gt;)</code>
-<dd>Returns a previously declared C Result from its matching C++ <code>status_code<code>.
+<dd>Returns a previously declared C Result from its matching C++ <code>status_code</code>.
 NOTE that the destructor of the C++ status code is NOT called. If this is important
 to your status code, it is 100% on you to ensure that your C Result reenters a C++
 Result at the end of its lifetime.
