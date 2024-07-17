@@ -82,5 +82,19 @@ as per the <code>quick_status_code_from_enum</code> documentation</a>.
 from a C enum.
 </dl>
 
+The operations available to C++ are:
+
+<dl>
+<dt><code>CXX_TO_RESULT_SYSTEM_CODE(ident, status_code&lt;T&gt;)</code>
+<dd>Returns a previously declared C Result from its matching C++ <code>status_code<code>.
+NOTE that the destructor of the C++ status code is NOT called. If this is important
+to your status code, it is 100% on you to ensure that your C Result reenters a C++
+Result at the end of its lifetime.
+
+<dt><code>to_result(any C Result)</code>
+<dd>This is an overloaded C++ free function which returns the C++ status_code&lt;T&gt;
+matching its input C Result.
+</dl>
+
 Using the above you can write C code using Outcome.Experimental's Result type
 quite effectively. Let's look at an example of use next.
