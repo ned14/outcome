@@ -21,7 +21,8 @@ project
       [ predef-require "!BOOST_COMP_CLANG" or "BOOST_COMP_CLANG >= 4.0" ]
       <define>BOOST_TEST_MODULE=Outcome
       <library>/boost/test//boost_unit_test_framework
-    ;
+      <library>/boost/outcome//boost_outcome
+   ;
 
 {
   test-suite outcome :
