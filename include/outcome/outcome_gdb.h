@@ -1,26 +1,28 @@
-/* Inline GDB pretty printer for result
-(C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
-File Created: Jun 2024
+// Inline GDB pretty printer for result
+// (C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+// File Created: Jun 2024
+//
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License in the accompanying file
+// Licence.txt or at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//
+// Distributed under the Boost Software License, Version 1.0.
+//     (See accompanying file Licence.txt or copy at
+//           http://www.boost.org/LICENSE_1_0.txt)
 
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
+// Generated on 2024-08-08T21:42:04
 
 #ifndef OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 #define OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
@@ -39,7 +41,7 @@ __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
 
         ".ascii \"def synthesise_gdb_value_from_string(s):\\n\"\n"
         ".ascii \"    '''For when you want to return a synthetic string from children()'''\\n\"\n"
-        ".ascii \"    return gdb.Value(s + '\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
+        ".ascii \"    return gdb.Value(s + '\\\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
 
         ".ascii \"class OutcomeBasicOutcomePrinter(object):\\n\"\n"
         ".ascii \"    '''Print an outcome::basic_outcome<T> and outcome::basic_result<T>'''\\n\"\n"
@@ -156,7 +158,7 @@ __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-#endif
-#endif
+#endif // defined(__ELF__)
+#endif // !defined(OUTCOME_GDB_DISABLE_INLINE)
 
-#endif
+#endif // !defined(OUTCOME_GDB_INLINE_H)
