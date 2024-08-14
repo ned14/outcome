@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-08-14T16:44:43 UTC">
+<meta name="revised" content="2024-08-14T17:03:59 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2862,6 +2862,11 @@ with display of <code>strerror()</code> if the code domain is POSIX or generic.<
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
+<ul>
+<li>The <code>status</code> enumeration used to track state internally did not list all possible enum
+values. This caused static analysers to complain.</li>
+</ul>
+
 <hr />
 
 <h2 id="v2-2-9-15th-april-2024-boost-1-85-release-https-github-com-ned14-outcome-releases-tag-v2-2-9">v2.2.9 15th April 2024 (Boost 1.85) <a href="https://github.com/ned14/outcome/releases/tag/v2.2.9">[release]</a></h2>
@@ -3604,7 +3609,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 14/06/2024
+        <i class='fa fa-calendar'></i> Last update on 14/08/2024
     </div>
     
 
