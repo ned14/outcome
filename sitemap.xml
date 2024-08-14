@@ -24,7 +24,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/experimental/advantages/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <lastmod>2019-02-05T21:41:47+00:00</lastmod>
   </url>
   
   <url>
@@ -58,18 +58,13 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-c/system_code/</loc>
-    <lastmod>2024-07-17T17:54:05+01:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://ned14.github.io/outcome/tutorial/essential/coroutines/try/</loc>
     <lastmod>2020-04-07T10:22:38+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/preamble/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/preamble/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
@@ -83,13 +78,13 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example/implicit-construction/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</loc>
+    <lastmod>2019-02-08T22:18:08+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/keeping_state/</loc>
-    <lastmod>2019-02-08T22:18:08+00:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/c-api/limitations/</loc>
+    <lastmod>2019-02-05T17:14:18+00:00</lastmod>
   </url>
   
   <url>
@@ -168,11 +163,6 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-cxx/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://ned14.github.io/outcome/reference/concepts/</loc>
     <lastmod>2018-12-11T14:56:04+00:00</lastmod>
   </url>
@@ -183,13 +173,8 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-c/declare/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-cxx/example/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/c-api/example/</loc>
+    <lastmod>2019-02-05T17:14:18+00:00</lastmod>
   </url>
   
   <url>
@@ -208,8 +193,8 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/value_type/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/value_type/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
@@ -258,13 +243,8 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-c/</loc>
-    <lastmod>2024-07-17T17:54:05+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-cxx/example2/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/c-api/example2/</loc>
+    <lastmod>2019-02-05T17:14:18+00:00</lastmod>
   </url>
   
   <url>
@@ -323,18 +303,13 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/constructor/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/constructor/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/reference/traits/</loc>
     <lastmod>2018-12-13T17:36:11+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-c/use/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
   </url>
   
   <url>
@@ -388,13 +363,8 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/string_ref/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/experimental/c-api/from-c/try/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/string_ref/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
@@ -433,6 +403,11 @@
   </url>
   
   <url>
+    <loc>https://ned14.github.io/outcome/experimental/c-api/reference/</loc>
+    <lastmod>2020-12-17T11:27:06+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://ned14.github.io/outcome/tutorial/advanced/hooks/hook_outcome/</loc>
     <lastmod>2020-12-15T12:22:39+00:00</lastmod>
   </url>
@@ -458,8 +433,8 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/message/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/message/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
@@ -498,8 +473,8 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/source/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/source/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
@@ -513,18 +488,13 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/implicit_conversion/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ned14.github.io/outcome/experimental/outcome/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/implicit_conversion/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ned14.github.io/outcome/changelog/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <lastmod>2024-06-14T11:40:56+01:00</lastmod>
   </url>
   
   <url>
@@ -538,13 +508,13 @@
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/outcome/</loc>
+    <lastmod>2019-02-05T17:14:18+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ned14.github.io/outcome/experimental/worked-example-long/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <loc>https://ned14.github.io/outcome/experimental/worked-example/</loc>
+    <lastmod>2019-01-26T23:38:56+00:00</lastmod>
   </url>
   
   <url>
@@ -1578,7 +1548,7 @@
   
   <url>
     <loc>https://ned14.github.io/outcome/</loc>
-    <lastmod>2024-07-16T21:33:35+01:00</lastmod>
+    <lastmod>2022-03-18T14:45:32+00:00</lastmod>
   </url>
   
   <url>
