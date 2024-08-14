@@ -23,6 +23,10 @@ to reflect the new facilities.
 
 ### Bug fixes:
 
+- This was fixed in Standalone Outcome in the last release, but the fix came too late for Boost.Outcome
+which ended up shipping with inline GDB pretty printers with the wrong escaping which caused
+failure to load.
+
 ---
 ## v2.2.10 14th August 2024 (Boost 1.86) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.10)
 
@@ -35,6 +39,11 @@ working with that type, as it will print the error message in GDB.
 
  Experimental Outcome's `status_code` has also gained its own auto-loading GDB pretty printer
 with display of `strerror()` if the code domain is POSIX or generic.
+
+### Bug fixes:
+
+- The `status` enumeration used to track state internally did not list all possible enum
+values. This caused static analysers to complain.
 
 ---
 ## v2.2.9 15th April 2024 (Boost 1.85) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.9)

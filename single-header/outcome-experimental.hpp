@@ -1044,9 +1044,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF b01ac71096775daf18d9a57a69be5e129f421a67
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-07-17 20:54:50 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b01ac710
+#define OUTCOME_PREVIOUS_COMMIT_REF e7d6c8312ee9628b8d7bb59b968b9c93e61091e8
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-08-14 17:04:36 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE e7d6c831
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -2350,10 +2350,10 @@ namespace detail
   to change the value to one of the enum's values. This is stupid to look at in source code,
   but it make clang's optimiser do the right thing, so it's worth it.
   */
-#define OUTCOME_USE_CONSTEXPR_ENUM_STATUS 0
   enum class status : uint16_t
   {
     // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
+    // bits 0-5 in use.
     none = 0,
     have_value = (1U << 0U),
     have_error = (1U << 1U),
@@ -2372,7 +2372,20 @@ namespace detail
     have_error_lost_consistency_error_is_errno = (1U << 1U) | (1U << 3U) | (1U << 4U),
     have_error_exception_lost_consistency_error_is_errno = (3U << 1U) | (1U << 3U) | (1U << 4U),
     // value has been moved from
-    have_moved_from = (1U << 5U)
+    have_moved_from = (1U << 5U),
+    have_value_moved_from = (1U << 0U) | (1U << 5U),
+    have_error_moved_from = (1U << 1U) | (1U << 5U),
+    have_exception_moved_from = (2U << 1U) | (1U << 5U),
+    have_error_exception_moved_from = (3U << 1U) | (1U << 5U),
+    have_value_lost_consistency_moved_from = (1U << 0U) | (1U << 3U) | (1U << 5U),
+    have_error_lost_consistency_moved_from = (1U << 1U) | (1U << 3U) | (1U << 5U),
+    have_exception_lost_consistency_moved_from = (2U << 1U) | (1U << 3U) | (1U << 5U),
+    have_error_exception_lost_consistency_moved_from = (3U << 1U) | (1U << 3U) | (1U << 5U),
+    have_error_is_errno_moved_from = (1U << 4U) | (1U << 5U),
+    have_error_error_is_errno_moved_from = (1U << 1U) | (1U << 4U) | (1U << 5U),
+    have_error_exception_error_is_errno_moved_from = (3U << 1U) | (1U << 4U) | (1U << 5U),
+    have_error_lost_consistency_error_is_errno_moved_from = (1U << 1U) | (1U << 3U) | (1U << 4U) | (1U << 5U),
+    have_error_exception_lost_consistency_error_is_errno_moved_from = (3U << 1U) | (1U << 3U) | (1U << 4U) | (1U << 5U),
   };
   struct status_bitfield_type
   {
@@ -2393,18 +2406,9 @@ namespace detail
     constexpr status_bitfield_type &operator=(const status_bitfield_type &) = default;
     constexpr status_bitfield_type &operator=(status_bitfield_type &&) = default;
     //~status_bitfield_type() = default;  // Do NOT uncomment this, it breaks older clangs!
-    constexpr bool have_value() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0;
-    }
-    constexpr bool have_error() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0;
-    }
-    constexpr bool have_exception() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0;
-    }
+    constexpr bool have_value() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0; }
+    constexpr bool have_error() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0; }
+    constexpr bool have_exception() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0; }
     constexpr bool have_lost_consistency() const noexcept
     {
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_lost_consistency)) != 0;
@@ -2413,10 +2417,7 @@ namespace detail
     {
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error_is_errno)) != 0;
     }
-    constexpr bool have_moved_from() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0;
-    }
+    constexpr bool have_moved_from() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0; }
     constexpr status_bitfield_type &set_have_value(bool v) noexcept
     {
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_value)) :
@@ -3925,29 +3926,29 @@ namespace detail
 } // namespace detail
 OUTCOME_V2_NAMESPACE_END
 #endif
-/* Inline GDB pretty printer for result
-(C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
-File Created: Jun 2024
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
+// Inline GDB pretty printer for result
+// (C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+// File Created: Jun 2024
+//
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License in the accompanying file
+// Licence.txt or at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//
+// Distributed under the Boost Software License, Version 1.0.
+//     (See accompanying file Licence.txt or copy at
+//           http://www.boost.org/LICENSE_1_0.txt)
+// Generated on 2024-08-12T21:44:07
 #ifndef OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 #define OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 #ifndef OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS
@@ -3957,13 +3958,12 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma clang diagnostic ignored "-Woverlength-strings"
 #endif
 __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
-        ".byte 4 /* Python Text */\n"
-        ".ascii \"gdb.inlined-script\\n\"\n"
+        ".ascii \"\\4gdb.inlined-script.OUTCOME_INLINE_GDB_PRETTY_PRINTER_H\\n\"\n"
         ".ascii \"import gdb.printing\\n\"\n"
         ".ascii \"import os\\n\"\n"
         ".ascii \"def synthesise_gdb_value_from_string(s):\\n\"\n"
         ".ascii \"    '''For when you want to return a synthetic string from children()'''\\n\"\n"
-        ".ascii \"    return gdb.Value(s + '\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
+        ".ascii \"    return gdb.Value(s + '\\\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
         ".ascii \"class OutcomeBasicOutcomePrinter(object):\\n\"\n"
         ".ascii \"    '''Print an outcome::basic_outcome<T> and outcome::basic_result<T>'''\\n\"\n"
         ".ascii \"    def __init__(self, val):\\n\"\n"
@@ -4060,9 +4060,9 @@ __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-#endif
-#endif
-#endif
+#endif // defined(__ELF__)
+#endif // !defined(OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS)
+#endif // !defined(OUTCOME_INLINE_GDB_PRETTY_PRINTER_H)
 /* Policies for result and outcome
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
 File Created: Oct 2017
@@ -8127,16 +8127,19 @@ namespace traits
 SYSTEM_ERROR2_NAMESPACE_END
 #ifndef SYSTEM_ERROR2_DISABLE_INLINE_GDB_PRETTY_PRINTERS
 #if defined(__ELF__)
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverlength-strings"
+#endif
 __asm__(
 ".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
-".byte 4 /* Python Text */\n"
-".ascii \"gdb.inlined-script\\n\"\n"
+".ascii \"\\4gdb.inlined-script.SYSTEM_ERROR2_INLINE_GDB_PRETTY_PRINTERS_H\\n\"\n"
 ".ascii \"import gdb.printing\\n\"\n"
 ".ascii \"import gdb\\n\"\n"
 ".ascii \"import os\\n\"\n"
 ".ascii \"def synthesise_gdb_value_from_string(s):\\n\"\n"
 ".ascii \"    '''For when you want to return a synthetic string from children()'''\\n\"\n"
-".ascii \"    return gdb.Value(s + '\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
+".ascii \"    return gdb.Value(s + '\\\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
 ".ascii \"class StatusCodePrinter(object):\\n\"\n"
 ".ascii \"    '''Print a system_error2::status_code<T>'''\\n\"\n"
 ".ascii \"    def __init__(self, val):\\n\"\n"
@@ -8164,8 +8167,11 @@ __asm__(
 ".ascii \"register_printers(gdb.current_objfile())\\n\"\n"
 ".byte 0\n"
 ".popsection\n");
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
-#endif
+#endif // defined(__ELF__)
+#endif // !defined(SYSTEM_ERROR2_DISABLE_INLINE_GDB_PRETTY_PRINTERS)
 #endif
 #include <exception> // for std::exception
 SYSTEM_ERROR2_NAMESPACE_BEGIN
