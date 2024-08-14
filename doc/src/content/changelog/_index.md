@@ -18,6 +18,9 @@ with display of `strerror()` if the code domain is POSIX or generic.
 
 ### Bug fixes:
 
+- The `status` enumeration used to track state internally did not list all possible enum
+values. This caused static analysers to complain.
+
 ---
 ## v2.2.9 15th April 2024 (Boost 1.85) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.9)
 

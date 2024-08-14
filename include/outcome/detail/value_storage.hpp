@@ -248,10 +248,10 @@ namespace detail
   to change the value to one of the enum's values. This is stupid to look at in source code,
   but it make clang's optimiser do the right thing, so it's worth it.
   */
-#define OUTCOME_USE_CONSTEXPR_ENUM_STATUS 0
   enum class status : uint16_t
   {
     // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
+    // bits 0-5 in use.
     none = 0,
 
     have_value = (1U << 0U),
@@ -261,6 +261,7 @@ namespace detail
 
     // failed to complete a strong swap
     have_lost_consistency = (1U << 3U),
+
     have_value_lost_consistency = (1U << 0U) | (1U << 3U),
     have_error_lost_consistency = (1U << 1U) | (1U << 3U),
     have_exception_lost_consistency = (2U << 1U) | (1U << 3U),
@@ -268,6 +269,7 @@ namespace detail
 
     // can errno be set from this error?
     have_error_is_errno = (1U << 4U),
+
     have_error_error_is_errno = (1U << 1U) | (1U << 4U),
     have_error_exception_error_is_errno = (3U << 1U) | (1U << 4U),
 
@@ -275,7 +277,24 @@ namespace detail
     have_error_exception_lost_consistency_error_is_errno = (3U << 1U) | (1U << 3U) | (1U << 4U),
 
     // value has been moved from
-    have_moved_from = (1U << 5U)
+    have_moved_from = (1U << 5U),
+
+    have_value_moved_from = (1U << 0U) | (1U << 5U),
+    have_error_moved_from = (1U << 1U) | (1U << 5U),
+    have_exception_moved_from = (2U << 1U) | (1U << 5U),
+    have_error_exception_moved_from = (3U << 1U) | (1U << 5U),
+
+    have_value_lost_consistency_moved_from = (1U << 0U) | (1U << 3U) | (1U << 5U),
+    have_error_lost_consistency_moved_from = (1U << 1U) | (1U << 3U) | (1U << 5U),
+    have_exception_lost_consistency_moved_from = (2U << 1U) | (1U << 3U) | (1U << 5U),
+    have_error_exception_lost_consistency_moved_from = (3U << 1U) | (1U << 3U) | (1U << 5U),
+
+    have_error_is_errno_moved_from = (1U << 4U) | (1U << 5U),
+    have_error_error_is_errno_moved_from = (1U << 1U) | (1U << 4U) | (1U << 5U),
+    have_error_exception_error_is_errno_moved_from = (3U << 1U) | (1U << 4U) | (1U << 5U),
+
+    have_error_lost_consistency_error_is_errno_moved_from = (1U << 1U) | (1U << 3U) | (1U << 4U) | (1U << 5U),
+    have_error_exception_lost_consistency_error_is_errno_moved_from = (3U << 1U) | (1U << 3U) | (1U << 4U) | (1U << 5U),
   };
   struct status_bitfield_type
   {
@@ -298,523 +317,53 @@ namespace detail
     constexpr status_bitfield_type &operator=(status_bitfield_type &&) = default;
     //~status_bitfield_type() = default;  // Do NOT uncomment this, it breaks older clangs!
 
-    constexpr bool have_value() const noexcept
-    {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      return (status_value == status::have_value)                      //
-             || (status_value == status::have_value_lost_consistency)  //
-      ;
-#else
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0;
-#endif
-    }
-    constexpr bool have_error() const noexcept
-    {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      return (status_value == status::have_error)                                               //
-             || (status_value == status::have_error_exception)                                  //
-             || (status_value == status::have_error_lost_consistency)                           //
-             || (status_value == status::have_error_exception_lost_consistency)                 //
-             || (status_value == status::have_error_error_is_errno)                             //
-             || (status_value == status::have_error_exception_error_is_errno)                   //
-             || (status_value == status::have_error_lost_consistency_error_is_errno)            //
-             || (status_value == status::have_error_exception_lost_consistency_error_is_errno)  //
-      ;
-#else
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0;
-#endif
-    }
-    constexpr bool have_exception() const noexcept
-    {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      return (status_value == status::have_exception)                                           //
-             || (status_value == status::have_error_exception)                                  //
-             || (status_value == status::have_exception_lost_consistency)                       //
-             || (status_value == status::have_error_exception_lost_consistency)                 //
-             || (status_value == status::have_error_exception_error_is_errno)                   //
-             || (status_value == status::have_error_exception_lost_consistency_error_is_errno)  //
-      ;
-#else
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0;
-#endif
-    }
+    constexpr bool have_value() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0; }
+    constexpr bool have_error() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0; }
+    constexpr bool have_exception() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0; }
     constexpr bool have_lost_consistency() const noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      return (status_value == status::have_value_lost_consistency)                              //
-             || (status_value == status::have_error_lost_consistency)                           //
-             || (status_value == status::have_exception_lost_consistency)                       //
-             || (status_value == status::have_error_lost_consistency_error_is_errno)            //
-             || (status_value == status::have_error_exception_lost_consistency_error_is_errno)  //
-      ;
-#else
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_lost_consistency)) != 0;
-#endif
     }
     constexpr bool have_error_is_errno() const noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      return (status_value == status::have_error_error_is_errno)                                //
-             || (status_value == status::have_error_exception_error_is_errno)                   //
-             || (status_value == status::have_error_lost_consistency_error_is_errno)            //
-             || (status_value == status::have_error_exception_lost_consistency_error_is_errno)  //
-      ;
-#else
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error_is_errno)) != 0;
-#endif
     }
-    constexpr bool have_moved_from() const noexcept
-    {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-#error Fixme
-#else
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0;
-#endif
-    }
+    constexpr bool have_moved_from() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0; }
 
     constexpr status_bitfield_type &set_have_value(bool v) noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      switch(status_value)
-      {
-      case status::none:
-        if(v)
-        {
-          status_value = status::have_value;
-        }
-        break;
-      case status::have_value:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_error:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_exception:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_exception:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_value_lost_consistency:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_error_lost_consistency:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_exception_lost_consistency:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_exception_lost_consistency:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_error_is_errno:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_exception_error_is_errno:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_lost_consistency_error_is_errno:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_exception_lost_consistency_error_is_errno:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      }
-#else
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_value)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_value)));
-#endif
       return *this;
     }
     constexpr status_bitfield_type &set_have_error(bool v) noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      switch(status_value)
-      {
-      case status::none:
-        if(v)
-        {
-          status_value = status::have_error;
-        }
-        break;
-      case status::have_value:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_exception:
-        if(v)
-        {
-          status_value = status::have_error_exception;
-        }
-        break;
-      case status::have_error_exception:
-        if(!v)
-        {
-          status_value = status::have_exception;
-        }
-        break;
-      case status::have_value_lost_consistency:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_lost_consistency:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_exception_lost_consistency:
-        if(v)
-        {
-          status_value = status::have_error_exception_lost_consistency;
-        }
-        break;
-      case status::have_error_exception_lost_consistency:
-        if(!v)
-        {
-          status_value = status::have_exception_lost_consistency;
-        }
-        break;
-      case status::have_error_error_is_errno:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_error_exception_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_exception;
-        }
-        break;
-      case status::have_error_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_error_exception_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_exception_lost_consistency;
-        }
-        break;
-      }
-#else
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_error)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_error)));
-#endif
       return *this;
     }
     constexpr status_bitfield_type &set_have_exception(bool v) noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      switch(status_value)
-      {
-      case status::none:
-        if(v)
-        {
-          status_value = status::have_exception;
-        }
-        break;
-      case status::have_value:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error:
-        if(v)
-        {
-          status_value = status::have_error_exception;
-        }
-        break;
-      case status::have_exception:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_error_exception:
-        if(!v)
-        {
-          status_value = status::have_error;
-        }
-        break;
-      case status::have_value_lost_consistency:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_error_lost_consistency:
-        if(v)
-        {
-          status_value = status::have_error_exception_lost_consistency;
-        }
-        break;
-      case status::have_exception_lost_consistency:
-        if(!v)
-        {
-          status_value = status::none;
-        }
-        break;
-      case status::have_error_exception_lost_consistency:
-        if(!v)
-        {
-          status_value = status::have_error_lost_consistency;
-        }
-        break;
-      case status::have_error_error_is_errno:
-        if(v)
-        {
-          status_value = status::have_error_exception_error_is_errno;
-        }
-        break;
-      case status::have_error_exception_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_error_is_errno;
-        }
-        break;
-      case status::have_error_lost_consistency_error_is_errno:
-        if(v)
-        {
-          status_value = status::have_error_exception_lost_consistency_error_is_errno;
-        }
-        break;
-      case status::have_error_exception_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_lost_consistency_error_is_errno;
-        }
-        break;
-      }
-#else
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_exception)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_exception)));
-#endif
       return *this;
     }
     constexpr status_bitfield_type &set_have_error_is_errno(bool v) noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      switch(status_value)
-      {
-      case status::none:
-        make_ub(*this);
-        break;
-      case status::have_value:
-        make_ub(*this);
-        break;
-      case status::have_error:
-        if(v)
-        {
-          status_value = status::have_error_error_is_errno;
-        }
-        break;
-      case status::have_exception:
-        make_ub(*this);
-        break;
-      case status::have_error_exception:
-        if(v)
-        {
-          status_value = status::have_error_exception_error_is_errno;
-        }
-        break;
-      case status::have_value_lost_consistency:
-        make_ub(*this);
-        break;
-      case status::have_error_lost_consistency:
-        if(v)
-        {
-          status_value = status::have_error_lost_consistency_error_is_errno;
-        }
-        break;
-      case status::have_exception_lost_consistency:
-        make_ub(*this);
-        break;
-      case status::have_error_exception_lost_consistency:
-        if(v)
-        {
-          status_value = status::have_error_exception_lost_consistency_error_is_errno;
-        }
-        break;
-      case status::have_error_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error;
-        }
-        break;
-      case status::have_error_exception_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_exception;
-        }
-        break;
-      case status::have_error_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_lost_consistency;
-        }
-        break;
-      case status::have_error_exception_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_exception_lost_consistency;
-        }
-        break;
-      }
-#else
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_error_is_errno)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_error_is_errno)));
-#endif
       return *this;
     }
     constexpr status_bitfield_type &set_have_lost_consistency(bool v) noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-      switch(status_value)
-      {
-      case status::none:
-        if(v)
-        {
-          make_ub(*this);
-        }
-        break;
-      case status::have_value:
-        if(v)
-        {
-          status_value = status::have_value_lost_consistency;
-        }
-        break;
-      case status::have_error:
-        if(v)
-        {
-          status_value = status::have_error_lost_consistency;
-        }
-        break;
-      case status::have_exception:
-        if(v)
-        {
-          status_value = status::have_exception_lost_consistency;
-        }
-        break;
-      case status::have_error_exception:
-        if(v)
-        {
-          status_value = status::have_error_exception_lost_consistency;
-        }
-        break;
-      case status::have_value_lost_consistency:
-        if(!v)
-        {
-          status_value = status::have_value;
-        }
-        break;
-      case status::have_error_lost_consistency:
-        if(!v)
-        {
-          status_value = status::have_error;
-        }
-        break;
-      case status::have_exception_lost_consistency:
-        if(!v)
-        {
-          status_value = status::have_exception;
-        }
-        break;
-      case status::have_error_exception_lost_consistency:
-        if(!v)
-        {
-          status_value = status::have_error_exception;
-        }
-        break;
-      case status::have_error_error_is_errno:
-        if(v)
-        {
-          status_value = status::have_error_lost_consistency_error_is_errno;
-        }
-        break;
-      case status::have_error_exception_error_is_errno:
-        if(v)
-        {
-          status_value = status::have_error_exception_lost_consistency_error_is_errno;
-        }
-        break;
-      case status::have_error_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_exception_error_is_errno;
-        }
-        break;
-      case status::have_error_exception_lost_consistency_error_is_errno:
-        if(!v)
-        {
-          status_value = status::have_error_exception_error_is_errno;
-        }
-        break;
-      }
-#else
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_lost_consistency)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_lost_consistency)));
-#endif
       return *this;
     }
     constexpr status_bitfield_type &set_have_moved_from(bool v) noexcept
     {
-#if OUTCOME_USE_CONSTEXPR_ENUM_STATUS
-#error Fixme
-#else
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_moved_from)) :
                                              (static_cast<uint16_t>(status_value) & ~static_cast<uint16_t>(status::have_moved_from)));
-#endif
       return *this;
     }
   };

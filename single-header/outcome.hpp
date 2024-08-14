@@ -1043,9 +1043,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 571f9c930e672950e99d5d30f743603aaaf8014c
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-03-13 20:29:49 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 571f9c93
+#define OUTCOME_PREVIOUS_COMMIT_REF 60147ab3146f0418b10a6a4671ea0802cb514432
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-08-14 16:41:50 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 60147ab3
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -3075,15 +3075,11 @@ namespace detail
   // Void does nothing
   template <> struct move_assign_to_empty<void, false, false>
   {
-    move_assign_to_empty(void *, void *) noexcept
-    { /* nothing to assign */
-    }
+    move_assign_to_empty(void *, void *) noexcept { /* nothing to assign */ }
   };
   template <> struct move_assign_to_empty<const void, false, false>
   {
-    move_assign_to_empty(const void *, const void *) noexcept
-    { /* nothing to assign */
-    }
+    move_assign_to_empty(const void *, const void *) noexcept { /* nothing to assign */ }
   };
   // Helpers for copy assigning to empty storage
   template <class T, bool isCopyConstructible = std::is_copy_constructible<T>::value,
@@ -3110,15 +3106,11 @@ namespace detail
   // Void does nothing
   template <> struct copy_assign_to_empty<void, false, false>
   {
-    copy_assign_to_empty(void *, void *) noexcept
-    { /* nothing to assign */
-    }
+    copy_assign_to_empty(void *, void *) noexcept { /* nothing to assign */ }
   };
   template <> struct copy_assign_to_empty<const void, false, false>
   {
-    copy_assign_to_empty(const void *, const void *) noexcept
-    { /* nothing to assign */
-    }
+    copy_assign_to_empty(const void *, const void *) noexcept { /* nothing to assign */ }
   };
   template <class T, bool nothrow> struct strong_swap_impl
   {
@@ -3246,9 +3238,10 @@ namespace detail
 #ifdef _MSC_VER
   __declspec(noreturn)
 #elif defined(__GNUC__) || defined(__clang__)
-        __attribute__((noreturn))
+  __attribute__((noreturn))
 #endif
-  void make_ub(T && /*unused*/)
+  void
+  make_ub(T && /*unused*/)
   {
     OUTCOME_ASSERT(false); // NOLINT
 #if defined(__GNUC__) || defined(__clang__)
@@ -3269,10 +3262,10 @@ namespace detail
   to change the value to one of the enum's values. This is stupid to look at in source code,
   but it make clang's optimiser do the right thing, so it's worth it.
   */
-#define OUTCOME_USE_CONSTEXPR_ENUM_STATUS 0
   enum class status : uint16_t
   {
     // WARNING: These bits are not tracked by abi-dumper, but changing them will break ABI!
+    // bits 0-5 in use.
     none = 0,
     have_value = (1U << 0U),
     have_error = (1U << 1U),
@@ -3291,7 +3284,20 @@ namespace detail
     have_error_lost_consistency_error_is_errno = (1U << 1U) | (1U << 3U) | (1U << 4U),
     have_error_exception_lost_consistency_error_is_errno = (3U << 1U) | (1U << 3U) | (1U << 4U),
     // value has been moved from
-    have_moved_from = (1U << 5U)
+    have_moved_from = (1U << 5U),
+    have_value_moved_from = (1U << 0U) | (1U << 5U),
+    have_error_moved_from = (1U << 1U) | (1U << 5U),
+    have_exception_moved_from = (2U << 1U) | (1U << 5U),
+    have_error_exception_moved_from = (3U << 1U) | (1U << 5U),
+    have_value_lost_consistency_moved_from = (1U << 0U) | (1U << 3U) | (1U << 5U),
+    have_error_lost_consistency_moved_from = (1U << 1U) | (1U << 3U) | (1U << 5U),
+    have_exception_lost_consistency_moved_from = (2U << 1U) | (1U << 3U) | (1U << 5U),
+    have_error_exception_lost_consistency_moved_from = (3U << 1U) | (1U << 3U) | (1U << 5U),
+    have_error_is_errno_moved_from = (1U << 4U) | (1U << 5U),
+    have_error_error_is_errno_moved_from = (1U << 1U) | (1U << 4U) | (1U << 5U),
+    have_error_exception_error_is_errno_moved_from = (3U << 1U) | (1U << 4U) | (1U << 5U),
+    have_error_lost_consistency_error_is_errno_moved_from = (1U << 1U) | (1U << 3U) | (1U << 4U) | (1U << 5U),
+    have_error_exception_lost_consistency_error_is_errno_moved_from = (3U << 1U) | (1U << 3U) | (1U << 4U) | (1U << 5U),
   };
   struct status_bitfield_type
   {
@@ -3312,18 +3318,9 @@ namespace detail
     constexpr status_bitfield_type &operator=(const status_bitfield_type &) = default;
     constexpr status_bitfield_type &operator=(status_bitfield_type &&) = default;
     //~status_bitfield_type() = default;  // Do NOT uncomment this, it breaks older clangs!
-    constexpr bool have_value() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0;
-    }
-    constexpr bool have_error() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0;
-    }
-    constexpr bool have_exception() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0;
-    }
+    constexpr bool have_value() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_value)) != 0; }
+    constexpr bool have_error() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error)) != 0; }
+    constexpr bool have_exception() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_exception)) != 0; }
     constexpr bool have_lost_consistency() const noexcept
     {
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_lost_consistency)) != 0;
@@ -3332,10 +3329,7 @@ namespace detail
     {
       return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_error_is_errno)) != 0;
     }
-    constexpr bool have_moved_from() const noexcept
-    {
-      return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0;
-    }
+    constexpr bool have_moved_from() const noexcept { return (static_cast<uint16_t>(status_value) & static_cast<uint16_t>(status::have_moved_from)) != 0; }
     constexpr status_bitfield_type &set_have_value(bool v) noexcept
     {
       status_value = static_cast<status>(v ? (static_cast<uint16_t>(status_value) | static_cast<uint16_t>(status::have_value)) :
@@ -3821,11 +3815,11 @@ namespace detail
       // value/value
       if(_status.have_value() && o._status.have_value())
       {
-        struct _
+        struct some_type
         {
           status_bitfield_type &a, &b;
           bool all_good{false};
-          ~_()
+          ~some_type()
           {
             if(!this->all_good)
             {
@@ -3834,19 +3828,19 @@ namespace detail
               this->b.set_have_lost_consistency(true);
             }
           }
-        } _{_status, o._status};
-        strong_swap(_.all_good, _value, o._value);
+        } some_type_value{_status, o._status};
+        strong_swap(some_type_value.all_good, _value, o._value);
         swap(_status, o._status);
         return;
       }
       // error/error
       if(_status.have_error() && o._status.have_error())
       {
-        struct _
+        struct some_type
         {
           status_bitfield_type &a, &b;
           bool all_good{false};
-          ~_()
+          ~some_type()
           {
             if(!this->all_good)
             {
@@ -3855,8 +3849,8 @@ namespace detail
               this->b.set_have_lost_consistency(true);
             }
           }
-        } _{_status, o._status};
-        strong_swap(_.all_good, _error, o._error);
+        } some_type_value{_status, o._status};
+        strong_swap(some_type_value.all_good, _error, o._error);
         swap(_status, o._status);
         return;
       }
@@ -3906,13 +3900,13 @@ namespace detail
         return;
       }
       // It can now only be value/error, or error/value
-      struct _
+      struct some_type
       {
         status_bitfield_type &a, &b;
         _value_type_ *value, *o_value;
         _error_type_ *error, *o_error;
         bool all_good{true};
-        ~_()
+        ~some_type()
         {
           if(!this->all_good)
           {
@@ -3921,21 +3915,21 @@ namespace detail
             this->b.set_have_lost_consistency(true);
           }
         }
-      } _{_status, o._status, OUTCOME_ADDRESS_OF(_value), OUTCOME_ADDRESS_OF(o._value), OUTCOME_ADDRESS_OF(_error), OUTCOME_ADDRESS_OF(o._error)};
+      } some_type_value{_status, o._status, OUTCOME_ADDRESS_OF(_value), OUTCOME_ADDRESS_OF(o._value), OUTCOME_ADDRESS_OF(_error), OUTCOME_ADDRESS_OF(o._error)};
       if(_status.have_value() && o._status.have_error())
       {
-        strong_placement(_.all_good, _.o_value, _.value, [&_] { //
-          strong_placement(_.all_good, _.error, _.o_error, [&_] { //
-            swap(_.a, _.b); //
+        strong_placement(some_type_value.all_good, some_type_value.o_value, some_type_value.value, [&some_type_value] { //
+          strong_placement(some_type_value.all_good, some_type_value.error, some_type_value.o_error, [&some_type_value] { //
+            swap(some_type_value.a, some_type_value.b); //
           });
         });
         return;
       }
       if(_status.have_error() && o._status.have_value())
       {
-        strong_placement(_.all_good, _.o_error, _.error, [&_] { //
-          strong_placement(_.all_good, _.value, _.o_value, [&_] { //
-            swap(_.a, _.b); //
+        strong_placement(some_type_value.all_good, some_type_value.o_error, some_type_value.error, [&some_type_value] { //
+          strong_placement(some_type_value.all_good, some_type_value.value, some_type_value.o_value, [&some_type_value] { //
+            swap(some_type_value.a, some_type_value.b); //
           });
         });
         return;
@@ -4006,12 +4000,12 @@ namespace detail
     constexpr
 #endif
     value_storage_nontrivial_move_assignment &
-    operator=(value_storage_nontrivial_move_assignment &&o) noexcept(
-    std::is_nothrow_move_assignable<value_type>::value &&
-    std::is_nothrow_move_assignable<error_type>::value && noexcept(move_assign_to_empty<value_type>(
-    static_cast<value_type *>(nullptr),
-    static_cast<value_type *>(nullptr))) && noexcept(move_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
-                                                                                      static_cast<error_type *>(nullptr)))) // NOLINT
+    operator=(value_storage_nontrivial_move_assignment &&o) noexcept(std::is_nothrow_move_assignable<value_type>::value &&
+                                                                     std::is_nothrow_move_assignable<error_type>::value &&
+                                                                     noexcept(move_assign_to_empty<value_type>(static_cast<value_type *>(nullptr),
+                                                                                                               static_cast<value_type *>(nullptr))) &&
+                                                                     noexcept(move_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
+                                                                                                               static_cast<error_type *>(nullptr)))) // NOLINT
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -4110,10 +4104,9 @@ namespace detail
 #endif
     value_storage_nontrivial_copy_assignment &
     operator=(const value_storage_nontrivial_copy_assignment &o) noexcept(
-    std::is_nothrow_copy_assignable<value_type>::value &&
-    std::is_nothrow_copy_assignable<error_type>::value && noexcept(copy_assign_to_empty<value_type>(
-    static_cast<value_type *>(nullptr), static_cast<value_type *>(nullptr))) && noexcept(copy_assign_to_empty<error_type>(static_cast<error_type *>(nullptr),
-                                                                                                                          static_cast<error_type *>(nullptr))))
+    std::is_nothrow_copy_assignable<value_type>::value && std::is_nothrow_copy_assignable<error_type>::value &&
+    noexcept(copy_assign_to_empty<value_type>(static_cast<value_type *>(nullptr), static_cast<value_type *>(nullptr))) &&
+    noexcept(copy_assign_to_empty<error_type>(static_cast<error_type *>(nullptr), static_cast<error_type *>(nullptr))))
     {
       using _value_type_ = typename Base::_value_type_;
       using _error_type_ = typename Base::_error_type_;
@@ -4845,41 +4838,44 @@ namespace detail
 } // namespace detail
 OUTCOME_V2_NAMESPACE_END
 #endif
-/* Inline GDB pretty printer for result
-(C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
-File Created: Jun 2024
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License in the accompanying file
-Licence.txt or at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-
-Distributed under the Boost Software License, Version 1.0.
-    (See accompanying file Licence.txt or copy at
-          http://www.boost.org/LICENSE_1_0.txt)
-*/
+// Inline GDB pretty printer for result
+// (C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+// File Created: Jun 2024
+//
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License in the accompanying file
+// Licence.txt or at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//
+// Distributed under the Boost Software License, Version 1.0.
+//     (See accompanying file Licence.txt or copy at
+//           http://www.boost.org/LICENSE_1_0.txt)
+// Generated on 2024-08-12T21:44:07
 #ifndef OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 #define OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 #ifndef OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS
 #if defined(__ELF__)
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverlength-strings"
+#endif
 __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
-        ".byte 4 /* Python Text */\n"
-        ".ascii \"gdb.inlined-script\\n\"\n"
+        ".ascii \"\\4gdb.inlined-script.OUTCOME_INLINE_GDB_PRETTY_PRINTER_H\\n\"\n"
         ".ascii \"import gdb.printing\\n\"\n"
         ".ascii \"import os\\n\"\n"
         ".ascii \"def synthesise_gdb_value_from_string(s):\\n\"\n"
         ".ascii \"    '''For when you want to return a synthetic string from children()'''\\n\"\n"
-        ".ascii \"    return gdb.Value(s + '\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
+        ".ascii \"    return gdb.Value(s + '\\\\0').cast(gdb.lookup_type('char').pointer())\\n\"\n"
         ".ascii \"class OutcomeBasicOutcomePrinter(object):\\n\"\n"
         ".ascii \"    '''Print an outcome::basic_outcome<T> and outcome::basic_result<T>'''\\n\"\n"
         ".ascii \"    def __init__(self, val):\\n\"\n"
@@ -4973,9 +4969,12 @@ __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
         ".ascii \"register_printers(gdb.current_objfile())\\n\"\n"
         ".byte 0\n"
         ".popsection\n");
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
-#endif
-#endif
+#endif // defined(__ELF__)
+#endif // !defined(OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS)
+#endif // !defined(OUTCOME_INLINE_GDB_PRETTY_PRINTER_H)
 /* Policies for result and outcome
 (C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
 File Created: Oct 2017
@@ -7599,12 +7598,12 @@ SIGNATURE NOT RECOGNISED
       swap(this->_ptr, o._ptr);
       return;
     }
-    struct _
+    struct some_type
     {
       basic_outcome &a, &b;
       bool exceptioned{false};
       bool all_good{false};
-      ~_()
+      ~some_type()
       {
         if(!this->all_good)
         {
@@ -7645,11 +7644,11 @@ SIGNATURE NOT RECOGNISED
           check(&this->b);
         }
       }
-    } _{*this, o};
-    strong_swap(_.all_good, this->_ptr, o._ptr);
-    _.exceptioned = true;
+    } some_type_value{*this, o};
+    strong_swap(some_type_value.all_good, this->_ptr, o._ptr);
+    some_type_value.exceptioned = true;
     this->_state.swap(o._state);
-    _.exceptioned = false;
+    some_type_value.exceptioned = false;
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
