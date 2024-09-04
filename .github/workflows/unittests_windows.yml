@@ -17,7 +17,7 @@ jobs:
       NAME: WinVS2019
           
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: CMake tests Windows
       shell: bash
@@ -26,7 +26,7 @@ jobs:
       
     - name: Upload Test Results
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Windows VS2019 test results
         path: prebuilt/merged_junit_results.xml

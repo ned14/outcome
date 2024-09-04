@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-20.04
           
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     
     - name: Force cmake version to older than runner's
       uses: jwlawson/actions-setup-cmake@v1.12
@@ -52,7 +52,7 @@ jobs:
        
     - name: Upload ABI stability reports 1
       if: success() || failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: ABI stability report (GCC 7 with C++ 14)
         path: abi-compliance/compat_reports/Outcome/2.2-gcc7-cxx14_to_test-gcc7-cxx14/compat_report.html
@@ -60,7 +60,7 @@ jobs:
 
     - name: Upload ABI stability reports 2
       if: success() || failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: ABI stability report (GCC 9 with C++ 17)
         path: abi-compliance/compat_reports/Outcome/2.2-gcc9-cxx17_to_test-gcc9-cxx17/compat_report.html
