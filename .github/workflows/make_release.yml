@@ -22,7 +22,7 @@ jobs:
       
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v2"
+        uses: "WyriHaximus/github-action-wait-for-status@v1.8"
         with:
           ignoreActions: "Publish Tarball"
           checkInterval: 60
