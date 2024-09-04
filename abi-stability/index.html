@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-09-04T14:51:05 UTC">
+<meta name="revised" content="2024-09-04T14:51:55 UTC">
 <title>Future ABI stability guarantees :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -75,38 +75,52 @@
       <a href="/outcome/alternatives/">Review of Error Handling Frameworks</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/alternatives/exceptions/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="dd-item">
         <div>
-          <a href="/outcome/alternatives/exceptions/">
-            std exception throws
+          <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/">
+            <code>auto basic_outcome_failure_exception_from_error(const EC &amp;)</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/alternatives/error_code/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/policy/error_code/" class="dd-item">
         <div>
-          <a href="/outcome/alternatives/error_code/">
-            std error codes
+          <a href="/outcome/reference/functions/policy/error_code/">
+            <code>decltype(auto) error_code(T &amp;&amp;)</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/alternatives/expected/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/policy/exception_ptr/" class="dd-item">
         <div>
-          <a href="/outcome/alternatives/expected/">
-            std expected
+          <a href="/outcome/reference/functions/policy/exception_ptr/">
+            <code>decltype(auto) exception_ptr(T &amp;&amp;)</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/alternatives/outcome/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/" class="dd-item">
         <div>
-          <a href="/outcome/alternatives/outcome/">
-            Outcome (proposed std result)
+          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/">
+            <code>void outcome_throw_as_system_error_with_payload(BoostErrorCodeEnum &amp;&amp;)</code>
           </a>
         </div>
     </li>
-      <li data-nav-id="/outcome/alternatives/leaf/" class="dd-item">
+      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/" class="dd-item">
         <div>
-          <a href="/outcome/alternatives/leaf/">
-            LEAF
+          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/">
+            <code>void outcome_throw_as_system_error_with_payload(ErrorCodeEnum &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/">
+            <code>void outcome_throw_as_system_error_with_payload(const boost::system::error_code &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/">
+            <code>void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)</code>
           </a>
         </div>
     </li>
