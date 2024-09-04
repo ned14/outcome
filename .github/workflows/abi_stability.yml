@@ -17,11 +17,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Force cmake version to older than runner's
-      uses: jwlawson/actions-setup-cmake@v1.12
-      with:
-        cmake-version: '3.22.2'
-
     - name: Install abi-compliance-checker and abigail tools
       shell: bash
       run: |

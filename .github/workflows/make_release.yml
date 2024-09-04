@@ -22,7 +22,7 @@ jobs:
       
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.2"
+        uses: "WyriHaximus/github-action-wait-for-status@v2"
         with:
           ignoreActions: "Publish Tarball"
           checkInterval: 60
@@ -97,7 +97,7 @@ jobs:
 
       - name: Get Hugo
         if: steps.vars.outputs.HAS_DEPLOY_KEY
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: hugo_bin
           key: hugo_bin

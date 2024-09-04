@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Outcome checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install packages
         if: startsWith(matrix.os, 'ubuntu') && matrix.install

@@ -23,14 +23,9 @@ jobs:
           fetch-depth: 0
           submodules: recursive
     
-      - name: Force cmake version to older than runner's
-        uses: jwlawson/actions-setup-cmake@v1.12
-        with:
-          cmake-version: '3.22.2'
-
       - name: Cache Hugo
         id: cache-hugo
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: hugo_bin
           key: documentation-hugo_bin
@@ -55,7 +50,7 @@ jobs:
          echo "google-site-verification: google5fc8a1f8de4b73f0.html" > google5fc8a1f8de4b73f0.html
           
       - name: Publish Documentation
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
