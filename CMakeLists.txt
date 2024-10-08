@@ -1,5 +1,5 @@
 # Outcome cmake
-# (C) 2016-2023 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2024 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -184,7 +184,7 @@ endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
   # For all possible configurations of this library, add each test
-  list_filter(outcome_TESTS EXCLUDE REGEX "constexprs")
+  list_filter(outcome_TESTS EXCLUDE REGEX "constexprs|link")
   set(outcome_TESTS_DISABLE_PRECOMPILE_HEADERS
     "outcome_hl--coroutine-support"
     "outcome_hl--core-result"
@@ -359,9 +359,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
   endforeach()
 endif()
 
+# Add in link tests
+add_subdirectory("test/link")
+
 # Turn on pedantic warnings for all tests, examples and snippets
 if(NOT MSVC)
-  foreach(target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS} ${example_bins})
+  foreach(target ${outcome_TEST_TARGETS} ${outcome_EXAMPLE_TARGETS} ${outcome_LINK_TARGETS} ${example_bins})
     target_compile_options(${target} PUBLIC "-Wpedantic")
   endforeach()
 endif()

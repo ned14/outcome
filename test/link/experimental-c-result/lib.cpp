@@ -1,5 +1,5 @@
-/* UPDATED BY SCRIPT
-(C) 2017-2019 Niall Douglas <http://www.nedproductions.biz/> (225 commits)
+/* Link testing for outcomes
+(C) 2024 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-// Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 2a8ff2b0ca37e4627b0d9919b653fee7d4cc6968
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-09-04 14:48:43 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 2a8ff2b0
+// This should be all that is necessary to create the C++ runtime
+// side of things for the C code
+#include "lib.h"  // NOLINT
