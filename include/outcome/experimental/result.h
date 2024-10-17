@@ -73,6 +73,14 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
+#ifndef OUTCOME_C_INLINE
+#if __STDC_VERSION__ >= 199900L || __cplusplus > 0
+#define OUTCOME_C_INLINE inline
+#elif defined(__GNUC__) || defined(__clang__)
+#define OUTCOME_C_INLINE __inline
+#endif
+#endif
+
 #include "../outcome_gdb.h"
 
 #ifdef __cplusplus
@@ -111,7 +119,6 @@ extern "C"
 
 #define CXX_STATUS_CODE(ident) struct cxx_status_code_##ident
 
-  extern OUTCOME_C_WEAK void outcome_make_result_status_code_success(void *out, size_t bytes, size_t offset, const void *toset, size_t tosetbytes);
   extern OUTCOME_C_WEAK void outcome_make_result_status_code_failure_posix(void *out, size_t bytes, size_t offset, int errcode);
   extern OUTCOME_C_WEAK void outcome_make_result_status_code_failure_system(void *out, size_t bytes, size_t offset, intptr_t errcode);
   extern int outcome_status_code_equal(const void *a, const void *b);
@@ -169,15 +176,13 @@ extern "C"
     unsigned flags;                                                                                                                                            \
     S error;                                                                                                                                                   \
   };                                                                                                                                                           \
-  OUTCOME_C_NODISCARD_EXTERN_C OUTCOME_C_WEAK struct cxx_result_status_code_##ident outcome_make_result_##ident##_success(R value)                             \
-  {                                                                                                                                                            \
+  OUTCOME_C_NODISCARD static OUTCOME_C_INLINE struct cxx_result_status_code_##ident outcome_make_result_##ident##_success(R value)                             \
+  { /* We special case this so it inlines efficiently */                                                                                                       \
     struct cxx_result_status_code_##ident ret;                                                                                                                 \
-    assert(outcome_make_result_status_code_success); /* If this fails, you need to compile this file at least once in C++. */                                  \
-    outcome_make_result_status_code_success((void *) &ret, sizeof(ret), offsetof(struct cxx_result_status_code_##ident, flags), (const void *) &value,         \
-                                            sizeof(value));                                                                                                    \
+    ret.value = value;                                                                                                                                         \
+    ret.flags = 1 /* have_value */;                                                                                                                            \
     return ret;                                                                                                                                                \
   }                                                                                                                                                            \
-  OUTCOME_C_MSVC_FORCE_EMIT(outcome_make_result_##ident##_success)                                                                                             \
   OUTCOME_C_NODISCARD_EXTERN_C OUTCOME_C_WEAK struct cxx_result_status_code_##ident outcome_make_result_##ident##_failure_posix(int errcode)                   \
   {                                                                                                                                                            \
     struct cxx_result_status_code_##ident ret;                                                                                                                 \
@@ -290,33 +295,6 @@ extern "C"
 #endif
 
 // You need to include this C header in at least one C++ source file to have these C helper functions be implemented
-extern "C" OUTCOME_C_WEAK void outcome_make_result_status_code_success(void *out, size_t bytes, size_t offset, const void *toset, size_t tosetbytes)
-{
-  union type_punner_t
-  {
-    OUTCOME_V2_NAMESPACE::experimental::status_result<intptr_t> cpp;
-    struct cxx_status_code
-    {
-      intptr_t value;
-      unsigned flags;
-      cxx_status_code_system error;
-    } c;
-
-    type_punner_t()
-        : cpp(0)
-    {
-    }
-    ~type_punner_t() {}
-  } pun;
-  static_assert(sizeof(pun.cpp) == sizeof(pun.c), "");
-  static constexpr size_t punoffset = offsetof(type_punner_t::cxx_status_code, flags);
-  assert(bytes - tosetbytes >= sizeof(pun.cpp) - punoffset);
-  const size_t tocopy = std::min(bytes - tosetbytes, sizeof(pun.c) - punoffset);
-  memcpy(out, toset, tosetbytes);
-  memcpy((void *) ((char *) out + offset), (const void *) ((const char *) &pun.c + punoffset), tocopy);
-}
-OUTCOME_C_MSVC_FORCE_EMIT(outcome_make_result_status_code_success)
-
 extern "C" OUTCOME_C_WEAK void outcome_make_result_status_code_failure_posix(void *out, size_t bytes, size_t offset, int errcode)
 {
   using value_type = OUTCOME_V2_NAMESPACE::experimental::posix_code::value_type;
