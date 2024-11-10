@@ -76,8 +76,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_C_INLINE
 #if __STDC_VERSION__ >= 199900L || __cplusplus > 0
 #define OUTCOME_C_INLINE inline
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 #define OUTCOME_C_INLINE __inline
+#else
+#define OUTCOME_C_INLINE
 #endif
 #endif
 
