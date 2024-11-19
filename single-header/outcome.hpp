@@ -791,7 +791,7 @@ extern "C" void _mm_pause();
 #endif
 #endif
 #ifndef QUICKCPPLIB_DISABLE_EXECINFO
-#if defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__) || defined(__ANDROID__)
 #define QUICKCPPLIB_DISABLE_EXECINFO 1
 #endif
 #endif
@@ -1043,9 +1043,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 84e9e394f800b73b5c4f4f901752998cd97aa767
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-10-17 18:48:13 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 84e9e394
+#define OUTCOME_PREVIOUS_COMMIT_REF 954a054e50f2f121703a65aa6173a5d4f9748375
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-11-10 23:34:00 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 954a054e
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -4869,7 +4869,7 @@ OUTCOME_V2_NAMESPACE_END
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverlength-strings"
 #endif
-__asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
+__asm__(".pushsection \".debug_gdb_scripts\", \"MS\",%progbits,1\n"
         ".ascii \"\\4gdb.inlined-script.OUTCOME_INLINE_GDB_PRETTY_PRINTER_H\\n\"\n"
         ".ascii \"import gdb.printing\\n\"\n"
         ".ascii \"import os\\n\"\n"

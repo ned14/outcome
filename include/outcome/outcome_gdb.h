@@ -27,12 +27,12 @@
 #define OUTCOME_INLINE_GDB_PRETTY_PRINTER_H
 
 #ifndef OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS
-#if defined(__ELF__) && !defined(__ANDROID__)
+#if defined(__ELF__)
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverlength-strings"
 #endif
-__asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
+__asm__(".pushsection \".debug_gdb_scripts\", \"MS\",%progbits,1\n"
         ".ascii \"\\4gdb.inlined-script.OUTCOME_INLINE_GDB_PRETTY_PRINTER_H\\n\"\n"
         ".ascii \"import gdb.printing\\n\"\n"
         ".ascii \"import os\\n\"\n"
@@ -156,7 +156,7 @@ __asm__(".pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n"
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-#endif // defined(__ELF__)
-#endif // !defined(OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS)
+#endif  // defined(__ELF__)
+#endif  // !defined(OUTCOME_DISABLE_INLINE_GDB_PRETTY_PRINTERS)
 
-#endif // !defined(OUTCOME_INLINE_GDB_PRETTY_PRINTER_H)
+#endif  // !defined(OUTCOME_INLINE_GDB_PRETTY_PRINTER_H)
