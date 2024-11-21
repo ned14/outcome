@@ -26,7 +26,7 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 set(outcome_LINK_TARGETS)
 foreach(type STATIC SHARED)
   foreach(visibility default hidden)
-    set(target outcome-link-test-experimental-c-result-type_${type}-vis_${visibility})
+    set(target outcome-link-test-c-result-type_${type}-vis_${visibility})
     add_library(${target}-lib ${type}
       "experimental-c-result/lib.c"
       "experimental-c-result/lib.cpp")
@@ -50,7 +50,7 @@ foreach(type STATIC SHARED)
       DISABLE_PRECOMPILE_HEADERS On
     )
     target_link_libraries(${target} PRIVATE ${target}-lib outcome::hl)
-    if(target MATCHES ".*-type_SHARED-vis_hidden")
+    if(target MATCHES ".*-type_SHARED-vis_hidden" OR (WIN32 AND target MATCHES ".*-type_SHARED.*"))
       # The shared library won't export the C++ helper machinery if visibility is hidden,
       # so without including a copy of the C++ helpers it would correctly fail to link.
       add_library(${target}-cxx-helpers OBJECT "experimental-c-result/lib.cpp")
