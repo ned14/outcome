@@ -53,13 +53,11 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: all_tests_passed_${{ github.sha }}
-          release_name: All tests passed ${{ github.sha }}
+          name: All tests passed ${{ github.sha }}
           body: |
             ```
             ${{ github.event.head_commit.message }}
@@ -68,17 +66,7 @@ jobs:
             Use the 'all-sources' tarball below, NOT the github generated one which is missing dependencies:
           draft: false
           prerelease: true
-          
-      - name: Upload
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ../outcome-v2-all-sources.tar.xz
-          asset_name: outcome-v2-all-sources-${{ github.sha }}.tar.xz
-          asset_content_type: application/gzip
+          files: ../outcome-v2-all-sources.tar.xz
           
       - name: Extract boostorg/outcome ssh keys
         id: vars
