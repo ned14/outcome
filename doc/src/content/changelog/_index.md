@@ -4,7 +4,7 @@ weight = 80
 +++
 
 ---
-## v2.2.11 ? (Boost 1.87) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.11)
+## v2.2.11 12th December 2024 (Boost 1.87) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.11)
 
 ### Enhancements:
 
