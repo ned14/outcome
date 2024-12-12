@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-12-12T16:33:05 UTC">
+<meta name="revised" content="2024-12-12T23:47:28 UTC">
 <title>`const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2869,91 +2869,6 @@
     <option value="/outcome/reference/types/" >
   - 
    Types</option> 
-    <option value="/outcome/reference/types/basic_outcome/" >
-  -- 
-   `basic_outcome&lt;T, EC, EP, NoValuePolicy&gt;`</option> 
-      <option value="/outcome/reference/types/basic_outcome/default/" >--- `basic_outcome() = delete`</option>
-      <option value="/outcome/reference/types/basic_outcome/move_constructor/" >--- `basic_outcome(basic_outcome &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/copy_constructor/" >--- `basic_outcome(const basic_outcome &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/move_assignment/" >--- `basic_outcome &amp;operator=(basic_outcome &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/copy_assignment/" >--- `basic_outcome &amp;operator=(const basic_outcome &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/destructor/" >--- `~basic_outcome()`</option>
-      <option value="/outcome/reference/types/basic_outcome/disabling_catchall/" >--- `basic_outcome(Args...) = delete`</option>
-      <option value="/outcome/reference/types/basic_outcome/disabling_implicit_constructor/" >--- `basic_outcome(X &amp;&amp;) = delete`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_value_converting_constructor/" >--- `basic_outcome(R &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_error_converting_constructor/" >--- `basic_outcome(S &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_error_condition_converting_constructor/" >--- `basic_outcome(ErrorCondEnum &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_exception_converting_constructor/" >--- `basic_outcome(P &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_error_exception_converting_constructor/" >--- `basic_outcome(S &amp;&amp;, P &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_valueorerror_converting_constructor/" >--- `explicit basic_outcome(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_copy_converting_constructor/" >--- `explicit basic_outcome(const basic_outcome&lt;A, B, C, D&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_move_converting_constructor/" >--- `explicit basic_outcome(basic_outcome&lt;A, B, C, D&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_result_copy_converting_constructor/" >--- `explicit basic_outcome(const basic_result&lt;A, B, C&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_result_move_converting_constructor/" >--- `explicit basic_outcome(basic_result&lt;A, B, C&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_result_make_error_code_copy_converting_constructor/" >--- `explicit basic_outcome(const basic_result&lt;A, B, C&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_result_make_error_code_move_converting_constructor/" >--- `explicit basic_outcome(basic_result&lt;A, B, C&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor/" >--- `explicit basic_outcome(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_inplace_value_constructor_il/" >--- `explicit basic_outcome(in_place_type_t&lt;value_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_inplace_error_constructor/" >--- `explicit basic_outcome(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_inplace_error_constructor_il/" >--- `explicit basic_outcome(in_place_type_t&lt;error_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_inplace_exception_constructor/" >--- `explicit basic_outcome(in_place_type_t&lt;exception_type_if_enabled&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/explicit_inplace_exception_constructor_il/" >--- `explicit basic_outcome(in_place_type_t&lt;exception_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_inplace_value_error_exception_constructor/" >--- `basic_outcome(A1 &amp;&amp;, A2 &amp;&amp;, Args ...)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_success_copy_constructor/" >--- `basic_outcome(const success_type&lt;T&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_success_move_constructor/" >--- `basic_outcome(success_type&lt;T&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_error_copy_constructor/" >--- `basic_outcome(const failure_type&lt;EC&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_error_move_constructor/" >--- `basic_outcome(failure_type&lt;EC&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_copy_constructor/" >--- `basic_outcome(const failure_type&lt;EC&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_error_make_error_code_move_constructor/" >--- `basic_outcome(failure_type&lt;EC&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_exception_copy_constructor/" >--- `basic_outcome(const failure_type&lt;EP&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_exception_move_constructor/" >--- `basic_outcome(failure_type&lt;EP&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_error_exception_copy_constructor/" >--- `basic_outcome(const failure_type&lt;EC, EP&gt; &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/implicit_failure_error_exception_move_constructor/" >--- `basic_outcome(failure_type&lt;EC, EP&gt; &amp;&amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/operator_bool/" >--- `explicit operator bool() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/has_value/" >--- `bool has_value() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/has_error/" >--- `bool has_error() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/has_exception/" >--- `bool has_exception() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/has_failure/" >--- `bool has_failure() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_value_lvalue/" >--- `value_type &amp;assume_value() &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_value_lvalue_const/" >--- `const value_type &amp;assume_value() const &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_value_rvalue/" >--- `value_type &amp;&amp;assume_value() &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_value_rvalue_const/" >--- `const value_type &amp;&amp;assume_value() const &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/value_lvalue/" >--- `value_type &amp;value() &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/value_lvalue_const/" >--- `const value_type &amp;value() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/value_rvalue/" >--- `value_type &amp;&amp;value() &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/value_rvalue_const/" >--- `const value_type &amp;&amp;value() const &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_error_lvalue/" >--- `error_type &amp;assume_error() &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_error_lvalue_const/" >--- `const error_type &amp;assume_error() const &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_error_rvalue/" >--- `error_type &amp;&amp;assume_error() &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_error_rvalue_const/"  selected>--- `const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/error_lvalue/" >--- `error_type &amp;error() &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/error_lvalue_const/" >--- `const error_type &amp;error() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/error_rvalue/" >--- `error_type &amp;&amp;error() &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/error_rvalue_const/" >--- `const error_type &amp;&amp;error() const &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_exception_lvalue/" >--- `exception_type &amp;assume_exception() &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_exception_lvalue_const/" >--- `const exception_type &amp;assume_exception() const &amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_exception_rvalue_const/" >--- `const exception_type &amp;&amp;assume_exception() const &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/assume_exception_rvalue/" >--- `exception_type &amp;&amp;assume_exception() &amp;&amp; noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/exception_lvalue/" >--- `exception_type &amp;exception() &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/exception_lvalue_const/" >--- `const exception_type &amp;exception() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/exception_rvalue/" >--- `exception_type &amp;&amp;exception() &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/exception_rvalue_const/" >--- `const exception_type &amp;&amp;exception() const &amp;&amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/failure/" >--- `exception_type failure() const noexcept`</option>
-      <option value="/outcome/reference/types/basic_outcome/equality_basic_result/" >--- `bool operator==(const basic_result&lt;A, B, C&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/equality_basic_outcome/" >--- `bool operator==(const basic_outcome&lt;A, B, C, D&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/inequality_success_type/" >--- `bool operator==(const success_type&lt;A&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/equality_failure_type/" >--- `bool operator==(const failure_type&lt;A, B&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/inequality_basic_result/" >--- `bool operator!=(const basic_result&lt;A, B, C&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/inequality_basic_outcome/" >--- `bool operator!=(const basic_outcome&lt;A, B, C, D&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/equality_success_type/" >--- `bool operator!=(const success_type&lt;A&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/inequality_failure_type/" >--- `bool operator!=(const failure_type&lt;A, B&gt; &amp;) const`</option>
-      <option value="/outcome/reference/types/basic_outcome/swap/" >--- `void swap(basic_outcome &amp;)`</option>
-      <option value="/outcome/reference/types/basic_outcome/as_failure_lvalue/" >--- `failure_type&lt;error_type, exception_type&gt; as_failure() const &amp;`</option>
-      <option value="/outcome/reference/types/basic_outcome/as_failure_rvalue/" >--- `failure_type&lt;error_type, exception_type&gt; as_failure() &amp;&amp;`</option>
-  
-    <option value="/outcome/reference/types/basic_result/" >
-  -- 
-   `basic_result&lt;T, E, NoValuePolicy&gt;`</option>
       <option value="/outcome/reference/types/bad_outcome_access/" >-- `bad_outcome_access`</option>
       <option value="/outcome/reference/types/bad_result_access_with/" >-- `bad_result_access_with&lt;EC&gt;`</option>
       <option value="/outcome/reference/types/bad_result_access/" >-- `bad_result_access`</option>
