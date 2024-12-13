@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2024-12-12T23:52:14 UTC">
+<meta name="revised" content="2024-12-13T19:17:54 UTC">
 <title>`bool try_operation_has_value(X)` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -559,6 +559,13 @@
         <div>
           <a href="/outcome/recipes/foreign-try/">
             Extending <code>OUTCOME_TRY</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/recipes/rust/" class="dd-item">
+        <div>
+          <a href="/outcome/recipes/rust/">
+            Rust FFI
           </a>
         </div>
     </li>
@@ -1898,6 +1905,440 @@
       <a href="/outcome/reference/types/basic_result/"><code>basic_result&lt;T, E, NoValuePolicy&gt;</code></a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/reference/types/basic_result/default/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/default/">
+            <code>basic_result() = delete</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/move_constructor/">
+            <code>basic_result(basic_result &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/copy_constructor/">
+            <code>basic_result(const basic_result &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/move_assignment/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/move_assignment/">
+            <code>basic_result &amp;operator=(basic_result &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/copy_assignment/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/copy_assignment/">
+            <code>basic_result &amp;operator=(const basic_result &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/destructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/destructor/">
+            <code>~basic_result()</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/disabling_catchall/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/disabling_catchall/">
+            <code>basic_result(Args...) = delete</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/disabling_implicit_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/disabling_implicit_constructor/">
+            <code>basic_result(X &amp;&amp;) = delete</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_value_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_value_converting_constructor/">
+            <code>basic_result(R &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_error_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_error_converting_constructor/">
+            <code>basic_result(S &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_error_condition_converting_constructor/">
+            <code>basic_result(ErrorCondEnum &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_valueorerror_converting_constructor/">
+            <code>explicit basic_result(concepts::value_or_error&lt;T, E&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_copy_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_copy_converting_constructor/">
+            <code>explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_move_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_move_converting_constructor/">
+            <code>explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_error_code_copy_converting_constructor/">
+            <code>explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_error_code_move_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_error_code_move_converting_constructor/">
+            <code>explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_exception_ptr_copy_converting_constructor/">
+            <code>explicit basic_result(const basic_result&lt;R, S, P&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_make_exception_ptr_move_converting_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_make_exception_ptr_move_converting_constructor/">
+            <code>explicit basic_result(basic_result&lt;R, S, P&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_inplace_value_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_inplace_value_constructor/">
+            <code>explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, Args ...)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_inplace_value_constructor_il/">
+            <code>explicit basic_result(in_place_type_t&lt;value_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_inplace_error_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_inplace_error_constructor/">
+            <code>explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, Args ...)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/explicit_inplace_error_constructor_il/">
+            <code>explicit basic_result(in_place_type_t&lt;error_type_if_enabled&gt;, std::initializer_list&lt;U&gt;, Args ...)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_inplace_value_error_constructor/">
+            <code>basic_result(A1 &amp;&amp;, A2 &amp;&amp;, Args ...)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_success_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_success_copy_constructor/">
+            <code>basic_result(const success_type&lt;T&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_success_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_success_move_constructor/">
+            <code>basic_result(success_type&lt;T&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_copy_constructor/">
+            <code>basic_result(const failure_type&lt;T&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_move_constructor/">
+            <code>basic_result(failure_type&lt;T&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_copy_constructor/">
+            <code>basic_result(const failure_type&lt;T&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_error_code_move_constructor/">
+            <code>basic_result(failure_type&lt;T&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_copy_constructor/">
+            <code>basic_result(const failure_type&lt;T&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/implicit_failure_make_exception_ptr_move_constructor/">
+            <code>basic_result(failure_type&lt;T&gt; &amp;&amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/operator_bool/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/operator_bool/">
+            <code>explicit operator bool() const noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_value/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_value/">
+            <code>bool has_value() const noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_error/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_error/">
+            <code>bool has_error() const noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_exception/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_exception/">
+            <code>bool has_exception() const noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_failure/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_failure/">
+            <code>bool has_failure() const noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/has_lost_consistency/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/has_lost_consistency/">
+            <code>bool has_lost_consistency() const noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_value_lvalue/">
+            <code>value_type &amp;assume_value() &amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_value_lvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_value_lvalue_const/">
+            <code>const value_type &amp;assume_value() const &amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_value_rvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_value_rvalue/">
+            <code>value_type &amp;&amp;assume_value() &amp;&amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_value_rvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_value_rvalue_const/">
+            <code>const value_type &amp;&amp;assume_value() const &amp;&amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/value_lvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/value_lvalue/">
+            <code>value_type &amp;value() &amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/value_lvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/value_lvalue_const/">
+            <code>const value_type &amp;value() const &amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/value_rvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/value_rvalue/">
+            <code>value_type &amp;&amp;value() &amp;&amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/value_rvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/value_rvalue_const/">
+            <code>const value_type &amp;&amp;value() const &amp;&amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_error_lvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_error_lvalue/">
+            <code>error_type &amp;assume_error() &amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_error_lvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_error_lvalue_const/">
+            <code>const error_type &amp;assume_error() const &amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_error_rvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_error_rvalue/">
+            <code>error_type &amp;&amp;assume_error() &amp;&amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/assume_error_rvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/assume_error_rvalue_const/">
+            <code>const error_type &amp;&amp;assume_error() const &amp;&amp; noexcept</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/error_lvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/error_lvalue/">
+            <code>error_type &amp;error() &amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/error_lvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/error_lvalue_const/">
+            <code>const error_type &amp;error() const &amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/error_rvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/error_rvalue/">
+            <code>error_type &amp;&amp;error() &amp;&amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/error_rvalue_const/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/error_rvalue_const/">
+            <code>const error_type &amp;&amp;error() const &amp;&amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/equality_basic_result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/equality_basic_result/">
+            <code>bool operator==(const basic_result&lt;A, B, C&gt; &amp;) const</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/inequality_success_type/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/inequality_success_type/">
+            <code>bool operator==(const success_type&lt;A&gt; &amp;) const</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/equality_failure_type/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/equality_failure_type/">
+            <code>bool operator==(const failure_type&lt;A, void&gt; &amp;) const</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/inequality_basic_result/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/inequality_basic_result/">
+            <code>bool operator!=(const basic_result&lt;A, B, C&gt; &amp;) const</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/equality_success_type/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/equality_success_type/">
+            <code>bool operator!=(const success_type&lt;A&gt; &amp;) const</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/inequality_failure_type/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/inequality_failure_type/">
+            <code>bool operator!=(const failure_type&lt;A, void&gt; &amp;) const</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/swap/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/swap/">
+            <code>void swap(basic_result &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/as_failure_lvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/as_failure_lvalue/">
+            <code>auto as_failure() const &amp;</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/types/basic_result/as_failure_rvalue/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/types/basic_result/as_failure_rvalue/">
+            <code>auto as_failure() &amp;&amp;</code>
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
       <li data-nav-id="/outcome/reference/types/bad_outcome_access/" class="dd-item">

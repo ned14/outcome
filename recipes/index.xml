@@ -44,5 +44,15 @@ Historically in ASIO you need to pass completion handler instances to the ASIO a
  A public .has_value() member function which returns a bool. In order of preference, a public .assume_value()/.value() member function. In order of preference, a public .as_failure()/.assume_error()/.error() member function.  This should automatically handle inputs of std::expected&amp;lt;T, E&amp;gt;, and many others, including intermixing Boost.</description>
     </item>
     
+    <item>
+      <title>Rust FFI</title>
+      <link>https://ned14.github.io/outcome/recipes/rust/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://ned14.github.io/outcome/recipes/rust/</guid>
+      <description>A nice side effect of Outcome.Experimental&amp;rsquo;s excellent C support is that teaching Rust about Outcome&amp;rsquo;s result&amp;lt;T&amp;gt; becomes trivially easy. C and C++ results propagate losslessly into Rust Results, and the full power of the Outcome C API is available to Rust code for semantic equivalence comparison et al.
+Here&amp;rsquo;s a quick snippet to get you started. This assumes that you have declared your C result using CXX_DECLARE_RESULT_SYSTEM(outcome, intptr_t) in order to produce a C result named &amp;ldquo;outcome&amp;rdquo; compatible with an erased system code C++ result:</description>
+    </item>
+    
   </channel>
 </rss>
