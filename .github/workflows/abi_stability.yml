@@ -20,7 +20,7 @@ jobs:
     - name: Install abi-compliance-checker and abigail tools
       shell: bash
       run: |
-       sudo apt-get -y install abi-dumper abi-compliance-checker abigail-tools g++-7 g++-9
+       sudo apt-get -y install abi-dumper abi-compliance-checker abigail-tools
 
     - name: Validate ABI compatibility (abi-dumper)
       if: success() || failure()
@@ -49,16 +49,16 @@ jobs:
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
-        name: ABI stability report (GCC 7 with C++ 14)
-        path: abi-compliance/compat_reports/Outcome/2.2-gcc7-cxx14_to_test-gcc7-cxx14/compat_report.html
+        name: ABI stability report (GCC 11 with C++ 14)
+        path: abi-compliance/compat_reports/Outcome/2.2-gcc11-cxx14_to_test-gcc11-cxx14/compat_report.html
 
 
     - name: Upload ABI stability reports 2
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
-        name: ABI stability report (GCC 9 with C++ 17)
-        path: abi-compliance/compat_reports/Outcome/2.2-gcc9-cxx17_to_test-gcc9-cxx17/compat_report.html
+        name: ABI stability report (GCC 11 with C++ 17)
+        path: abi-compliance/compat_reports/Outcome/2.2-gcc11-cxx17_to_test-gcc11-cxx17/compat_report.html
 
 #      with:
 #        name: API + ABI stability report (GCC 9 with C++ 17)
