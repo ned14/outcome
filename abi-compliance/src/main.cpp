@@ -48,8 +48,8 @@ struct NonTrivialType
 extern QUICKCPPLIB_SYMBOL_EXPORT OUTCOME_V2_NAMESPACE::detail::status_bitfield_type status_bits()
 {
   using status = OUTCOME_V2_NAMESPACE::detail::status;
-  return (status)((uint16_t) status::have_value | (uint16_t) status::have_error | (uint16_t) status::have_exception | (uint16_t) status::have_error_is_errno |
-                  (uint16_t) status::have_lost_consistency | (uint16_t) status::have_moved_from);
+  return (status) ((uint16_t) status::have_value | (uint16_t) status::have_error | (uint16_t) status::have_exception | (uint16_t) status::have_error_is_errno |
+                   (uint16_t) status::have_lost_consistency | (uint16_t) status::have_moved_from);
 }
 
 // Lock ABI for the internal value storage for trivial types
@@ -85,18 +85,18 @@ struct QUICKCPPLIB_SYMBOL_EXPORT abi_stamper : public abi_stamper<T, EC, EP, NoV
   template <class X> using atomic_eager = OUTCOME_V2_NAMESPACE::awaitables::atomic_eager<X>;
   template <class X> using atomic_lazy = OUTCOME_V2_NAMESPACE::awaitables::atomic_lazy<X>;
 
-  virtual eager<int> get(eager<int> &v) { return v; }
-  virtual eager<result> get(eager<result> &v) { return v; }
-  virtual eager<outcome> get(eager<outcome> &v) { return v; }
-  virtual lazy<int> get(lazy<int> &v) { return v; }
-  virtual lazy<result> get(lazy<result> &v) { return v; }
-  virtual lazy<outcome> get(lazy<outcome> &v) { return v; }
-  virtual atomic_eager<int> get(atomic_eager<int> &v) { return v; }
-  virtual atomic_eager<result> get(atomic_eager<result> &v) { return v; }
-  virtual atomic_eager<outcome> get(atomic_eager<outcome> &v) { return v; }
-  virtual atomic_lazy<int> get(atomic_lazy<int> &v) { return v; }
-  virtual atomic_lazy<result> get(atomic_lazy<result> &v) { return v; }
-  virtual atomic_lazy<outcome> get(atomic_lazy<outcome> &v) { return v; }
+  virtual eager<int> get(eager<int> &&v) { return std::move(v); }
+  virtual eager<result> get(eager<result> &&v) { return std::move(v); }
+  virtual eager<outcome> get(eager<outcome> &&v) { return std::move(v); }
+  virtual lazy<int> get(lazy<int> &&v) { return std::move(v); }
+  virtual lazy<result> get(lazy<result> &&v) { return std::move(v); }
+  virtual lazy<outcome> get(lazy<outcome> &&v) { return std::move(v); }
+  virtual atomic_eager<int> get(atomic_eager<int> &&v) { return std::move(v); }
+  virtual atomic_eager<result> get(atomic_eager<result> &&v) { return std::move(v); }
+  virtual atomic_eager<outcome> get(atomic_eager<outcome> &&v) { return std::move(v); }
+  virtual atomic_lazy<int> get(atomic_lazy<int> &&v) { return std::move(v); }
+  virtual atomic_lazy<result> get(atomic_lazy<result> &&v) { return std::move(v); }
+  virtual atomic_lazy<outcome> get(atomic_lazy<outcome> &&v) { return std::move(v); }
 #endif
 };
 template <class T, class EC, class EP> struct QUICKCPPLIB_SYMBOL_EXPORT abi_stamper<T, EC, EP, void>

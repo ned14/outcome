@@ -29,9 +29,9 @@ jobs:
       run: |
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-         sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-11 main";
+         sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main";
          sudo apt update;
-         sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
+         sudo apt install clang-19 libc++-19-dev libc++abi-19-dev libomp-19-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
          ctest -S .ci.cmake -VV -E noexcept --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
        else

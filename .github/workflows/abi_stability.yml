@@ -12,7 +12,7 @@ on:
 jobs:
   abi_stability:
     name: "ABI stability"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
           
     steps:
     - uses: actions/checkout@v4
@@ -49,16 +49,16 @@ jobs:
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
-        name: ABI stability report (GCC 11 with C++ 14)
-        path: abi-compliance/compat_reports/Outcome/2.2-gcc11-cxx14_to_test-gcc11-cxx14/compat_report.html
+        name: ABI stability report (GCC 13 with C++ 17)
+        path: abi-compliance/compat_reports/Outcome/2.2-gcc13-cxx17_to_test-gcc13-cxx17/compat_report.html
 
 
     - name: Upload ABI stability reports 2
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
-        name: ABI stability report (GCC 11 with C++ 17)
-        path: abi-compliance/compat_reports/Outcome/2.2-gcc11-cxx17_to_test-gcc11-cxx17/compat_report.html
+        name: ABI stability report (GCC 13 with C++ 20)
+        path: abi-compliance/compat_reports/Outcome/2.2-gcc13-cxx20_to_test-gcc13-cxx20/compat_report.html
 
 #      with:
 #        name: API + ABI stability report (GCC 9 with C++ 17)

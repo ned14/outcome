@@ -18,17 +18,16 @@ for selected compilers and configuration, which can be useful for verifying
 stability. These are what are checked per CI commit:
 
 <dl>
-  <dt>2.2-gcc7-cxx14</dt>
-  <dd>This is when compiled under the C++ 14 standard by GCC 7.5.</dd>
-  <dt>2.2-gcc9-cxx17</dt>
-  <dd>This is when compiled under the C++ 17 standard by GCC 9.3.</dd>
+  <dt>2.2-gcc13-cxx17</dt>
+  <dd>This is when compiled under the C++ 17 standard by GCC 13.3.</dd>
+  <dt>2.2-gcc13-cxx20</dt>
+  <dd>This is when compiled under the C++ 20 standard by GCC 13.3.</dd>
 </dl>
 
 ## Prerequisites for using this directory:
 
-1. GCC 7.5 with libstdc++.
-2. GCC 9.3 with libstdc++.
-3. Ubuntu 20.04 LTS.
+1. GCC 13.3 with libstdc++.
+2. Ubuntu 24.04 LTS.
 
 ### Prerequisites if you want to check only ABI (abi-dumper):
 

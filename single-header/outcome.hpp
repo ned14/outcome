@@ -132,7 +132,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef QUICKCPPLIB_CONFIG_HPP
 #define QUICKCPPLIB_CONFIG_HPP
 /* Provides SG-10 feature checking for all C++ compilers
-(C) 2014-2017 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
+(C) 2014-2024 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
 File Created: Nov 2014
 
 
@@ -156,6 +156,12 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
+// Completely disable this file if on C++ 20 or later, or if compiler is new enough
+#if __cplusplus >= 202002L || _HAS_CXX20
+#include <version>
+#elif _MSC_VER >= 1920 || __GNUC__ >= 12 || __clang_major__ >= 17
+#include <ciso646>
+#else
 #if __cplusplus >= 201103L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
@@ -305,7 +311,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_return_type_deduction)
 #define __cpp_return_type_deduction 190000
 #endif
-#if !defined(__cpp_sized_deallocation)
+#if !defined(__cpp_sized_deallocation) && !defined(__clang__)
 #define __cpp_sized_deallocation 190000
 #endif
 #if !defined(__cpp_variable_templates)
@@ -370,9 +376,9 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_static_assert) && _MSC_VER >= 1600
 #define __cpp_static_assert 190000
 #endif
-//#if !defined(__cpp_unicode_literals)
-//# define __cpp_unicode_literals 190000
-//#endif
+// #if !defined(__cpp_unicode_literals)
+// # define __cpp_unicode_literals 190000
+// #endif
 #if !defined(__cpp_user_defined_literals) && _MSC_VER >= 1900
 #define __cpp_user_defined_literals 190000
 #endif
@@ -380,9 +386,9 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 // C++ 14
-//#if !defined(__cpp_aggregate_nsdmi)
-//#define __cpp_aggregate_nsdmi 190000
-//#endif
+// #if !defined(__cpp_aggregate_nsdmi)
+// #define __cpp_aggregate_nsdmi 190000
+// #endif
 #if !defined(__cpp_binary_literals) && _MSC_VER >= 1900
 #define __cpp_binary_literals 190000
 #endif
@@ -563,6 +569,7 @@ Distributed under the Boost Software License, Version 1.0.
 // Every C++ 14 supporting clang does the right thing here
 #endif // __GXX_EXPERIMENTAL_CXX0X__
 #endif // clang
+#endif
 #endif
 /*
 This is a dummy header file which is a placeholder for the real config.hpp which
@@ -1043,9 +1050,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 954a054e50f2f121703a65aa6173a5d4f9748375
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-11-10 23:34:00 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 954a054e
+#define OUTCOME_PREVIOUS_COMMIT_REF 9b5743a7156aad7808723f9be75a5120380818b4
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2025-04-30 21:36:38 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9b5743a7
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -5285,6 +5292,10 @@ OUTCOME_V2_NAMESPACE_END
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
 #endif
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable: 6287) // redundant code
+#endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 template <class R, class S, class NoValuePolicy> //
 class basic_result;
@@ -5953,6 +5964,9 @@ static_assert(std::is_trivially_move_assignable<basic_result<int, long, policy::
 static_assert(std::is_standard_layout<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not a standard layout type!");
 #endif
 OUTCOME_V2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -6701,6 +6715,10 @@ OUTCOME_V2_NAMESPACE_END
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
+#endif
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 6287) // redundant code
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 template <class R, class S, class P, class NoValuePolicy> //
@@ -7740,6 +7758,9 @@ SIGNATURE NOT RECOGNISED
   }
 } // namespace hooks
 OUTCOME_V2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif

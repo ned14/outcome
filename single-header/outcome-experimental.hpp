@@ -133,7 +133,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef QUICKCPPLIB_CONFIG_HPP
 #define QUICKCPPLIB_CONFIG_HPP
 /* Provides SG-10 feature checking for all C++ compilers
-(C) 2014-2017 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
+(C) 2014-2024 Niall Douglas <http://www.nedproductions.biz/> (13 commits)
 File Created: Nov 2014
 
 
@@ -157,6 +157,12 @@ Distributed under the Boost Software License, Version 1.0.
 */
 #ifndef QUICKCPPLIB_HAS_FEATURE_H
 #define QUICKCPPLIB_HAS_FEATURE_H
+// Completely disable this file if on C++ 20 or later, or if compiler is new enough
+#if __cplusplus >= 202002L || _HAS_CXX20
+#include <version>
+#elif _MSC_VER >= 1920 || __GNUC__ >= 12 || __clang_major__ >= 17
+#include <ciso646>
+#else
 #if __cplusplus >= 201103L
 // Some of these macros ended up getting removed by ISO standards,
 // they are prefixed with ////
@@ -306,7 +312,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_return_type_deduction)
 #define __cpp_return_type_deduction 190000
 #endif
-#if !defined(__cpp_sized_deallocation)
+#if !defined(__cpp_sized_deallocation) && !defined(__clang__)
 #define __cpp_sized_deallocation 190000
 #endif
 #if !defined(__cpp_variable_templates)
@@ -371,9 +377,9 @@ Distributed under the Boost Software License, Version 1.0.
 #if !defined(__cpp_static_assert) && _MSC_VER >= 1600
 #define __cpp_static_assert 190000
 #endif
-//#if !defined(__cpp_unicode_literals)
-//# define __cpp_unicode_literals 190000
-//#endif
+// #if !defined(__cpp_unicode_literals)
+// # define __cpp_unicode_literals 190000
+// #endif
 #if !defined(__cpp_user_defined_literals) && _MSC_VER >= 1900
 #define __cpp_user_defined_literals 190000
 #endif
@@ -381,9 +387,9 @@ Distributed under the Boost Software License, Version 1.0.
 #define __cpp_variadic_templates 190000
 #endif
 // C++ 14
-//#if !defined(__cpp_aggregate_nsdmi)
-//#define __cpp_aggregate_nsdmi 190000
-//#endif
+// #if !defined(__cpp_aggregate_nsdmi)
+// #define __cpp_aggregate_nsdmi 190000
+// #endif
 #if !defined(__cpp_binary_literals) && _MSC_VER >= 1900
 #define __cpp_binary_literals 190000
 #endif
@@ -564,6 +570,7 @@ Distributed under the Boost Software License, Version 1.0.
 // Every C++ 14 supporting clang does the right thing here
 #endif // __GXX_EXPERIMENTAL_CXX0X__
 #endif // clang
+#endif
 #endif
 /*
 This is a dummy header file which is a placeholder for the real config.hpp which
@@ -1044,9 +1051,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF 954a054e50f2f121703a65aa6173a5d4f9748375
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2024-11-10 23:34:00 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 954a054e
+#define OUTCOME_PREVIOUS_COMMIT_REF 9b5743a7156aad7808723f9be75a5120380818b4
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2025-04-30 21:36:38 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE 9b5743a7
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -4373,6 +4380,10 @@ OUTCOME_V2_NAMESPACE_END
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
 #endif
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable: 6287) // redundant code
+#endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 template <class R, class S, class NoValuePolicy> //
 class basic_result;
@@ -5041,6 +5052,9 @@ static_assert(std::is_trivially_move_assignable<basic_result<int, long, policy::
 static_assert(std::is_standard_layout<basic_result<int, long, policy::all_narrow>>::value, "result<int> is not a standard layout type!");
 #endif
 OUTCOME_V2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -5191,6 +5205,10 @@ OUTCOME_V2_NAMESPACE_END
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation" // Standardese markup confuses clang
+#endif
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 6287) // redundant code
 #endif
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 template <class R, class S, class P, class NoValuePolicy> //
@@ -6230,6 +6248,9 @@ SIGNATURE NOT RECOGNISED
   }
 } // namespace hooks
 OUTCOME_V2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -6592,7 +6613,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_QUICK_STATUS_CODE_FROM_ENUM_ASSERT_ON_MISSING_MAPPING_TABLE_ENTRIES 1
 #endif
 /* Proposed SG14 status_code
-(C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2024 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -8266,6 +8287,10 @@ public:
 SYSTEM_ERROR2_NAMESPACE_END
 #endif
 #include <cerrno> // for error constants
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 6326) // constant comparison
+#endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 //! The generic error coding (POSIX)
 enum class errc : int
@@ -8708,6 +8733,9 @@ SYSTEM_ERROR2_CONSTEXPR14 inline bool operator!=(const T &a, const status_code<D
   return !b.equivalent(QuickStatusCodeType(a));
 }
 SYSTEM_ERROR2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 template <class Enum> class _quick_status_code_from_enum_domain;
@@ -9321,6 +9349,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #error <posix_code.hpp> is not includable when SYSTEM_ERROR2_NOT_POSIX is defined!
 #endif
 #include <cstring> // for strchr and strerror_r
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 6326) // constant comparison
+#endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 // Fix for issue #48 Issue compiling on arm-none-eabi (newlib) with GNU extensions off
 #if !defined(_MSC_VER) && !defined(__APPLE__)
@@ -9328,7 +9360,9 @@ namespace detail
 {
   namespace avoid_string_include
   {
-#if defined(__GLIBC__) && !defined(__UCLIBC__)
+#if defined(__ANDROID__)
+    using ::strerror_r;
+#elif defined(__GLIBC__) && !defined(__UCLIBC__)
     // This returns int for non-glibc strerror_r, but glibc's is particularly weird so we retain it
     extern "C" char *strerror_r(int errnum, char *buf, size_t buflen);
 #else
@@ -9465,6 +9499,9 @@ namespace mixins
   }
 } // namespace mixins
 SYSTEM_ERROR2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #endif
 #else
 #endif
@@ -9524,6 +9561,10 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define SYSTEM_ERROR2_WIN32_CODE_HPP
 #if !defined(_WIN32) && !0L
 #error This file should only be included on Windows
+#endif
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 6326) // constant comparison
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 //! \exclude
@@ -9793,6 +9834,13 @@ namespace mixins
   }
 } // namespace mixins
 SYSTEM_ERROR2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
+#endif
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 6326) // constant comparison
 #endif
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 //! \exclude
@@ -11098,6 +11146,9 @@ inline constexpr const _nt_code_domain &_nt_code_domain::get()
   return nt_code_domain;
 }
 SYSTEM_ERROR2_NAMESPACE_END
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #endif
 // NOT "com_code.hpp"
 #endif
