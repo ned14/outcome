@@ -54,6 +54,7 @@ set(outcome_HEADERS
   "include/outcome/experimental/status_outcome.hpp"
   "include/outcome/experimental/status_result.hpp"
   "include/outcome/iostream_support.hpp"
+  "include/outcome/iostream_support_result.hpp"
   "include/outcome/outcome.hpp"
   "include/outcome/outcome.natvis"
   "include/outcome/outcome_gdb.h"

@@ -8,6 +8,9 @@ weight = 80
 
 ### Enhancements:
 
+[#312](https://github.com/ned14/outcome/issues/312)
+- `iostream_support.hpp` has been split into `iostream_support_result.hpp` and `iostream_support.hpp`.
+
 ### Bug fixes:
 
 
