@@ -1,5 +1,5 @@
 /* Configure Outcome with QuickCppLib
-(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2025 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -127,6 +127,7 @@ SIGNATURE NOT RECOGNISED
 #include <initializer_list>
 #include <iosfwd>  // for future serialisation
 #include <new>     // for placement in moves etc
+#include <utility> // for swap
 #include <type_traits>
 
 #ifndef OUTCOME_USE_STD_IN_PLACE_TYPE
