@@ -11,6 +11,9 @@ weight = 80
 [#312](https://github.com/ned14/outcome/issues/312)
 - `iostream_support.hpp` has been split into `iostream_support_result.hpp` and `iostream_support.hpp`.
 
+[#313](https://github.com/ned14/outcome/issues/313)
+- Bump min cmake required to 3.10 amongst other cmake modernisation fixes to please cmake 4.0.
+
 ### Bug fixes:
 
 
