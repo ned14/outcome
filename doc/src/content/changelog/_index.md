@@ -4,7 +4,19 @@ weight = 80
 +++
 
 ---
-## v2.2.13 ? (Boost 1.89) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.13)
+## v2.2.14 ? (Boost 1.90) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.14)
+
+### Enhancements:
+
+[#314](https://github.com/ned14/outcome/issues/314)
+- Bump Boost min cmake required to 3.10 to match standalone Outcome. Also bump minium cmake to 3.10
+everywhere else in Outcome, as CI is now failing due to us requested too old a cmake.
+
+### Bug fixes:
+
+
+---
+## v2.2.13 6th August 2025 (Boost 1.89) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.13)
 
 ### Enhancements:
 
@@ -13,9 +25,6 @@ weight = 80
 
 [#313](https://github.com/ned14/outcome/issues/313)
 - Bump min cmake required to 3.10 amongst other cmake modernisation fixes to please cmake 4.0.
-
-### Bug fixes:
-
 
 ---
 ## v2.2.12 10th April 2025 (Boost 1.88) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.12)

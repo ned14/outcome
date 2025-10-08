@@ -21,7 +21,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10...4.0 FATAL_ERROR)
 
 set(OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
 if(NOT OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")

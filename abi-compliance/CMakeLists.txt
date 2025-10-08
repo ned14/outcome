@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10...4.0 FATAL_ERROR)
 
 if(NOT DEFINED LABEL)
   set(LABEL default)

@@ -10,11 +10,11 @@ on:
   - cron: '0 0 1 * *'
 
 jobs:
-  WinVS2019:
-    name: Windows VS2019
-    runs-on: windows-2019
+  WinVS2022:
+    name: Windows VS2022
+    runs-on: windows-2022
     env:
-      NAME: WinVS2019
+      NAME: WinVS2022
           
     steps:
     - uses: actions/checkout@v4
@@ -28,12 +28,12 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: Windows VS2019 test results
+        name: Windows VS2022 test results
         path: prebuilt/merged_junit_results.xml
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    needs: [WinVS2019]
+    needs: [WinVS2022]
     runs-on: ubuntu-latest
     if: success() || failure()
 
