@@ -190,6 +190,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
     "outcome_hl--core-result"
     "outcome_hl--fileopen"
     "outcome_hl--hooks"
+    "outcome_hl--experimental-wg14-result"
     "outcome_hl--outcome-int-int-1"
     "outcome_hl--result-int-int-1"
     "outcome_hl--result-int-int-2"
@@ -205,6 +206,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
     if(MSVC AND NOT CLANG)
       target_compile_options(${target} PRIVATE /permissive-)
     endif()
+    if(${target} MATCHES "experimental-wg14-result")
+      target_compile_features(${target} PUBLIC cxx_std_20)
+    endif()
   endforeach()
   
   # Duplicate all tests into C++ exceptions disabled forms
@@ -219,10 +223,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
         add_executable(${target_name} "${testsource}")
         if(NOT first_test_target_noexcept)
           set(first_test_target_noexcept ${target_name})
-        elseif(${target_name} MATCHES "coroutine-support|fileopen|hooks|core-result")
+        elseif(${target_name} MATCHES "coroutine-support|fileopen|hooks|core-result|experimental-wg14-result")
           set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
         elseif(COMMAND target_precompile_headers)
           target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_noexcept})
+        endif()
+        if(${target_name} MATCHES "experimental-wg14-result")
+          target_compile_features(${target_name} PUBLIC cxx_std_20)
         endif()
         add_dependencies(_hl ${target_name})
         list(APPEND noexcept_tests ${target_name})
@@ -250,10 +257,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
           add_executable(${target_name} "${testsource}")
           if(NOT first_test_target_permissive)
             set(first_test_target_permissive ${target_name})
-          elseif(${target_name} MATCHES "coroutine-support|fileopen|core-result")
+          elseif(${target_name} MATCHES "coroutine-support|fileopen|core-result|experimental-wg14-result")
             set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
           elseif(COMMAND target_precompile_headers)
             target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
+          endif()
+          if(${target_name} MATCHES "experimental-wg14-result")
+            target_compile_features(${target_name} PUBLIC cxx_std_20)
           endif()
           add_dependencies(_hl ${target_name})
           target_link_libraries(${target_name} PRIVATE outcome::hl)

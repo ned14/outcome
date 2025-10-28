@@ -18,3 +18,6 @@
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
+[submodule "include/outcome/experimental/wg14_result"]
+	path = include/outcome/experimental/wg14_result
+	url = https://github.com/ned14/wg14_result.git

@@ -10,6 +10,7 @@ include_files = [
 ]
 exclude_files = [
     r'.*quickcpplib.*',
+    r'.*wg14.result.*',
     r'^include/outcome/experimental/status-code/(?!include)',
     r'^include/outcome.ixx',
     r'.*\.natvis$',
