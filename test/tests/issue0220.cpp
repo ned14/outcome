@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define SYSTEM_ERROR2_FATAL(msg) abort()
+
 #include "../../include/outcome/experimental/status_result.hpp"
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
@@ -34,7 +36,10 @@ namespace issues220
 
   template <class T> using PosixResult = outcome_e::status_result<T, outcome_e::posix_code>;
 
-  Result<int> convert(const PosixResult<int> &posix_result) { return Result<int>(posix_result); }
+  Result<int> convert(const PosixResult<int> &posix_result)
+  {
+    return Result<int>(posix_result);
+  }
 }  // namespace issues220
 #endif
 

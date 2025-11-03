@@ -238,7 +238,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
           target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
 #          target_compile_options(${target_name} PRIVATE /permissive-)  # test bug report #142
         endif()
-        target_compile_definitions(${target_name} PRIVATE SYSTEM_ERROR2_NOT_POSIX=1 "SYSTEM_ERROR2_FATAL=::abort()")
+        target_compile_definitions(${target_name} PRIVATE SYSTEM_ERROR2_NOT_POSIX=1)
         target_link_libraries(${target_name} PRIVATE outcome::hl)
         if(${target_name} MATCHES "coroutine-support")
           apply_cxx_coroutines_to(PRIVATE ${target_name})

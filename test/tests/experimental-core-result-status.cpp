@@ -21,9 +21,13 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define SYSTEM_ERROR2_FATAL(msg) abort()
+
 #include "../../include/outcome/experimental/status_result.hpp"
 
-template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class NoValuePolicy = OUTCOME_V2_NAMESPACE::experimental::policy::default_status_result_policy<T, S>> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, S, NoValuePolicy>;
+template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code,
+          class NoValuePolicy = OUTCOME_V2_NAMESPACE::experimental::policy::default_status_result_policy<T, S>>
+using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, S, NoValuePolicy>;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 #include "quickcpplib/boost/test/unit_test.hpp"
@@ -66,25 +70,35 @@ public:
   using string_ref = _base::string_ref;
 
 public:
-  constexpr _payload_domain() noexcept : _base(0x7b782c8f935e34ba) {}
+  constexpr _payload_domain() noexcept
+      : _base(0x7b782c8f935e34ba)
+  {
+  }
 
   static inline constexpr const _payload_domain &get();
 
-  virtual _base::string_ref name() const noexcept override final { return string_ref("payload domain"); }  // NOLINT
-
-  virtual payload_info_t payload_info() const noexcept override
-  {
-    return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type),
-            (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)};
-  }
-
 protected:
-  virtual bool _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual int _do_name(_vtable_name_args &args) const noexcept override final
   {
-    assert(code.domain() == *this);                                                                              // NOLINT
-    return static_cast<const status_code_payload &>(code).value().ec != SYSTEM_ERROR2_NAMESPACE::errc::success;  // NOLINT
+    args.ret = string_ref("payload domain");
+    return 0;
+  }  // NOLINT
+  virtual void _do_payload_info(_vtable_payload_info_args &args) const noexcept override final
+  {
+    args.ret = {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type),
+                (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) :
+                                                                        alignof(status_code_domain *)};
   }
-  virtual bool _do_equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code1, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code2) const noexcept override final  // NOLINT
+  virtual bool
+  _do_failure(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  {
+    assert(code.domain() == *this);  // NOLINT
+    return static_cast<const status_code_payload &>(code).value().ec !=
+           SYSTEM_ERROR2_NAMESPACE::errc::success;  // NOLINT
+  }
+  virtual bool
+  _do_equivalent(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code1,
+                 const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code2) const noexcept override final  // NOLINT
   {
     assert(code1.domain() == *this);                                   // NOLINT
     const auto &c1 = static_cast<const status_code_payload &>(code1);  // NOLINT
@@ -95,18 +109,20 @@ protected:
     }
     return false;
   }
-  virtual SYSTEM_ERROR2_NAMESPACE::generic_code _generic_code(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual void _do_generic_code(_vtable_generic_code_args &args) const noexcept override final
   {
-    assert(code.domain() == *this);                                    // NOLINT
-    return static_cast<const status_code_payload &>(code).value().ec;  // NOLINT
+    assert(args.code.domain() == *this);                                        // NOLINT
+    args.ret = static_cast<const status_code_payload &>(args.code).value().ec;  // NOLINT
   }
-  virtual _base::string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final  // NOLINT
+  virtual int _do_message(_vtable_message_args &args) const noexcept override final
   {
-    assert(code.domain() == *this);                                  // NOLINT
-    const auto &c = static_cast<const status_code_payload &>(code);  // NOLINT
-    return string_ref(SYSTEM_ERROR2_NAMESPACE::detail::generic_code_message(c.value().ec));
+    assert(args.code.domain() == *this);                                  // NOLINT
+    const auto &c = static_cast<const status_code_payload &>(args.code);  // NOLINT
+    args.ret = string_ref(SYSTEM_ERROR2_NAMESPACE::detail::generic_code_message(c.value().ec));
+    return 0;
   }
-  virtual void _do_throw_exception(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const override final  // NOLINT
+  virtual void
+  _do_throw_exception(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const override final  // NOLINT
   {
     assert(code.domain() == *this);                                  // NOLINT
     const auto &c = static_cast<const status_code_payload &>(code);  // NOLINT
@@ -210,9 +226,12 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / result, "Tests that the resul
     {
       int _v{0};
       udt() = default;
-      udt(udt &&o) noexcept : _v(o._v) {}
+      udt(udt &&o) noexcept
+          : _v(o._v)
+      {
+      }
       udt(const udt &o)  // NOLINT
-      : _v(o._v)
+          : _v(o._v)
       {
       }
       udt &operator=(udt &&o) noexcept

@@ -21,10 +21,14 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define SYSTEM_ERROR2_FATAL(msg) abort()
+
 #include "../../include/outcome/experimental/status_outcome.hpp"
 
 #define OUTCOME_PREVENT_CONVERSION_WORKAROUND std
-template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code, class P = OUTCOME_PREVENT_CONVERSION_WORKAROUND::exception_ptr> using outcome = OUTCOME_V2_NAMESPACE::experimental::status_outcome<T, S, P>;
+template <class T, class S = SYSTEM_ERROR2_NAMESPACE::system_code,
+          class P = OUTCOME_PREVENT_CONVERSION_WORKAROUND::exception_ptr>
+using outcome = OUTCOME_V2_NAMESPACE::experimental::status_outcome<T, S, P>;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 #include "quickcpplib/boost/test/unit_test.hpp"
@@ -117,7 +121,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
 #if !defined(__APPLE__) || defined(__cpp_exceptions)
   {  // excepted
     OUTCOME_PREVENT_CONVERSION_WORKAROUND::error_code ec(5, OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_category());
-    auto e = OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error(ec));  // NOLINT
+    auto e = OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(
+    OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error(ec));  // NOLINT
     outcome<int> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
@@ -153,7 +158,8 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / outcome, "Tests that the outc
   }
   {  // outcome<void, void> should work
     OUTCOME_PREVENT_CONVERSION_WORKAROUND::error_code ec(5, OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_category());
-    auto e = OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error(ec));
+    auto e =
+    OUTCOME_PREVENT_CONVERSION_WORKAROUND::make_exception_ptr(OUTCOME_PREVENT_CONVERSION_WORKAROUND::system_error(ec));
     outcome<void, void> m(e);
     BOOST_CHECK(!m);
     BOOST_CHECK(!m.has_value());
