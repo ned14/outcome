@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2025-11-01T01:44:59 UTC">
+<meta name="revised" content="2025-11-06T19:52:41 UTC">
 <title>String refs :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2674,55 +2674,6 @@
       <a href="/outcome/reference/functions/policy/">Policy</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/basic_outcome_failure_exception_from_error/">
-            <code>auto basic_outcome_failure_exception_from_error(const EC &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/error_code/">
-            <code>decltype(auto) error_code(T &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/exception_ptr/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/exception_ptr/">
-            <code>decltype(auto) exception_ptr(T &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(BoostErrorCodeEnum &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_enum/">
-            <code>void outcome_throw_as_system_error_with_payload(ErrorCodeEnum &amp;&amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_boost_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const boost::system::error_code &amp;)</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/functions/policy/outcome_throw_as_system_error_with_payload_std_error_code/">
-            <code>void outcome_throw_as_system_error_with_payload(const std::error_code &amp;)</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
       <li data-nav-id="/outcome/reference/functions/failure/" class="dd-item">
@@ -2930,12 +2881,12 @@ particular, if you need to string search or slice it, you can construct a
 <code>string_view</code> on top easily.</p>
 
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++">  <span class="c1">// Return the name of our custom code domain
-</span><span class="c1"></span>  <span class="k">virtual</span> <span class="n">_base</span><span class="o">::</span><span class="n">string_ref</span> <span class="n">name</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="k">override</span> <span class="k">final</span>  <span class="c1">// NOLINT
-</span><span class="c1"></span>  <span class="p">{</span>
-    <span class="k">static</span> <span class="n">string_ref</span> <span class="n">v</span><span class="p">(</span><span class="s">&#34;file i/o error domain&#34;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>  <span class="c1">// NOLINT
+</span><span class="c1"></span>  <span class="k">virtual</span> <span class="kt">int</span> <span class="nf">_do_name</span><span class="p">(</span><span class="n">_vtable_name_args</span> <span class="o">&amp;</span><span class="n">args</span><span class="p">)</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="k">override</span> <span class="k">final</span>
+  <span class="p">{</span>
+    <span class="n">args</span><span class="p">.</span><span class="n">ret</span> <span class="o">=</span> <span class="n">string_ref</span><span class="p">(</span><span class="s">&#34;file i/o error domain&#34;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// errno value if failed
 </span><span class="c1"></span>  <span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L98" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L101" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>Now you understand what <code>string_ref</code> does, returning the name of the
