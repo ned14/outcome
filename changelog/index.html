@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2025-11-06T19:52:42 UTC">
+<meta name="revised" content="2025-11-06T20:46:16 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2917,6 +2917,13 @@ calling conventions. I also made them able to return failure without throwing
 a C++ exception. If you have created your own <code>status_code_domain</code>&rsquo;s
 you will need to update your code (the refactoring is very minor), otherwise
 you shouldn&rsquo;t notice any change.</p></li>
+
+<li><p>The C reimplementation simplified the implementation of <code>atomic_refcounted_string_ref</code>,
+and the C++ implementation was updated to match. The biggest change is that the
+input string is now ALWAYS COPIED and is no longer a <code>malloc</code> pointer whose
+ownership is taken. If you have used <code>atomic_refcounted_string_ref</code> in your own
+code, you&rsquo;ll need to refactor it to no longer allocate the input buffer using
+<code>malloc</code> and instead pass in the original <code>char</code> buffer.</p></li>
 
 <li><p>The complete C reimplementation is currently <strong>NOT YET FIT FOR PRODUCTION USE</strong> and
 you should use instead the current, mature, C API to the C++ implementation.
