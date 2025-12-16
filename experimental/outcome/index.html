@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2025-12-05T15:20:03 UTC">
+<meta name="revised" content="2025-12-16T20:21:25 UTC">
 <title>Tying it all together :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2912,7 +2912,7 @@
 <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err"> </span><span class="nc">T</span><span class="p">,</span> <span class="k">class</span><span class="err"> </span><span class="nc">E</span> <span class="o">=</span> <span class="n">outcome_e</span><span class="o">::</span><span class="n">error</span><span class="o">&gt;</span>
 <span class="k">using</span> <span class="n">result</span> <span class="o">=</span>  <span class="c1">//
 </span><span class="c1"></span><span class="n">outcome_e</span><span class="o">::</span><span class="n">status_result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">outcome_e</span><span class="o">::</span><span class="n">policy</span><span class="o">::</span><span class="n">default_status_result_policy</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="o">&gt;&gt;</span><span class="p">;</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L191" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L203" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>(The defaulting of <code>default_result_policy</code> is superfluous, it&rsquo;s already the default)</p>
@@ -2956,11 +2956,13 @@ just fine under standard Outcome with only a few typedefs.</p>
   <span class="p">{</span>
     <span class="k">auto</span> <span class="n">e</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">r</span><span class="p">).</span><span class="n">error</span><span class="p">();</span>
     <span class="c1">// A quick demonstration that the indirection works as indicated
-</span><span class="c1"></span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Returned error has a code domain of &#39;%s&#39;, a message of &#39;%s&#39;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">domain</span><span class="p">().</span><span class="n">name</span><span class="p">().</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">e</span><span class="p">.</span><span class="n">message</span><span class="p">().</span><span class="n">c_str</span><span class="p">());</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">And semantically comparing it to &#39;errc::no_such_file_or_directory&#39; = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">e</span> <span class="o">==</span> <span class="n">outcome_e</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">no_such_file_or_directory</span><span class="p">);</span>
+</span><span class="c1"></span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Returned error has a code domain of &#39;%s&#39;, a message of &#39;%s&#39;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">domain</span><span class="p">().</span><span class="n">name</span><span class="p">().</span><span class="n">c_str</span><span class="p">(),</span>
+           <span class="n">e</span><span class="p">.</span><span class="n">message</span><span class="p">().</span><span class="n">c_str</span><span class="p">());</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">And semantically comparing it to &#39;errc::no_such_file_or_directory&#39; = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+           <span class="n">e</span> <span class="o">==</span> <span class="n">outcome_e</span><span class="o">::</span><span class="n">errc</span><span class="o">::</span><span class="n">no_such_file_or_directory</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L196" class="code-snippet-url" target="_blank">View this code on Github</a></div>
+</code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/experimental_status_code.cpp#L208" class="code-snippet-url" target="_blank">View this code on Github</a></div>
 
 
 <p>And running this program yields:</p>
