@@ -51,6 +51,8 @@ set(PROJECT_NAMESPACE)
 include(QuickCppLibSetupProject)
 
 option(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB "Whether to bundle an embedded copy of QuickCppLib with Outcome. Used by various package managers such as vcpkg." OFF)
+option(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE "Whether to bundle an embedded copy of status-code with Outcome. Used by various package managers such as vcpkg." OFF)
+option(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT "Whether to bundle an embedded copy of wg14_result with Outcome. Used by various package managers such as vcpkg." ON)
 option(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that Outcome is fully working. Used by various package managers such as vcpkg." OFF)
 option(OUTCOME_ENABLE_CXX_MODULES "Whether to enable the building of an Outcome C++ module" OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
@@ -98,6 +100,9 @@ else()
     IS_HEADER_ONLY
   )
   list_filter(${PROJECT_NAME}_HEADERS EXCLUDE REGEX include/outcome/experimental/status-code/)
+endif()
+if(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT)
+  ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/wg14_result/include" "https://github.com/ned14/wg14_result.git")
 endif()
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
