@@ -23,5 +23,4 @@ particular, if you need to string search or slice it, you can construct a
 Now you understand what `string_ref` does, returning the name of the
 status code domain is self describing. Note we use the non-managing
 constructor of `string_ref`, as the string `"file i/o error domain"`
-is statically stored. We cache the returned value locally in static
-storage.
+is statically stored.

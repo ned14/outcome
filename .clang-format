@@ -16,7 +16,7 @@ BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: true
 BinPackParameters: true
-ColumnLimit:     160
+ColumnLimit:     120
 CommentPragmas:  '^!<'
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ContinuationIndentWidth: 0

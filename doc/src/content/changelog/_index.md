@@ -4,15 +4,53 @@ weight = 80
 +++
 
 ---
-## v2.2.14 ? (Boost 1.90) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.14)
+## v2.2.15 ? (Boost 1.91) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.15)
+
+### Enhancements:
+
+- Added the beginnings of a complete reimplementation of Experimental Outcome
+from scratch, but written 100% in C. This reimplementation will be usable from
+any ISO C right back to 1989, and it is 100% ABI compatible with this C++
+implementation i.e. you can cast pointers to the types from one
+implementation to the other if you wish, and virtual functions do correctly
+call into 100% C implementations and vice versa.
+
+- The C reimplementation required that the C++ `status_code_domain`'s virtual
+and thunk functions had to be refactored so calling them with `__thiscall`
+would also work when called with `__cdecl` on all major architectures and
+calling conventions. I also made them able to return failure without throwing
+a C++ exception. If you have created your own `status_code_domain`'s
+you will need to update your code (the refactoring is very minor), otherwise
+you shouldn't notice any change.
+
+- The C reimplementation simplified the implementation of `atomic_refcounted_string_ref`,
+and the C++ implementation was updated to match. The biggest change is that the
+input string is now ALWAYS COPIED and is no longer a `malloc` pointer whose
+ownership is taken. If you have used `atomic_refcounted_string_ref` in your own
+code, you'll need to refactor it to no longer allocate the input buffer using
+`malloc` and instead pass in the original `char` buffer.
+
+- The complete C reimplementation is currently **NOT YET FIT FOR PRODUCTION USE** and
+you should use instead the current, mature, C API to the C++ implementation.
+The documentation currently makes no reference to the complete C reimplementation,
+though if/when it becomes production ready, it will be updated.
+
+- Finally, the C reimplementation is what is being proposed for standardisation
+into the C standard library, so expect the usual renaming and other mild changes
+that standards committees like to do. As I no longer serve on WG21 C++ standards,
+I don't expect any further changes from that standards commitee.
+
+### Bug fixes:
+
+
+---
+## v2.2.14 10th December 2025 (Boost 1.90) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.14)
 
 ### Enhancements:
 
 [#314](https://github.com/ned14/outcome/issues/314)
 - Bump Boost min cmake required to 3.10 to match standalone Outcome. Also bump minium cmake to 3.10
 everywhere else in Outcome, as CI is now failing due to us requested too old a cmake.
-
-### Bug fixes:
 
 
 ---

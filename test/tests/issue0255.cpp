@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define SYSTEM_ERROR2_FATAL(msg) abort()
+
 #include "../../include/outcome/experimental/status_result.hpp"
 
 #include "quickcpplib/boost/test/unit_test.hpp"
@@ -31,10 +33,14 @@ namespace issues255
 {
   namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
 
-  static_assert(outcome_e::traits::is_move_bitcopying<outcome_e::error>::value, "outcome_e::error is not move bitcopying!");
+  static_assert(outcome_e::traits::is_move_bitcopying<outcome_e::error>::value,
+                "outcome_e::error is not move bitcopying!");
 
-  constexpr outcome_e::status_result<int> test() { return outcome_e::success(42); }
-}
+  constexpr outcome_e::status_result<int> test()
+  {
+    return outcome_e::success(42);
+  }
+}  // namespace issues255
 
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0255 / test, "status_result<int> not usable from constexpr in C++ 20")
 {
