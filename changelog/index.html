@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2026-01-08T18:28:18 UTC">
+<meta name="revised" content="2026-01-08T18:54:08 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2938,6 +2938,12 @@ I don&rsquo;t expect any further changes from that standards commitee.</p></li>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
 
+<ul>
+<li>In Experimental.Outcome, the <code>make_status_code()</code> ADL customisation point in
+<code>status_code</code> kinda supported transforming between kinds of status code, but it
+also kinda didn&rsquo;t. Now it definitely does. This fix may cause corner case breakage.</li>
+</ul>
+
 <hr />
 
 <h2 id="v2-2-14-10th-december-2025-boost-1-90-release-https-github-com-ned14-outcome-releases-tag-v2-2-14">v2.2.14 10th December 2025 (Boost 1.90) <a href="https://github.com/ned14/outcome/releases/tag/v2.2.14">[release]</a></h2>
@@ -3764,7 +3770,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/11/2025
+        <i class='fa fa-calendar'></i> Last update on 08/01/2026
     </div>
     
 
