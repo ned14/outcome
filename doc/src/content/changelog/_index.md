@@ -42,6 +42,10 @@ I don't expect any further changes from that standards commitee.
 
 ### Bug fixes:
 
+- In Experimental.Outcome, the `make_status_code()` ADL customisation point in
+`status_code` kinda supported transforming between kinds of status code, but it
+also kinda didn't. Now it definitely does. This fix may cause corner case breakage.
+
 
 ---
 ## v2.2.14 10th December 2025 (Boost 1.90) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.14)
