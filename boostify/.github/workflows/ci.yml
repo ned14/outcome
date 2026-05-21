@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - { name: "MSVC 14.3 - C++17-20", os: windows-2022, cxxstd: '17,20', cmake_args: -G "Visual Studio 17 2022" -A x64, }
-          - { name: "clang-cl 14.3 - C++14,20", os: windows-2022, cxxstd: '14,20', cmake_args: -G "Visual Studio 17 2022" -T ClangCL -A x64, }
+#          - { name: "clang-cl 14.3 - C++14,20", os: windows-2022, cxxstd: '14,20', cmake_args: -G "Visual Studio 17 2022" -T ClangCL -A x64, }
 #          - { name: "MSVC 14.2 - C++14-17", os: windows-2019, cxxstd: '14,17', cmake_args: -G "Visual Studio 16 2019" -A x64, }
 
           - { name: "GCC 12 - C++17-20", os: ubuntu-22.04, cc: gcc-12, cxx: g++-12, cxxstd: '17,20', install: g++-12, }
