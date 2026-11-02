@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2026-11-01T04:51:11 UTC">
+<meta name="revised" content="2026-11-02T07:35:12 UTC">
 <title>Declare a Result :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2920,10 +2920,10 @@
     
     
     <div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// Declare to C a Result with a happy value of intptr_t
-</span><span class="c1"></span><span class="n">CXX_DECLARE_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">,</span> <span class="n">intptr_t</span><span class="p">)</span>
+</span><span class="c1"></span><span class="n">CXX_DECLARE_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">,</span> <span class="n">intptr_t</span><span class="p">);</span>
 
 <span class="c1">// Save oneself typing out CXX_RESULT_SYSTEM(result_int) all the time
-</span><span class="c1"></span><span class="k">typedef</span> <span class="n">CXX_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">)</span> <span class="n">result</span><span class="p">;</span>
+</span><span class="c1"></span><span class="k">typedef</span> <span class="nf">CXX_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">)</span> <span class="n">result</span><span class="p">;</span>
 
 <span class="c1">// Our custom C enum
 </span><span class="c1"></span><span class="k">enum</span> <span class="n">c_enum</span>

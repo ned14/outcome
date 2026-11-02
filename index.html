@@ -6,7 +6,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2026-11-01T04:51:15 UTC">
+<meta name="revised" content="2026-11-02T07:35:17 UTC">
 <title>Home :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2982,7 +2982,7 @@ is available in scope.</p>
 
 <p>Equivalent to the C++ API: <code>CXX_DECLARE_RESULT_SYSTEM(ident, T)</code> declares the C type, thereafter <code>CXX_RESULT_SYSTEM(ident)</code> refers to it. You use it in the function&rsquo;s return type:</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">CXX_DECLARE_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_string</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span>
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">CXX_DECLARE_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_string</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">);</span>
 
 <span class="n">CXX_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_string</span><span class="p">)</span> <span class="n">data_from_file</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">);</span>
 </code></pre></div><a href="https://github.com/ned14/outcome/tree/master/doc/src/snippets/intro_c_example.cpp#L33" class="code-snippet-url" target="_blank">View this code on Github</a></div>
@@ -3000,7 +3000,7 @@ is available in scope.</p>
 
 <p>Or, if this function is called in another function that also returns <code>CXX_RESULT_SYSTEM(ident)</code>, you can use a dedicated control statement:</p>
 
-<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">CXX_DECLARE_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span>
+<div class="code-snippet"><div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">CXX_DECLARE_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
 
 <span class="n">CXX_RESULT_SYSTEM</span><span class="p">(</span><span class="n">result_int</span><span class="p">)</span> <span class="n">process</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">content</span><span class="p">);</span>
 
