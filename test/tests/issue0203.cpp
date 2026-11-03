@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#include "../ndebug.h"
+
 #include "../../include/outcome/std_result.hpp"
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"

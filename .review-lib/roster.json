@@ -1,0 +1,76 @@
+{
+  "repo": "/workspace/projects/outcome",
+  "areas": [
+    {
+      "id": "core-headers",
+      "area": "Header-only core library (result/outcome/experimental)",
+      "files": "include/**",
+      "lens": "header-only template correctness: UB and lifetime on error paths, ODR/revision-namespace ABI permutation, exception-ptr/hooks/policy semantics, noexcept-correctness, move/copy and triviality guarantees, silent failure modes (an error observed as success), C++ standard-version portability (C++17/20/23) and compiler differences",
+      "own": [
+        "include/**"
+      ]
+    },
+    {
+      "id": "tests",
+      "area": "Unit test suites, harness and single-header generatation",
+      "files": "test/**",
+      "lens": "can the suite report a FALSE GREEN (crash counted as pass, exit code ignored, a permutation silently not run, a skipped suite reported ok)? Does the suite actually cover what the docs promise? Are checks order-dependent or timing-flaky?",
+      "own": [
+        "test/**"
+      ]
+    },
+    {
+      "id": "docs",
+      "area": "Documentation and tutorials",
+      "files": "doc/**",
+      "lens": "doc-versus-code drift: a claim the code no longer honours, an example that would not compile or would throw/abort, a documented invariant with no mechanism enforcing it, and stale version/policy statements",
+      "own": [
+        "doc/**"
+      ]
+    },
+    {
+      "id": "build-ci",
+      "area": "Build system, packaging, CI and ABI compliance",
+      "files": "CMakeLists.txt CTestConfig.cmake .ci.cmake .docs.cmake .boostify cmake/** .github/** conan/** abi-compliance/** install_dev_githooks.sh make_reference_docs.py .gitmodules .quickcpplib",
+      "lens": "build-system correctness: dependency resolution and bootstrap, an option documented but ignored, silent misconfiguration, packaging (conan/vcpkg) drift, CI coverage versus claims, and anything that makes a green build not actually build what is claimed",
+      "own": [
+        "CMakeLists.txt",
+        "CTestConfig.cmake",
+        ".ci.cmake",
+        ".docs.cmake",
+        ".boostify",
+        "cmake/**",
+        ".github/**",
+        "conan/**",
+        "abi-compliance/**",
+        "install_dev_githooks.sh",
+        "make_reference_docs.py",
+        ".gitmodules",
+        ".quickcpplib"
+      ]
+    },
+    {
+      "id": "perf-boostify-misc",
+      "area": "Benchmarks, boostify generators, single-header output and repo metadata",
+      "files": "benchmark/** boostify/** single-header/** attic/** index.html Readme.md Licence.txt Doxyfile .clang-format .clang-format-ignore .clang-tidy .gitattributes .gitignore .review-lib/** plans/**",
+      "lens": "benchmark methodology (can a number be a false signal?), generator/transpiler correctness in boostify, drift between the committed single-header and what the headers actually contain, and stale repo metadata",
+      "own": [
+        "benchmark/**",
+        "boostify/**",
+        "single-header/**",
+        "attic/**",
+        "index.html",
+        "Readme.md",
+        "Licence.txt",
+        "Doxyfile",
+        ".clang-format",
+        ".clang-format-ignore",
+        ".clang-tidy",
+        ".gitattributes",
+        ".gitignore",
+        ".review-lib/**",
+        "plans/**"
+      ]
+    }
+  ]
+}

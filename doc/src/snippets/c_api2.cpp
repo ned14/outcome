@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! [preamble]
 // Declare to C a Result with a happy value of intptr_t
-CXX_DECLARE_RESULT_SYSTEM(result_int, intptr_t)
+CXX_DECLARE_RESULT_SYSTEM(result_int, intptr_t);
 
 // Save oneself typing out CXX_RESULT_SYSTEM(result_int) all the time
 typedef CXX_RESULT_SYSTEM(result_int) result;

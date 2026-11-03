@@ -23,6 +23,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define SYSTEM_ERROR2_FATAL(msg) abort()
 
+#include "../ndebug.h"
+
 #include "../../include/outcome/experimental/status_result.hpp"
 
 #include "quickcpplib/boost/test/unit_test.hpp"

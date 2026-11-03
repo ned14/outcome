@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#include "../ndebug.h"
+
 #define OUTCOME_USE_STD_ADDRESSOF 1
 
 #ifdef TESTING_WG21_EXPERIMENTAL_RESULT

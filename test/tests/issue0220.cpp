@@ -44,10 +44,22 @@ namespace issues220
 #endif
 
 
+// The body only exists for the POSIX status-code backend. The -noexcept
+// duplicate defines SYSTEM_ERROR2_NOT_POSIX, so guarding INSIDE the case left it
+// registering a test with zero assertions that CTest recorded as PASSED
+// (reviewer P0 r4:T1). Guard the whole case and let the duplicate report SKIPPED
+// via the marker.
+#ifndef SYSTEM_ERROR2_NOT_POSIX
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0220 / test, "ubsan reports reference binding to null pointer")
 {
-#ifndef SYSTEM_ERROR2_NOT_POSIX
   using namespace issues220;
   BOOST_CHECK(convert(PosixResult<int>(0)).value() == 0);
-#endif
 }
+#else
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0220 / test, "Skipped: issue0220 needs the POSIX status-code backend")
+{
+  SKIP_TEST_IF_DISABLED("test/tests/issue0220.cpp needs the POSIX status-code backend");
+}
+#endif

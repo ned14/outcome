@@ -25,9 +25,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
+// The body only compiles with exceptions enabled. Guarding INSIDE the case left the
+// -noexcept duplicate registering a case with zero assertions that CTest recorded as
+// PASSED (reviewer P0 r1:T-1). Guard the whole case and let the duplicate report
+// SKIPPED via the marker.
+#ifdef __cpp_exceptions
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0065 / outcome, "OUTCOME_TRY does not preserve the exception_ptr")
 {
-#ifdef __cpp_exceptions
   using namespace OUTCOME_V2_NAMESPACE;
   auto g = []() -> outcome<int> {
     auto f = []() -> outcome<int> {
@@ -55,5 +59,12 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0065 / outcome, "OUTCOME_TRY does not pres
   {
     BOOST_CHECK(!strcmp(e.what(), "XXX"));
   }
-#endif
 }
+#else
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0065 / outcome, "Skipped: issue0065 needs exceptions")
+{
+  SKIP_TEST_IF_DISABLED("test/tests/issue0065.cpp needs exceptions");
+}
+#endif

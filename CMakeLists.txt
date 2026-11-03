@@ -51,7 +51,6 @@ set(PROJECT_NAMESPACE)
 include(QuickCppLibSetupProject)
 
 option(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB "Whether to bundle an embedded copy of QuickCppLib with Outcome. Used by various package managers such as vcpkg." OFF)
-option(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE "Whether to bundle an embedded copy of status-code with Outcome. Used by various package managers such as vcpkg." OFF)
 option(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT "Whether to bundle an embedded copy of wg14_result with Outcome. Used by various package managers such as vcpkg." ON)
 option(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that Outcome is fully working. Used by various package managers such as vcpkg." OFF)
 option(OUTCOME_ENABLE_CXX_MODULES "Whether to enable the building of an Outcome C++ module" OFF)
@@ -72,6 +71,18 @@ if(NOT outcome_IS_DEPENDENCY)
 #    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/outcome.natvis" "${new_natvis_contents}")
 #  endif()
 endif()
+# quickcpplib defaults to requiring C++17. Outcome is a C++14 library and
+# deliberately builds at C++14 (the CI has an explicit C++14 job), so opt into
+# quickcpplib's C++14 compatibility mode before it is found. That mode disables
+# quickcpplib's two std::byte headers and its std::pmr test - Outcome includes
+# neither quickcpplib/byte.hpp / mem_flush_loads_stores.hpp / detach_cast.hpp nor
+# quickcpplib/memory_resource.hpp (it uses <optional>, <string_view> and pmr from
+# the standard library only where its own C++17 paths need them), so nothing is
+# lost. Without this, configuring Outcome with CMAKE_CXX_STANDARD=14 fails in
+# quickcpplib's floor probe.
+set(QUICKCPPLIB_MIN_CXX_STANDARD 14 CACHE STRING
+  "quickcpplib's minimum standard; Outcome opts into the C++14 compatibility mode")
+
 # Find my library dependencies
 if(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB AND CTEST_QUICKCPPLIB_CLONE_DIR)
   file(COPY "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/" DESTINATION "${CMAKE_BINARY_DIR}/quickcpplib")
@@ -103,6 +114,13 @@ else()
 endif()
 if(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT)
   ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/wg14_result/include" "https://github.com/ned14/wg14_result.git")
+else()
+  # The option had no else() branch, so turning it OFF changed nothing: the
+  # vendored wg14 headers stayed in the interface and install sets and were still
+  # used (P1). Mirror the status-code branch above: drop them from the header
+  # list so a consumer has to supply wg14_result itself.
+  list_filter(${PROJECT_NAME}_HEADERS EXCLUDE REGEX include/outcome/experimental/wg14_result/)
+  indented_message(STATUS "Not bundling the embedded wg14_result headers; consumers must provide them.")
 endif()
 
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
@@ -113,7 +131,13 @@ apply_cxx_concepts_to(INTERFACE outcome_hl REQUIRE_STD_CONCEPTS)
 
 # Make preprocessed edition of this library target
 if(NOT outcome_IS_DEPENDENCY OR OUTCOME_FORCE_ENABLE_PP_TARGETS)
-  if(NOT PYTHONINTERP_FOUND)
+  # QuickCppLibSetupProject() finds the interpreter with the MODERN module
+  # (find_package(Python COMPONENTS Interpreter)), which sets Python_FOUND;
+  # PYTHONINTERP_FOUND belongs to the deprecated FindPythonInterp and is never
+  # set. Testing only the legacy variable meant the preprocessed single-header
+  # editions were NEVER rebuilt, whatever python was installed - which is how
+  # they silently rotted while include/ was fixed (reviewer r1:pbm-1).
+  if(NOT Python_FOUND AND NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   else()
     function(make_single_header target name)
@@ -196,12 +220,18 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
     "outcome_hl--fileopen"
     "outcome_hl--hooks"
     "outcome_hl--experimental-wg14-result"
+    # cabi-layout includes the WG14 C headers next to Outcome's, so it must not
+    # see a precompiled header of Outcome's (same reason as the wg14 test).
+    "outcome_hl--cabi-layout"
     "outcome_hl--outcome-int-int-1"
     "outcome_hl--result-int-int-1"
     "outcome_hl--result-int-int-2"
   )
   include(QuickCppLibMakeStandardTests)
-  
+
+  # The tests this directory has registered, for the skip property below.
+  get_property(outcome_registered_tests DIRECTORY PROPERTY TESTS)
+
   # Enable Coroutines for the coroutines support test
   foreach(target ${outcome_TEST_TARGETS})
     if(${target} MATCHES "coroutine-support")
@@ -211,8 +241,20 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
     if(MSVC AND NOT CLANG)
       target_compile_options(${target} PRIVATE /permissive-)
     endif()
-    if(${target} MATCHES "experimental-wg14-result")
+    if(${target} MATCHES "experimental-wg14-result|cabi-layout")
       target_compile_features(${target} PUBLIC cxx_std_20)
+    endif()
+    # A test which does not apply to this compiler registers a case which prints a
+    # marker and exits 77 (test/tests/skip_test.hpp), and CTest turns that into
+    # SKIPPED only for the targets whose property says so. It was set on the
+    # exceptions-disabled duplicates alone, so the plain variants which skip failed
+    # the Windows lane instead: issue0009 needs statement expressions, which MSVC has
+    # not, so it exited 77 and CTest recorded "Failed" - a configuration-limited test
+    # reported as a defect (and, because an unexpected skip exit is not a count,
+    # ctest_test() answered -1 and named nothing). Set it on every registered test.
+    list(FIND outcome_registered_tests ${target} outcome_test_index)
+    if(outcome_test_index GREATER -1)
+      set_tests_properties(${target} PROPERTIES SKIP_RETURN_CODE 77)
     endif()
   endforeach()
   
@@ -228,12 +270,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
         add_executable(${target_name} "${testsource}")
         if(NOT first_test_target_noexcept)
           set(first_test_target_noexcept ${target_name})
-        elseif(${target_name} MATCHES "coroutine-support|fileopen|hooks|core-result|experimental-wg14-result")
+        elseif(${target_name} MATCHES "coroutine-support|fileopen|hooks|core-result|experimental-wg14-result|cabi-layout")
           set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
         elseif(COMMAND target_precompile_headers)
           target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_noexcept})
         endif()
-        if(${target_name} MATCHES "experimental-wg14-result")
+        if(${target_name} MATCHES "experimental-wg14-result|cabi-layout")
           target_compile_features(${target_name} PUBLIC cxx_std_20)
         endif()
         add_dependencies(_hl ${target_name})
@@ -257,17 +299,28 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
         add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
           COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
         )
+        # A duplicate whose body compiles away in a no-exceptions build registers
+        # ZERO test cases and exits 0, which CTest records as PASSED - that is how
+        # the whole exceptions-disabled matrix was a false green (P0 r8:tests-T1,
+        # r7:T1, r6:T1). Such a test now prints a skip marker, and this makes CTest
+        # report SKIPPED rather than a green test that ran nothing.
+        # The disabled branch prints its marker and then exits 77, which CTest
+        # maps to SKIPPED. SKIP_REGULAR_EXPRESSION was used first and is wrong:
+        # CTest applies it BEFORE the exit status, so a test that both emits the
+        # marker AND fails was reported Skipped with rc 0 (reproduced; P0
+        # r1:T9). SKIP_RETURN_CODE only skips on that exact status.
+        set_tests_properties(${target_name} PROPERTIES SKIP_RETURN_CODE 77)
         if(MSVC AND NOT CLANG)
           set(target_name "outcome_hl--${testname}-permissive")
           add_executable(${target_name} "${testsource}")
           if(NOT first_test_target_permissive)
             set(first_test_target_permissive ${target_name})
-          elseif(${target_name} MATCHES "coroutine-support|fileopen|core-result|experimental-wg14-result")
+          elseif(${target_name} MATCHES "coroutine-support|fileopen|core-result|experimental-wg14-result|cabi-layout")
             set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
           elseif(COMMAND target_precompile_headers)
             target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
           endif()
-          if(${target_name} MATCHES "experimental-wg14-result")
+          if(${target_name} MATCHES "experimental-wg14-result|cabi-layout")
             target_compile_features(${target_name} PUBLIC cxx_std_20)
           endif()
           add_dependencies(_hl ${target_name})
@@ -374,8 +427,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND NOT outcome_IS_DEPENDENCY AND (
   endforeach()
 endif()
 
-# Add in link tests
-add_subdirectory("test/link")
+# Add in link tests - only when they are wanted. This was unconditional, so a
+# consumer using outcome as a dependency (or anyone with BUILD_TESTING=OFF) still
+# got the link-test executables configured and built (P1).
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/link" AND NOT outcome_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
+  add_subdirectory("test/link")
+endif()
 
 # Turn on pedantic warnings for all tests, examples and snippets
 if(NOT MSVC)

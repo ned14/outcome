@@ -77,4 +77,17 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / fileopen, "Tests that the outcome
   BOOST_CHECK(a.error() == std::error_code(ENOENT, std::generic_category()));
   //! [file_open_example]
 }
+#else
+
+// The -noexcept duplicate of this test compiles to nothing: the example returns
+// `outcome<int>` and drives its error path, which needs exceptions. Skip instead
+// of passing a binary that registered zero tests (reviewer P0 r8:tests-T1; see
+// skip_test.hpp).
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / fileopen, "Skipped: fileopen is an exception-only test")
+{
+  SKIP_TEST_IF_DISABLED("test/tests/fileopen.cpp needs exceptions");
+}
+
 #endif

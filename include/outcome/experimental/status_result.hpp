@@ -135,6 +135,12 @@ namespace experimental
             OUTCOME_THROW_EXCEPTION("wide value check failed");
 #endif
           }
+          // Neither value nor error: a bitless status_result whose status was
+          // never set. Falling out of this function let the caller read the dead
+          // value payload as if it were live, i.e. a failure observed as success
+          // (reviewer P0 r5:H1). Every sibling policy ends this function with an
+          // unconditional throw (see policy/outcome_error_code_throw_as_system_error.hpp).
+          OUTCOME_THROW_EXCEPTION("wide value check failed");
         }
       }
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }

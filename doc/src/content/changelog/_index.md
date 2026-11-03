@@ -4,7 +4,56 @@ weight = 80
 +++
 
 ---
-## v2.2.15 ? (Boost 1.91) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.15)
+## v2.2.16 3rd November 2026 (Boost 1.93) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.16)
+
+### Enhancements:
+
+- Experimental.Outcome's C ABI now has exactly ONE description of a C result's
+layout - the struct the `CXX_DECLARE_RESULT_*` macros declare - and the compiler
+checks it against `status_result<R>`'s own offsets, size and alignment, so a
+divergence is a compile error instead of silent corruption at runtime. The C result
+makers and readers are strong declarations as well: a program which forgot to
+compile the C++ translation unit that supplies the runtime now gets a link error
+rather than filling the result from a layout guess.
+
+- The C ABI's names carry C linkage in every C++ build now. MSVC reports
+`__cplusplus` as 199711L unless `/Zc:__cplusplus` is passed, which had given every
+maker a mangled name, so a C translation unit on Windows could never link against
+them. The four C link tests are also real tests now - built and run, not merely
+linked - which is what proves the C ABI actually loads.
+
+### Bug fixes:
+
+- The vendored WG14 `result` (`result_with_<name>`): its 4 byte status word sat at
+`align_up(sizeof(R), 4)` where `status_result<R>` keeps it at `align_up(sizeof(R), 2)`,
+so for `bool`, `char` and `short` a result written by one implementation and read
+by the other came back bitless - the interchange this C ABI exists to offer did not
+work for the shapes a C caller is most likely to use. The status word now goes
+where the C++ layout puts it (the `wg14_result` submodule moves to 0048f89), and
+the three implementations are pinned against each other by a compile time matrix,
+a runtime interchange test and a seeded fuzz, so it cannot silently drift again.
+
+- `status_result` and `status_outcome` reported success for a bitless result:
+`wide_value_check()` fell out of the end of the function when the status was
+neither value, exception nor error, so the caller read the dead value payload as if
+it were live. It throws like every sibling policy now (`status_outcome` had the
+same hole as `status_result`).
+
+- `result::operator!=(const success_type<T> &)` returned false for a result which
+held an error or an exception, so a failed result compared BOTH equal and unequal
+to the same success value. It returns true.
+
+- The single-header editions are regenerated: they were carrying a stale
+`operator!=` (and had drifted from the headers they are generated from).
+
+- CMake: `OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB` and
+`OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT=OFF` now actually unbundle - they changed
+nothing before - and the C link tests are configured only when tests are wanted, so
+a consumer using Outcome as a dependency no longer gets them built.
+
+
+---
+## v2.2.15 22nd April 2026 (Boost 1.91) [[release]](https://github.com/ned14/outcome/releases/tag/v2.2.15)
 
 ### Enhancements:
 

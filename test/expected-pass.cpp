@@ -16,6 +16,8 @@
 // incorrect, but because the reference test suite is testing an Expected quite far away from
 // the latest WG21 proposal paper, and we're implementing that latest edition.
 
+#include "ndebug.h"
+
 #include <utility>
 
 #include "../include/outcome/iostream_support.hpp"
@@ -1024,6 +1026,16 @@ void expected_swap_function_value()
 }
 
 
+// This file keeps its own main() (via QUICKCPPLIB_BOOST_UNIT_TEST_CUSTOM_MAIN_DEFINED)
+// because its body is a plain sequence of assertions rather than a registered
+// test case. That is not a false green: BOOST_CHECK in quickcpplib's header
+// counts into unit_test::current_test_case(), which is a valid default case in
+// this context, and main() returns `fails != 0`, so a failing assertion exits
+// non-zero and fails CTest (verified: a deliberately broken assertion exits 1).
+// The one limitation is that a no-argument main() cannot honour CTest's
+// "--reporter junit --out FILE" arguments, so this test contributes no JUnit
+// detail to the dashboard (reviewer P0 r9:T1 claimed the assertions could never
+// fail; they can).
 #ifdef QUICKCPPLIB_BOOST_UNIT_TEST_HPP
 int main()
 #else

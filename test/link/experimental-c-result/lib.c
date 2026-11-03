@@ -33,3 +33,21 @@ mylib_result test_function(int x)
   }
   return make_success_result(x);
 }
+
+mylib_i32_result test_function_i32(int x)
+{
+  if(x < 0)
+  {
+    return make_failure_result_i32(EINVAL);
+  }
+  return make_success_result_i32(x);
+}
+
+mylib_chr_result test_function_chr(int x)
+{
+  if(x < 0)
+  {
+    return make_failure_result_chr(EINVAL);
+  }
+  return make_success_result_chr((char) x);
+}

@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#include "../ndebug.h"
+
 #if !defined(SYSTEM_ERROR2_NOT_POSIX) && __has_include("../../include/outcome/experimental/wg14_result/include/wg14_result/status_code.h")
 
 #ifdef __GNUC__
@@ -129,8 +131,16 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / status_code / wg14_status_code, "Tests that
   }
 }
 #else
-int main(void)
+
+// With SYSTEM_ERROR2_NOT_POSIX defined (the -noexcept duplicate) the whole body
+// above projects away, so this used to compile to a binary that ran nothing and
+// that CTest still recorded as PASSED (reviewer P0 r5:T1). Skip instead (see
+// skip_test.hpp).
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / experimental / wg14_result, "Skipped: wg14_result needs the POSIX status-code backend")
 {
-  return 0;
+  SKIP_TEST_IF_DISABLED("test/tests/experimental-wg14-result.cpp needs the POSIX status-code backend");
 }
+
 #endif
