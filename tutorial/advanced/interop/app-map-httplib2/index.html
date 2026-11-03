@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2026-11-02T23:15:45 UTC">
+<meta name="revised" content="2026-11-03T10:54:06 UTC">
 <title>Mapping the HTTP library into the Application `2/2` :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -1015,76 +1015,6 @@
       <a href="/outcome/reference/traits/">Traits</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
-      <li data-nav-id="/outcome/reference/traits/is_basic_outcome/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_basic_outcome/">
-            <code>is_basic_outcome&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_basic_result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_basic_result/">
-            <code>is_basic_result&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_error_code_available/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_error_code_available/">
-            <code>is_error_code_available&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_error_type/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_error_type/">
-            <code>is_error_type&lt;E&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_error_type_enum/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_error_type_enum/">
-            <code>is_error_type_enum&lt;E, Enum&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_exception_ptr_available/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_exception_ptr_available/">
-            <code>is_exception_ptr_available&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_failure_type/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_failure_type/">
-            <code>is_failure_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_move_bitcopying/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_move_bitcopying/">
-            <code>is_move_bitcopying&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/is_success_type/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/is_success_type/">
-            <code>is_success_type&lt;T&gt;</code>
-          </a>
-        </div>
-    </li>
-      <li data-nav-id="/outcome/reference/traits/type_can_be_used_in_basic_result/" class="dd-item">
-        <div>
-          <a href="/outcome/reference/traits/type_can_be_used_in_basic_result/">
-            <code>type_can_be_used_in_basic_result&lt;R&gt;</code>
-          </a>
-        </div>
-    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/policies/" class="dd-item haschildren
@@ -2625,6 +2555,48 @@
       <a href="/outcome/reference/functions/iostream/">Iostream</a><i class="fa fa-angle-right fa-lg category-icon"></i>
       </div>
         <ul>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_in/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_in/">
+            <code>std::istream &amp;operator&gt;&gt;(std::istream &amp;, basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_operator_out/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_operator_out/">
+            <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/outcome_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/outcome_print/">
+            <code>std::string print(const basic_outcome&lt;T, EC, EP, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
+      <li data-nav-id="/outcome/reference/functions/iostream/result_print/" class="dd-item">
+        <div>
+          <a href="/outcome/reference/functions/iostream/result_print/">
+            <code>std::string print(const basic_result&lt;T, E, NoValuePolicy&gt; &amp;)</code>
+          </a>
+        </div>
+    </li>
         </ul>
     </li>
     <li data-nav-id="/outcome/reference/functions/policy/" class="dd-item haschildren
@@ -2810,6 +2782,38 @@
    Future ABI stability guarantees</option>
     <option value="/outcome/tutorial/" >
    Tutorial</option> 
+    <option value="/outcome/tutorial/essential/" >
+  - 
+   Essential</option>
+    <option value="/outcome/tutorial/advanced/" >
+  - 
+   Advanced</option> 
+    <option value="/outcome/tutorial/advanced/payload/" >
+  -- 
+   Custom payloads</option>
+    <option value="/outcome/tutorial/advanced/constructors/" >
+  -- 
+   Result returning constructors</option>
+    <option value="/outcome/tutorial/advanced/hooks/" >
+  -- 
+   Hooking events</option>
+    <option value="/outcome/tutorial/advanced/interop/" >
+  -- 
+   Interoperation</option> 
+      <option value="/outcome/tutorial/advanced/interop/problem/" >--- Incommensurate E types</option>
+      <option value="/outcome/tutorial/advanced/interop/value-or-error/" >--- value_or_error Concept</option>
+      <option value="/outcome/tutorial/advanced/interop/httplib/" >--- The HTTP library</option>
+      <option value="/outcome/tutorial/advanced/interop/tidylib/" >--- The HTMLTidy library</option>
+      <option value="/outcome/tutorial/advanced/interop/filelib/" >--- The File I/O library</option>
+      <option value="/outcome/tutorial/advanced/interop/app/" >--- The Application</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib1/" >--- Mapping the HTTP library into the Application `1/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-httplib2/"  selected>--- Mapping the HTTP library into the Application `2/2`</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-filelib/" >--- Mapping the File I/O library into the Application</option>
+      <option value="/outcome/tutorial/advanced/interop/app-map-tidylib/" >--- Mapping the HTMLTidy library into the Application</option>
+      <option value="/outcome/tutorial/advanced/interop/app-go/" >--- In use</option>
+      <option value="/outcome/tutorial/advanced/interop/conclusion/" >--- Conclusion</option>
+  
+  
   
     <option value="/outcome/recipes/" >
    Recipes</option>
