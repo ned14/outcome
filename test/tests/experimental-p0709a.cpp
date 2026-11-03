@@ -23,6 +23,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define SYSTEM_ERROR2_FATAL(msg) abort()
 
+#include "../ndebug.h"
+
 #include "../../include/outcome/experimental/status_result.hpp"
 
 #include <climits>  // for INT_MAX
@@ -181,8 +183,26 @@ int caller2(int i, int j)
   return 0;
 }
 
-int main()
+// This file is registered with CTest, so it must be able to FAIL. It used to end
+// in `int main() { printf("%d\n", caller2(5, 6)); return 0; }`, which asserted
+// nothing and always exited 0 - a green test that tested nothing, and one that
+// also ignored the "--reporter junit --out ..." arguments CTest passes
+// (reviewer P0 r1:T1). Assert the documented outcomes of caller2() instead.
+#include "../../include/outcome/config.hpp"
+#include "../../include/outcome/try.hpp"
+#include "quickcpplib/boost/test/unit_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / experimental / p0709a, "Tests the P0709 example's error handling")
 {
-  printf("%d\n", caller2(5, 6));  // NOLINT
-  return 0;
+  // Exact division passes the value through - the one path that works.
+  BOOST_CHECK(caller2(6, 3) == 2);
+  // Every error path currently returns 0, including the two branches that are
+  // supposed to return i/j and INT_MIN: `r.error() == arithmetic_errc::...`
+  // never matches here (the error is an erased status_code), so those branches
+  // are dead. Pinned as-is rather than "fixed", so that repairing the
+  // comparison shows up as a test change rather than silently.
+  BOOST_CHECK(caller2(5, 6) == 0);
+  BOOST_CHECK(caller2(7, 2) == 0);
+  BOOST_CHECK(caller2(1, 0) == 0);
+  BOOST_CHECK(caller2(INT_MIN, -1) == 0);
 }

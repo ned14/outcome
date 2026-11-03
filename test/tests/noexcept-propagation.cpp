@@ -28,7 +28,12 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
 
-#ifdef __cpp_exceptions
+// The assertions here are std::is_nothrow_* trait checks, which need no
+// exceptions at all - the guard exists only because MSVC's traits return random
+// values when exceptions are disabled. So the -noexcept duplicate DOES run this
+// test on gcc/clang instead of registering zero cases and passing (reviewer P0
+// r6:T1); MSVC falls through to the skip marker at the bottom of the file.
+#if defined(__cpp_exceptions) || !defined(_MSC_VER)
 // std nothrow traits seem to return random values if exceptions are disabled on MSVC
 BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / noexcept, "Tests that the outcome correctly inherits noexcept from its type R")
 {
@@ -74,4 +79,14 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / noexcept, "Tests that the outcome
     BOOST_CHECK(!std::is_nothrow_destructible<type>::value);
   }
 }
+
+#else
+
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / noexcept, "Skipped: nothrow traits are unreliable on MSVC without exceptions")
+{
+  SKIP_TEST_IF_DISABLED("test/tests/noexcept-propagation.cpp skipped (MSVC nothrow traits with exceptions disabled)");
+}
+
 #endif

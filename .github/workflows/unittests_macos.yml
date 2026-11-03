@@ -17,16 +17,90 @@ jobs:
       NAME: MacOS
           
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: true
+        fetch-depth: 0
+
+    # CMake's ensure_git_subrepo() initialises these two only when their include
+    # directories are missing, and it does so with `git submodule update --init
+    # --recursive --depth 1`: a shallow fetch of a pinned commit, which git answers
+    # with 128 when that pin is not the tip of the branch the shallow clone saw. The
+    # run before last reported exactly that - "Fetched in submodule path
+    # 'include/outcome/experimental/wg14_result', but it did not contain
+    # 0048f890689a95f31b5098a554f4d0c9de00ce49" - and the direct clone it then falls
+    # back to needs the network to succeed, which is a fragile thing to hang a
+    # configure on. Do the update here instead, non-shallow and limited to the two
+    # submodules the build reads (doc/html and the doc themes are not part of it), so
+    # that configure has nothing to fetch; and if a pin really is unreachable, let
+    # git say so in an annotation rather than in a configure log nobody can read.
+    - name: Fetch the submodules the build reads
+      shell: bash
+      run: |
+       set -o pipefail
+       if ! git submodule update --init include/outcome/experimental/status-code include/outcome/experimental/wg14_result 2>&1 | tee submodules.log; then
+         tail -5 submodules.log | sed -e 's/%/%25/g' -e 's/^/::error::git submodule update: /'
+         exit 1
+       fi
 
     - name: CMake tests Mac OS
       shell: bash
       run: |
-       ctest -S .ci.cmake -VV -E 'noexcept|comparison' --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
-      
+       set -o pipefail
+       ctest -S .ci.cmake -VV -E 'noexcept|comparison' --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS" 2>&1 | tee ci.log
+
+    # The job log lives on storage this project's own tooling cannot reach, so the
+    # first errors are re-emitted as workflow commands: those become check-run
+    # annotations, which are readable through the API.
+    - name: Annotate the errors
+      if: failure()
+      shell: bash
+      run: |
+        set +e
+        log=ci.log
+        # Check runs keep only the first ten annotations a step emits, so this is in
+        # order of usefulness: the compiler, the linker and the test runner each name
+        # their failure on one line, and everything else here is the noise around it
+        # ("-- Performing Test ... - Failed").
+        #
+        # The compiler pattern has to carry MSVC's spelling too - "error C2338: ...",
+        # "error LNK2019: ..." - which puts a space and a code between the word and
+        # the colon, so plain 'error:' never matched it. That is why the Windows job
+        # has been arriving with no compiler diagnostic in it: the only MSVC error it
+        # ever reported (a failed static_assert in cabi-layout.cpp) came through the
+        # older sweep solely because that sweep still contained a bare 'FAILED', which
+        # 'static_assert failed' satisfies case-insensitively, and this step dropped
+        # 'FAILED' when the '-- Performing Test ... - Failed' noise was removed.
+        if [ -f "$log" ]; then
+          emit() { sed -e 's/%/%25/g' -e 's/\r$//' | sed 's/^/::error::/'; }
+          {
+            # The test run's own verdict comes first. CTest answers "-1" rather than a
+            # count when any test was "Not Run" - one whose executable was never built,
+            # or whose REQUIRED_FILES is not there - and it names that test in its
+            # summary alone. With the cap at ten lines, a single compile-fail test's
+            # -VV output fills it on its own and the verdict never arrives: that is why
+            # the Windows lane reported "-1" and nothing else.
+            # Our own one-line list of the tests which did not pass comes first, on
+            # its own, because it is the one line that says which test to go and look
+            # at; ctest's summary spells the same thing out over several lines.
+            grep -iE 'NOT PASSED' "$log" | head -2
+            grep -iE 'not run|unable to find executable|tests failed out of|The following tests FAILED|% tests passed' "$log" | head -3
+            # Then the compiler, the linker, the test runner.
+            grep -iE 'error:|error C[0-9]{3,4}:|error LNK[0-9]{4}|LNK[0-9]{4}|unresolved external|undefined (reference|symbol)|fatal error' "$log" | head -3
+            # Then what a ctest script was doing when it failed: CMake prints the
+            # cause on the lines after its error line ("Unknown CMake command ...",
+            # "FATAL: build of _hl failed ..."), so its body is taken, not its head.
+            grep -iE -A4 'CMake Error' "$log" | grep -viE '^--$|^-- Performing Test|CMake(Error|Output)\.log' | head -3
+            # A failure matching none of the above still has to arrive with the last
+            # thing that happened in it.
+            tail -1 "$log"
+          } | awk '!seen[$0]++' | head -10 | emit
+        else
+          echo "::error::$log was never written: the failing step never reached tee(1), so there is nothing to annotate"
+        fi
     - name: Upload Test Results
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Mac OS test results
         path: prebuilt/merged_junit_results.xml
@@ -39,7 +113,7 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts
 

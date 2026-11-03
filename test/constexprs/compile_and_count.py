@@ -54,8 +54,30 @@ _function_ = \
 #
 limits = {
 "min_result_construct_value_move_destruct"     : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
-"min_result_next"                              : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
+# Was "min_result_next", which matches no source file - the budget had silently
+# stopped being enforced when the file was renamed to min_result_get_value.cpp
+# (reviewer P0 r2:tests-T1). check_limits_cover_sources() below now makes that a
+# hard error instead of a quiet no-op.
+"min_result_get_value"                         : { 'gcc' :  5, 'clang' :  5, 'msvc' :  5 },
 }
+
+
+def check_limits_cover_sources():
+    """Every budget must name a source that exists, or it enforces nothing.
+
+    The opcode budgets are looked up by source basename, so renaming a test file
+    silently disables its budget. Refuse to run in that state.
+    """
+    sources = set(f[:-4] for f in list_src_files())
+    stale = sorted(k for k in limits if k not in sources)
+    if stale:
+        print("ERROR: opcode limit(s) for source file(s) that do not exist: " +
+              ", ".join(stale) + " (present: " + ", ".join(sorted(sources)) + ")",
+              file=sys.stderr)
+        sys.exit(1)
+    missing = sorted(s for s in sources if s.startswith("min_") and s not in limits)
+    if missing:
+        print("WARNING: no opcode budget for " + ", ".join(missing), file=sys.stderr)
 
 
 
@@ -145,6 +167,7 @@ def list_src_files():
 
 
 def test_all(func : dict):
+    check_limits_cover_sources()
     xml_string = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
                  '<testsuite name="constexpr">\n'
     # holds (compiler, name, count) tuples

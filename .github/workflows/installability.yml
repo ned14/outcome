@@ -15,13 +15,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]  # windows-2019 fails due to too long paths
+        # Pinned, not `-latest`: this job deliberately builds with Python 3.8 to
+        # prove the install still works on an old interpreter, and the latest
+        # runner images no longer carry that version - setup-python answers
+        # "The version '3.8' with architecture 'x64' was not found" on Ubuntu
+        # 26.04. windows-2019 is excluded for the old reason: paths too long.
+        os: [ubuntu-24.04, macos-14]
     env:
       NAME: Install-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
           
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: true
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -31,12 +39,67 @@ jobs:
     - name: Install
       shell: bash
       run: |
+       set -o pipefail
        git config --global core.longpaths true
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
-       python quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome develop ""
+       python quickcpplib/scripts/test_cpp-pm_install.py conan/test_package/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome develop "" 2>&1 | tee install.log
+       # The line above adds outcome as a submodule of UPSTREAM develop, so this
+       # job used to install and test whatever upstream happened to have - never
+       # the commit under test (reviewer P0 r1:BC-1). Re-point the submodule at
+       # the checked-out commit, and fail if that does not take: a job that
+       # silently tests someone else's code is worse than no job.
+       git -C test_cpp-pm_install/outcome fetch --quiet "file://${GITHUB_WORKSPACE}" HEAD
+       git -C test_cpp-pm_install/outcome checkout --quiet --detach FETCH_HEAD
+       test "$(git -C test_cpp-pm_install/outcome rev-parse HEAD)" = "${GITHUB_SHA}"
        cd test_cpp-pm_install
        mkdir build
        cd build
-       cmake .. -DCMAKE_BUILD_TYPE=Release $CMAKE_CONFIGURE_OPTIONS
-       cmake --build .
+       # Both stages are teed: a configure failure used to leave no log behind at
+       # all, and the only annotation it produced was "no log matched".
+       cmake .. -DCMAKE_BUILD_TYPE=Release $CMAKE_CONFIGURE_OPTIONS 2>&1 | tee configure.log
+       cmake --build . 2>&1 | tee build.log
+
+    # The job log lives on storage this project's own tooling cannot reach, so the
+    # first errors are re-emitted as workflow commands: those become check-run
+    # annotations, which are readable through the API.
+    - name: Annotate the errors
+      if: failure()
+      shell: bash
+      run: |
+        set +e
+        logs=""
+        for f in test_cpp-pm_install/build/configure.log test_cpp-pm_install/build/build.log install.log; do
+          [ -f "$f" ] && logs="$logs $f"
+        done
+        # Check runs keep only the first ten annotations a step emits, so what an
+        # error looks like here goes first (a compiler, the CMake error and its body,
+        # Hunter's own words), and only then are the log tails appended - the previous
+        # version spent its whole budget on one log and reported nothing about the
+        # stage which actually failed.
+        #
+        # This job's configure builds outcome through Hunter, which streams the
+        # package's build output into configure.log, so the failure can be a clang or
+        # MSVC diagnostic (with MSVC's spelling, "error C2338: ...", which 'error:'
+        # does not match) or one of Hunter's own messages, none of which contain
+        # "error:". The last run annotated "-- Configuring incomplete, errors
+        # occurred!" and a git submodule warning and nothing else, so the cause of the
+        # configure failure never arrived; hence the body of the log around the point
+        # where it stopped, and not one line of it.
+        if [ -n "$logs" ]; then
+          emit() { sed -e 's/%/%25/g' -e 's/\r$//' | sed 's/^/::error::/'; }
+          {
+            for f in $logs; do
+              grep -iE 'error:|error C[0-9]{3,4}:|error LNK[0-9]{4}|LNK[0-9]{4}|unresolved external|undefined (reference|symbol)|fatal error|assertion' "$f" | head -3 | sed "s|^|${f}: |"
+            done
+            for f in $logs; do
+              grep -iE 'CMake Error|hunter \*\*|FATAL|Building package failed|Build step for' "$f" | head -2 | sed "s|^|${f}: |"
+            done
+            for f in test_cpp-pm_install/build/configure.log test_cpp-pm_install/build/build.log; do
+              [ -f "$f" ] && tail -5 "$f" | sed "s|^|${f}: tail: |"
+            done
+            tail -1 install.log | sed "s|^|install.log: tail: |"
+          } | awk '!seen[$0]++' | grep -vE ': tail: *$' | head -10 | emit
+        else
+          echo "::error::no log was written at all: the step failed before it teed anything, which is itself the finding"
+        fi

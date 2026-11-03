@@ -15,7 +15,10 @@ jobs:
     runs-on: ubuntu-24.04
           
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: true
+        fetch-depth: 0
     
     - name: Install abi-compliance-checker and abigail tools
       shell: bash
@@ -26,28 +29,44 @@ jobs:
       if: success() || failure()
       shell: bash
       run: |
+       set -o pipefail
        cd abi-compliance
        chmod +x check-abi.sh
-       ./check-abi.sh 2.2
+       ./check-abi.sh 2.2 2>&1 | tee abi-dumper.log
        
     - name: Validate ABI compatibility (abigail)
       if: success() || failure()
       shell: bash
       run: |
+       set -o pipefail
        cd abi-compliance
        chmod +x check-abigail.sh
-       ./check-abigail.sh 2.2
-       
-#    - name: Validate API + ABI compatibility (abi-compliance-checker)
-#      if: success() || failure()
-#      shell: bash
-#      run: |
-#       cd abi-compliance
-#       ./check-api-abi.sh 2.2
-       
+       ./check-abigail.sh 2.2 2>&1 | tee abigail.log
+
+    # The job log lives on storage this project's own tooling cannot reach, so the
+    # first errors are re-emitted as workflow commands: those become check-run
+    # annotations, which are readable through the API.
+    - name: Annotate the errors
+      if: failure()
+      shell: bash
+      run: |
+        hits=0
+        for f in abi-compliance/abi-dumper.log abi-compliance/abigail.log; do
+          [ -f "$f" ] || continue
+          out=$(grep -m 10 -iE 'error|FAILED|undefined symbol|tests failed|assertion' "$f" || true)
+          if [ -n "$out" ]; then echo "$out" | sed 's/^/::error::/'; hits=1; fi
+        done
+        if [ "$hits" -eq 0 ]; then
+          for f in abi-compliance/abi-dumper.log abi-compliance/abigail.log; do
+            [ -f "$f" ] || continue
+            tail -5 "$f" | sed 's/^/::error::log tail: /'
+            break
+          done
+          echo "::error::no log matched: the failing step wrote no log, or failed before writing one"
+        fi
     - name: Upload ABI stability reports 1
       if: success() || failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ABI stability report (GCC 13 with C++ 17)
         path: abi-compliance/compat_reports/Outcome/2.2-gcc13-cxx17_to_test-gcc13-cxx17/compat_report.html
@@ -55,7 +74,7 @@ jobs:
 
     - name: Upload ABI stability reports 2
       if: success() || failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ABI stability report (GCC 13 with C++ 20)
         path: abi-compliance/compat_reports/Outcome/2.2-gcc13-cxx20_to_test-gcc13-cxx20/compat_report.html

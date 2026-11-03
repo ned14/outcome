@@ -18,14 +18,14 @@ jobs:
 
     steps:
       - name: Checkout Documentation
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
     
       - name: Cache Hugo
         id: cache-hugo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: hugo_bin
           key: documentation-hugo_bin
@@ -41,14 +41,44 @@ jobs:
       - name: Regenerate Documentation
         shell: bash
         run: |
+         set -o pipefail
          export PATH=$PATH:`pwd`/hugo_bin
          cd doc/html
          git checkout gh-pages
          cd ../..
-         CXX=clang++ ctest -S .docs.cmake -V
+         CXX=clang++ ctest -S .docs.cmake -V 2>&1 | tee ci-docs.log
          cd doc/html
          echo "google-site-verification: google5fc8a1f8de4b73f0.html" > google5fc8a1f8de4b73f0.html
-          
+
+      # The job log lives on storage this project's own tooling cannot reach, so the
+      # first errors are re-emitted as workflow commands: those become check-run
+      # annotations, which are readable through the API.
+      - name: Annotate the errors
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          log=ci-docs.log
+          # A CMake script error IS the failure, and the line after it is where CMake
+          # names the cause ("Unknown CMake command ..."). That body matches no error
+          # keyword, so the old -m 10 keyword sweep spent its whole budget on the noise
+          # around it ("-- Performing Test ... - Failed") and never showed the cause.
+          if [ -f "$log" ]; then
+            emit() { sed -e 's/%/%25/g' -e 's/\r$//' | sed 's/^/::error::/'; }
+            grep -iE -A4 'CMake Error' "$log" | grep -v '^--$' | head -60 | emit
+            # Then the compiler, linker and test failures.
+            grep -iE 'error:|undefined (reference|symbol)|tests failed|FAILED' "$log" | head -20 | emit
+            # ctest_update() runs `git fetch`; when that fails CTest reports the command
+            # but never the reason, so run it again here and let git speak.
+            if grep -q 'Update command failed' "$log"; then
+              GIT_TERMINAL_PROMPT=0 git fetch -v --dry-run 2>&1 | tail -15 | sed 's/^/::error::git fetch: /'
+            fi
+            # Always annotate the tail as well: a failure whose log matches no pattern
+            # still has to arrive with the last thing that happened in it.
+            tail -15 "$log" | emit
+          else
+            echo "::error::$log was never written: the failing step never reached tee(1), so there is nothing to annotate"
+          fi
       - name: Publish Documentation
         uses: JamesIves/github-pages-deploy-action@v4
         with:

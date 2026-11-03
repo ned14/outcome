@@ -26,9 +26,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../include/outcome/try.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
+// The body only compiles with exceptions enabled. Guarding INSIDE the case left the
+// -noexcept duplicate registering a case with zero assertions that CTest recorded as
+// PASSED (reviewer P0 r1:T-1). Guard the whole case and let the duplicate report
+// SKIPPED via the marker.
+#ifdef __cpp_exceptions
 BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0064 / outcome, "OUTCOME_TRY on excepted outcome is propagating a null error rather than just an exception")
 {
-#ifdef __cpp_exceptions
   using namespace OUTCOME_V2_NAMESPACE;
   auto f = []() -> outcome<int> {
     auto h = []() -> outcome<int> { return std::make_exception_ptr(std::runtime_error("hello")); };
@@ -39,5 +43,12 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0064 / outcome, "OUTCOME_TRY on excepted o
   BOOST_CHECK(!f.has_value());
   BOOST_CHECK(!f.has_error());
   BOOST_CHECK(f.has_exception());
-#endif
 }
+#else
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0064 / outcome, "Skipped: issue0064 needs exceptions")
+{
+  SKIP_TEST_IF_DISABLED("test/tests/issue0064.cpp needs exceptions");
+}
+#endif

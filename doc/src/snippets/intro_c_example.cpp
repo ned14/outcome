@@ -30,7 +30,7 @@ void use_string(const char *foo)
 }
 
 //! [signature]
-CXX_DECLARE_RESULT_SYSTEM(result_string, const char *)
+CXX_DECLARE_RESULT_SYSTEM(result_string, const char *);
 
 CXX_RESULT_SYSTEM(result_string) data_from_file(const char *path);
 //! [signature]
@@ -47,7 +47,7 @@ int main()
 }
 
 //! [implementation]
-CXX_DECLARE_RESULT_SYSTEM(result_int, int)
+CXX_DECLARE_RESULT_SYSTEM(result_int, int);
 
 CXX_RESULT_SYSTEM(result_int) process(const char *content);
 

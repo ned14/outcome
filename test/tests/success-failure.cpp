@@ -21,6 +21,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#include "../ndebug.h"
+
 #include "../../include/outcome/result.hpp"
 #include "quickcpplib/boost/test/unit_test.hpp"
 
@@ -59,4 +61,41 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure, "Tests that the success 
     static_assert(std::is_same<decltype(c)::exception_type, int>::value, "");
   }
 #endif
+}
+
+// A result holding an error is never equal to a success sugar, so `!=` must be
+// true for it. This used to return false, which made a failed result compare
+// both equal AND unequal to the same success value (reviewer P0
+// r2:core-headers-1 / r6:H1).
+BOOST_OUTCOME_AUTO_TEST_CASE(works / success - failure - compare, "Tests that a failed result never compares equal to a success sugar")
+{
+  using namespace OUTCOME_V2_NAMESPACE;
+  using E = std::error_code;
+  const auto err = std::make_error_code(std::errc::invalid_argument);
+
+  result<int, E> val(5);
+  result<int, E> bad(err);
+
+  // value against a success sugar
+  BOOST_CHECK(val == success(5));
+  BOOST_CHECK(!(val != success(5)));
+  BOOST_CHECK(val != success(6));
+  BOOST_CHECK(!(val == success(6)));
+
+  // error against a success sugar: the case that was wrong
+  BOOST_CHECK(bad != success(5));
+  BOOST_CHECK(!(bad == success(5)));
+  BOOST_CHECK(success(5) != bad);
+  BOOST_CHECK(!(success(5) == bad));
+
+  // void success sugar behaves the same way
+  BOOST_CHECK(bad != success());
+  BOOST_CHECK(!(bad == success()));
+  BOOST_CHECK(val == success());
+
+  // and a value never compares equal to a failure sugar
+  BOOST_CHECK(val != failure(err));
+  BOOST_CHECK(!(val == failure(err)));
+  BOOST_CHECK(bad == failure(err));
+  BOOST_CHECK(!(bad != failure(err)));
 }

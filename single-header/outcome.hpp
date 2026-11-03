@@ -48,7 +48,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_COROUTINE_SUPPORT_HPP
 #define OUTCOME_COROUTINE_SUPPORT_HPP
 /* Configure Outcome with QuickCppLib
-(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2025 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: August 2015
 
 
@@ -99,7 +99,7 @@ Distributed under the Boost Software License, Version 1.0.
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_MINOR 2
 /*! AWAITING HUGO JSON CONVERSION TOOL */
-#define OUTCOME_VERSION_PATCH 9
+#define OUTCOME_VERSION_PATCH 16
 /*! AWAITING HUGO JSON CONVERSION TOOL */
 #define OUTCOME_VERSION_REVISION 0 // Revision version for cmake and DLL version stamping
 /*! AWAITING HUGO JSON CONVERSION TOOL */
@@ -1050,9 +1050,9 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define OUTCOME_PREVIOUS_COMMIT_REF bfd1a782496e8719001f39ec3d329e8f124726ba
-#define OUTCOME_PREVIOUS_COMMIT_DATE "2025-05-20 11:22:18 +00:00"
-#define OUTCOME_PREVIOUS_COMMIT_UNIQUE bfd1a782
+#define OUTCOME_PREVIOUS_COMMIT_REF b43baf066f9c7c6ef1a3965811c4825da7fa6c39
+#define OUTCOME_PREVIOUS_COMMIT_DATE "2026-10-28 04:59:33 +00:00"
+#define OUTCOME_PREVIOUS_COMMIT_UNIQUE b43baf06
 #define OUTCOME_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2))
 #ifdef _DEBUG
 #define OUTCOME_V2_CXX_MODULE_NAME QUICKCPPLIB_BIND_NAMESPACE((QUICKCPPLIB_BIND_NAMESPACE_VERSION(outcome_v2d)))
@@ -1074,6 +1074,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <initializer_list>
 #include <iosfwd> // for future serialisation
 #include <new> // for placement in moves etc
+#include <utility> // for swap
 #include <type_traits>
 #ifndef OUTCOME_USE_STD_IN_PLACE_TYPE
 #if defined(_MSC_VER) && _HAS_CXX17
@@ -1371,21 +1372,25 @@ Distributed under the Boost Software License, Version 1.0.
 #include <stdlib.h> // for abort
 #include <string.h>
 // To avoid including windows.h, this source has been macro expanded and win32 function shimmed for C++ only
-#if defined(__cplusplus) && !defined(__clang__)
+#if defined(__cplusplus) && !defined(__clang__) && !defined(__MINGW32__)
+#define QUICKCPPLIB_EXECINFO_WINDOWS_H 0
 namespace win32
 {
   extern _Ret_maybenull_ void *__stdcall LoadLibraryA(_In_ const char *lpLibFileName);
   typedef int(__stdcall *GetProcAddress_returntype)();
   extern GetProcAddress_returntype __stdcall GetProcAddress(_In_ void *hModule, _In_ const char *lpProcName);
-  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(_In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture,
-                                                                                  _Out_writes_to_(FramesToCapture, return ) void **BackTrace,
-                                                                                  _Out_opt_ unsigned long *BackTraceHash);
+  extern _Success_(return != 0) unsigned short __stdcall RtlCaptureStackBackTrace(
+  _In_ unsigned long FramesToSkip, _In_ unsigned long FramesToCapture,
+  _Out_writes_to_(FramesToCapture, return) void **BackTrace, _Out_opt_ unsigned long *BackTraceHash);
   extern _Success_(return != 0)
   _When_((cchWideChar == -1) && (cbMultiByte != 0),
          _Post_equal_to_(_String_length_(lpMultiByteStr) +
-                         1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags, const wchar_t *lpWideCharStr,
-                                                               _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return ) char *lpMultiByteStr,
-                                                               _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar, _Out_opt_ int *lpUsedDefaultChar);
+                         1)) int __stdcall WideCharToMultiByte(_In_ unsigned int CodePage, _In_ unsigned long dwFlags,
+                                                               const wchar_t *lpWideCharStr, _In_ int cchWideChar,
+                                                               _Out_writes_bytes_to_opt_(cbMultiByte,
+                                                                                         return) char *lpMultiByteStr,
+                                                               _In_ int cbMultiByte, _In_opt_ const char *lpDefaultChar,
+                                                               _Out_opt_ int *lpUsedDefaultChar);
 #pragma comment(lib, "kernel32.lib")
 #if (defined(__x86_64__) || defined(_M_X64)) || (defined(__aarch64__) || defined(_M_ARM64))
 #pragma comment(linker, "/alternatename:?LoadLibraryA@win32@@YAPEAXPEBD@Z=LoadLibraryA")
@@ -1407,13 +1412,14 @@ namespace win32
 #endif
 } // namespace win32
 #else
+#define QUICKCPPLIB_EXECINFO_WINDOWS_H 1
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <Windows.h>
+#include <windows.h>
 #endif
 #ifdef __cplusplus
 namespace
@@ -1427,11 +1433,12 @@ namespace
     wchar_t *FileName;
     unsigned long long int Address;
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
-  typedef int(__stdcall *SymInitialize_t)(_In_ void *hProcess, _In_opt_ const wchar_t *UserSearchPath, _In_ int fInvadeProcess);
-  typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr, _Out_ unsigned long *pdwDisplacement,
-                                                 _Out_ PIMAGEHLP_LINE64 Line);
+  typedef int(__stdcall *SymInitialize_t)(_In_ void *hProcess, _In_opt_ const wchar_t *UserSearchPath,
+                                          _In_ int fInvadeProcess);
+  typedef int(__stdcall *SymGetLineFromAddr64_t)(_In_ void *hProcess, _In_ unsigned long long int dwAddr,
+                                                 _Out_ unsigned long *pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line);
   static std::atomic<unsigned> dbghelp_init_lock;
-#if defined(__cplusplus) && !defined(__clang__)
+#if !QUICKCPPLIB_EXECINFO_WINDOWS_H
   static void *dbghelp;
 #else
 static HMODULE dbghelp;
@@ -1440,7 +1447,7 @@ static HMODULE dbghelp;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
   static void load_dbghelp()
   {
-#if defined(__cplusplus) && !defined(__clang__)
+#if !QUICKCPPLIB_EXECINFO_WINDOWS_H
     using win32::GetProcAddress;
     using win32::LoadLibraryA;
 #endif
@@ -1474,18 +1481,18 @@ extern "C"
 #endif
   _Check_return_ size_t backtrace(_Out_writes_(len) void **bt, _In_ size_t len)
   {
-#if defined(__cplusplus) && !defined(__clang__)
+#if !QUICKCPPLIB_EXECINFO_WINDOWS_H
     using win32::RtlCaptureStackBackTrace;
 #endif
     return RtlCaptureStackBackTrace(1, (unsigned long) len, bt, NULL);
   }
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 6385 6386) // MSVC static analyser can't grok this function. clang's analyser gives it thumbs up.
+#pragma warning( disable : 6385 6386) // MSVC static analyser can't grok this function. clang's analyser gives it thumbs up.
 #endif
   _Check_return_ _Ret_writes_maybenull_(len) char **backtrace_symbols(_In_reads_(len) void *const *bt, _In_ size_t len)
   {
-#if defined(__cplusplus) && !defined(__clang__)
+#if !QUICKCPPLIB_EXECINFO_WINDOWS_H
     using win32::WideCharToMultiByte;
 #endif
     size_t bytes = (len + 1) * sizeof(void *) + 256, n;
@@ -1519,7 +1526,8 @@ extern "C"
             static std::atomic<unsigned> symlock(0);
             while(symlock.exchange(1, std::memory_order_acq_rel))
               ;
-            if(!SymGetLineFromAddr64 || !SymGetLineFromAddr64((void *) (size_t) -1 /*GetCurrentProcess()*/, (size_t) bt[n], &displ, &ihl))
+            if(!SymGetLineFromAddr64 ||
+               !SymGetLineFromAddr64((void *) (size_t) -1 /*GetCurrentProcess()*/, (size_t) bt[n], &displ, &ihl))
             {
               symlock.store(0, std::memory_order_release);
               if(n == 0)
@@ -1538,13 +1546,14 @@ extern "C"
         retry:
           if(please_realloc)
           {
+            const auto offset = p - (char *) ret;
             char **temp = (char **) realloc(ret, bytes + 256);
             if(!temp)
             {
               free(ret);
               return NULL;
             }
-            p = (char *) temp + (p - (char *) ret);
+            p = (char *) temp + offset;
             ret = temp;
             bytes += 256;
             end = (char *) ret + bytes;
@@ -3029,7 +3038,7 @@ type definition  is_exception_ptr_available. Potential doc page: NOT FOUND
 OUTCOME_V2_NAMESPACE_END
 #endif
 /* Essentially an internal optional implementation :)
-(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2017-2025 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2017
 
 
@@ -4819,7 +4828,10 @@ namespace detail
       {
         return this->_state._value != o.value();
       }
-      return false;
+      // A result holding an error (or an exception) is never equal to a success
+      // sugar: returning false here made every failed result compare BOTH equal
+      // and unequal to the same success value (reviewer P0 r2:core-headers-1).
+      return true;
     }
     constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
@@ -8630,7 +8642,7 @@ SIGNATURE NOT RECOGNISED
 /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, s(, ), __VA_ARGS__)
+#define OUTCOME_CO_TRYV2_FAILURE_LIKELY(s, ...) OUTCOME_TRYV3_FAILURE_LIKELY(OUTCOME_TRY_UNIQUE_NAME, co_return, (s, ), __VA_ARGS__)
 #if defined(__GNUC__) || defined(__clang__)
 #define OUTCOME_TRYX2(unique, retstmt, ...) ({ OUTCOME_TRYV2_SUCCESS_LIKELY(unique, retstmt, deduce, __VA_ARGS__); ::OUTCOME_V2_NAMESPACE::try_operation_extract_value(static_cast<decltype(unique) &&>(unique)); })
 /*! AWAITING HUGO JSON CONVERSION TOOL

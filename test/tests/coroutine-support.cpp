@@ -186,8 +186,15 @@ BOOST_OUTCOME_AUTO_TEST_CASE(works / coroutine / generator, "Tests that results 
 #endif
 }
 #else
-int main(void)
+
+// No coroutine support in this configuration: the body above projects away, so
+// this used to compile to a binary that registered zero tests and was recorded
+// as PASSED (reviewer P0 r5:T1's class). Skip instead (see skip_test.hpp).
+#include "skip_test.hpp"
+
+BOOST_OUTCOME_AUTO_TEST_CASE(works / outcome / coroutine - support, "Skipped: this compiler has no coroutine support")
 {
-  return 0;
+  SKIP_TEST_IF_DISABLED("test/tests/coroutine-support.cpp needs coroutine support");
 }
+
 #endif

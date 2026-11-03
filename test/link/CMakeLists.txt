@@ -50,6 +50,10 @@ foreach(type STATIC SHARED)
       DISABLE_PRECOMPILE_HEADERS On
     )
     target_link_libraries(${target} PRIVATE ${target}-lib outcome::hl)
+    # These executables assert the library's behaviour AT RUNTIME (main.c aborts
+    # on a wrong result). Nothing used to run them - they were only linked - so
+    # their assertions were dead and a broken C ABI still produced a green build.
+    add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
     if(target MATCHES ".*-type_SHARED-vis_hidden" OR (WIN32 AND target MATCHES ".*-type_SHARED.*"))
       # The shared library won't export the C++ helper machinery if visibility is hidden,
       # so without including a copy of the C++ helpers it would correctly fail to link.
@@ -60,3 +64,10 @@ foreach(type STATIC SHARED)
     list(APPEND outcome_LINK_TARGETS ${target})
   endforeach()
 endforeach()
+
+# One target to build them all. These arrow at the C ABI from C, so they are not
+# dependencies of _hl (which is the C++ test tree), and a CI that builds only
+# _hl leaves all four executables missing - ctest then reports them "Not Run",
+# which reads like four failures and is really a build that never happened.
+add_custom_target(outcome-link-tests COMMENT "Building all link tests ...")
+add_dependencies(outcome-link-tests ${outcome_LINK_TARGETS})

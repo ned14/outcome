@@ -141,6 +141,11 @@ SIGNATURE NOT RECOGNISED
             OUTCOME_THROW_EXCEPTION("wide value check failed");
 #endif
           }
+          // Neither value, exception nor error: a bitless status_outcome.
+          // Falling out here let the caller read the dead payload as a success
+          // (reviewer P0 r2:r2:core-headers-1, the twin of the hole fixed in
+          // status_result.hpp last round). Every sibling policy throws here.
+          OUTCOME_THROW_EXCEPTION("wide value check failed");
         }
       }
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }

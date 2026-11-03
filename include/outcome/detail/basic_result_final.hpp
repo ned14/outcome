@@ -122,7 +122,10 @@ namespace detail
       {
         return this->_state._value != o.value();
       }
-      return false;
+      // A result holding an error (or an exception) is never equal to a success
+      // sugar: returning false here made every failed result compare BOTH equal
+      // and unequal to the same success value (reviewer P0 r2:core-headers-1).
+      return true;
     }
     constexpr bool operator!=(const success_type<void> &o) const noexcept
     {
