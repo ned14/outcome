@@ -22,6 +22,13 @@ project
       <define>BOOST_TEST_MODULE=Outcome
       <library>/boost/test//boost_unit_test_framework
       <library>/boost/outcome//boost_outcome
+      # Boost.System's error_condition/error_code conversion machinery needs a
+      # deeper template instantiation limit than gcc's default 900 on the older
+      # toolchains (gcc-10 dies in boost/system/detail/error_condition.hpp:80 at
+      # C++20 with "template instantiation depth exceeds maximum of 900"). The
+      # CMake side of this library already raises it for gcc 10; doing it for
+      # every gcc here costs nothing and keeps the two lanes in step.
+      <toolset>gcc:<cxxflags>-ftemplate-depth=5000
    ;
 
 {
