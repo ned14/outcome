@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2026-11-04T12:44:37 UTC">
+<meta name="revised" content="2026-11-04T14:00:57 UTC">
 <title>Changelog :: Outcome documentation</title>
 <link rel="shortcut icon" href="/outcome/images/favicon.png" type="image/x-icon" />
 <link href="/outcome/css/font-awesome.min.css" rel="stylesheet">
@@ -2916,6 +2916,21 @@ rather than filling the result from a layout guess.</p></li>
 maker a mangled name, so a C translation unit on Windows could never link against
 them. The four C link tests are also real tests now - built and run, not merely
 linked - which is what proves the C ABI actually loads.</p></li>
+
+<li><p>The Boost edition&rsquo;s CI is the shared Boost.CI reusable workflow
+(<code>boostorg/boost-ci</code>) rather than a hand-rolled matrix from 2022, so compilers, C++
+standards, the Windows/macOS/Linux/s390x/Cygwin/MinGW lanes, sanitizers, both the B2
+and the CMake test suites and code coverage all come from upstream and no longer
+rot. C++11 is excluded (the library needs C++14 or later) and the C++26 reflection
+lane is not run.</p></li>
+
+<li><p>The Boost edition no longer ships the Travis CI and Drone.io (both decommissioned)
+configurations, nor the two hand-rolled GitHub actions which only ever built one
+lane against a five-library partial Boost. It also ships <code>LICENSE_1_0.txt</code> now; it
+had no licence file, so GitHub did not report the repository as BSL-1.0.</p></li>
+
+<li><p>The Boost edition&rsquo;s CMake test list gained <code>issue0259.cpp</code>, which only the B2 list
+had.</p></li>
 </ul>
 
 <h3 id="bug-fixes">Bug fixes:</h3>
@@ -2947,6 +2962,34 @@ to the same success value. It returns true.</p></li>
 <code>OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT=OFF</code> now actually unbundle - they changed
 nothing before - and the C link tests are configured only when tests are wanted, so
 a consumer using Outcome as a dependency no longer gets them built.</p></li>
+
+<li><p>Experimental.Outcome was the only part of the library which threw something not
+derived from <code>std::exception</code>: the bitless-result check added earlier in this release raised
+<code>OUTCOME_THROW_EXCEPTION(&quot;wide value check failed&quot;)</code>, i.e. <code>throw &quot;literal&quot;</code>, so a
+<code>catch(const std::exception &amp;)</code> around a <code>.value()</code> that should have rethrown
+missed it. It raises <code>bad_outcome_access(&quot;no value&quot;)</code> now, which is what every
+sibling policy already throws for that state. In the Boost edition the literal did
+not compile at all, because <code>BOOST_THROW_EXCEPTION</code> only accepts a
+<code>std::exception</code>-derived type: that is what has been failing the boostorg edition&rsquo;s
+CI (<a href="https://github.com/ned14/outcome/issues/323">#323</a>).</p></li>
+
+<li><p><code>trait::is_exception_ptr_available&lt;T&gt;</code> reported EVERY type as exception-pointer
+available in the Boost edition. Boost.Exception declares an unconstrained
+<code>boost::make_exception_ptr(T const &amp;)</code> in namespace boost, and the trait detected
+availability with an unqualified call made from inside namespace boost, so ordinary
+name lookup - not merely argument dependent lookup - found it for any <code>T</code>. Every
+<code>result</code> and <code>outcome</code> in that edition therefore selected the
+<code>exception_ptr_rethrow</code> policy where <code>error_code_throw_as_system_error</code> belonged.
+Detection now happens from global scope, so only ADL can find a <code>make_exception_ptr</code>
+and <code>int</code> is exception-pointer unavailable again. <code>test/tests/issue0182.cpp</code>, which
+had been excluded from the Boost edition&rsquo;s test lists as &ldquo;not applicable to Boost&rdquo;,
+is re-enabled in both the CMake and the B2 lists.</p></li>
+
+<li><p><code>test/tests/issue0065.cpp</code> threw <code>std::runtime_error</code> with a plain <code>throw</code> and then
+called <code>boost::current_exception()</code>, which aborts inside Boost.Exception (&ldquo;pure
+virtual method called&rdquo;) unless the exception was thrown through
+<code>BOOST_THROW_EXCEPTION</code>. It throws through <code>OUTCOME_THROW_EXCEPTION</code> now, which is
+<code>throw</code> standalone and <code>BOOST_THROW_EXCEPTION</code> in the Boost edition.</p></li>
 </ul>
 
 <hr />
@@ -3823,7 +3866,7 @@ and Boost.Exception (these are <code>result.hpp</code> and <code>outcome.hpp</co
 
     
     <div class="date">
-        <i class='fa fa-calendar'></i> Last update on 03/11/2026
+        <i class='fa fa-calendar'></i> Last update on 04/11/2026
     </div>
     
 
