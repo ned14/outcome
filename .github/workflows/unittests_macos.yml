@@ -12,7 +12,12 @@ on:
 jobs:
   MacOS:
     name: Mac OS
-    runs-on: macos-latest
+    # Pinned deliberately: `macos-latest` twice left this job queued for 15
+    # minutes and then cancelled it without GitHub ever assigning a runner
+    # (jobs 126672120093 and 126750708613: empty runner_name, zero steps), while
+    # the run before it got a runner and finished in under 7 minutes. Do not
+    # "modernise" this back to the alias without removing this comment.
+    runs-on: macos-15
     env:
       NAME: MacOS
           
