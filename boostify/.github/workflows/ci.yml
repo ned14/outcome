@@ -59,7 +59,12 @@ jobs:
       # C++23/2c, and - decisively - on `predef_check_cc_*` probes, which are
       # handfuls of lines of Boost.Predef at C++14/17/20 and cannot be our code.
       # A crashing compiler is not a result.
-      exclude_compiler: 'gcc-4.7,gcc-6,clang-20'
+      # gcc-7 does not get as far as this library: b2 fails while compiling its
+      # Boost.Predef configuration probes (`...failed gcc.compile.c++
+      # bin.v2/check/predef/gcc-7/...`), i.e. before a single Outcome test is
+      # built, in the same way clang-20 does. That is the toolchain, not the
+      # code, and the earlier hand-written matrix had the lane disabled too.
+      exclude_compiler: 'gcc-4.7,gcc-6,gcc-7,clang-20'
       # clang-win is excluded while its single failure is unexplained. Its only
       # failing target is the `swap` test, and it fails to LINK rather than to
       # run:
