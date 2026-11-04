@@ -45,6 +45,16 @@ jobs:
       # pre-C++14 polyfills are gone. On top of the 98/03/0x that Boost.CI
       # already drops, also drop C++11 from the matrix.
       exclude_cxxstd: '98,03,0x,11'
+      # gcc-6 cannot build the vendored experimental status-code at all: its
+      # C++14 constexpr rule rejects status_code_domain.hpp's non-static
+      # constexpr members because their enclosing class is not a literal type
+      # ("error: enclosing class of constexpr non-static member function ..."),
+      # in both C++14 and C++17, so every status-code test fails to compile.
+      # That is the submodule's requirement on the compiler, not a defect in
+      # Outcome, and the previous hand-written matrix had this lane disabled
+      # too. gcc-7 is deliberately left in: it is not yet proven to fail, and
+      # its own result will say so.
+      exclude_compiler: 'gcc-4.7,gcc-6'
       # The CMakeLists accepts 3.10 and later; test/CMakeLists.txt is consumed by
       # the superproject's BoostTest.cmake.
       min_cmake_version: '3.10'
