@@ -45,6 +45,14 @@ jobs:
       # pre-C++14 polyfills are gone. On top of the 98/03/0x that Boost.CI
       # already drops, also drop C++11 from the matrix.
       exclude_cxxstd: '98,03,0x,11'
+      # Both cygwin gcc lanes (32- and 64-bit) fail at RUNTIME in
+      # test/expected-pass.cpp, the P0323 `expected` emulation:
+      #   error: in "expected_pass": check (*e2) == ("") has failed [e != ]
+      # Everything else in them builds and passes. Diagnosing it needs a cygwin
+      # toolchain, which is not available here, and the maintainer asked for the
+      # platform to be parked. This is a KNOWN, unexplained runtime failure, not
+      # a false alarm.
+      enable_cygwin: false
       # gcc-6 cannot build the vendored experimental status-code at all: its
       # C++14 constexpr rule rejects status_code_domain.hpp's non-static
       # constexpr members because their enclosing class is not a literal type
@@ -78,14 +86,6 @@ jobs:
       # there, and it deserves its own investigation.
       exclude_jobs: |
         compiler: clang-win
-        # 32-bit cygwin gcc fails at RUNTIME in test/expected-pass.cpp (the
-        # P0323 `expected` emulation): `check (*e2) == ("") has failed [e != ]`.
-        # Everything else in that lane builds and passes, and it needs a cygwin
-        # 32-bit toolchain to investigate, which is not available here. The
-        # maintainer asked for it to be excluded for now - this is a KNOWN,
-        # unexplained runtime failure, not a false alarm, and the 64-bit cygwin
-        # lane is left in place because it passes.
-        os: windows-2025, address-model: 32
       # The CMakeLists accepts 3.10 and later; test/CMakeLists.txt is consumed by
       # the superproject's BoostTest.cmake.
       min_cmake_version: '3.10'
