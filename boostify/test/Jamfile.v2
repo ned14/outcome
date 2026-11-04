@@ -51,7 +51,11 @@ project
     [ run tests/fileopen.cpp ]
     [ run tests/hooks.cpp ]
     [ run tests/issue0007.cpp ]
-    [ run tests/issue0009.cpp ]
+    # issue0009 needs OUTCOME_TRYX, which try.hpp defines only for GNU and Clang
+    # (a statement-expression extension). MSVC therefore takes the test's skip
+    # branch, which prints a marker and exits 77 - CTest maps that to SKIPPED
+    # (test/CMakeLists.txt) but B2 reports any non-zero exit as a failure.
+    [ run tests/issue0009.cpp : : : <toolset>msvc:<build>no ]
     [ run tests/issue0010.cpp ]
     [ run tests/issue0012.cpp ]
     [ run tests/issue0016.cpp ]
