@@ -67,7 +67,14 @@ boost_test(TYPE run SOURCES "expected-pass.cpp")
 # 77, so every test registered here maps it to SKIPPED; a genuine failure of any
 # other exit code is still reported as Failed. The B2 lane has no such concept,
 # so test/Jamfile.v2 disables those cases per cxxstd instead.
-get_cmake_property(__outcome_tests TESTS)
+# `get_cmake_property` does not expose this one (it reads variables and a fixed
+# list of special properties); `get_directory_property` does, and unlike
+# `get_property(... DIRECTORY ...)` it exists back to CMake 2.6, which matters
+# because Boost.CI tests a 3.10 floor. Guard anyway: a test may not have been
+# registered at all.
+get_directory_property(__outcome_tests TESTS)
 foreach(__outcome_test IN LISTS __outcome_tests)
-  set_tests_properties(${__outcome_test} PROPERTIES SKIP_RETURN_CODE 77)
+  if(TEST ${__outcome_test})
+    set_tests_properties(${__outcome_test} PROPERTIES SKIP_RETURN_CODE 77)
+  endif()
 endforeach()
