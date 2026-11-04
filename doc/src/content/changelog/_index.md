@@ -22,6 +22,21 @@ maker a mangled name, so a C translation unit on Windows could never link agains
 them. The four C link tests are also real tests now - built and run, not merely
 linked - which is what proves the C ABI actually loads.
 
+- The Boost edition's CI is the shared Boost.CI reusable workflow
+(`boostorg/boost-ci`) rather than a hand-rolled matrix from 2022, so compilers, C++
+standards, the Windows/macOS/Linux/s390x/Cygwin/MinGW lanes, sanitizers, both the B2
+and the CMake test suites and code coverage all come from upstream and no longer
+rot. C++11 is excluded (the library needs C++14 or later) and the C++26 reflection
+lane is not run.
+
+- The Boost edition no longer ships the Travis CI and Drone.io (both decommissioned)
+configurations, nor the two hand-rolled GitHub actions which only ever built one
+lane against a five-library partial Boost. It also ships `LICENSE_1_0.txt` now; it
+had no licence file, so GitHub did not report the repository as BSL-1.0.
+
+- The Boost edition's CMake test list gained `issue0259.cpp`, which only the B2 list
+had.
+
 ### Bug fixes:
 
 - The vendored WG14 `result` (`result_with_<name>`): its 4 byte status word sat at
@@ -50,6 +65,34 @@ to the same success value. It returns true.
 `OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT=OFF` now actually unbundle - they changed
 nothing before - and the C link tests are configured only when tests are wanted, so
 a consumer using Outcome as a dependency no longer gets them built.
+
+- Experimental.Outcome was the only part of the library which threw something not
+derived from `std::exception`: the bitless-result check added earlier in this release raised
+`OUTCOME_THROW_EXCEPTION("wide value check failed")`, i.e. `throw "literal"`, so a
+`catch(const std::exception &)` around a `.value()` that should have rethrown
+missed it. It raises `bad_outcome_access("no value")` now, which is what every
+sibling policy already throws for that state. In the Boost edition the literal did
+not compile at all, because `BOOST_THROW_EXCEPTION` only accepts a
+`std::exception`-derived type: that is what has been failing the boostorg edition's
+CI ([#323](https://github.com/ned14/outcome/issues/323)).
+
+- `trait::is_exception_ptr_available<T>` reported EVERY type as exception-pointer
+available in the Boost edition. Boost.Exception declares an unconstrained
+`boost::make_exception_ptr(T const &)` in namespace boost, and the trait detected
+availability with an unqualified call made from inside namespace boost, so ordinary
+name lookup - not merely argument dependent lookup - found it for any `T`. Every
+`result` and `outcome` in that edition therefore selected the
+`exception_ptr_rethrow` policy where `error_code_throw_as_system_error` belonged.
+Detection now happens from global scope, so only ADL can find a `make_exception_ptr`
+and `int` is exception-pointer unavailable again. `test/tests/issue0182.cpp`, which
+had been excluded from the Boost edition's test lists as "not applicable to Boost",
+is re-enabled in both the CMake and the B2 lists.
+
+- `test/tests/issue0065.cpp` threw `std::runtime_error` with a plain `throw` and then
+called `boost::current_exception()`, which aborts inside Boost.Exception ("pure
+virtual method called") unless the exception was thrown through
+`BOOST_THROW_EXCEPTION`. It throws through `OUTCOME_THROW_EXCEPTION` now, which is
+`throw` standalone and `BOOST_THROW_EXCEPTION` in the Boost edition.
 
 
 ---

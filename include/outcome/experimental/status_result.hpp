@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_RESULT_HPP
 
+#include "../bad_access.hpp"
 #include "../basic_result.hpp"
 #include "../policy/fail_to_compile_observers.hpp"
 
@@ -132,7 +133,7 @@ namespace experimental
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION("wide value check failed");
+            OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
 #endif
           }
           // Neither value nor error: a bitless status_result whose status was
@@ -140,7 +141,7 @@ namespace experimental
           // value payload as if it were live, i.e. a failure observed as success
           // (reviewer P0 r5:H1). Every sibling policy ends this function with an
           // unconditional throw (see policy/outcome_error_code_throw_as_system_error.hpp).
-          OUTCOME_THROW_EXCEPTION("wide value check failed");
+          OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
         }
       }
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }

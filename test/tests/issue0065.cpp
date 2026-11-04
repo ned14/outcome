@@ -37,7 +37,12 @@ BOOST_OUTCOME_AUTO_TEST_CASE(issues / 0065 / outcome, "OUTCOME_TRY does not pres
     auto f = []() -> outcome<int> {
       try
       {
-        throw std::runtime_error{"XXX"};
+        // Thrown through the library's macro so that the Boost edition throws via
+        // BOOST_THROW_EXCEPTION: boost::current_exception() below can only recover an
+        // exception which Boost.Exception knows how to clone, and aborts inside Boost
+        // ("pure virtual method called") for a plain throw. Standalone this is exactly
+        // `throw std::runtime_error{"XXX"}`.
+        OUTCOME_THROW_EXCEPTION(std::runtime_error{"XXX"});
       }
       catch(...)
       {
