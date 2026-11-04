@@ -54,7 +54,12 @@ jobs:
       # Outcome, and the previous hand-written matrix had this lane disabled
       # too. gcc-7 is deliberately left in: it is not yet proven to fail, and
       # its own result will say so.
-      exclude_compiler: 'gcc-4.7,gcc-6'
+      # clang-20 in the ubuntu:25.04 image SEGFAULTS: "clang frontend command
+      # failed with exit code 139" on the experimental status-code tests at
+      # C++23/2c, and - decisively - on `predef_check_cc_*` probes, which are
+      # handfuls of lines of Boost.Predef at C++14/17/20 and cannot be our code.
+      # A crashing compiler is not a result.
+      exclude_compiler: 'gcc-4.7,gcc-6,clang-20'
       # clang-win is excluded while its single failure is unexplained. Its only
       # failing target is the `swap` test, and it fails to LINK rather than to
       # run:
