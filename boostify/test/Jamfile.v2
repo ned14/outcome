@@ -48,7 +48,11 @@ project
     [ run tests/issue0010.cpp ]
     [ run tests/issue0012.cpp ]
     [ run tests/issue0016.cpp ]
-    [ run tests/issue0059.cpp ]
+    # issue0059 needs C++17 or MSVC; below that it registers a SKIP case which
+    # exits 77. CTest maps 77 to SKIPPED (see test/CMakeLists.txt) but B2 has no
+    # such concept and reports any non-zero exit as a failure, so do not build it
+    # where it cannot run.
+    [ run tests/issue0059.cpp : : : <cxxstd>11:<build>no <cxxstd>14:<build>no ]
     [ run tests/issue0061.cpp ]
     [ run tests/issue0064.cpp ]
     [ run tests/issue0065.cpp ]
