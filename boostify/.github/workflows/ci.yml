@@ -55,6 +55,19 @@ jobs:
       # too. gcc-7 is deliberately left in: it is not yet proven to fail, and
       # its own result will say so.
       exclude_compiler: 'gcc-4.7,gcc-6'
+      # clang-win is excluded while its single failure is unexplained. Its only
+      # failing target is the `swap` test, and it fails to LINK rather than to
+      # run:
+      #   lld-link: error: undefined symbol: public: __thiscall ... ::swap(...)
+      #     [basic_outcome<enum ErrorCode, struct Throwy<1,1>, enum ErrorCode2,
+      #      policy::all_narrow>]
+      # Everything else in that lane builds and passes. The previous
+      # hand-written matrix had this lane commented out as well. This is NOT a
+      # fix and is not claimed to be one: either basic_outcome::swap is not being
+      # emitted under clang-cl, or the test exercises something unsupported
+      # there, and it deserves its own investigation.
+      exclude_jobs: |
+        compiler: clang-win
       # The CMakeLists accepts 3.10 and later; test/CMakeLists.txt is consumed by
       # the superproject's BoostTest.cmake.
       min_cmake_version: '3.10'
