@@ -15,7 +15,21 @@ cmake_minimum_required(VERSION 3.5...3.16)
 project(cmake_subdir_test LANGUAGES CXX)
 
 if(BOOST_CI_INSTALL_TEST)
-    find_package(boost_outcome REQUIRED)
+    if(BOOST_CI_INSTALLED_BY STREQUAL "B2")
+        # B2 does not install CMake package configs for header-only libraries, so
+        # a consumer of a B2-installed Boost links the generic Boost::headers
+        # target instead of a per-library one. Without this branch the step
+        # "Run CMake install tests w/ B2 installed library" cannot configure.
+        find_package(Boost REQUIRED)
+        if(NOT TARGET Boost::headers)
+            message(FATAL_ERROR "find_package(Boost) did not define Boost::headers")
+        endif()
+        add_library(boost_outcome_headers INTERFACE)
+        target_link_libraries(boost_outcome_headers INTERFACE Boost::headers)
+        add_library(Boost::outcome ALIAS boost_outcome_headers)
+    else()
+        find_package(boost_outcome REQUIRED)
+    endif()
 else()
     set(BOOST_INCLUDE_LIBRARIES outcome)
     add_subdirectory(../../../.. deps/boost EXCLUDE_FROM_ALL)
