@@ -73,6 +73,14 @@ jobs:
       # there, and it deserves its own investigation.
       exclude_jobs: |
         compiler: clang-win
+        # 32-bit cygwin gcc fails at RUNTIME in test/expected-pass.cpp (the
+        # P0323 `expected` emulation): `check (*e2) == ("") has failed [e != ]`.
+        # Everything else in that lane builds and passes, and it needs a cygwin
+        # 32-bit toolchain to investigate, which is not available here. The
+        # maintainer asked for it to be excluded for now - this is a KNOWN,
+        # unexplained runtime failure, not a false alarm, and the 64-bit cygwin
+        # lane is left in place because it passes.
+        os: windows-2025, address-model: 32
       # The CMakeLists accepts 3.10 and later; test/CMakeLists.txt is consumed by
       # the superproject's BoostTest.cmake.
       min_cmake_version: '3.10'
