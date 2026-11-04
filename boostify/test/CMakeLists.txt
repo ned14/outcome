@@ -59,3 +59,15 @@ boost_test(TYPE run SOURCES "tests/udts.cpp")
 boost_test(TYPE run SOURCES "tests/value-or-error.cpp")
 
 boost_test(TYPE run SOURCES "expected-pass.cpp")
+
+# Several tests cannot exercise anything in every configuration (issue0059 below
+# C++17, the no-exceptions-only ones when exceptions are on, ...). They print a
+# marker and exit 77 rather than registering a case which asserts nothing, which
+# CTest records as PASSED (see tests/skip_test.hpp). CTest only honours that on
+# 77, so every test registered here maps it to SKIPPED; a genuine failure of any
+# other exit code is still reported as Failed. The B2 lane has no such concept,
+# so test/Jamfile.v2 disables those cases per cxxstd instead.
+get_cmake_property(__outcome_tests TESTS)
+foreach(__outcome_test IN LISTS __outcome_tests)
+  set_tests_properties(${__outcome_test} PROPERTIES SKIP_RETURN_CODE 77)
+endforeach()
