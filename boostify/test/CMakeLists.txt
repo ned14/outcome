@@ -41,12 +41,15 @@ boost_test(TYPE run SOURCES "tests/issue0095.cpp")
 boost_test(TYPE run SOURCES "tests/issue0115.cpp")
 boost_test(TYPE run SOURCES "tests/issue0116.cpp")
 boost_test(TYPE run SOURCES "tests/issue0140.cpp")
-#boost_test(TYPE run SOURCES "tests/issue0182.cpp")  ## not applicable to Boost
+boost_test(TYPE run SOURCES "tests/issue0182.cpp")
 boost_test(TYPE run SOURCES "tests/issue0203.cpp")
 boost_test(TYPE run SOURCES "tests/issue0210.cpp")
 boost_test(TYPE run SOURCES "tests/issue0220.cpp")
 boost_test(TYPE run SOURCES "tests/issue0244.cpp")
 boost_test(TYPE run SOURCES "tests/issue0247.cpp")
+boost_test(TYPE run SOURCES "tests/issue0259.cpp")
+# issue0255 is C++20-only, so it would register zero cases (a false green) in this
+# lane below C++20; the B2 lane runs it at every standard instead.
 boost_test(TYPE run SOURCES "tests/noexcept-propagation.cpp")
 boost_test(TYPE run SOURCES "tests/propagate.cpp")
 boost_test(TYPE run SOURCES "tests/serialisation.cpp")

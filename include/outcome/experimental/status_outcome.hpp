@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 #define OUTCOME_EXPERIMENTAL_STATUS_OUTCOME_HPP
 
+#include "../bad_access.hpp"
 #include "../basic_outcome.hpp"
 
 #include "../detail/trait_std_exception.hpp"
@@ -138,14 +139,14 @@ SIGNATURE NOT RECOGNISED
 #ifdef __cpp_exceptions
             base::_error(static_cast<Impl &&>(self)).throw_exception();
 #else
-            OUTCOME_THROW_EXCEPTION("wide value check failed");
+            OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
 #endif
           }
           // Neither value, exception nor error: a bitless status_outcome.
           // Falling out here let the caller read the dead payload as a success
           // (reviewer P0 r2:r2:core-headers-1, the twin of the hole fixed in
           // status_result.hpp last round). Every sibling policy throws here.
-          OUTCOME_THROW_EXCEPTION("wide value check failed");
+          OUTCOME_THROW_EXCEPTION(bad_outcome_access("no value"));
         }
       }
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }

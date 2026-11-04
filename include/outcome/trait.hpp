@@ -27,6 +27,20 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "config.hpp"
 
+/*! A namespace at GLOBAL scope, deliberately outside OUTCOME_V2_NAMESPACE, whose only
+member exists so that a `make_exception_ptr()` can be probed with ARGUMENT-DEPENDENT
+lookup alone. Boost.Exception declares an unconstrained `boost::make_exception_ptr(T
+const &)`, and ordinary unqualified lookup from inside namespace boost finds it for
+every T; that would report every type as exception-ptr available, which in turn makes
+every result/outcome select the exception_ptr_rethrow policy. Doing the probe from a
+global-scope namespace removes ordinary lookup from the picture, so only a user's own
+ADL-visible overload (or one of the explicit specialisations below) can be found.
+*/
+namespace outcome_adl_probe
+{
+  template <class T> auto probe(T &&v) -> decltype(make_exception_ptr(static_cast<T &&>(v)));
+}
+
 OUTCOME_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace trait
@@ -94,7 +108,7 @@ type definition  is_error_type_enum. Potential doc page: NOT FOUND
     template <class Arg> using result_of_make_error_code = decltype(make_error_code(declval<Arg>()));
     template <class Arg> using introspect_make_error_code = is_detected<result_of_make_error_code, Arg>;
 
-    template <class Arg> using result_of_make_exception_ptr = decltype(make_exception_ptr(declval<Arg>()));
+    template <class Arg> using result_of_make_exception_ptr = decltype(::outcome_adl_probe::probe(declval<Arg>()));
     template <class Arg> using introspect_make_exception_ptr = is_detected<result_of_make_exception_ptr, Arg>;
 
     template <class T> struct _is_error_code_available
