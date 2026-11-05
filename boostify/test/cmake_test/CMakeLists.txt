@@ -10,7 +10,7 @@
 # This exists because neither case is covered by the library's own test suite: it
 # only proves that the headers are found, the target links and the program runs.
 
-cmake_minimum_required(VERSION 3.5...3.16)
+cmake_minimum_required(VERSION 3.8...4.0)
 
 project(cmake_subdir_test LANGUAGES CXX)
 
