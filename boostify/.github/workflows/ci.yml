@@ -94,9 +94,16 @@ jobs:
       # there, and it deserves its own investigation.
       exclude_jobs: |
         compiler: clang-win
-      # The CMakeLists accepts 3.10 and later; test/CMakeLists.txt is consumed by
-      # the superproject's BoostTest.cmake.
-      min_cmake_version: '3.10'
+      # The library's CMakeLists still declares 3.10 as its own minimum, but that
+      # floor can no longer be TESTED: the min-CMake job builds CMake 3.10 from
+      # source, and a current runner's system CMake is 4.x, which refuses CMake
+      # 3.10's own `cmake_minimum_required(VERSION 2.8...)`:
+      #   CMake Error at CMakeLists.txt:4 (cmake_minimum_required):
+      #   -- Configuring incomplete, errors occurred!
+      # Nothing in this repository can affect that. Use Boost.CI's default (3.16),
+      # which current runners can still build, and treat the 3.10 claim as
+      # untested rather than silently pretending it is verified.
+      min_cmake_version: '3.16'
       # The reflection lane compiles with an experimental compiler at C++26.
       # Outcome's supported range is C++14 to C++20 (C++23 is known good too), so
       # that lane is not part of this project's matrix.
