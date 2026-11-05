@@ -60,21 +60,15 @@ boost_test(TYPE run SOURCES "tests/value-or-error.cpp")
 
 boost_test(TYPE run SOURCES "expected-pass.cpp")
 
-# Several tests cannot exercise anything in every configuration (issue0059 below
-# C++17, the no-exceptions-only ones when exceptions are on, ...). They print a
-# marker and exit 77 rather than registering a case which asserts nothing, which
-# CTest records as PASSED (see tests/skip_test.hpp). CTest only honours that on
-# 77, so every test registered here maps it to SKIPPED; a genuine failure of any
-# other exit code is still reported as Failed. The B2 lane has no such concept,
-# so test/Jamfile.v2 disables those cases per cxxstd instead.
-# `get_cmake_property` does not expose this one (it reads variables and a fixed
-# list of special properties); `get_directory_property` does, and unlike
-# `get_property(... DIRECTORY ...)` it exists back to CMake 2.6, which matters
-# because Boost.CI tests a 3.10 floor. Guard anyway: a test may not have been
-# registered at all.
-get_directory_property(__outcome_tests TESTS)
-foreach(__outcome_test IN LISTS __outcome_tests)
-  if(TEST ${__outcome_test})
-    set_tests_properties(${__outcome_test} PROPERTIES SKIP_RETURN_CODE 77)
+# CTest has no notion of "skipped" other than SKIP_RETURN_CODE, and our gated
+# tests print a marker and exit 77 rather than registering a case that asserts
+# nothing (see tests/skip_test.hpp). The TESTS directory property only exists
+# from CMake 3.12 while Boost.CI tests a 3.10 floor, so name the tests that can
+# skip and guard each one instead: BoostTest.cmake registers them as
+# run-<project>-<stem>, and `if(TEST ...)` is CMake 3.3 and later. A test renamed
+# or not registered is a silent no-op rather than a configure error.
+foreach(__outcome_skippable issue0009 issue0059)
+  if(TEST run-boost_outcome-${__outcome_skippable})
+    set_tests_properties(run-boost_outcome-${__outcome_skippable} PROPERTIES SKIP_RETURN_CODE 77)
   endif()
 endforeach()
