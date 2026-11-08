@@ -3000,3 +3000,49 @@ proposed repair; each finding's full citation/repro is in the run artefact
 - **[P2] (open) No test covers the is_move_bitcopying assignment paths or error_from_exception's null-ep branch** — `test/tests/issue0255.cpp:1`
 
 <!-- r11:H9 priority-ranked-merge-end -->
+
+<!-- inbound-from-github begin -->
+
+## Inbound from GitHub — triaged 2026-11-08
+
+Not review findings: the open issues and pull requests in `ned14/outcome` as at 2026-11-08,
+triaged so that the tree's open work is tracked in one place. Kept outside the H9 merge block above
+so that a re-merge cannot clobber it. Each line is the reporter's claim plus what closing it would
+take; none has been investigated to the depth of the review entries above.
+
+### Defects
+
+- **#264 (bug, 2023-02) a change on the no-error path produces a maybe-uninitialized warning** —
+  repro `https://godbolt.org/z/YG6e8q3Y5` reduces to `result<std::tuple<int, std::string>,
+  InHouseErrorz *, MyNVP>`. Action: reproduce with a current GCC, then either restore the older
+  no-error path or teach the compiler in the affected expression.
+
+### Test and build coverage
+
+- **#234 enable the noexcept unit tests in Boost.Outcome** — `BOOST_NO_EXCEPTIONS` now works in
+  Boost.Exception, so the Boost edition's exception-free lane can run the unit tests. The
+  `boostify/` lanes exist now; this is the missing test list, not a missing capability.
+- **#248 add a check that `basic_outcome.hpp` never includes the headers it documents it does not
+  include** — a compile-only test target would pin it.
+- **#304 (PR, 2025-12) work around an MSVC SFINAE bug when default-constructing `ErrorCondEnum` in
+  a constraint** — decide whether the constraint can be reformulated instead of worked around,
+  then land or close.
+
+### Features
+
+- **#164 structured bindings compatibility** — `[has_error, value, error] = func(...)`; the issue
+  already outlines the `tuple_size`/`tuple_element`/`get` specialisations it needs.
+- **#134 debug mode for detecting misuse at run time** — track at run time whether a `result` is
+  in its value or error state on the paths which would otherwise be UB.
+
+### Documentation
+
+- **#163 FAQ item: the differences to LEAF (`zajo.github.io/leaf`)** — the most-asked comparison.
+- **#187 another ASIO recipe** — a standard completion handler whose `&ec` is set on exit by a
+  `result` with a custom `NoValuePolicy`.
+- **#166 a script to transpose the function comments into the API reference docs** — makes the
+  doxygen reference maintainable from the header comments.
+- **#316 suggested README improvements** — scope and new-contributor clarity; the reporter has
+  supplied a rewritten structure.
+
+<!-- inbound-from-github end -->
