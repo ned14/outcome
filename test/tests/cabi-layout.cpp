@@ -89,7 +89,7 @@ Distributed under the Boost Software License, Version 1.0.
 // sizeof(R) bytes can never be comparing padding.
 struct two_field_16
 {
-  intptr_t a, b;
+  int64_t a, b;
 };
 static_assert(sizeof(two_field_16) == 16, "the two field struct is the 16 byte shape");
 struct struct24
