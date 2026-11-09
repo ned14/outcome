@@ -87,9 +87,14 @@ Distributed under the Boost Software License, Version 1.0.
 // status_result<R> is only trivially copyable, and only memcpy-interchangeable,
 // if R is) and none of them has a padding byte inside, so comparing a value's
 // sizeof(R) bytes can never be comparing padding.
+
+// Fixed width on purpose: this row is the 16-byte by-value shape on every
+// target, so its fields must not be intptr_t. Two intptr_t fields are 8 bytes
+// wherever pointers are 4 bytes, which failed the assertion below and took the
+// whole unit-test target with it (issue #325).
 struct two_field_16
 {
-  intptr_t a, b;
+  int64_t a, b;
 };
 static_assert(sizeof(two_field_16) == 16, "the two field struct is the 16 byte shape");
 struct struct24
