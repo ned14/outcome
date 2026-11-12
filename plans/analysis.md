@@ -3045,4 +3045,35 @@ take; none has been investigated to the depth of the review entries above.
 - **#316 suggested README improvements** — scope and new-contributor clarity; the reporter has
   supplied a rewritten structure.
 
+### New since the 2026-11-08 triage — triaged 2026-11-09
+
+Only two items appeared in any of the four repositories after the 2026-11-08 sweep (llfio,
+quickcpplib and kerneltest were unchanged): issue #325 and its pull request #326.
+
+- **[P0] #325 (bug, 2026-11-09) `test/tests/cabi-layout.cpp` does not compile on any 32-bit target**
+  — `struct two_field_16 { intptr_t a, b; };` is 8 bytes where `intptr_t` is 4 bytes, so the
+  retained `static_assert(sizeof(two_field_16) == 16)` at `test/tests/cabi-layout.cpp:94` fires before
+  the ABI matrix can run. Verified present on `develop`; introduced by 4385184843 ("make the C ABI
+  hold"). **Priority P0 by owner decision (2026-11-09):** the tree is red for every 32-bit consumer —
+  the entire unit-test target fails to compile, not just the one row, so `develop` cannot be tested or
+  packaged on i386/ARMv7/wasm32-class targets at all, and the test it breaks is precisely the C-ABI
+  shape check those targets most need. Measured against the usual "does shipped code misbehave" test
+  this would be P1, and that is how it was first triaged; the owner rated a red build on a supported
+  target class above that distinction. Nothing is red in CI only because no lane builds 32-bit
+  (`unittests_linux.yml`, `_windows.yml`, `_macos.yml` matrixes are all 64-bit), which is why this
+  went unnoticed — and is itself the coverage gap worth closing. Not raised by the 2026-11-08/09
+  review run either; that reviewed the tree on x86_64 only.
+  - abi: fix — PR #326 takes `int64_t` for both fields, which is the right repair: 16 bytes on both
+    32- and 64-bit targets, still an actual 16-byte value type in the matrix row, and the assertion
+    and the pointer-sized error-code uses elsewhere are untouched. Its own caveat is that the full
+    suite was not run. **Applied as eaf87a558f** (PR authorship preserved) with one added comment
+    recording that the row is fixed-width on purpose, so a later tidy-up cannot reintroduce it.
+  - ci: fix — the reason this survived is that every lane built where `intptr_t` is 8 bytes.
+    `unittests_linux.yml` gained a `Linux-32bit` job (ubuntu-22.04, `g++-multilib`, `-m32` via the
+    new `cmake/toolchain-linux-32bit.cmake`), added to `publish-test-results`'s `needs` so its
+    results are published like the others. **Landed as 68a1835be9**, not yet pushed, so it has never
+    run: the first observation of it is the first CI run after the push. Follow-up worth considering:
+    `abi_stability.yml` still dumps only the host architecture, so the C-ABI comparison itself
+    remains 64-bit-only.
+
 <!-- inbound-from-github end -->
