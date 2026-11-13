@@ -53,7 +53,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           tag_name: all_tests_passed_${{ github.sha }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: Get Hugo
         if: steps.vars.outputs.HAS_DEPLOY_KEY
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: hugo_bin
           key: hugo_bin
@@ -94,6 +94,11 @@ jobs:
         if: steps.vars.outputs.HAS_DEPLOY_KEY
         shell: bash
         run: |
+         # The job log lives on storage this project's own tooling cannot reach, so
+         # the step's output is teed and the annotate step below re-emits the useful
+         # lines as workflow commands. pipefail, or tee's exit status would decide.
+         set -o pipefail
+         {
          if [ ! -f "hugo_bin/hugo" ]; then
            wget -O hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.52/hugo_0.52_Linux-64bit.tar.gz;
            mkdir hugo_bin;
@@ -139,10 +144,31 @@ jobs:
          git add . || true
          cd ../..
          git commit -a -m "CI regenerates Boost.Outcome docs" || true
+         # `git push` exits 0 when there is nothing to push - "Everything up-to-date" -
+         # so nothing here needs `|| true` to tolerate a no-op. What `|| true` did do was
+         # swallow a rejected or unauthenticated push, which is the difference between a
+         # mirror that is current and one that has silently stopped updating. Push
+         # through this, which says which branch failed and why, and annotates it.
+         git_push() {
+           local branch="${1}" out rc
+           shift
+           # The if/else is not decoration: a bare `out=$(git push ...)` under the
+           # `-e` this shell runs with aborts the step before the status can be
+           # reported, and `rc=$?` after the `fi` would be 0 whatever happened.
+           if out=$(git push "$@" git@github.com:boostorg/outcome.git "${branch}" 2>&1); then
+             printf '%s\n' "${out}"
+             return 0
+           else
+             rc=$?
+           fi
+           printf '%s\n' "${out}" | sed -e 's/%/%25/g' -e 's/^/::error::/'
+           echo "::error::pushing ${branch} to boostorg/outcome failed (exit ${rc})"
+           return "${rc}"
+         }
          if [ "${GITHUB_REF##*/}" = "master" ]; then
-           git push git@github.com:boostorg/outcome.git master || true
+           git_push master
          fi
-         git push git@github.com:boostorg/outcome.git develop || true
+         git_push develop
          cd doc
          rm -rf html
          git clone -b gh-pages --single-branch https://github.com/boostorg/outcome html
@@ -151,5 +177,23 @@ jobs:
          cd ../html
          git add . || true
          git commit -a -m "CI regenerates Boost.Outcome docs" || true
-         git push -f git@github.com:boostorg/outcome.git gh-pages
+         git_push gh-pages -f
          cd ../..
+
+         } 2>&1 | tee convert.log
+
+      - name: Annotate the errors
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          log=convert.log
+          if [ -f "$log" ]; then
+            emit() { sed -e 's/%/%25/g' -e 's/\r$//' | sed 's/^/::error::/'; }
+            {
+              grep -iE 'fatal:|error:|denied|rejected|Permission|could not resolve|rate limit|api.github.com|exit code' "$log" | head -6
+              tail -3 "$log"
+            } | awk '!seen[$0]++' | head -10 | emit
+          else
+            echo "::error::$log was never written: the step failed before it reached tee(1), so there is nothing to annotate"
+          fi
