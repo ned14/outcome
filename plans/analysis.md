@@ -2752,7 +2752,19 @@ proposed repair; each finding's full citation/repro is in the run artefact
   - also: `boostify/.drone.star:32` boostify/.drone.star gives clang 9 and clang 11 the same DRONE_JOB_UUID
 
 
-- **[P2] (open) Only macOS CI job pinned to the retired macos-12 label; loss of macOS coverage is silent** — `boostify/.github/workflows/ci.yml:38`
+- **[P2] (obsolete) Only macOS CI job pinned to the retired macos-12 label; loss of macOS coverage is silent** — `boostify/.github/workflows/ci.yml:38`
+  - why not fixed: the finding no longer describes this file. The local `macos-12` matrix
+    entry was removed in 430953d3ed, when the workflow was reduced to a call to
+    `boostorg/boost-ci`'s reusable workflow (`uses: .../reusable.yml@master`), so this
+    repository no longer owns a macOS label at all - the labels come from that
+    repository's matrix. Nothing here to repoint.
+  - still worth knowing: the failure mode the row describes is real and is not a
+    failed job. GitHub retired the `macos-14` image on 2026-11-02 and a job on a
+    retired label comes back *cancelled*, with no runner and zero steps, so a whole
+    lane disappears while the rest of the matrix stays green. That is exactly how
+    `installability.yml` spent 12-13 November, fixed in f02cc9f. A pinned runner
+    label is a dependency with an expiry date; watch it in boost-ci's matrix now
+    that the labels have moved there.
 
 - **[P2] (open) Stale boostify/.travis.yml fetches Boost from dl.bintray.com (host sunset in 2021) on trusty with g++-6** — `boostify/.travis.yml:35`
 
