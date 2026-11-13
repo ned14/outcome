@@ -2752,7 +2752,19 @@ proposed repair; each finding's full citation/repro is in the run artefact
   - also: `boostify/.drone.star:32` boostify/.drone.star gives clang 9 and clang 11 the same DRONE_JOB_UUID
 
 
-- **[P2] (open) Only macOS CI job pinned to the retired macos-12 label; loss of macOS coverage is silent** — `boostify/.github/workflows/ci.yml:38`
+- **[P2] (obsolete) Only macOS CI job pinned to the retired macos-12 label; loss of macOS coverage is silent** — `boostify/.github/workflows/ci.yml:38`
+  - why not fixed: the finding no longer describes this file. The local `macos-12` matrix
+    entry was removed in 430953d3ed, when the workflow was reduced to a call to
+    `boostorg/boost-ci`'s reusable workflow (`uses: .../reusable.yml@master`), so this
+    repository no longer owns a macOS label at all - the labels come from that
+    repository's matrix. Nothing here to repoint.
+  - still worth knowing: the failure mode the row describes is real and is not a
+    failed job. GitHub retired the `macos-14` image on 2026-11-02 and a job on a
+    retired label comes back *cancelled*, with no runner and zero steps, so a whole
+    lane disappears while the rest of the matrix stays green. That is exactly how
+    `installability.yml` spent 12-13 November, fixed in f02cc9f. A pinned runner
+    label is a dependency with an expiry date; watch it in boost-ci's matrix now
+    that the labels have moved there.
 
 - **[P2] (open) Stale boostify/.travis.yml fetches Boost from dl.bintray.com (host sunset in 2021) on trusty with g++-6** — `boostify/.travis.yml:35`
 
@@ -3000,3 +3012,80 @@ proposed repair; each finding's full citation/repro is in the run artefact
 - **[P2] (open) No test covers the is_move_bitcopying assignment paths or error_from_exception's null-ep branch** — `test/tests/issue0255.cpp:1`
 
 <!-- r11:H9 priority-ranked-merge-end -->
+
+<!-- inbound-from-github begin -->
+
+## Inbound from GitHub — triaged 2026-11-08
+
+Not review findings: the open issues and pull requests in `ned14/outcome` as at 2026-11-08,
+triaged so that the tree's open work is tracked in one place. Kept outside the H9 merge block above
+so that a re-merge cannot clobber it. Each line is the reporter's claim plus what closing it would
+take; none has been investigated to the depth of the review entries above.
+
+### Defects
+
+- **#264 (bug, 2023-02) a change on the no-error path produces a maybe-uninitialized warning** —
+  repro `https://godbolt.org/z/YG6e8q3Y5` reduces to `result<std::tuple<int, std::string>,
+  InHouseErrorz *, MyNVP>`. Action: reproduce with a current GCC, then either restore the older
+  no-error path or teach the compiler in the affected expression.
+
+### Test and build coverage
+
+- **#234 enable the noexcept unit tests in Boost.Outcome** — `BOOST_NO_EXCEPTIONS` now works in
+  Boost.Exception, so the Boost edition's exception-free lane can run the unit tests. The
+  `boostify/` lanes exist now; this is the missing test list, not a missing capability.
+- **#248 add a check that `basic_outcome.hpp` never includes the headers it documents it does not
+  include** — a compile-only test target would pin it.
+- **#304 (PR, 2025-12) work around an MSVC SFINAE bug when default-constructing `ErrorCondEnum` in
+  a constraint** — decide whether the constraint can be reformulated instead of worked around,
+  then land or close.
+
+### Features
+
+- **#164 structured bindings compatibility** — `[has_error, value, error] = func(...)`; the issue
+  already outlines the `tuple_size`/`tuple_element`/`get` specialisations it needs.
+- **#134 debug mode for detecting misuse at run time** — track at run time whether a `result` is
+  in its value or error state on the paths which would otherwise be UB.
+
+### Documentation
+
+- **#163 FAQ item: the differences to LEAF (`zajo.github.io/leaf`)** — the most-asked comparison.
+- **#187 another ASIO recipe** — a standard completion handler whose `&ec` is set on exit by a
+  `result` with a custom `NoValuePolicy`.
+- **#166 a script to transpose the function comments into the API reference docs** — makes the
+  doxygen reference maintainable from the header comments.
+- **#316 suggested README improvements** — scope and new-contributor clarity; the reporter has
+  supplied a rewritten structure.
+
+### New since the 2026-11-08 triage — triaged 2026-11-09
+
+Only two items appeared in any of the four repositories after the 2026-11-08 sweep (llfio,
+quickcpplib and kerneltest were unchanged): issue #325 and its pull request #326.
+
+- **[P0] #325 (bug, 2026-11-09) `test/tests/cabi-layout.cpp` does not compile on any 32-bit target**
+  — `struct two_field_16 { intptr_t a, b; };` is 8 bytes where `intptr_t` is 4 bytes, so the
+  retained `static_assert(sizeof(two_field_16) == 16)` at `test/tests/cabi-layout.cpp:94` fires before
+  the ABI matrix can run. Verified present on `develop`; introduced by 4385184843 ("make the C ABI
+  hold"). **Priority P0 by owner decision (2026-11-09):** the tree is red for every 32-bit consumer —
+  the entire unit-test target fails to compile, not just the one row, so `develop` cannot be tested or
+  packaged on i386/ARMv7/wasm32-class targets at all, and the test it breaks is precisely the C-ABI
+  shape check those targets most need. Measured against the usual "does shipped code misbehave" test
+  this would be P1, and that is how it was first triaged; the owner rated a red build on a supported
+  target class above that distinction. Nothing is red in CI only because no lane builds 32-bit
+  (`unittests_linux.yml`, `_windows.yml`, `_macos.yml` matrixes are all 64-bit), which is why this
+  went unnoticed — and is itself the coverage gap worth closing. Not raised by the 2026-11-08/09
+  review run either; that reviewed the tree on x86_64 only.
+  - abi: fix — PR #326 takes `int64_t` for both fields, which is the right repair: 16 bytes on both
+    32- and 64-bit targets, still an actual 16-byte value type in the matrix row, and the assertion
+    and the pointer-sized error-code uses elsewhere are untouched. Its own caveat is that the full
+    suite was not run. **Applied as eaf87a558f** (PR authorship preserved) with one added comment
+    recording that the row is fixed-width on purpose, so a later tidy-up cannot reintroduce it.
+  - ci: fix — the reason this survived is that every lane built where `intptr_t` is 8 bytes.
+    `unittests_linux.yml` gained a `Linux-32bit` job (ubuntu-22.04, `g++-multilib`, `-m32` via the
+    new `cmake/toolchain-linux-32bit.cmake`), added to `publish-test-results`'s `needs` so its
+    results are published like the others. **Landed as 68a1835be9**, not yet pushed, so it has never
+    run: the first observation of it is the first CI run after the push. Follow-up worth considering:
+    `abi_stability.yml` still dumps only the host architecture, so the C-ABI comparison itself
+    remains 64-bit-only.
+
+<!-- inbound-from-github end -->

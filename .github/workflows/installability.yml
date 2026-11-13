@@ -20,7 +20,17 @@ jobs:
         # runner images no longer carry that version - setup-python answers
         # "The version '3.8' with architecture 'x64' was not found" on Ubuntu
         # 26.04. windows-2019 is excluded for the old reason: paths too long.
-        os: [ubuntu-24.04, macos-14]
+        #
+        # macos-15, because GitHub retired the macos-14 image on 2 November 2026
+        # (actions/runner-images#13518). A job on a retired label does not fail
+        # with an error the way a broken build does: it ends as *cancelled*, with
+        # no runner assigned and no steps run, which reads like flaky
+        # infrastructure and invites a re-run that also cancels. Three runs of this
+        # workflow spent 12-13 November that way while every other job in them
+        # passed. `unittests_macos.yml` had already moved to macos-15, which is
+        # what makes that lane a working reference for the same commits. Same class
+        # of defect as the register's P2 about boostify's macos-12 pin.
+        os: [ubuntu-24.04, macos-15]
     env:
       NAME: Install-${{ matrix.os }}
     runs-on: ${{ matrix.os }}

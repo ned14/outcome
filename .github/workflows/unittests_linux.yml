@@ -216,9 +216,110 @@ jobs:
         else
           echo "::error::$log was never written: the failing step never reached tee(1), so there is nothing to annotate"
         fi
+  # A 32-bit lane, added because there was none: #325 was a 16-byte ABI shape
+  # asserted over two intptr_t fields, which is 8 bytes wherever pointers are 4,
+  # so the whole unit-test target failed to compile on every 32-bit target and
+  # nothing noticed - every lane built where intptr_t is 8 bytes. Keep this lane
+  # cheap and ordinary: it is the target class that is unusual, not the build.
+  Linux-32bit:
+    name: Ubuntu 22.04 (32-bit -m32)
+    runs-on: ubuntu-22.04
+    env:
+      NAME: Linux-g++-32bit
+      CXX: g++
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: true
+        fetch-depth: 0
+
+    - name: Fetch the submodules the build reads
+      shell: bash
+      run: |
+       set -o pipefail
+       if ! git submodule update --init include/outcome/experimental/status-code include/outcome/experimental/wg14_result 2>&1 | tee submodules.log; then
+         tail -5 submodules.log | sed -e 's/%/%25/g' -e 's/^/::error::git submodule update: /'
+         exit 1
+       fi
+
+    # g++-multilib is what makes -m32 linkable at all: it brings the 32-bit
+    # libstdc++ and libgcc, without which the configure succeeds and every link
+    # fails with a 64-bit archive. The runner is x86_64 and its kernel runs
+    # 32-bit binaries natively, so nothing else is needed - no i386 container.
+    - name: Install the 32-bit multilib toolchain
+      shell: bash
+      run: |
+        set -o pipefail
+        sudo apt-get update
+        sudo apt-get install -y g++-multilib
+
+    - name: CMake tests Linux (32-bit)
+      shell: bash
+      run: |
+        set -o pipefail
+        ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-32bit.cmake" 2>&1 | tee ci.log
+
+    # This lane builds the C++ side of the WG14 ABI (test/tests/cabi-layout.cpp,
+    # which pins the C++ result against the C struct). The pure C compilation of
+    # the same header lives in the wg14_result submodule, whose test tree this
+    # repository does not build - so compile it here, with the same -m32, or the C
+    # half of a dual-language ABI is the half with no 32-bit coverage. The header
+    # has already shipped one 32-bit-only defect that only a `-m32` build could
+    # see, so both languages are exercised rather than the one CMake happens to
+    # give us. The standards probed are the ones the submodule's own CMakeLists
+    # uses, including C23 only where the compiler has it.
+    - name: Compile and run the WG14 layout matrix as C, 32-bit
+      shell: bash
+      run: |
+        set -o pipefail
+        inc=include/outcome/experimental/wg14_result/include
+        src=include/outcome/experimental/wg14_result/test/layout_test.c
+        for std in c11 c17 c2x; do
+          if ! gcc -m32 -std=$std -fsyntax-only -x c /dev/null 2>/dev/null; then
+            echo "$std is not a mode this gcc has; skipped" | tee -a wg14-c32.log
+            continue
+          fi
+          gcc -m32 -std=$std -Wall -Wextra -Wpedantic -I "$inc" "$src" \
+            -o "layout_test_$std" 2>&1 | tee -a wg14-c32.log
+          "./layout_test_$std" 2>&1 | tee -a wg14-c32.log
+        done
+        g++ -m32 -std=c++11 -Wall -Wextra -Wpedantic -I "$inc" \
+          include/outcome/experimental/wg14_result/test/layout_test_cxx.cpp \
+          -o layout_test_cxx11_32 2>&1 | tee -a wg14-c32.log
+        ./layout_test_cxx11_32 2>&1 | tee -a wg14-c32.log
+
+    # The job log lives on storage this project's own tooling cannot reach, so the
+    # first errors are re-emitted as workflow commands: those become check-run
+    # annotations, which are readable through the API.
+    - name: Annotate the errors
+      if: failure()
+      shell: bash
+      run: |
+        set +e
+        for log in ci.log wg14-c32.log; do
+        if [ -f "$log" ]; then
+          emit() { sed -e 's/%/%25/g' -e 's/\r$//' | sed 's/^/::error::/'; }
+          {
+            grep -iE 'NOT PASSED' "$log" | head -2
+            grep -iE 'not run|unable to find executable|tests failed out of|The following tests FAILED|% tests passed' "$log" | head -3
+            grep -iE 'error:|error C[0-9]{3,4}:|error LNK[0-9]{4}|LNK[0-9]{4}|unresolved external|undefined (reference|symbol)|fatal error|static assertion failed' "$log" | head -3
+            grep -iE -A4 'CMake Error' "$log" | grep -viE '^--$|^-- Performing Test|CMake(Error|Output)\.log' | head -3
+            tail -1 "$log"
+          } | awk '!seen[$0]++' | head -10 | emit
+        else
+          echo "::error::$log was never written: the failing step never reached tee(1), so there is nothing to annotate"
+        fi
+        done
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v7
+      with:
+        name: Linux 32-bit test results
+        path: prebuilt/merged_junit_results.xml
+
   publish-test-results:
     name: "Publish Unit Tests Results"
-    needs: [Linux]
+    needs: [Linux, Linux-32bit]
     runs-on: ubuntu-latest
     if: success() || failure()
 
