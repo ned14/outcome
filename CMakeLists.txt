@@ -33,7 +33,9 @@ if(NOT OUTCOME_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
   endif()
 endif()
 set(OUTCOME_DEPENDENCY_STATUS_CODE_GIT_TAG "master" CACHE STRING "Which git tag to use for the status-code dependency")
-option(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE "Whether to bundle an embedded copy of SG14 status-code with Outcome. Used by various package managers such as vcpkg." ON)
+option(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE
+       "Whether to bundle an embedded copy of SG14 status-code with Outcome. Used by various package managers such as vcpkg."
+       ON)
 
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
@@ -47,11 +49,36 @@ project(outcome VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE)
 
+# The embedded subrepos must be populated BEFORE QuickCppLibSetupProject scans
+# include/ for ${PROJECT_NAME}_HEADERS, or their headers never enter the header
+# list and a fresh clone installs without them. That is exactly what the
+# quickcpplib dependency superbuild does: it clones with GIT_SUBMODULES "",
+# configures, and gets an Outcome whose install set holds no
+# include/outcome/experimental/status-code/include/status-code/ at all, so every
+# consumer asking for SG14 status_code fails to compile with
+# "status-code/system_error2.hpp: No such file or directory".
+# ensure_git_subrepo warns and returns rather than failing when git is missing,
+# so FindGit has to have run by the time we get here.
+include(FindGit)
+option(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE
+       "Whether to bundle an embedded copy of SG14 status-code with Outcome. Used by various package managers such as vcpkg."
+       ON)
+option(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT
+       "Whether to bundle an embedded copy of wg14_result with Outcome. Used by various package managers such as vcpkg."
+       ON)
+if(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE)
+  ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status-code/include"
+                     "https://github.com/ned14/status-code.git")
+endif()
+if(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT)
+  ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/wg14_result/include"
+                     "https://github.com/ned14/wg14_result.git")
+endif()
+
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
 
 option(OUTCOME_BUNDLE_EMBEDDED_QUICKCPPLIB "Whether to bundle an embedded copy of QuickCppLib with Outcome. Used by various package managers such as vcpkg." OFF)
-option(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT "Whether to bundle an embedded copy of wg14_result with Outcome. Used by various package managers such as vcpkg." ON)
 option(OUTCOME_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that Outcome is fully working. Used by various package managers such as vcpkg." OFF)
 option(OUTCOME_ENABLE_CXX_MODULES "Whether to enable the building of an Outcome C++ module" OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the unit tests")
@@ -101,9 +128,7 @@ else()
     IS_HEADER_ONLY
   )
 endif()
-if(OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE)
-  ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/status-code/include" "https://github.com/ned14/status-code.git")
-else()
+if(NOT OUTCOME_BUNDLE_EMBEDDED_STATUS_CODE)
   find_quickcpplib_library(status-code
     GIT_REPOSITORY "https://github.com/ned14/status-code.git"
     GIT_TAG "${OUTCOME_DEPENDENCY_STATUS_CODE_GIT_TAG}"
@@ -112,9 +137,7 @@ else()
   )
   list_filter(${PROJECT_NAME}_HEADERS EXCLUDE REGEX include/outcome/experimental/status-code/)
 endif()
-if(OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT)
-  ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/outcome/experimental/wg14_result/include" "https://github.com/ned14/wg14_result.git")
-else()
+if(NOT OUTCOME_BUNDLE_EMBEDDED_WG14_RESULT)
   # The option had no else() branch, so turning it OFF changed nothing: the
   # vendored wg14 headers stayed in the interface and install sets and were still
   # used (P1). Mirror the status-code branch above: drop them from the header
