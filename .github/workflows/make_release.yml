@@ -74,14 +74,19 @@ jobs:
           BOOSTORG_OUTCOME_DEPLOY_KEY: ${{ secrets.BOOSTORG_OUTCOME_DEPLOY_KEY }}
         shell: bash
         run: |
+         HAS_DEPLOY_KEY='';
          if [ -n "$BOOSTORG_OUTCOME_DEPLOY_KEY" ] && [ "${{ steps.waitforstatuschecks.outputs.status }}" = "success" ]; then
            mkdir -p $HOME/.ssh;
            printf "%s" "$BOOSTORG_OUTCOME_DEPLOY_KEY" > "$HOME/.ssh/id_ed25519";
            chmod -R og-rwx $HOME/.ssh;
-           unset HAS_DEPLOY_KEY;
            HAS_DEPLOY_KEY='true';
          fi
-         echo ::set-output name=HAS_DEPLOY_KEY::${HAS_DEPLOY_KEY}
+         # `::set-output` was retired by GitHub, and when it stopped working this step
+         # silently stopped setting the output: every step gated on
+         # `steps.vars.outputs.HAS_DEPLOY_KEY` was skipped forever while the run stayed
+         # green. $GITHUB_OUTPUT is the supported transport; the `if:` gates below must
+         # keep working if it is ever changed again, which is what the guard below checks.
+         echo "HAS_DEPLOY_KEY=${HAS_DEPLOY_KEY}" >> "$GITHUB_OUTPUT"
 
       - name: Get Hugo
         if: steps.vars.outputs.HAS_DEPLOY_KEY
@@ -197,3 +202,27 @@ jobs:
           else
             echo "::error::$log was never written: the step failed before it reached tee(1), so there is nothing to annotate"
           fi
+
+      # `skipped` must never read as success. The two ways this job has lied about the
+      # boostorg mirror are: (a) the step-output transport breaks and every gated step is
+      # silently skipped, (b) the key is never extracted although the secret is present
+      # and all checks passed. Both are detected here, without needing `secrets` in an
+      # `if:` expression.
+      - name: Check the deploy-key handoff
+        if: always()
+        shell: bash
+        env:
+          HAS_DEPLOY_KEY: ${{ steps.vars.outputs.HAS_DEPLOY_KEY }}
+          BOOSTORG_OUTCOME_DEPLOY_KEY: ${{ secrets.BOOSTORG_OUTCOME_DEPLOY_KEY }}
+          CHECKS_STATUS: ${{ steps.waitforstatuschecks.outputs.status }}
+        run: |
+         set -eu
+         if [ -f "$HOME/.ssh/id_ed25519" ] && [ "${HAS_DEPLOY_KEY}" != "true" ]; then
+           echo "::error::a deploy key was written but HAS_DEPLOY_KEY is not 'true', so every step gated on it was skipped: the step-output transport is broken"
+           exit 1
+         fi
+         if [ -n "${BOOSTORG_OUTCOME_DEPLOY_KEY}" ] && [ "${CHECKS_STATUS}" = "success" ] && [ "${HAS_DEPLOY_KEY}" != "true" ]; then
+           echo "::error::the deploy key secret is present and all checks passed, but the boostorg conversion was skipped (HAS_DEPLOY_KEY='${HAS_DEPLOY_KEY}')"
+           exit 1
+         fi
+         echo "deploy-key handoff ok (HAS_DEPLOY_KEY='${HAS_DEPLOY_KEY}', checks='${CHECKS_STATUS}')"
